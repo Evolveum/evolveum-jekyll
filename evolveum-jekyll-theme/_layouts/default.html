@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+
+{%- include head.html -%}
+
+<body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
+
+    <div id="overlayer"></div>
+    <div class="loader">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
+
+    <div class="site-wrap">
+
+{%- include header.html -%}
+
+        <div class="site-blocks-cover overlay" style="background-image: url(/assets/images/hero_2.jpg);" data-aos="fade" id="home-section">
+
+
+            <div class="container">
+                <div class="row align-items-center justify-content-center">
+                    <div class="col-md-8 mt-lg-5 text-center">
+{{ content }}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+{%- include footer.html -%}
+
+    </div>
+
+</body>
+
+</html>
