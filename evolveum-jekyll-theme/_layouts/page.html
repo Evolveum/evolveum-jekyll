@@ -5,6 +5,14 @@ layout: default
 <div class="row">
     <div class="col">
         <h1>{{ page.title | escape }}</h1>
-{{ content }}
+
+        {% if page.toc %}
+        <div class="toc-{{page.toc}}">
+            <title>Table of Contents</title>
+            {{ page.document | tocify_asciidoc }}
+        </div>
+        {% endif %}
+
+        {{ content }}
     </div>
 </div>
