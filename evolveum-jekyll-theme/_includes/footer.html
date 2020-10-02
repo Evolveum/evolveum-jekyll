@@ -1,6 +1,40 @@
-<footer class="py-2 bg-dark">
-  <div class="container">
-    <p class="m-0 text-center text-white">Copyright &copy; 2011-{{ site.time | date: '%Y' }}</p>
-    <!-- <p>{{ site.description | escape }}</p> -->
+<footer class="page-footer bg-dark text-white pt-4 pb-4">
+  <div class="container-fluid text-center text-md-left">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="row justify-content-start">
+          <div class="col">
+            <object type="image/svg+xml" data="/assets/images/evolveum-logo.svg" class="logo-footer"></object>
+          </div>
+        </div>
+        <div class="row justify-content-start">
+          <div class="col footer-description">
+            {{ site.description | default: "Site description placeholder"}}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="footer-heading">Misc</div>
+        <ul class="list-unstyled footer-list">
+          <li><a href="#">Sitemap</a></li>
+          <li><a href="https://evolveum.com/about-us/">About us</a></li>
+          <li><a href="https://evolveum.com/about-us/contact-us/">Contact us</a></li>
+        </ul>
+      </div>
+      <div class="col-md-3">
+        <div class="footer-heading">Follow us</div>
+        <a href="https://evolveum.com/blog/" class="social"><i class="fas fa-rss"></i></a>
+        <a href="https://twitter.com/Evolveum" class="social"><i class="fab fa-twitter"></i></a>
+        <a href="https://www.facebook.com/evolveum" class="social"><i class="fab fa-facebook"></i></a>
+        <a href="https://www.linkedin.com/company/evolveum" class="social"><i class="fab fa-linkedin"></i></a>
+        <a href="https://www.youtube.com/channel/UCSDs8qBlv7MgRKRLu1rU_FQ" class="social"><i class="fab fa-youtube-square"></i></a>
+        <a href="https://www.instagram.com/evolveum_midpoint/" class="social"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+    <div>
+      <div class="col m-0 text-center copyright">
+        <a href="https://docs.evolveum.com/copyright/">Copyright &copy; 2011-{{ site.time | date: '%Y' }}</a>
+      </div>
+    </div>
   </div>
 </footer>
