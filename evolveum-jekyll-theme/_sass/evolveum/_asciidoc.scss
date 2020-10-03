@@ -1,89 +1,253 @@
-// --------- VARIABLES
+// MY
 
-// TODO: align with bootstrap
-$body-bg: white;
-$body-font-color: rgba(0,0,0,0.8);
-$body-font-family: "Noto Serif", "DejaVu Serif", serif;
-$header-font-family: "Open Sans", "DejaVu Sans", sans-serif;
-$header-font-weight: 300;
-$header-font-color: #ba3925;
-$header-line-height: 1.2;
-$header-top-margin: 1em;
-$header-word-spacing: -0.05em;
-$subheader-font-family: $body-font-family;
-$subheader-font-size: 1rem;
-$subheader-font-color: darken($header-font-color, 15%); // resolves to #7a2518
-$subheader-font-weight: normal;
-$subheader-font-style: italic;
-$panel-margin-bottom: emCalc(20px);
-$global-radius: 4px;
-$hr-border-style: solid;
+// Also for adminitions
 $blockquote-cite-font-color: rgba(0,0,0,0.6);
-
-$header-text-rendering: geometricPrecision;
-$subheader-text-rendering: $header-text-rendering !default;
-
-$table-border-size: 1px;
-$table-head-font-size: inherit;
-$table-row-font-size: inherit;
-$table-line-height: 1.6;
-$table-head-bg: #f7f8f7;
-$table-even-row-bg: #f8f8f7;
-$table-border-color: #dedede;
-$table-head-font-weight: normal;
-
-$paragraph-margin-bottom: emCalc(20px);
-$list-side-margin: emCalc(24px);
-$definition-list-content-margin-left: emCalc(18px) !default;
-$inline-list-bottom-margin: $paragraph-margin-bottom / 2;
-$inline-list-item-spacing: $paragraph-margin-bottom !default;
-
-$panel-padding: emCalc(20px);
-$panel-border-style: solid;
-$panel-border-size: 1px;
-$panel-function-factor: 10%;
-$panel-font-color: rgba(0,0,0,0.75);
-$panel-bg: #f8f8f7;
-
-$sidebar-header-align: center;
-$sidebar-header-border-style: solid !default;
-$sidebar-header-border-size: 0 !default;
-$sidebar-header-border-color: #ddd !default;
-
-$blockquote-border-color: #ddd !default;
-$blockquote-font-color: $body-font-color;
+$admonition-icon-color: $black;
+$blockquote-font-color: $black;
 $blockquote-cite-font-color: rgba(0,0,0,0.6);
-$blockquote-cite-font-size: emCalc(15px);
+$blockquote-cite-font-size: 1rem;
+$asciidoc-block-indent: 3rem;
 
-$code-border-size: 0 !default;
-$code-font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
-// NOTE will need to adjust code-font-size if we bump p font-size to 1.125em
-//$code-font-size: 0.95em;
-$code-font-size: emCalc(15px);
-$code-font-weight: normal;
-// FIXME don't forget about code in a table cell
-$code-line-height: 1.45;
-$code-color: rgba(0,0,0,0.9);
-$code-bg-color: #f7f7f8;
-$code-padding: 0.1em 0.5ex;
-$code-word-spacing: -0.15em;
-$code-text-rendering: optimizeSpeed;
+$paragraph-margin-bottom: 2rem;
 
-$pre-font-family: "Droid Sans Mono", "DejaVu Sans Mono", "Monospace", monospace;
-$pre-font-color: rgba(0,0,0,0.9);
-$pre-border-size: null;
-$pre-bg: #f7f7f8;
-$pre-padding: emCalc(16px);
-$pre-line-height: 1.45;
 
-$thumb-border-style: solid !default;
-$thumb-border-width: 4px !default;
-$thumb-border-color: #fff !default;
-$thumb-box-shadow: 0 0 0 1px #ddd !default;
+.admonitionblock > table {
+    border-collapse: separate;
+    border: 0;
+    background: none;
+    width: 100%;
 
-$include-asciidoc-role-classes: true !default;
+    td.content {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        color: $blockquote-cite-font-color;
+        border-left: 1px solid #dddddd;
 
-//--------- CUSTOM
+        > :last-child > :last-child {
+          margin-bottom: 0;
+        }
+    }
+
+    td.icon {
+        font-size: 1.75rem;
+        text-align: center;
+        width: 4rem;
+        color: $admonition-icon-color;
+        cursor: default;
+
+        .icon-note:before {
+          content: "\f05a";
+        }
+
+        .icon-tip:before {
+          content: "\f0eb";
+        }
+
+        .icon-warning:before {
+          content: "\f071";
+        }
+
+        .icon-caution:before {
+          content: "\f06d";
+        }
+
+        .icon-important:before {
+          content: "\f06a";
+        }
+
+    }
+}
+
+// Block indent
+.admonitionblock,
+.audioblock,
+.exampleblock,
+.imageblock,
+.listingblock,
+.literalblock,
+.stemblock,
+.openblock,
+.quoteblock,
+table.tableblock,
+.verseblock,
+.videoblock {
+    margin-left: $asciidoc-block-indent;
+}
+
+// Title for blocks and paragraphs
+.admonitionblock td.content,
+.audioblock,
+.exampleblock,
+.imageblock,
+.listingblock,
+.literalblock,
+.stemblock,
+.openblock,
+.paragraph,
+.quoteblock,
+table.tableblock,
+.verseblock,
+.videoblock,
+.dlist,
+.olist,
+.ulist,
+.qlist,
+.hdlist {
+
+    > .title {
+        text-align: left;
+        font-style: italic;
+        margin-bottom: 0.25rem;
+    }
+}
+
+
+.quoteblock {
+  margin: 1.5rem 1rem $paragraph-margin-bottom $asciidoc-block-indent;
+  display: table; // enables auto width
+  &:not(.excerpt) > .title {
+    margin-left: -1.5em;
+    margin-bottom: 0.75em;
+  }
+
+  blockquote, p {
+    color: $blockquote-font-color;
+    font-size: 1.15rem;
+    line-height: 1.75;
+    word-spacing: 0.1em;
+    letter-spacing: 0;
+    font-style: italic;
+    text-align: justify;
+  }
+
+  blockquote {
+    margin: 0;
+    padding: 0;
+    border: 0;
+
+    &:before {
+      content: "\201c";
+      float: left;
+      //font-size: 3em;
+      font-size: 2.75em;
+      font-weight: bold;
+      line-height: 0.6em; // use 0.67em if font-weight: normal
+      margin-left: -0.6em;
+      color: $blockquote-cite-font-color;
+      //text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    > .paragraph:last-child p {
+      margin-bottom: 0;
+    }
+  }
+
+  .attribution {
+    margin-top: 0.75em;
+    margin-right: 0.5ex;
+    text-align: right;
+  }
+}
+
+.verseblock {
+  //margin: 0 0.5em $paragraph-margin-bottom 0.5em;
+  margin: 0 1em $paragraph-margin-bottom 1em;
+  pre {
+    // FIXME make me a variable
+    font-family: "Open Sans", "DejaVu Sans", sans;
+    font-size: 1.15rem;
+    color: $blockquote-font-color;
+    font-weight: 300;
+    text-rendering: optimizeLegibility;
+    strong {
+      font-weight: 400;
+    }
+  }
+
+  .attribution {
+    margin-top: 1.25rem;
+    margin-left: 0.5ex;
+  }
+}
+
+.quoteblock,
+.verseblock {
+  .attribution {
+    font-size: $blockquote-cite-font-size;
+    line-height: 1.45;
+    font-style: italic;
+    br {
+      display: none;
+    }
+    cite {
+      display: block;
+      //letter-spacing: -0.05em;
+      letter-spacing: -0.025em;
+      color: $blockquote-cite-font-color;
+    }
+  }
+}
+
+.quoteblock {
+  &.abstract,
+  &.excerpt,
+  .quoteblock {
+    blockquote {
+      &:before {
+        display: none;
+      }
+    }
+
+    blockquote, p {
+      line-height: 1.6;
+      word-spacing: 0;
+    }
+  }
+
+  &.abstract {
+    margin: 0 1em $paragraph-margin-bottom 1em;
+    display: block;
+    > .title {
+      margin: 0 0 0.375em 0;
+      font-size: 1.15em;
+      text-align: center;
+    }
+  }
+
+  &.excerpt > blockquote,
+  .quoteblock {
+    padding: 0 0 0.25em 1em;
+    border-left: 0.25em solid $hr-border-color;
+  }
+
+  &.excerpt,
+  .quoteblock {
+    margin-left: 0;
+    blockquote, p {
+      //color: rgba(0, 0, 0, 0.6);
+      color: inherit;
+      font-size: 1.0625rem;
+    }
+    .attribution {
+      //color: rgba(0, 0, 0, 0.6);
+      color: inherit;
+      text-align: left;
+      margin-right: 0;
+    }
+  }
+}
+
+
+
+
+// trick to prevent caption from influencing width of an autowidth table
+table.tableblock.fit-content > caption.title {
+  white-space: nowrap;
+  width: 0;
+}
+
 
 .toc {
     border: 1px solid #e0e0e0;
@@ -155,6 +319,106 @@ span.blue {
 //         margin-top: 10px;
 //     }
 // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////// OLD: NEEDS WORK
+
+
+
+// --------- VARIABLES
+
+// TODO: align with bootstrap
+$body-bg: white;
+$body-font-color: rgba(0,0,0,0.8);
+$body-font-family: "Noto Serif", "DejaVu Serif", serif;
+$header-font-family: "Open Sans", "DejaVu Sans", sans-serif;
+$header-font-weight: 300;
+$header-font-color: #ba3925;
+$header-line-height: 1.2;
+$header-top-margin: 1em;
+$header-word-spacing: -0.05em;
+$subheader-font-family: $body-font-family;
+$subheader-font-size: 1rem;
+$subheader-font-color: darken($header-font-color, 15%); // resolves to #7a2518
+$subheader-font-weight: normal;
+$subheader-font-style: italic;
+$panel-margin-bottom: emCalc(20px);
+$global-radius: 4px;
+$hr-border-style: solid;
+
+$header-text-rendering: geometricPrecision;
+$subheader-text-rendering: $header-text-rendering !default;
+
+$table-border-size: 1px;
+$table-head-font-size: inherit;
+$table-row-font-size: inherit;
+$table-line-height: 1.6;
+$table-head-bg: #f7f8f7;
+$table-even-row-bg: #f8f8f7;
+$table-border-color: #dedede;
+$table-head-font-weight: normal;
+
+$list-side-margin: emCalc(24px);
+$definition-list-content-margin-left: emCalc(18px) !default;
+$inline-list-bottom-margin: $paragraph-margin-bottom / 2;
+$inline-list-item-spacing: $paragraph-margin-bottom !default;
+
+$panel-padding: emCalc(20px);
+$panel-border-style: solid;
+$panel-border-size: 1px;
+$panel-function-factor: 10%;
+$panel-font-color: rgba(0,0,0,0.75);
+$panel-bg: #f8f8f7;
+
+$sidebar-header-align: center;
+$sidebar-header-border-style: solid !default;
+$sidebar-header-border-size: 0 !default;
+$sidebar-header-border-color: #ddd !default;
+
+
+$code-border-size: 0 !default;
+$code-font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
+// NOTE will need to adjust code-font-size if we bump p font-size to 1.125em
+//$code-font-size: 0.95em;
+$code-font-size: emCalc(15px);
+$code-font-weight: normal;
+// FIXME don't forget about code in a table cell
+$code-line-height: 1.45;
+$code-color: rgba(0,0,0,0.9);
+$code-bg-color: #f7f7f8;
+$code-padding: 0.1em 0.5ex;
+$code-word-spacing: -0.15em;
+$code-text-rendering: optimizeSpeed;
+
+$pre-font-family: "Droid Sans Mono", "DejaVu Sans Mono", "Monospace", monospace;
+$pre-font-color: rgba(0,0,0,0.9);
+$pre-border-size: null;
+$pre-bg: #f7f7f8;
+$pre-padding: emCalc(16px);
+$pre-line-height: 1.45;
+
+$thumb-border-style: solid !default;
+$thumb-border-width: 4px !default;
+$thumb-border-color: #fff !default;
+$thumb-box-shadow: 0 0 0 1px #ddd !default;
+
+$include-asciidoc-role-classes: true !default;
+
+//--------- CUSTOM
+
 
 
 //
@@ -365,81 +629,7 @@ details,
   margin-bottom: $panel-margin-bottom;
 }
 
-.admonitionblock td.content,
-.audioblock,
-.exampleblock,
-.imageblock,
-.listingblock,
-.literalblock,
-.stemblock,
-.openblock,
-.paragraph,
-.quoteblock,
-table.tableblock,
-.verseblock,
-.videoblock,
-.dlist,
-.olist,
-.ulist,
-.qlist,
-.hdlist {
-  > .title {
-    //@extend %subheader;
-    text-rendering: $subheader-text-rendering;
-    text-align: left;
-    @if $subheader-font-family {
-      font-family: $subheader-font-family;
-    }
-    @if $subheader-font-size {
-      font-size: $subheader-font-size;
-    }
-    @if $subheader-font-style {
-      font-style: $subheader-font-style;
-    }
-  }
-}
 
-// trick to prevent caption from influencing width of an autowidth table
-table.tableblock.fit-content > caption.title {
-  white-space: nowrap;
-  width: 0;
-}
-
-.admonitionblock > table {
-  border-collapse: separate;
-  border: 0;
-  background: none; // FIXME this wouldn't be required if a background was set on table.tableblock and not table
-  width: 100%;
-  td.icon {
-    text-align: center;
-    // FIXME use ems!
-    width: 80px;
-    img {
-      max-width: none;
-    }
-    .title {
-      //font-weight: $header-font-weight;
-      font-weight: bold;
-      font-family: $header-font-family;
-      text-transform: uppercase;
-    }
-  }
-
-  td.content {
-    padding-left: emCalc(18px);
-    padding-right: emCalc(20px);
-    border-left: $hr-border-width $hr-border-style $hr-border-color;
-    // FIXME use $aside-font-color
-    color: $blockquote-cite-font-color;
-    // QUESTION use opacity instead of blockquote-cite-font-color?
-    //opacity: 0.75;
-
-    //> .paragraph:last-child > p {
-    > :last-child > :last-child {
-      margin-bottom: 0;
-    }
-  }
-}
 
 .exampleblock > .content {
   // FIXME add variable for $example-bg
@@ -630,141 +820,6 @@ pre.pygments .lineno {
   }
 }
 
-.quoteblock {
-  margin: 0 1em $paragraph-margin-bottom 1.5em;
-  display: table; // enables auto width
-  &:not(.excerpt) > .title {
-    margin-left: -1.5em;
-    margin-bottom: 0.75em;
-  }
-
-  blockquote, p {
-    color: $blockquote-font-color;
-    font-size: 1.15rem;
-    line-height: 1.75;
-    word-spacing: 0.1em;
-    letter-spacing: 0;
-    font-style: italic;
-    text-align: justify;
-  }
-
-  blockquote {
-    margin: 0;
-    padding: 0;
-    border: 0;
-
-    &:before {
-      content: "\201c";
-      float: left;
-      //font-size: 3em;
-      font-size: 2.75em;
-      font-weight: bold;
-      line-height: 0.6em; // use 0.67em if font-weight: normal
-      margin-left: -0.6em;
-      //color: $blockquote-cite-font-color;
-      color: $subheader-font-color;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    }
-
-    > .paragraph:last-child p {
-      margin-bottom: 0;
-    }
-  }
-
-  .attribution {
-    margin-top: 0.75em;
-    margin-right: 0.5ex;
-    text-align: right;
-  }
-}
-
-.verseblock {
-  //margin: 0 0.5em $paragraph-margin-bottom 0.5em;
-  margin: 0 1em $paragraph-margin-bottom 1em;
-  pre {
-    // FIXME make me a variable
-    font-family: "Open Sans", "DejaVu Sans", sans;
-    font-size: 1.15rem;
-    color: $blockquote-font-color;
-    font-weight: 300;
-    text-rendering: optimizeLegibility;
-    strong {
-      font-weight: 400;
-    }
-  }
-
-  .attribution {
-    margin-top: 1.25rem;
-    margin-left: 0.5ex;
-  }
-}
-
-.quoteblock,
-.verseblock {
-  .attribution {
-    font-size: $blockquote-cite-font-size;
-    line-height: 1.45;
-    font-style: italic;
-    br {
-      display: none;
-    }
-    cite {
-      display: block;
-      //letter-spacing: -0.05em;
-      letter-spacing: -0.025em;
-      color: $blockquote-cite-font-color;
-    }
-  }
-}
-
-.quoteblock {
-  &.abstract,
-  &.excerpt,
-  .quoteblock {
-    blockquote {
-      &:before {
-        display: none;
-      }
-    }
-
-    blockquote, p {
-      line-height: 1.6;
-      word-spacing: 0;
-    }
-  }
-
-  &.abstract {
-    margin: 0 1em $paragraph-margin-bottom 1em;
-    display: block;
-    > .title {
-      margin: 0 0 0.375em 0;
-      font-size: 1.15em;
-      text-align: center;
-    }
-  }
-
-  &.excerpt > blockquote,
-  .quoteblock {
-    padding: 0 0 0.25em 1em;
-    border-left: 0.25em solid $hr-border-color;
-  }
-
-  &.excerpt,
-  .quoteblock {
-    margin-left: 0;
-    blockquote, p {
-      //color: rgba(0, 0, 0, 0.6);
-      color: inherit;
-      font-size: 1.0625rem;
-    }
-    .attribution {
-      //color: rgba(0, 0, 0, 0.6);
-      color: inherit;
-      text-align: left;
-      margin-right: 0;
-    }
-  }
-}
 
 table.tableblock {
   max-width: 100%;
