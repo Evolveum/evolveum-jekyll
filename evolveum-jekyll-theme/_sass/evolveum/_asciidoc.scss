@@ -1,4 +1,6 @@
-// MY
+////
+// VARIABLES
+////
 
 // Also for adminitions
 $blockquote-cite-font-color: rgba(0,0,0,0.6);
@@ -6,19 +8,41 @@ $admonition-icon-color: $black;
 $blockquote-font-color: $black;
 $blockquote-cite-font-color: rgba(0,0,0,0.6);
 $blockquote-cite-font-size: 1rem;
-$asciidoc-block-indent: 3rem;
+$asciidoc-block-indent: 0rem;
 
 $paragraph-margin-bottom: 2rem;
 $box-radius: 3px;
 
 $pre-font-family: "Droid Sans Mono", "DejaVu Sans Mono", "Monospace", monospace;
-$pre-font-color: rgba(0,0,0,0.9);
+$pre-font-color: $body-color;
 $pre-border-size: 0px;
 $pre-border-style: solid;
 $pre-border-color: rgba(0,0,0,0.6);
 $pre-bg: #f7f7f8;
 $pre-padding: 0.5rem;
 $pre-line-height: 1.45;
+
+// Tables
+
+$table-head-font-size: inherit;
+$table-head-font-weight: normal;
+$table-head-font-color: $body-color !default;
+$table-head-background-color: whitesmoke;
+$table-row-font-size: inherit;
+$table-line-height: 1.6;
+$table-head-bg: #f7f8f7;
+$table-even-row-bg: #f8f8f7;
+$table-border-color: #dedede;
+$table-border-style: solid;
+$table-border-size: 1px;
+$table-padding: 0.5rem 0.625rem 0.625rem;
+$table-background: transparent;
+
+////
+// IMPLEMENTATION
+////
+
+// Adminitions, blocks
 
 .admonitionblock > table {
     border-collapse: separate;
@@ -111,6 +135,9 @@ table.tableblock,
         margin-bottom: 0.25rem;
     }
 }
+
+
+// Code and pre-formatted
 
 pre {
   color: $pre-font-color;
@@ -247,19 +274,170 @@ pre.prettyprint li:not(:first-child) code[data-lang]:before {
 
 
 
+// Tables
+
+table.tableblock {
+    max-width: 100%;
+    border-collapse: separate;
+    border-radius: $box-radius;
+
+    thead,
+    tbody,
+    tfoot {
+      border: $table-border-size $table-border-style $table-border-color;
+      background-color: $table-background;
+    }
+
+    // Caption
+    caption {
+      padding: $table-padding;
+      font-weight: bold;
+    }
+
+    // Table head and foot
+    thead, tfoot {
+        background: $table-head-background-color;
+        font-weight: $table-head-font-weight;
+        font-size: $table-head-font-size;
+
+        // Rows within head and foot
+        tr {
+            background: transparent;
+        }
+
+        // Cells within head and foot
+        th, td {
+            padding: $table-padding;
+            font-weight: normal;
+            text-align: left;
+        }
+    }
+
+    // Table rows
+    tbody {
+      th, td {
+        padding: $table-padding;
+      }
+    }
+}
+
+p.tableblock:last-child {
+  margin-bottom: 0;
+}
+
+// NOTE compensate for bottom margin on last block in AsciiDoc table cell
+td.tableblock > .content {
+  margin-bottom: $paragraph-margin-bottom;
+  > :last-child {
+    margin-bottom: -$paragraph-margin-bottom;
+  }
+}
+
+// NOTE .grid-* selectors must be defined before .frame-* selectors in order for styles to cascade properly
+table.tableblock, th.tableblock, td.tableblock {
+  border: 0 solid $table-border-color;
+}
+
+table.grid-all > thead > tr > .tableblock,
+table.grid-all > tbody > tr > .tableblock {
+  border-width: 0 $table-border-size $table-border-size 0;
+}
+
+table.grid-all > tfoot > tr > .tableblock {
+  border-width: $table-border-size $table-border-size 0 0;
+}
+
+table.grid-cols > * > tr > .tableblock {
+  border-width: 0 $table-border-size 0 0;
+}
+
+table.grid-rows > thead > tr > .tableblock,
+table.grid-rows > tbody > tr > .tableblock {
+  border-width: 0 0 $table-border-size 0;
+}
+
+table.grid-rows > tfoot > tr > .tableblock {
+  border-width: $table-border-size 0 0 0;
+}
+
+table.grid-all > * > tr > .tableblock:last-child,
+table.grid-cols > * > tr > .tableblock:last-child {
+  border-right-width: 0;
+}
+
+table.grid-all > tbody > tr:last-child > .tableblock,
+table.grid-all > thead:last-child > tr > .tableblock,
+table.grid-rows > tbody > tr:last-child > .tableblock,
+table.grid-rows > thead:last-child > tr > .tableblock {
+  border-bottom-width: 0;
+}
+
+table.frame-all {
+  border-width: $table-border-size;
+}
+
+table.frame-sides {
+  border-width: 0 $table-border-size;
+}
+
+table.frame-topbot, table.frame-ends {
+  border-width: $table-border-size 0;
+}
+
+table.stripes-all tr,
+table.stripes-odd tr:nth-of-type(odd),
+table.stripes-even tr:nth-of-type(even),
+table.stripes-hover tr:hover {
+  background: $table-even-row-bg;
+}
+
+// NOTE removing default stripes using script instead
+//table.stripes-none tr,
+//table.stripes-odd tr:nth-of-type(even),
+//table.stripes-even tr:nth-of-type(odd) {
+//  background: none;
+//}
+
+@each $halign in (left, right, center) {
+  th.halign-#{$halign},
+  td.halign-#{$halign} {
+    text-align: $halign;
+  }
+}
+
+@each $valign in (top, bottom, middle) {
+  th.valign-#{$valign},
+  td.valign-#{$valign} {
+    vertical-align: $valign;
+  }
+}
+
+// NOTE Fix required in Foundation, user-agent stylesheet is overriding
+table thead th,
+table tfoot th {
+  font-weight: $table-head-font-weight;
+}
+
+// vertical table header (content)
+tbody tr th,
+tfoot tr th {
+  &, p {
+    color: $table-head-font-color;
+    font-weight: $table-head-font-weight;
+  }
+}
+
+p.tableblock > code:only-child {
+  background: none;
+  padding: 0;
+}
+
+p.tableblock {
+  font-size: 1em;
+}
 
 
-
-
-
-
-
-
-
-
-
-
-
+// Quotes
 
 .quoteblock {
   margin: 1.5rem 1rem $paragraph-margin-bottom $asciidoc-block-indent;
@@ -554,15 +732,6 @@ $hr-border-style: solid;
 $header-text-rendering: geometricPrecision;
 $subheader-text-rendering: $header-text-rendering !default;
 
-$table-border-size: 1px;
-$table-head-font-size: inherit;
-$table-row-font-size: inherit;
-$table-line-height: 1.6;
-$table-head-bg: #f7f8f7;
-$table-even-row-bg: #f8f8f7;
-$table-border-color: #dedede;
-$table-head-font-weight: normal;
-
 $list-side-margin: emCalc(24px);
 $definition-list-content-margin-left: emCalc(18px) !default;
 $inline-list-bottom-margin: $paragraph-margin-bottom / 2;
@@ -818,172 +987,7 @@ details,
 }
 
 
-// overrides for built-in Pygments & Rouge styles
-table.linenotable {
-  border-collapse: separate;
-  border: 0;
-  margin-bottom: 0;
-  background: none; // FIXME this wouldn't be required if a background was set on table.tableblock and not table
-  td[class] {
-    color: inherit;
-    vertical-align: top;
-    padding: 0;
-    line-height: inherit;
-    white-space: normal; // NOTE we don't want whitespace in the table elements themselves to cause a problem
-  }
-  td {
-    &.code {
-      padding-left: 0.75em;
-    }
-    &.linenos {
-      border-right: 1px solid currentColor;
-      opacity: 0.35;
-      padding-right: 0.5em;
-    }
-  }
-}
 
-// NOTE pygments uses fixed-length line numbers (padded with spaces) in this case
-pre.pygments .lineno {
-  border-right: 1px solid currentColor;
-  opacity: 0.35;
-  display: inline-block;
-  margin-right: 0.75em; // NOTE margin-right should match padding-left of code in table linenum-mode
-  &:before {
-    content: "";
-    margin-right: -0.125em;
-  }
-}
-
-
-table.tableblock {
-  max-width: 100%;
-  border-collapse: separate;
-}
-
-p.tableblock:last-child {
-  margin-bottom: 0;
-}
-
-// NOTE compensate for bottom margin on last block in AsciiDoc table cell
-td.tableblock > .content {
-  margin-bottom: $paragraph-margin-bottom;
-  > :last-child {
-    margin-bottom: -$paragraph-margin-bottom;
-  }
-}
-
-// NOTE .grid-* selectors must be defined before .frame-* selectors in order for styles to cascade properly
-table.tableblock, th.tableblock, td.tableblock {
-  border: 0 solid $table-border-color;
-}
-
-table.grid-all > thead > tr > .tableblock,
-table.grid-all > tbody > tr > .tableblock {
-  border-width: 0 $table-border-size $table-border-size 0;
-}
-
-table.grid-all > tfoot > tr > .tableblock {
-  border-width: $table-border-size $table-border-size 0 0;
-}
-
-table.grid-cols > * > tr > .tableblock {
-  border-width: 0 $table-border-size 0 0;
-}
-
-table.grid-rows > thead > tr > .tableblock,
-table.grid-rows > tbody > tr > .tableblock {
-  border-width: 0 0 $table-border-size 0;
-}
-
-table.grid-rows > tfoot > tr > .tableblock {
-  border-width: $table-border-size 0 0 0;
-}
-
-table.grid-all > * > tr > .tableblock:last-child,
-table.grid-cols > * > tr > .tableblock:last-child {
-  border-right-width: 0;
-}
-
-table.grid-all > tbody > tr:last-child > .tableblock,
-table.grid-all > thead:last-child > tr > .tableblock,
-table.grid-rows > tbody > tr:last-child > .tableblock,
-table.grid-rows > thead:last-child > tr > .tableblock {
-  border-bottom-width: 0;
-}
-
-table.frame-all {
-  border-width: $table-border-size;
-}
-
-table.frame-sides {
-  border-width: 0 $table-border-size;
-}
-
-table.frame-topbot, table.frame-ends {
-  border-width: $table-border-size 0;
-}
-
-table.stripes-all tr,
-table.stripes-odd tr:nth-of-type(odd),
-table.stripes-even tr:nth-of-type(even),
-table.stripes-hover tr:hover {
-  background: $table-even-row-bg;
-}
-
-// NOTE removing default stripes using script instead
-//table.stripes-none tr,
-//table.stripes-odd tr:nth-of-type(even),
-//table.stripes-even tr:nth-of-type(odd) {
-//  background: none;
-//}
-
-@each $halign in (left, right, center) {
-  th.halign-#{$halign},
-  td.halign-#{$halign} {
-    text-align: $halign;
-  }
-}
-
-@each $valign in (top, bottom, middle) {
-  th.valign-#{$valign},
-  td.valign-#{$valign} {
-    vertical-align: $valign;
-  }
-}
-
-// NOTE Fix required in Foundation, user-agent stylesheet is overriding
-table thead th,
-table tfoot th {
-  font-weight: $table-head-font-weight;
-}
-
-// vertical table header (block)
-tbody tr th {
-  line-height: $table-line-height;
-  background: $table-head-bg;
-}
-
-// vertical table header (content)
-tbody tr th,
-tfoot tr th {
-  &, p {
-    font-weight: $table-head-font-weight;
-  }
-}
-
-p.tableblock > code:only-child {
-  background: none;
-  padding: 0;
-}
-
-p.tableblock {
-  font-size: 1em;
-}
-
-//td > div.verse {
-//  white-space: pre;
-//}
 
 // AsciiDoc list styles
 
