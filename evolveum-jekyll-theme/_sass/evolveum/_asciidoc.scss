@@ -9,7 +9,16 @@ $blockquote-cite-font-size: 1rem;
 $asciidoc-block-indent: 3rem;
 
 $paragraph-margin-bottom: 2rem;
+$box-radius: 3px;
 
+$pre-font-family: "Droid Sans Mono", "DejaVu Sans Mono", "Monospace", monospace;
+$pre-font-color: rgba(0,0,0,0.9);
+$pre-border-size: 0px;
+$pre-border-style: solid;
+$pre-border-color: rgba(0,0,0,0.6);
+$pre-bg: #f7f7f8;
+$pre-padding: 0.5rem;
+$pre-line-height: 1.45;
 
 .admonitionblock > table {
     border-collapse: separate;
@@ -102,6 +111,154 @@ table.tableblock,
         margin-bottom: 0.25rem;
     }
 }
+
+pre {
+  color: $pre-font-color;
+  font-family: $pre-font-family;
+  line-height: $pre-line-height;
+  padding-top: $pre-padding;
+  padding-bottom: $pre-padding;
+  padding-left: $pre-padding * 2;
+  padding-right: $pre-padding * 2;
+  // NOTE syntax highlighters may deeply nest both code and pre tags
+  code, pre {
+    // QUESTION what about background?
+    color: inherit;
+    font-size: inherit;
+    line-height: inherit;
+  }
+  > code {
+    display: block;
+  }
+}
+
+pre.nowrap,
+pre.nowrap pre {
+  white-space: pre;
+  //overflow-wrap: normal;
+  word-wrap: normal;
+}
+
+.exampleblock > .content,
+.sidebarblock > .content {
+  // FIXME argh, review!
+  > :last-child > :last-child,
+  .olist > ol > li:last-child > :last-child,
+  .ulist > ul > li:last-child > :last-child,
+  .qlist > ol > li:last-child > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+.literalblock pre,
+.listingblock > .content > pre {
+    border: $pre-border-size $pre-border-style $pre-border-color;
+    border-radius: $box-radius;
+    //overflow-wrap: break-word;
+    word-wrap: break-word;
+    // set overflow-x just in case content refuses to break
+    overflow-x: auto;
+    // screens below breakpoint
+    padding-top: $pre-padding;
+    padding-bottom: $pre-padding;
+    padding-left: $pre-padding * 2;
+    padding-right: $pre-padding * 2;
+    font-size: 1rem;
+}
+
+// NOTE if highlight class is absent or in first position, we know source highlighter is not active
+.literalblock pre,
+.listingblock > .content > pre:not(.highlight),
+.listingblock > .content > pre[class="highlight"],
+.listingblock > .content > pre[class^="highlight "] {
+  background: $pre-bg;
+}
+
+.literalblock.output pre {
+  // FIXME this doesn't work if pre-bg is an image!
+  color: $pre-bg;
+  background-color: $pre-font-color;
+}
+
+.listingblock > .content {
+  // give floating language text a place to drop anchor
+  position: relative;
+}
+
+.listingblock code[data-lang]:before {
+  display: none;
+  content: attr(data-lang);
+  position: absolute;
+  font-size: emCalc(12px);
+  //top: 0.5rem; // 0.67em
+  top: 0.425rem;
+  right: 0.5rem; // 0.67em
+  line-height: 1;
+  text-transform: uppercase;
+  color: inherit;
+  opacity: 0.5;
+}
+
+.listingblock:hover code[data-lang]:before {
+  display: block;
+}
+
+.listingblock.terminal pre .command:before {
+  content: attr(data-prompt);
+  padding-right: 0.5em;
+  color: inherit;
+  opacity: 0.5;
+}
+
+.listingblock.terminal pre .command:not([data-prompt]):before {
+  content: "$";
+}
+
+// overrides for built-in prettify styles
+@if not $pre-border-size {
+  .listingblock pre.prettyprint {
+    border-width: 0;
+  }
+}
+
+// NOTE set the lowest priority background color in case prettify style doesn't provide one
+.prettyprint {
+  background: $pre-bg;
+}
+
+pre.prettyprint .linenums {
+  line-height: $pre-line-height;
+  margin-left: 2em;
+}
+
+pre.prettyprint li {
+  background: none;
+  list-style-type: inherit;
+  padding-left: 0;
+}
+
+pre.prettyprint li code[data-lang]:before {
+  opacity: 1;
+}
+
+pre.prettyprint li:not(:first-child) code[data-lang]:before {
+  display: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 .quoteblock {
@@ -251,7 +408,7 @@ table.tableblock.fit-content > caption.title {
 
 .toc {
     border: 1px solid #e0e0e0;
-    border-radius: 3px;
+    border-radius: $box-radius;
     background-color: #f8f8f8;
     margin-right: 20px;
     margin-bottom: 20px;
@@ -322,6 +479,42 @@ span.blue {
 
 
 
+// Circled highlights
+.conum[data-value] {
+  display: inline-block;
+  color: #fff !important;
+  background: rgba(0,0,0,.8);
+  -webkit-border-radius: 1em;
+  border-radius: 1em;
+  text-align: center;
+  font-size: .75em;
+  width: 1.67em;
+  height: 1.67em;
+  line-height: 1.67em;
+  font-family: "Open Sans", "DejaVu Sans", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+}
+.conum[data-value] * {
+  color: #fff !important;
+}
+.conum[data-value] + b {
+  display: none;
+}
+.conum[data-value]::after {
+  content: attr(data-value);
+}
+pre .conum[data-value] {
+  position: relative;
+  top: -.125em;
+}
+b.conum * {
+  color: inherit !important;
+}
+.conum:not([data-value]):empty {
+  display: none;
+}
+
 
 
 
@@ -356,7 +549,6 @@ $subheader-font-color: darken($header-font-color, 15%); // resolves to #7a2518
 $subheader-font-weight: normal;
 $subheader-font-style: italic;
 $panel-margin-bottom: emCalc(20px);
-$global-radius: 4px;
 $hr-border-style: solid;
 
 $header-text-rendering: geometricPrecision;
@@ -403,12 +595,6 @@ $code-padding: 0.1em 0.5ex;
 $code-word-spacing: -0.15em;
 $code-text-rendering: optimizeSpeed;
 
-$pre-font-family: "Droid Sans Mono", "DejaVu Sans Mono", "Monospace", monospace;
-$pre-font-color: rgba(0,0,0,0.9);
-$pre-border-size: null;
-$pre-bg: #f7f7f8;
-$pre-padding: emCalc(16px);
-$pre-line-height: 1.45;
 
 $thumb-border-style: solid !default;
 $thumb-border-width: 4px !default;
@@ -427,13 +613,6 @@ $include-asciidoc-role-classes: true !default;
 
 // @mixins
 //
-// We use this to control border radius.
-// $radius - Default: $global-radius || 4px
-@mixin radius($radius:$global-radius) {
-  @if $radius {
-    border-radius: $radius;
-  }
-}
 
 @mixin panel($bg:$panel-bg, $padding:$panel-padding, $adjust:$panel-header-adjust) {
 
@@ -502,9 +681,6 @@ object, svg {
   @if $code-border-size != 0 {
     border: $code-border-size $code-border-style $code-border-color;
   }
-  @if $code-bg-color != inherit or $code-border-size != 0 {
-    @include radius;
-  }
   //text-shadow: none;
   line-height: $code-line-height;
   @if $code-text-rendering != inherit {
@@ -524,32 +700,6 @@ object, svg {
   }
 }
 
-pre {
-  color: $pre-font-color;
-  font-family: $pre-font-family;
-  //font-weight: $pre-font-weight;
-  line-height: $pre-line-height;
-  @if $code-text-rendering != inherit {
-    text-rendering: $code-text-rendering;
-  }
-  // NOTE syntax highlighters may deeply nest both code and pre tags
-  code, pre {
-    // QUESTION what about background?
-    color: inherit;
-    font-size: inherit;
-    line-height: inherit;
-  }
-  > code {
-    display: block;
-  }
-}
-
-pre.nowrap,
-pre.nowrap pre {
-  white-space: pre;
-  //overflow-wrap: normal;
-  word-wrap: normal;
-}
 
 .keyseq {
   color: lighten($body-font-color, 20%);
@@ -563,7 +713,7 @@ kbd {
   line-height: 1.45;
   background-color: #f7f7f7;
   border: 1px solid #ccc;
-  @include radius(3px);
+  border-radius: $box-radius;
   @include box-shadow(0 1px 0 rgba(0,0,0,0.2), 0 0 0 0.1em white inset);
   margin: 0 0.15em;
   padding: 0.2em 0.5em;
@@ -634,7 +784,7 @@ details,
 .exampleblock > .content {
   // FIXME add variable for $example-bg
   @include panel($body-bg, $panel-padding, false);
-  @include radius;
+  border-radius: $box-radius;
   //> :last-child > :last-child,
   //// argh, review!
   //.olist > ol > li:last-child > :last-child,
@@ -646,7 +796,7 @@ details,
 
 .sidebarblock {
   @include panel(darken($panel-bg, 2%), $panel-padding, false);
-  @include radius;
+  border-radius: $box-radius;
 
   > .content {
     > .title {
@@ -667,121 +817,6 @@ details,
   }
 }
 
-.exampleblock > .content,
-.sidebarblock > .content {
-  // FIXME argh, review!
-  > :last-child > :last-child,
-  .olist > ol > li:last-child > :last-child,
-  .ulist > ul > li:last-child > :last-child,
-  .qlist > ol > li:last-child > :last-child {
-    margin-bottom: 0;
-  }
-}
-
-.literalblock pre,
-.listingblock > .content > pre {
-  @if $pre-border-size {
-    border: $pre-border-size $pre-border-style $pre-border-color;
-  }
-  // FIXME make border radius on listing blocks configurable!
-  @include radius;
-  //overflow-wrap: break-word;
-  word-wrap: break-word;
-  // set overflow-x just in case content refuses to break
-  overflow-x: auto;
-  // screens below breakpoint
-  padding: $pre-padding;
-  font-size: 1rem;
-}
-
-// NOTE if highlight class is absent or in first position, we know source highlighter is not active
-.literalblock pre,
-.listingblock > .content > pre:not(.highlight),
-.listingblock > .content > pre[class="highlight"],
-.listingblock > .content > pre[class^="highlight "] {
-  background: $pre-bg;
-}
-
-.literalblock.output pre {
-  // FIXME this doesn't work if pre-bg is an image!
-  color: $pre-bg;
-  background-color: $pre-font-color;
-}
-
-.listingblock > .content {
-  // give floating language text a place to drop anchor
-  position: relative;
-}
-
-.listingblock code[data-lang]:before {
-  display: none;
-  content: attr(data-lang);
-  position: absolute;
-  font-size: emCalc(12px);
-  //top: 0.5rem; // 0.67em
-  top: 0.425rem;
-  right: 0.5rem; // 0.67em
-  line-height: 1;
-  text-transform: uppercase;
-  color: inherit;
-  opacity: 0.5;
-}
-
-.listingblock:hover code[data-lang]:before {
-  display: block;
-}
-
-.listingblock.terminal pre .command:before {
-  content: attr(data-prompt);
-  padding-right: 0.5em;
-  color: inherit;
-  opacity: 0.5;
-}
-
-.listingblock.terminal pre .command:not([data-prompt]):before {
-  content: "$";
-}
-
-// highlight.js themes put bg on <code>, so shift padding
-.listingblock pre.highlightjs {
-  padding: 0;
-  > code {
-    padding: $pre-padding;
-    // FIXME make border radius on listing blocks configurable!
-    @include radius;
-  }
-}
-
-// overrides for built-in prettify styles
-@if not $pre-border-size {
-  .listingblock pre.prettyprint {
-    border-width: 0;
-  }
-}
-
-// NOTE set the lowest priority background color in case prettify style doesn't provide one
-.prettyprint {
-  background: $pre-bg;
-}
-
-pre.prettyprint .linenums {
-  line-height: $pre-line-height;
-  margin-left: 2em;
-}
-
-pre.prettyprint li {
-  background: none;
-  list-style-type: inherit;
-  padding-left: 0;
-}
-
-pre.prettyprint li code[data-lang]:before {
-  opacity: 1;
-}
-
-pre.prettyprint li:not(:first-child) code[data-lang]:before {
-  display: none;
-}
 
 // overrides for built-in Pygments & Rouge styles
 table.linenotable {
