@@ -50,3 +50,15 @@ $theme-colors: (
     "dark":       $dark
 );
 
+
+$separator-line-color: rgba($light, 0.1);
+
+// Dark footer settings
+//$footer-color = $white;
+//$footer-background-color = $dark;
+//$footer-logo-filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(150%);
+
+// White footer settings
+$footer-color: $light;
+$footer-background-color: transparent;
+$footer-logo-filter: saturate(0%) opacity(60%);

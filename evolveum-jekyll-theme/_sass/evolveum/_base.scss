@@ -1,21 +1,30 @@
 nav {
-    border-bottom: 1px solid rgba($light, 0.2);
+    border-bottom: 1px solid $separator-line-color;
 }
 
 .navbar-brand {
     font-size: 1.75rem;
 }
 
-.logo-footer {
+// FOOTER
+
+.footer-logo {
     display: inline-block;
     vertical-align: middle;
     width: 170px;
     background-size: cover;
-    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(150%);
+    filter: $footer-logo-filter;
 }
 
 .page-footer {
+    color: $footer-color;
+    background-color: $footer-background-color;
     margin-top: 2rem;
+    border-top: 1px solid $separator-line-color !important;
+
+    .footer-body {
+        padding-bottom: 1.25rem;
+    }
 
     .footer-heading {
         font-size: x-large;
@@ -23,7 +32,7 @@ nav {
     }
 
     .footer-description {
-        color: rgba($white, 0.7);
+        color: rgba($footer-color, 0.7);
     }
 
     .footer-list {
@@ -31,7 +40,7 @@ nav {
     }
 
     a {
-        color: rgba($white, 0.7);
+        color: rgba($footer-color, 0.7);
     }
 
     .social {
@@ -39,7 +48,7 @@ nav {
     }
 
     .copyright {
-        padding-top: 1.5rem;
-        border-top: 1px solid rgba($white, 0.1) !important;
+        padding-top: 1.25rem;
+        border-top: 1px solid $separator-line-color !important;
     }
 }
