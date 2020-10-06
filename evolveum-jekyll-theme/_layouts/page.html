@@ -3,7 +3,14 @@ layout: default
 ---
 
 <div class="row">
-    <div class="col">
+    <div class="col-3">
+        <div class="navtree">
+            {% navtree %}
+        </div>
+    </div>
+    <div class="col-9">
+        <nav aria-label="breadcrumb">{% breadcrumbs %}</nav>
+
         <h1>{{ page.title | escape }}</h1>
 
         {% if page.toc %}

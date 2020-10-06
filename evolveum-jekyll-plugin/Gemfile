@@ -3,6 +3,4 @@
 source "https://ruby.evolveum.com"
 gemspec
 
-gem "evolveum-jekyll-plugin"
-gem "jekyll-asciidoc"
-gem "coderay"
+gem "jekyll"

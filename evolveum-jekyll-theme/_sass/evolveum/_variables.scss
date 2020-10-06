@@ -1,3 +1,7 @@
+///////////////////////////
+// BOOTSTRAP variables
+///////////////////////////
+
 // Fonts
 $font-family-sans-serif:      'Roboto', 'Open Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
 
@@ -49,6 +53,25 @@ $theme-colors: (
     "light":      $light,
     "dark":       $dark
 );
+
+
+$breadcrumb-font-size:              0.75rem;
+
+$breadcrumb-padding-y:              0rem;
+$breadcrumb-padding-x:              0rem;
+$breadcrumb-item-padding:           .25rem;
+
+$breadcrumb-margin-bottom:          1rem;
+
+$breadcrumb-bg:                     transparent;
+$breadcrumb-divider-color:          $gray-600 !default;
+$breadcrumb-active-color:           $gray-600 !default;
+$breadcrumb-divider:                quote("/") !default;
+
+
+///////////////////////////
+// EVOLVEUM variables
+///////////////////////////
 
 
 $separator-line-color: rgba($light, 0.1);

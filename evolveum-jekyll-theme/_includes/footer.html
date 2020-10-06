@@ -1,7 +1,7 @@
 <footer class="page-footer pt-4 pb-4">
   <div class="container-fluid text-center text-md-left">
     <div class="row footer-body">
-      <div class="col-md-3">
+      <div class="col-md-4">
         <div class="row justify-content-start">
           <div class="col">
             <object type="image/svg+xml" data="/assets/images/evolveum-logo.svg" class="footer-logo"></object>
@@ -13,15 +13,23 @@
           </div>
         </div>
       </div>
-      <div class="col-md-6">
-        <div class="footer-heading">Misc</div>
+      <div class="col-md-2">
+        <div class="footer-heading">{{ site.shortname | default: "Site" }}</div>
         <ul class="list-unstyled footer-list">
-          <li><a href="#">Sitemap</a></li>
+          <li><a href="/sitemap/">Sitemap</a></li>
+          <li><a href="/about/">About the site</a></li>
+          <li><a href="/copyright/">Copyright</a></li>
+        </ul>
+      </div>
+      <div class="col-md-2">
+        <div class="footer-heading">Evolveum</div>
+        <ul class="list-unstyled footer-list">
+          <li><a href="https://evolveum.com/services/">Services</a></li>
           <li><a href="https://evolveum.com/about-us/">About us</a></li>
           <li><a href="https://evolveum.com/about-us/contact-us/">Contact us</a></li>
         </ul>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-4">
         <div class="footer-heading">Follow us</div>
         <a href="https://evolveum.com/blog/" class="social"><i class="fas fa-rss"></i></a>
         <a href="https://twitter.com/Evolveum" class="social"><i class="fab fa-twitter"></i></a>
