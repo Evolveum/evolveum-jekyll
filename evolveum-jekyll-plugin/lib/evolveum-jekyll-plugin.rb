@@ -150,28 +150,45 @@ module Evolveum
         end
 
         def dive(s, topnode, level, currentPageUrl, currentPageSlugs)
-            node = topnode.subnodes.find { |nav| nav.slug == currentPageSlugs[level] }
-            if (node == nil) then return end
-            s << node.indent(level * 2 + 1)
-            s << "<ul>\n"
-            append_li_label_start(s, node, currentPageUrl, level * 2 + 2)
-            if (node.url == currentPageUrl)
-                if (node.subnodes.empty?)
-                    # We would like to display subnodes, but there are none
-                    s << "</li>\n"
-                else
-                    # Display immediate subnodes under current node
-                    append_subnodes(s, node, level * 2 + 3)
-                    s << node.indent(level * 2 + 2)
-                    s << "</li>\n"
+            if topnode.subnodes.any? { |nav| nav.active?(currentPageUrl) }
+                # We have active node at this level.
+                # Therefore we want to list the whole level
+                s << topnode.indent(level * 2 + 1)
+                s << "<ul>\n"
+                topnode.subnodes.each do |node|
+                    append_li_label_start(s, node, currentPageUrl, level * 2 + 2)
+                    if (node.active?(currentPageUrl))
+                        if (node.subnodes.empty?)
+                            # We would like to display subnodes, but there are none
+                            s << "</li>\n"
+                        else
+                            # Display immediate subnodes under current node
+                            append_subnodes(s, node, level * 2 + 3)
+                            s << node.indent(level * 2 + 2)
+                            s << "</li>\n"
+                        end
+                    else
+                        dive(s, node, level + 1, currentPageUrl, currentPageSlugs)
+                        s << node.indent(level * 2 + 2)
+                        s << "</li>\n"
+                    end
                 end
+                s << topnode.indent(level * 2 + 1)
+                s << "</ul>\n"
             else
+                # Active node is not on this level.
+                # Display just a single "slug" that lies on the way down and dive deeper.
+                node = topnode.subnodes.find { |nav| nav.slug == currentPageSlugs[level] }
+                if (node == nil) then return end
+                s << node.indent(level * 2 + 1)
+                s << "<ul>\n"
+                append_li_label_start(s, node, currentPageUrl, level * 2 + 2)
                 dive(s, node, level + 1, currentPageUrl, currentPageSlugs)
                 s << node.indent(level * 2 + 2)
                 s << "</li>\n"
+                s << node.indent(level * 2 + 1)
+                s << "</ul>\n"
             end
-            s << node.indent(level * 2 + 1)
-            s << "</ul>\n"
         end
 
         def append_subnodes(s, topnode, indent)
@@ -187,7 +204,7 @@ module Evolveum
 
         def append_li_label_start(s, node, currentPageUrl, indent)
             s << node.indent(indent)
-            if (node.url == currentPageUrl)
+            if (node.active?(currentPageUrl))
                 s << '<li class="active">'
             else
                 s << "<li>"
@@ -300,6 +317,10 @@ module Evolveum
                 breadcrumbs << nav
             end
             breadcrumbs
+        end
+
+        def active?(currentPageUrl)
+            @url != nil && @url == currentPageUrl
         end
 
     end

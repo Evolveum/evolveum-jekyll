@@ -1,0 +1,27 @@
+Navigation
+==========
+
+* Sorting
+
+* Visibility
+  * visible (normal)
+  * ??? (not in nav, but present in sitemap.xml, e.g. presentation pdf)
+  * hidden (not in nav, not in sitemap.xml)
+
+* Automatic page for "stub" index.html
+
+* Liquid tag to list children nodes
+
+* (optional) Short list of children page at the bottom of page?
+
+
+Misc
+====
+
+* Fix exercise layout
+
+
+Documentation
+=============
+
+* Page layouts (page, default, exercise)
