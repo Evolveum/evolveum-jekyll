@@ -2,13 +2,55 @@ h1 {
     margin-bottom: 2rem;
 }
 
+// NAVBAR
 
 nav.navbar {
     border-bottom: 1px solid $separator-line-color;
 }
 
+
+// NAVTREE
+
+.navtree {
+    list-style: none;
+
+    li {
+        list-style: none;
+        color: $navbar-light-color;
+    }
+
+    li > a {
+            color: $navbar-light-color;
+    }
+
+    li.active {
+        list-style: none;
+        color: $navbar-light-active-color;
+    }
+
+    li.active > a {
+        color: $navbar-light-active-color;
+    }
+
+    ul {
+        // deeper-level nodes
+        // We them indented, but just a little. We want to fit in long labels.
+        padding-left: 1.5rem;
+    }
+
+    > ul {
+        // top-level nodes, we want it closer to margin
+        padding-left: 0.5rem;
+    }
+
+}
+
 .navbar-brand {
     font-size: 1.75rem;
+}
+
+.breadcrumb-item > a {
+    color: $navbar-light-color;
 }
 
 // FOOTER
