@@ -4,9 +4,12 @@ Navigation
 * Sorting
 
 * Visibility
-  * visible (normal)
-  * ??? (not in nav, but present in sitemap.xml, e.g. presentation pdf)
-  * hidden (not in nav, not in sitemap.xml)
+  * visible: (normal)
+  * system: system object, not in nav, not in any sitemap
+  * data: (not in nav, but present in sitemap.xml, e.g. presentation pdf)
+  * auxiliary: Auxiliary or helper page, page for special purpose, but still public (not in nav, but present in sitemap.xml, e.g. presentation pdf)
+  * draft: do not publish yet (not in any nav, not in any sitemap)
+  * hidden: we do not want to publish this (not in any nav, not in any sitemap)
 
 * Automatic page for "stub" index.html
 

@@ -16,6 +16,8 @@ nav.navbar {
 
     li {
         list-style: none;
+        padding-left: 1rem;
+        text-indent: -1rem;
         color: $navbar-light-color;
     }
 
@@ -25,6 +27,8 @@ nav.navbar {
 
     li.active {
         list-style: none;
+        padding-left: 1rem;
+        text-indent: -1rem;
         color: $navbar-light-active-color;
     }
 
@@ -35,7 +39,7 @@ nav.navbar {
     ul {
         // deeper-level nodes
         // We them indented, but just a little. We want to fit in long labels.
-        padding-left: 1.5rem;
+        padding-left: 0.5rem;
     }
 
     > ul {

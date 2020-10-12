@@ -127,7 +127,7 @@ module Evolveum
 
             s = StringIO.new
             s << "<ul>\n"
-            navtree.subnodes.each do |topnode|
+            navtree.visible_subnodes.each do |topnode|
                 append_li_label_start(s, topnode, currentPageUrl, 1)
                 if (topnode.subnodes.empty?)
                     s << "</li>\n"
@@ -150,12 +150,12 @@ module Evolveum
         end
 
         def dive(s, topnode, level, currentPageUrl, currentPageSlugs)
-            if topnode.subnodes.any? { |nav| nav.active?(currentPageUrl) }
+            if topnode.visible_subnodes.any? { |nav| nav.active?(currentPageUrl) }
                 # We have active node at this level.
                 # Therefore we want to list the whole level
                 s << topnode.indent(level * 2 + 1)
                 s << "<ul>\n"
-                topnode.subnodes.each do |node|
+                topnode.visible_subnodes.each do |node|
                     append_li_label_start(s, node, currentPageUrl, level * 2 + 2)
                     if (node.active?(currentPageUrl))
                         if (node.subnodes.empty?)
@@ -178,7 +178,7 @@ module Evolveum
             else
                 # Active node is not on this level.
                 # Display just a single "slug" that lies on the way down and dive deeper.
-                node = topnode.subnodes.find { |nav| nav.slug == currentPageSlugs[level] }
+                node = topnode.visible_subnodes.find { |nav| nav.slug == currentPageSlugs[level] }
                 if (node == nil) then return end
                 s << node.indent(level * 2 + 1)
                 s << "<ul>\n"
@@ -204,6 +204,9 @@ module Evolveum
 
         def append_li_label_start(s, node, currentPageUrl, indent)
             s << node.indent(indent)
+            s << "<!--"
+            s << node.display_order.to_s
+            s << "-->"
             if (node.active?(currentPageUrl))
                 s << '<li class="active">'
             else
@@ -217,7 +220,7 @@ module Evolveum
 
     class Nav
         attr_reader :subnodes, :slug
-        attr_accessor :url, :title
+        attr_accessor :url, :title, :visibility, :display_order
 
         def initialize(slug)
             @subnodes = []
@@ -238,7 +241,12 @@ module Evolveum
         def index_page(page)
             nav = index_path(page.url)
             nav.url = page.url
-            nav.title = page.data['title']
+            nav.title = page.data['nav-title'] || page.data['title']
+            nav.visibility = page.data['visibility'] || "visible"
+            nav.display_order = page.data['display-order'].to_i
+            if (nav.display_order == 0)
+                nav.display_order = 100
+            end
         end
 
         def index_path(url)
@@ -290,8 +298,12 @@ module Evolveum
             end
         end
 
+        def label
+            (@title == nil || @title.empty?) ? @slug : @title
+        end
+
         def label_encoded
-            ((@title == nil || @title.empty?) ? @slug : @title ).encode(:xml => :text)
+            label.encode(:xml => :text)
         end
 
         def append_label_link(s)
@@ -321,6 +333,23 @@ module Evolveum
 
         def active?(currentPageUrl)
             @url != nil && @url == currentPageUrl
+        end
+
+        def visible?
+            @visibility == "visible"
+        end
+
+        def <=> other
+            order = self.display_order <=> other.display_order
+            if (order == 0)
+                self.label.downcase <=> other.label.downcase
+            else
+                order
+            end
+        end
+
+        def visible_subnodes
+            subnodes.select{ |node| node.visible? }.sort
         end
 
     end
