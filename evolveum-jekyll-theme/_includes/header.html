@@ -11,8 +11,9 @@
       </li>
       {% endfor %}
     </ul>
-    <form class="form-inline mt-2 mt-md-0">
-      <input class="form-control form-control-sm mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+    <form class="form-inline mt-2 mt-md-0" method="get" id="search" action="https://duckduckgo.com/">
+      <input type="hidden" name="sites" value="{{ site.fqdn }}"/>
+      <input class="form-control form-control-sm mr-sm-2" type="text" name="q" placeholder="Search" aria-label="Search">
       <button class="btn btn-outline-secondary btn-sm my-2 my-sm-0" type="submit">Search</button>
     </form>
   </div>
