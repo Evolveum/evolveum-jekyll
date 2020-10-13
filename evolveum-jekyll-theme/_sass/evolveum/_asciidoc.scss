@@ -9,6 +9,7 @@ $blockquote-font-color: $black;
 $blockquote-cite-font-color: rgba(0,0,0,0.6);
 $blockquote-cite-font-size: 1rem;
 $asciidoc-block-indent: 0rem;
+$asciidoc-block-margin-bottom: 2rem;
 
 $paragraph-margin-bottom: 2rem;
 $box-radius: 3px;
@@ -107,6 +108,7 @@ table.tableblock,
 .verseblock,
 .videoblock {
     margin-left: $asciidoc-block-indent;
+    margin-bottom: $asciidoc-block-margin-bottom;
 }
 
 // Title for blocks and paragraphs
