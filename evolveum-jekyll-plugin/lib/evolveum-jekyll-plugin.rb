@@ -1,54 +1,22 @@
 module Evolveum
 
-    class SiteDumpGenerator < Jekyll::Generator
+    class StubGenerator < Jekyll::Generator
         priority :low
 
         def generate(site)
-            site.pages << SiteDumpPage.new(site, site.source, 'misc')
-        end
-
-    end
-
-    class SiteDumpPage < Jekyll::Page
-
-        def initialize(site, base, dir)
             @site = site
-            @base = base
-            @dir  = dir
-            @name = 'sitedump.html'
-
-            self.process(@name)
-            self.read_yaml(File.join(base, '_layouts'), 'sitedump.html')
-            self.data['title'] = "Site dump"
-            self.data['foo'] = "BAR"
-
-            self.data['navtree'] = site.data['nav']
-
-#             navtree = []
-#
-#             site.pages.each do |page|
-#                 index_page(navtree, page)
-#             end
-#
-#             self.data['navtree'] = navtree
+            site.data['nav'].stubs.each do |nav|
+                puts "Generating stub #{nav.url}"
+                site.pages << stub(nav)
+            end
         end
 
-
-    end
-
-    # Experimental, diag
-    class NavTag < Liquid::Tag
-
-        def initialize(tag_name, text, tokens)
-          super
-          @text = text
-        end
-
-        def render(context)
-            site = context['site']
-            page = context['page']
-            navtree = site['data']['nav']
-            navtree.pretty_print
+        def stub(nav)
+            stub = Jekyll::PageWithoutAFile.new(@site, __dir__, nav.url, "index.html")
+            stub.content = File.read(File.join(__dir__, 'stub.html'))
+            stub.data["layout"] = "page"
+            stub.data['title'] = nav.slug
+            stub
         end
     end
 
@@ -76,10 +44,11 @@ module Evolveum
                 nav.append_label_link(s)
                 s << "</li>\n"
             end
-            if (!nav.subnodes.empty?)
+            presentable_subnodes = nav.presentable_subnodes
+            if (!presentable_subnodes.empty?)
                 s << nav.indent(indent + 1)
                 s << "<ul>\n"
-                nav.subnodes.each do |subnode|
+                presentable_subnodes.each do |subnode|
                     sitemap_indent(s, subnode, indent + 2)
                 end
                 s << nav.indent(indent + 1)
@@ -127,7 +96,7 @@ module Evolveum
 
             s = StringIO.new
             s << "<ul>\n"
-            navtree.visible_subnodes.each do |topnode|
+            navtree.presentable_subnodes.each do |topnode|
                 append_li_label_start(s, topnode, currentPageUrl, 1)
                 if (topnode.subnodes.empty?)
                     s << "</li>\n"
@@ -150,12 +119,12 @@ module Evolveum
         end
 
         def dive(s, topnode, level, currentPageUrl, currentPageSlugs)
-            if topnode.visible_subnodes.any? { |nav| nav.active?(currentPageUrl) }
+            if topnode.presentable_subnodes.any? { |nav| nav.active?(currentPageUrl) }
                 # We have active node at this level.
                 # Therefore we want to list the whole level
                 s << topnode.indent(level * 2 + 1)
                 s << "<ul>\n"
-                topnode.visible_subnodes.each do |node|
+                topnode.presentable_subnodes.each do |node|
                     append_li_label_start(s, node, currentPageUrl, level * 2 + 2)
                     if (node.active?(currentPageUrl))
                         if (node.subnodes.empty?)
@@ -178,7 +147,7 @@ module Evolveum
             else
                 # Active node is not on this level.
                 # Display just a single "slug" that lies on the way down and dive deeper.
-                node = topnode.visible_subnodes.find { |nav| nav.slug == currentPageSlugs[level] }
+                node = topnode.presentable_subnodes.find { |nav| nav.slug == currentPageSlugs[level] }
                 if (node == nil) then return end
                 s << node.indent(level * 2 + 1)
                 s << "<ul>\n"
@@ -194,7 +163,7 @@ module Evolveum
         def append_subnodes(s, topnode, indent)
             s << topnode.indent(indent)
             s << "<ul>\n"
-            topnode.subnodes.each do |node|
+            topnode.presentable_subnodes.each do |node|
                 append_li_label_start(s, node, nil, indent + 1)
                 s << "</li>\n"
             end
@@ -218,9 +187,32 @@ module Evolveum
     end
 
 
+    class ChildrenTag < Liquid::Tag
+
+        def initialize(tag_name, text, tokens)
+          super
+          @text = text
+        end
+
+        def render(context)
+            navtree = context['site']['data']['nav']
+            s = StringIO.new
+            s << '<ul class="children">'
+            children = navtree.children(context['page']['url'])
+            children.each do |child|
+                s << '<li class="children-item">'
+                child.append_label_link(s)
+                s << '</li>'
+            end
+            s << '</ul>'
+            s.string
+        end
+    end
+
+
     class Nav
         attr_reader :subnodes, :slug
-        attr_accessor :url, :title, :visibility, :display_order
+        attr_accessor :url, :title, :visibility, :display_order, :page
 
         def initialize(slug)
             @subnodes = []
@@ -232,21 +224,30 @@ module Evolveum
         def self.construct(site)
             navtree = Evolveum::Nav.new(nil)
             site.pages.each do |page|
-                puts("  url=#{page.url}")
-                navtree.index_page(page)
+                nav = navtree.index_page(page)
+                #puts("  [C] #{nav.url}: #{nav.title}")
             end
             return navtree
+        end
+
+        def update(site)
+            site.pages.each do |page|
+                nav = index_page(page)
+                #puts("  [U] #{nav.url}: #{nav.title}")
+            end
         end
 
         def index_page(page)
             nav = index_path(page.url)
             nav.url = page.url
+            nav.page = page
             nav.title = page.data['nav-title'] || page.data['title']
             nav.visibility = page.data['visibility'] || "visible"
             nav.display_order = page.data['display-order'].to_i
             if (nav.display_order == 0)
                 nav.display_order = 100
             end
+            nav
         end
 
         def index_path(url)
@@ -331,6 +332,45 @@ module Evolveum
             breadcrumbs
         end
 
+        def children(url)
+            slugs = slugize(url)
+            nav = self
+            slugs.each do |slug|
+                nav = nav.resolve(slug)
+            end
+            nav.presentable_subnodes
+        end
+
+        def stubs
+            stubs = []
+            collect_stubs(stubs, [])
+            stubs
+        end
+
+        def collect_stubs(stubs, slugs)
+            subnodes.each do |subnode|
+                if (subnode.stub?)
+                    subnode.generate_url_if_needed(slugs)
+                    stubs << subnode
+                end
+                subnode.collect_stubs(stubs, slugs + [ subnode.slug ])
+            end
+        end
+
+        def generate_url_if_needed(slugs)
+            if (@url == nil)
+                if (slugs.empty?)
+                    @url = '/' + slug
+                else
+                    @url = '/' + slugs.join('/') + '/' + slug
+                end
+            end
+        end
+
+        def stub?
+            @page == nil
+        end
+
         def active?(currentPageUrl)
             @url != nil && @url == currentPageUrl
         end
@@ -348,7 +388,7 @@ module Evolveum
             end
         end
 
-        def visible_subnodes
+        def presentable_subnodes
             subnodes.select{ |node| node.visible? }.sort
         end
 
@@ -356,12 +396,17 @@ module Evolveum
 
 end
 
-Liquid::Template.register_tag('nav', Evolveum::NavTag)
 Liquid::Template.register_tag('sitemap', Evolveum::SitemapTag)
 Liquid::Template.register_tag('breadcrumbs', Evolveum::BreadcrumbsTag)
 Liquid::Template.register_tag('navtree', Evolveum::NavtreeTag)
+Liquid::Template.register_tag('children', Evolveum::ChildrenTag)
+
+Jekyll::Hooks.register :site, :post_read do |site|
+    #puts "=========[ EVOLVEUM ]============== post_read #{site}"
+    site.data['nav'] = Evolveum::Nav.construct(site)
+end
 
 Jekyll::Hooks.register :site, :pre_render do |site|
-    puts "=========[ EVOLVEUM ]============== pre_render #{site}"
-    site.data['nav'] = Evolveum::Nav.construct(site)
+    #puts "=========[ EVOLVEUM ]============== pre_render #{site}"
+    site.data['nav'].update(site)
 end

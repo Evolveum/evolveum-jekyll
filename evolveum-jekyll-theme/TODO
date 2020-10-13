@@ -1,9 +1,27 @@
 Navigation
 ==========
 
-* Sorting
+* (optional) Expanded/collapsed marker for non-leaf nodes
 
-* Visibility
+* (optional) Short list of children page at the bottom of page?
+
+* (later) sitemap.xml
+
+Documentation
+=============
+
+* Installing Jekyll
+* building evolveum gems
+
+* Front matter
+* Asciidoc: page attributes
+
+* Page layouts (page, default, exercise)
+
+* Sorting DONE
+  * display-order (defalut: 100)
+
+* Visibility DONE
   * visible: (normal)
   * system: system object, not in nav, not in any sitemap
   * data: (not in nav, but present in sitemap.xml, e.g. presentation pdf)
@@ -11,20 +29,12 @@ Navigation
   * draft: do not publish yet (not in any nav, not in any sitemap)
   * hidden: we do not want to publish this (not in any nav, not in any sitemap)
 
-* Automatic page for "stub" index.html
+* title and nav-title
 
 * Liquid tag to list children nodes
 
-* (optional) Short list of children page at the bottom of page?
+* Automatic page for "stub" index.html
+  * How to create minimal index.html for hidden subtree
 
-
-Misc
-====
-
-* Fix exercise layout
-
-
-Documentation
-=============
-
-* Page layouts (page, default, exercise)
+* Best practice:
+  * foo.adoc vs foo/index.adoc
