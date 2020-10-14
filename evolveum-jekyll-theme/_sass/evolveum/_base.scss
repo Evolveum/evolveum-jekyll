@@ -57,6 +57,11 @@ nav.navbar {
     color: $navbar-light-color;
 }
 
+
+main {
+    margin-bottom: 2rem;
+}
+
 // FOOTER
 
 .footer-logo {
@@ -74,7 +79,7 @@ nav.navbar {
     border-top: 1px solid $separator-line-color !important;
 
     .footer-body {
-        padding-bottom: 1.25rem;
+        // padding-bottom: 1.25rem;
     }
 
     .footer-heading {
@@ -99,7 +104,7 @@ nav.navbar {
     }
 
     .copyright {
-        padding-top: 1.25rem;
+        padding-top: 0.5rem;
         border-top: 1px solid $separator-line-color !important;
     }
 }
