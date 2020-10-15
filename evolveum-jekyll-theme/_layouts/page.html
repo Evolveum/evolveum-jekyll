@@ -12,6 +12,7 @@ layout: default
         <nav aria-label="breadcrumb">{% breadcrumbs %}</nav>
 
         <h1>{{ page.title | escape }}</h1>
+        {% if page.author %}<address class="author" rel="author">{{ page.author }}</address>{% endif %}
 
         {% if page.toc %}
         <div class="toc-{{page.toc}}">
