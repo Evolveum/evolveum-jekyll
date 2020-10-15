@@ -1,5 +1,27 @@
+# (C) 2020 Evolveum
+#
+# Evolveum Jekyll Plugin
+#
+# This plugin is used to implement various Jekyll functionality for Evolveum sites.
+# It mostly deals with navigation, sitemap and similar things that cannot be done by
+# exiting Jekyll plugins.
+#
+# This plugin is designed to work with Evolveum Jekyll theme.
+#
+# The basic idea:
+#
+# Navigation tree is built from Jekyll pages in :post_read and :pre_render hooks.
+# The tree is a hierarchical structure of instances of Nav class.
+# The tree represents the hierarchy of pages as Jekyll knows them.
+# The tree is then used by other code to create navigation panel, breadcrumbs, list of child pages, etc.
+
+
+
 module Evolveum
 
+    ##
+    # Page generator.
+    # Generates stub pages for URLs that do not have their own pages.
     class StubGenerator < Jekyll::Generator
         priority :low
 
@@ -12,7 +34,11 @@ module Evolveum
         end
 
         def stub(nav)
+            # WARNING: Magic follows.
+            # We create new "virtual" page using PageWithoutAFile class.
+            # This page has no source file, we will explicitly read the content from stub.html "template"
             stub = Jekyll::PageWithoutAFile.new(@site, __dir__, nav.url, "index.html")
+            # The "stub.html" template is in the gem, in the same dir as this source code (hence __dir__)
             stub.content = File.read(File.join(__dir__, 'stub.html'))
             stub.data["layout"] = "page"
             stub.data['title'] = nav.slug
@@ -20,7 +46,12 @@ module Evolveum
         end
     end
 
-    # Sitemap page (long hierarchical list of all pages)
+    ##
+    # Sitemap Liquid tag (long hierarchical list of all pages)
+    #
+    # This is a code for {% sitemap %} Liquid tag.
+    # This tag is not used on ordinary pages.
+    # It is usually used on a dedicated sitemap.html page.
     class SitemapTag < Liquid::Tag
 
         def initialize(tag_name, text, tokens)
@@ -58,7 +89,11 @@ module Evolveum
 
     end
 
-
+    ##
+    # Breadcrumbs Liquid tag.
+    #
+    # This is a code for {% breadcrumbs %} Liquid tag.
+    # This tag renders a short list of breadcrumbs from current page to the top.
     class BreadcrumbsTag < Liquid::Tag
 
         def initialize(tag_name, text, tokens)
@@ -82,6 +117,13 @@ module Evolveum
     end
 
 
+    ##
+    # Navigation tree Liguid tag.
+    #
+    # This is a code for {% navtree %} Liquid tag.
+    # It rendets navigation tree suitable for navigation panel.
+    # This tree is "dynamic", it is sensitive to what current page is.
+    # The part of the tree that leads to current page is expanded, as are tree branches around it.
     class NavtreeTag < Liquid::Tag
 
         def initialize(tag_name, text, tokens)
@@ -186,7 +228,11 @@ module Evolveum
 
     end
 
-
+    ##
+    # Children Liquid tag (list of child pages)
+    #
+    # This is a code for {% children %} liquid tag.
+    # It lists child pages of a current page.
     class ChildrenTag < Liquid::Tag
 
         def initialize(tag_name, text, tokens)
@@ -210,6 +256,12 @@ module Evolveum
     end
 
 
+    ##
+    # Navigation tree node.
+    #
+    # Navigation tree is a hierarchy of Nav nodes.
+    # Subnodes of each node are stored in subnodes field.
+    # Each node is identified by "slug", which is one part of the URL hierarchy.
     class Nav
         attr_reader :subnodes, :slug
         attr_accessor :url, :title, :visibility, :display_order, :page
@@ -396,10 +448,27 @@ module Evolveum
 
 end
 
+# Registering custom Liquid tags with Jekyll
+
 Liquid::Template.register_tag('sitemap', Evolveum::SitemapTag)
 Liquid::Template.register_tag('breadcrumbs', Evolveum::BreadcrumbsTag)
 Liquid::Template.register_tag('navtree', Evolveum::NavtreeTag)
 Liquid::Template.register_tag('children', Evolveum::ChildrenTag)
+
+# Hooks to build the Nav tree.
+#
+# The tree is built in two passes.
+#
+# :post_read is first pass.
+# At the time Jekyll knows about all the pages, but it does not have complete information.
+# E.g. some page titles may be missing.
+# However, we need to build basic Nav tree this early in the Jekyll build,
+# because we need to generate stub pages.
+# Therefore we need at least a basic Nav tree at the time when page generators are run.
+#
+# :pre_render is second run.
+# Jekyll should have complete information about the pages now.
+# We update the tree at this point, to have correct page titles later when the pages are rendered.
 
 Jekyll::Hooks.register :site, :post_read do |site|
     #puts "=========[ EVOLVEUM ]============== post_read #{site}"
