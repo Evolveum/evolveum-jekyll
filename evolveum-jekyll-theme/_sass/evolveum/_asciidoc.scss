@@ -415,8 +415,8 @@ table.stripes-hover tr:hover {
 }
 
 // NOTE Fix required in Foundation, user-agent stylesheet is overriding
-table thead th,
-table tfoot th {
+table.tableblock thead th,
+table.tableblock tfoot th {
   font-weight: $table-head-font-weight;
 }
 
