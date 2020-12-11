@@ -13,6 +13,7 @@ layout: default
 
         <h1>{{ page.title | escape }}</h1>
         {% if page.author %}<address class="author" rel="author">{{ page.author }}</address>{% endif %}
+        {% if page.lastModificationDate %}<div class="page-meta">Last modified {{ page.lastModificationDate | date: "%d %b %Y %H:%M %Z" }}</div>{% endif %}
 
         {% if page.toc %}
         <div class="toc-{{page.toc}}">

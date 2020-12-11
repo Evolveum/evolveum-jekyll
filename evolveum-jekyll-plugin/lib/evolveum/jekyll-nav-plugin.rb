@@ -1,9 +1,9 @@
 # (C) 2020 Evolveum
 #
-# Evolveum Jekyll Plugin
+# Evolveum Navigation Plugin for Jekyll
 #
-# This plugin is used to implement various Jekyll functionality for Evolveum sites.
-# It mostly deals with navigation, sitemap and similar things that cannot be done by
+# This plugin is used to implement navigation functionality for Evolveum Jekyll sites.
+# It deals with navigation, sitemap and similar things that cannot be done by
 # exiting Jekyll plugins.
 #
 # This plugin is designed to work with Evolveum Jekyll theme.
@@ -14,7 +14,6 @@
 # The tree is a hierarchical structure of instances of Nav class.
 # The tree represents the hierarchy of pages as Jekyll knows them.
 # The tree is then used by other code to create navigation panel, breadcrumbs, list of child pages, etc.
-
 
 
 module Evolveum
