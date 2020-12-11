@@ -24,8 +24,13 @@ module Evolveum
             lastModDate = nil
             if page.path != nil && File.exists?(page.path)
                 dateString = git("log -1 --pretty='format:%ci' '#{page.path}'")
-                if dateString != nil
-                    lastModDate = DateTime.parse(dateString)
+                if dateString != nil && !dateString.empty?
+                    begin
+                        lastModDate = DateTime.parse(dateString)
+                    rescue Date::Error => e
+                        STDERR.puts("Error parsing last modification date \"#{dateString}\" for file #{page.path}: #{e}")
+                        lastModDate = nil
+                    end
                     page.data['lastModificationDate'] = lastModDate
                 end
             end
