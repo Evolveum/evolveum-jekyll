@@ -218,7 +218,7 @@ pre.nowrap pre {
   display: none;
   content: attr(data-lang);
   position: absolute;
-  font-size: emCalc(12px);
+  font-size: 1.2rem;
   //top: 0.5rem; // 0.67em
   top: 0.425rem;
   right: 0.5rem; // 0.67em
@@ -728,18 +728,18 @@ $subheader-font-size: 1rem;
 $subheader-font-color: darken($header-font-color, 15%); // resolves to #7a2518
 $subheader-font-weight: normal;
 $subheader-font-style: italic;
-$panel-margin-bottom: emCalc(20px);
+$panel-margin-bottom: 2rem;
 $hr-border-style: solid;
 
 $header-text-rendering: geometricPrecision;
 $subheader-text-rendering: $header-text-rendering !default;
 
-$list-side-margin: emCalc(24px);
-$definition-list-content-margin-left: emCalc(18px) !default;
+$list-side-margin: 1rem;
+$definition-list-content-margin-left: 1.5rem !default;
 $inline-list-bottom-margin: $paragraph-margin-bottom / 2;
 $inline-list-item-spacing: $paragraph-margin-bottom !default;
 
-$panel-padding: emCalc(20px);
+$panel-padding: 2rem;;
 $panel-border-style: solid;
 $panel-border-size: 1px;
 $panel-function-factor: 10%;
@@ -756,7 +756,7 @@ $code-border-size: 0 !default;
 $code-font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
 // NOTE will need to adjust code-font-size if we bump p font-size to 1.125em
 //$code-font-size: 0.95em;
-$code-font-size: emCalc(15px);
+$code-font-size: 1rem;
 $code-font-weight: normal;
 // FIXME don't forget about code in a table cell
 $code-line-height: 1.45;
@@ -994,7 +994,7 @@ details,
 // AsciiDoc list styles
 
 ol {
-  margin-left: $list-side-margin + emCalc(4px);
+  margin-left: $list-side-margin + 0.2rem;
 }
 
 ul li ol {
@@ -1038,7 +1038,7 @@ ul.unstyled, ol.unstyled {
 }
 
 ul.checklist {
-  margin-left: emCalc(10px);
+  margin-left: 0.5rem;
 }
 
 // use consistent size for checkbox
@@ -1104,7 +1104,7 @@ ul.inline > li {
 td.hdlist1,
 td.hdlist2 {
   vertical-align: top;
-  padding: 0 emCalc(10px);
+  padding: 0 0.5rem;
 }
 
 td.hdlist1 {
@@ -1131,16 +1131,16 @@ td.hdlist1 {
 
   // text column
   &:last-child {
-    padding: emCalc(4px) 0;
+    padding: 0.2rem 0;
   }
 }
 
 .imageblock {
   &.left {
-    margin: emCalc(4px) emCalc(10px) $panel-margin-bottom 0;
+    margin: 0.2rem 0.5rem $panel-margin-bottom 0;
   }
   &.right {
-    margin: emCalc(4px) 0 $panel-margin-bottom emCalc(10px);
+    margin: 0.2rem 0 $panel-margin-bottom 0.5rem;
   }
   //&.center {
   //  display: table;
@@ -1154,7 +1154,7 @@ td.hdlist1 {
   &.th {
     border-width: $thumb-border-width + ($thumb-border-width * .5);
     > .title {
-      padding: 0 emCalc(2px);
+      padding: 0 0.2rem;
     }
   }
 }
@@ -1172,7 +1172,7 @@ a.image {
 // AsciiDoc footnote styles
 sup.footnote,
 sup.footnoteref {
-  font-size: emCalc(14px); // 80% instead?
+  font-size: 1.5rem; // 80% instead?
   position: static;
   vertical-align: super;
   a {
@@ -1184,19 +1184,19 @@ sup.footnoteref {
 }
 
 #footnotes {
-  padding-top: emCalc(12px);
-  padding-bottom: emCalc(12px);
+  padding-top: 1.2rem;
+  padding-bottom: 1.2rem;
   margin-bottom: $panel-margin-bottom / 2;
   hr {
     width: 20%;
-    min-width: emCalc(100px);
+    min-width: 10rem;
     margin: -0.25em 0 0.75em 0;
     border-width: 1px 0 0 0;
   }
   .footnote {
     padding: 0 0.375em 0 0.225em; // .15em difference is due to text-indent
     line-height: 1.3334;
-    font-size: emCalc(14px);
+    font-size: 1.5rem;
     margin-left: 1.2em;
     margin-bottom: 0.2em;
     a:first-of-type {
@@ -1214,7 +1214,7 @@ sup.footnoteref {
   #content & {
     margin-top: -$panel-margin-bottom / 2;
     margin-bottom: 0;
-    padding: emCalc(12px) 0;
+    padding: 1.2rem 0;
   }
 }
 
