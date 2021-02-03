@@ -141,3 +141,19 @@ div.page-meta {
 .max-width {
     max-width: 1440px;
 }
+
+
+.synopsis-table {
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+    border-bottom: $table-border-width solid $table-border-color;
+
+    th, td {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    th {
+        width: 20%;
+    }
+}

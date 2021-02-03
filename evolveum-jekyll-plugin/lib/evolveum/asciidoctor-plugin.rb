@@ -1,4 +1,4 @@
-# (C) 2020 Evolveum
+# (C) 2020-2021 Evolveum
 #
 # Evolveum AsciiDoctor Plugin for Jekyll sites
 #
@@ -88,8 +88,66 @@ module Evolveum
 
     end
 
+    class WikiInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
+      use_dsl
+
+      named :wiki
+      name_positional_attributes 'linktext'
+
+      def process(parent, target, attrs)
+        targetName = target
+        fragmentSuffix = ""
+        if target.include?('#')
+            targetName = target[0 .. target.rindex('#')-1]
+            fragmentSuffix = target[target.rindex('#')..-1]
+        end
+        #puts "targetName=#{targetName}, fragment=#{fragmentSuffix}"
+
+        # TODO: look for pages that are already converted: search pages for wiki-name page attribute
+
+        if attrs['linktext'] == nil || attrs['linktext'].strip.empty?
+            # TODO: urldecode
+            linktext = targetName
+        else
+            linktext = attrs['linktext']
+        end
+        targetUrl = "https://wiki.evolveum.com/display/midPoint/#{target}"
+
+        puts "WWWIKI: #{target} -> #{targetUrl}"
+
+        parent.document.register :links, targetUrl
+        (create_anchor parent, linktext, type: :link, target: (targetUrl)).convert
+      end
+
+    end
+
+    class BugInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
+      use_dsl
+
+      named :bug
+      name_positional_attributes 'linktext'
+
+      def process(parent, target, attrs)
+
+        if attrs['linktext'] == nil || attrs['linktext'].strip.empty?
+            linktext = target
+        else
+            linktext = attrs['linktext']
+        end
+        targetUrl = "https://jira.evolveum.com/browse/#{target}"
+
+        puts "BBBUG: #{target} -> #{targetUrl}"
+
+        parent.document.register :links, targetUrl
+        (create_anchor parent, linktext, type: :link, target: (targetUrl)).convert
+      end
+
+    end
+
 end
 
 Asciidoctor::Extensions.register do
   inline_macro Evolveum::XrefInlineMacro
+  inline_macro Evolveum::WikiInlineMacro
+  inline_macro Evolveum::BugInlineMacro
 end
