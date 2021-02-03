@@ -13,42 +13,33 @@ require 'pp'
 
 module Evolveum
 
-    class XrefInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
+    class JekyllInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
       use_dsl
 
-      named :xref
       name_positional_attributes 'linktext'
 
-      def process(parent, target, attrs)
-    #    puts "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXREF -------> Processing #{parent} #{targetFile} #{attrs}"
-
+      def parseFraqment(target)
         targetPath = target
         fragmentSuffix = ""
         if target.include?('#')
             targetPath = target[0 .. target.rindex('#')-1]
             fragmentSuffix = target[target.rindex('#')..-1]
         end
-        #puts "targetPath=#{targetPath}, fragment=#{fragmentSuffix}"
+        return targetPath, fragmentSuffix
+      end
 
-        targetPage = findPage(parent.document.attributes["docdir"], targetPath)
-
-        if targetPage == nil
-            sourceFile = parent.document.attributes["docfile"]
-            Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
-            return (create_anchor parent, attrs['linktext'], type: :link, target: "/broken_link/").convert
-        end
-        #puts pp parent.document
+      def createLink(targetUrl, parent, attrs, defaultLinkText)
         if attrs['linktext'] == nil || attrs['linktext'].strip.empty?
-            linktext = targetPage.data['title']
+            linktext = defaultLinkText
         else
             linktext = attrs['linktext']
         end
-        targetUrl = targetPage.url
         parent.document.register :links, targetUrl
-        (create_anchor parent, linktext, type: :link, target: (targetUrl + fragmentSuffix)).convert
+        (create_anchor parent, linktext, type: :link, target: targetUrl).convert
       end
 
-      def findPage(docdir, target)
+      # target can be URL or file path
+      def findPageByTarget(docdir, target)
         if target.end_with?("/")
             return findPageByUrl(docdir, target)
         else
@@ -57,7 +48,7 @@ module Evolveum
       end
 
       def findPageByFilePath(docdir, target)
-        site = Jekyll.sites[0]
+        site = getJekyllSite()
         filePathname = Pathname.new(target)
 
         if filePathname.absolute?
@@ -68,11 +59,11 @@ module Evolveum
         end
 
     #    puts "relativeSourceDir=#{relativeSourceDir}, relativeFilePath=#{relativeFilePath}"
-        return site.pages.find { |page| page.path == relativeFilePath }
+        return findPage { |page| page.path == relativeFilePath }
       end
 
       def findPageByUrl(docdir, target)
-        site = Jekyll.sites[0]
+        site = getJekyllSite()
         targetPathname = Pathname.new(target)
 
         if targetPathname.absolute?
@@ -83,45 +74,77 @@ module Evolveum
         end
 
     #    puts "url=#{url}"
-        return site.pages.find { |page| page.url == url }
+        return findPage { |page| page.url == url }
+      end
+
+      def getJekyllSite()
+        return Jekyll.sites[0]
+      end
+
+      def findPage
+        return getJekyllSite().pages.find { |page| yield page }
       end
 
     end
 
-    class WikiInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
+
+    class XrefInlineMacro < JekyllInlineMacro
+      use_dsl
+
+      named :xref
+      name_positional_attributes 'linktext'
+
+      def process(parent, target, attrs)
+    #    puts "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXREF -------> Processing #{parent} #{targetFile} #{attrs}"
+
+        targetPath, fragmentSuffix = parseFraqment(target)
+        #puts "targetPath=#{targetPath}, fragment=#{fragmentSuffix}"
+
+        targetPage = findPageByTarget(parent.document.attributes["docdir"], targetPath)
+#        puts("XXXREF found page #{targetPage}")
+
+        if targetPage == nil
+            sourceFile = parent.document.attributes["docfile"]
+            Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
+            return (create_anchor parent, attrs['linktext'], type: :link, target: "/broken_link/").convert
+        end
+
+        createLink(targetPage.url, parent, attrs, targetPage.data['title'])
+      end
+    end
+
+
+    class WikiInlineMacro < JekyllInlineMacro
       use_dsl
 
       named :wiki
       name_positional_attributes 'linktext'
 
       def process(parent, target, attrs)
-        targetName = target
-        fragmentSuffix = ""
-        if target.include?('#')
-            targetName = target[0 .. target.rindex('#')-1]
-            fragmentSuffix = target[target.rindex('#')..-1]
-        end
-        #puts "targetName=#{targetName}, fragment=#{fragmentSuffix}"
+        targetName, fragmentSuffix = parseFraqment(target)
+        wikiName = targetName.gsub(/\+/, ' ')
 
-        # TODO: look for pages that are already converted: search pages for wiki-name page attribute
-
-        if attrs['linktext'] == nil || attrs['linktext'].strip.empty?
-            # TODO: urldecode
-            linktext = targetName
+        page = findMigratedPage(wikiName)
+        if page != nil
+#            puts("WWWIKI-------> found page #{page.url}")
+            targetUrl = page.url
         else
-            linktext = attrs['linktext']
+ #           puts("WWWIKI no page for name #{wikiName}")
+            targetUrl = "https://wiki.evolveum.com/display/midPoint/#{target}"
         end
-        targetUrl = "https://wiki.evolveum.com/display/midPoint/#{target}"
 
-        puts "WWWIKI: #{target} -> #{targetUrl}"
+ #       puts "WWWIKI: #{target} -> #{targetUrl}"
 
-        parent.document.register :links, targetUrl
-        (create_anchor parent, linktext, type: :link, target: (targetUrl)).convert
+        createLink(targetUrl, parent, attrs, wikiName)
+      end
+
+      def findMigratedPage(wikiName)
+        findPage { |page| page.data['wiki-name'] == wikiName }
       end
 
     end
 
-    class BugInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
+    class BugInlineMacro < JekyllInlineMacro
       use_dsl
 
       named :bug
@@ -129,17 +152,9 @@ module Evolveum
 
       def process(parent, target, attrs)
 
-        if attrs['linktext'] == nil || attrs['linktext'].strip.empty?
-            linktext = target
-        else
-            linktext = attrs['linktext']
-        end
         targetUrl = "https://jira.evolveum.com/browse/#{target}"
-
-        puts "BBBUG: #{target} -> #{targetUrl}"
-
-        parent.document.register :links, targetUrl
-        (create_anchor parent, linktext, type: :link, target: (targetUrl)).convert
+#        puts "BBBUG: #{target} -> #{targetUrl}"
+        createLink(targetUrl, parent, attrs, target)
       end
 
     end
