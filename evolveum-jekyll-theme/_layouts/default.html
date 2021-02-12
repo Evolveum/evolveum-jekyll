@@ -19,6 +19,10 @@
 <script src="/assets/js/popper.min.js"></script>
 <script src="/assets/js/bootstrap.min.js"></script>
 
+{% for script in page.scripts %}
+    <script src="/assets/scripts/{{ script }}"></script>
+{% endfor %}
+
 </div>
 </body>
 </html>
