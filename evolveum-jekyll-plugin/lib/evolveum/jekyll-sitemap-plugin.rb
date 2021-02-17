@@ -18,7 +18,7 @@ module Evolveum
 
         FILENAME_SITEMAP_XML = 'sitemap.xml'
         FILENAME_SITEMAP_HTML = 'sitemap.html'
-        FILENAME_SEARCHMAP = 'searchmap.xml'
+        FILENAME_SEARCHMAP = 'searchmap.json'
         FILENAME_ROBOTS = 'robots.txt'
 
         def generate(site)
@@ -32,6 +32,8 @@ module Evolveum
         private
 
             MINIFY_REGEX = %r!(?<=>\n|})\s+!.freeze
+
+            SEARCHMAP_PROPS = [ 'title', 'author', 'description', 'keywords' ]
 
             def sourceFilePath(filename)
               File.expand_path filename, __dir__
@@ -55,7 +57,24 @@ module Evolveum
               page.content = File.read(sourceFilePath(FILENAME_SEARCHMAP)) # No minification here
               page.data["layout"] = nil
               page.data["visibility"] = "system"
+              page.data["searchmap"] = constructSearchMap()
               page
+            end
+
+            def constructSearchMap
+                searchmap = []
+                @site.pages.each do |page|
+                    if page.data['visibility'] == nil || page.data['visibility'] == 'visible'
+                        pageEntry = { url: page.url, lastModificationDate: page.data['lastModificationDate'] }
+                        SEARCHMAP_PROPS.each do |prop|
+                            if page.data[prop]
+                                pageEntry[prop] = page.data[prop]
+                            end
+                        end
+                        searchmap << pageEntry
+                    end
+                end
+                return searchmap
             end
 
 
