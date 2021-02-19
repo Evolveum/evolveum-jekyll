@@ -45,48 +45,6 @@ module Evolveum
         end
     end
 
-    ##
-    # Sitemap Liquid tag (long hierarchical list of all pages)
-    #
-    # This is a code for {% sitemap %} Liquid tag.
-    # This tag is not used on ordinary pages.
-    # It is usually used on a dedicated sitemap.html page.
-    class SitemapTag < Liquid::Tag
-
-        def initialize(tag_name, text, tokens)
-          super
-          @text = text
-        end
-
-        def render(context)
-            navtree = context['site']['data']['nav']
-            s = StringIO.new
-            s << "<ul>\n"
-            sitemap_indent(s, navtree, 0)
-            s << "</ul>\n"
-            s.string
-        end
-
-        def sitemap_indent(s, nav, indent)
-            if (nav.slug != nil)
-                s << nav.indent(indent)
-                s << "<li>"
-                nav.append_label_link(s)
-                s << "</li>\n"
-            end
-            presentable_subnodes = nav.presentable_subnodes
-            if (!presentable_subnodes.empty?)
-                s << nav.indent(indent + 1)
-                s << "<ul>\n"
-                presentable_subnodes.each do |subnode|
-                    sitemap_indent(s, subnode, indent + 2)
-                end
-                s << nav.indent(indent + 1)
-                s << "</ul>\n"
-            end
-        end
-
-    end
 
     ##
     # Breadcrumbs Liquid tag.
@@ -449,7 +407,6 @@ end
 
 # Registering custom Liquid tags with Jekyll
 
-Liquid::Template.register_tag('sitemap', Evolveum::SitemapTag)
 Liquid::Template.register_tag('breadcrumbs', Evolveum::BreadcrumbsTag)
 Liquid::Template.register_tag('navtree', Evolveum::NavtreeTag)
 Liquid::Template.register_tag('children', Evolveum::ChildrenTag)

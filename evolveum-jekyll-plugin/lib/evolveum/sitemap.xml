@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    {% for page in site.pages %}
+    {% for page in page.mappages %}
         {% if page.visibility != "system" and page.visibility != "auxiliary" and page.visibility != "hidden" %}
     <url>
         <loc>{{ page.url | absolute_url | xml_escape }}</loc>
