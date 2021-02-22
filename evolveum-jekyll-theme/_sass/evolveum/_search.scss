@@ -1,0 +1,30 @@
+#autocombox {
+    list-style-type: none;
+    width: 100%;
+}
+
+.searchResult {
+   border: 2px solid $black;
+   border-radius: 5px;
+   padding: 5px;
+   margin: 10px;
+}
+
+.font1 {
+   font-size: 0.9rem;
+}
+
+.font2 {
+   font-size: 0.7rem;
+}
+
+.notShown {
+   font-size: 0.78rem;
+   font-style: italic;
+   text-align: center;
+   color: $gray-600;
+}
+
+.modal-dialog {
+   margin-right: 0;
+}
