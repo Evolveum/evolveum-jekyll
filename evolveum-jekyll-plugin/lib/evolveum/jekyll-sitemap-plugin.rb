@@ -51,7 +51,7 @@ module Evolveum
           page.data["layout"] = nil
           page.data["visibility"] = "system"
           mappages = []
-          processVisibleNavs { |nav| mappages << nav.page }
+          @nav.processAllVisibleNavs { |nav| mappages << nav.page }
           page.data["mappages"] = mappages
           page
         end
@@ -67,7 +67,7 @@ module Evolveum
 
         def constructSearchMap
             searchmap = []
-            processVisibleNavs do |nav|
+            @nav.processAllVisibleNavs do |nav|
                 page = nav.page
                 pageEntry = { url: page.url, lastModificationDate: page.data['lastModificationDate'] }
                 SEARCHMAP_PROPS.each do |prop|
@@ -96,17 +96,6 @@ module Evolveum
           page.data["layout"] = nil
           page.data["visibility"] = "system"
           page
-        end
-
-        def processVisibleNavs(&block)
-            processVisibleNavsLevel(@nav, &block)
-        end
-
-        def processVisibleNavsLevel(nav, &block)
-            nav.presentable_subnodes.each do |subnav|
-                block.call(subnav)
-                processVisibleNavsLevel(subnav, &block)
-            end
         end
 
     end
@@ -140,11 +129,11 @@ module Evolveum
                 nav.append_label_link(s)
                 s << "</li>\n"
             end
-            presentable_subnodes = nav.presentable_subnodes
-            if (!presentable_subnodes.empty?)
+            presentableSubnodes = nav.presentableSubnodes
+            if (!presentableSubnodes.empty?)
                 s << nav.indent(indent + 1)
                 s << "<ul>\n"
-                presentable_subnodes.each do |subnode|
+                presentableSubnodes.each do |subnode|
                     sitemap_indent(s, subnode, indent + 2)
                 end
                 s << nav.indent(indent + 1)

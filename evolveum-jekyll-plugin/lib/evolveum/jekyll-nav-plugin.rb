@@ -1,4 +1,4 @@
-# (C) 2020 Evolveum
+# (C) 2020-2021 Evolveum
 #
 # Evolveum Navigation Plugin for Jekyll
 #
@@ -26,13 +26,13 @@ module Evolveum
 
         def generate(site)
             @site = site
-            site.data['nav'].stubs.each do |nav|
+            site.data['nav'].uninitializedStubs.each do |nav|
                 puts "Generating stub #{nav.url}"
-                site.pages << stub(nav)
+                site.pages << generateStub(nav)
             end
         end
 
-        def stub(nav)
+        def generateStub(nav)
             # WARNING: Magic follows.
             # We create new "virtual" page using PageWithoutAFile class.
             # This page has no source file, we will explicitly read the content from stub.html "template"
@@ -41,6 +41,7 @@ module Evolveum
             stub.content = File.read(File.join(__dir__, 'stub.html'))
             stub.data["layout"] = "page"
             stub.data['title'] = nav.slug
+            nav.page = stub
             stub
         end
     end
@@ -95,7 +96,7 @@ module Evolveum
 
             s = StringIO.new
             s << "<ul>\n"
-            navtree.presentable_subnodes.each do |topnode|
+            navtree.presentableSubnodes.each do |topnode|
                 append_li_label_start(s, topnode, currentPageUrl, 1)
                 if (topnode.subnodes.empty?)
                     s << "</li>\n"
@@ -118,12 +119,12 @@ module Evolveum
         end
 
         def dive(s, topnode, level, currentPageUrl, currentPageSlugs)
-            if topnode.presentable_subnodes.any? { |nav| nav.active?(currentPageUrl) }
+            if topnode.presentableSubnodes.any? { |nav| nav.active?(currentPageUrl) }
                 # We have active node at this level.
                 # Therefore we want to list the whole level
                 s << topnode.indent(level * 2 + 1)
                 s << "<ul>\n"
-                topnode.presentable_subnodes.each do |node|
+                topnode.presentableSubnodes.each do |node|
                     append_li_label_start(s, node, currentPageUrl, level * 2 + 2)
                     if (node.active?(currentPageUrl))
                         if (node.subnodes.empty?)
@@ -146,7 +147,7 @@ module Evolveum
             else
                 # Active node is not on this level.
                 # Display just a single "slug" that lies on the way down and dive deeper.
-                node = topnode.presentable_subnodes.find { |nav| nav.slug == currentPageSlugs[level] }
+                node = topnode.presentableSubnodes.find { |nav| nav.slug == currentPageSlugs[level] }
                 if (node == nil) then return end
                 s << node.indent(level * 2 + 1)
                 s << "<ul>\n"
@@ -162,7 +163,7 @@ module Evolveum
         def append_subnodes(s, topnode, indent)
             s << topnode.indent(indent)
             s << "<ul>\n"
-            topnode.presentable_subnodes.each do |node|
+            topnode.presentableSubnodes.each do |node|
                 append_li_label_start(s, node, nil, indent + 1)
                 s << "</li>\n"
             end
@@ -236,7 +237,30 @@ module Evolveum
                 nav = navtree.index_page(page)
                 #puts("  [C] #{nav.url}: #{nav.title}")
             end
+            navtree.recomputeTree()
             return navtree
+        end
+
+        def recomputeTree()
+            recomputeLevel(nil)
+        end
+
+        def recomputeLevel(parent)
+            recomputeNode(parent)
+            subnodes.each do |subnode|
+                subnode.recomputeLevel(self)
+            end
+        end
+
+        def recomputeNode(parent)
+            if @visibility == nil
+                if parent == nil
+                    @visibility = 'visible'
+                else
+                    @visibility = parent.visibility
+                end
+            end
+#            puts("R: #{self.url} : #{self.visibility}")
         end
 
         def update(site)
@@ -251,7 +275,7 @@ module Evolveum
             nav.url = page.url
             nav.page = page
             nav.title = page.data['nav-title'] || page.data['title']
-            nav.visibility = page.data['visibility'] || "visible"
+            nav.visibility = page.data['visibility']
             nav.display_order = page.data['display-order'].to_i
             if (nav.display_order == 0)
                 nav.display_order = 100
@@ -347,22 +371,22 @@ module Evolveum
             slugs.each do |slug|
                 nav = nav.resolve(slug)
             end
-            nav.presentable_subnodes
+            nav.presentableSubnodes
         end
 
-        def stubs
+        def uninitializedStubs
             stubs = []
-            collect_stubs(stubs, [])
+            collectUninitializedStubs(stubs, [])
             stubs
         end
 
-        def collect_stubs(stubs, slugs)
+        def collectUninitializedStubs(stubs, slugs)
             subnodes.each do |subnode|
-                if (subnode.stub?)
+                if (subnode.uninitializedStub?)
                     subnode.generate_url_if_needed(slugs)
                     stubs << subnode
                 end
-                subnode.collect_stubs(stubs, slugs + [ subnode.slug ])
+                subnode.collectUninitializedStubs(stubs, slugs + [ subnode.slug ])
             end
         end
 
@@ -376,7 +400,7 @@ module Evolveum
             end
         end
 
-        def stub?
+        def uninitializedStub?
             @page == nil
         end
 
@@ -397,10 +421,25 @@ module Evolveum
             end
         end
 
-        def presentable_subnodes
+        # NOTE: this may not work well until we have all labels generated correctly
+        def presentableSubnodes
             subnodes.select{ |node| node.visible? }.sort
         end
 
+        def visibleSubnodes
+            subnodes.select{ |node| node.visible? }
+        end
+
+        def processAllVisibleNavs(&block)
+            processAllVisibleNavsLevel(self, &block)
+        end
+
+        def processAllVisibleNavsLevel(nav, &block)
+            nav.visibleSubnodes.each do |subnav|
+                block.call(subnav)
+                processAllVisibleNavsLevel(subnav, &block)
+            end
+        end
     end
 
 end
