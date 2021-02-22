@@ -275,7 +275,9 @@ module Evolveum
             nav.url = page.url
             nav.page = page
             nav.title = page.data['nav-title'] || page.data['title']
-            nav.visibility = page.data['visibility']
+            if page.data['visibility'] != nil
+                nav.visibility = page.data['visibility']
+            end
             nav.display_order = page.data['display-order'].to_i
             if (nav.display_order == 0)
                 nav.display_order = 100
@@ -409,7 +411,7 @@ module Evolveum
         end
 
         def visible?
-            @visibility == "visible"
+            @visibility == 'visible'
         end
 
         def <=> other
@@ -466,7 +468,7 @@ Liquid::Template.register_tag('children', Evolveum::ChildrenTag)
 # We update the tree at this point, to have correct page titles later when the pages are rendered.
 
 Jekyll::Hooks.register :site, :post_read do |site|
-    #puts "=========[ EVOLVEUM ]============== post_read #{site}"
+    #putsts "=========[ EVOLVEUM ]============== post_read #{site}"
     site.data['nav'] = Evolveum::Nav.construct(site)
 end
 
