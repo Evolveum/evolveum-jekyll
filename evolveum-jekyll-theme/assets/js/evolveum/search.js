@@ -24,8 +24,13 @@ var searchMap = '';
 function searchForPhrase() {
 
     if (searchMap === '') {
-        $.getJSON("/searchmap.json", function(data) {
-            searchMap = data;
+        $.ajax({
+            dataType: "json",
+            url: "/searchmap.json",
+            async: false,
+            success: function(data) {
+                searchMap = data
+            }
         });
     }
 
