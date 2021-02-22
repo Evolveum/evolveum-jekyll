@@ -13,6 +13,97 @@
 
 module Evolveum
 
+    class PreviewGenerator < Jekyll::Generator
+        priority :low
+
+        def generate(site)
+            @site = site
+            @site.pages.each do |page|
+                if page.data["description"] == nil
+                    if page.data["preview"] == nil
+                        preview = generatePreview(page)
+#                        puts("PPPP:\n#{preview}")
+                        page.data["preview"] = preview
+                    end
+                else
+                    page.data["preview"] = page.data["description"]
+                end
+            end
+        end
+
+        def generatePreview(page)
+            out = page.content
+
+            # Remove Liquid formatting
+            out = out.gsub(/\{\{[^\}]*\}\}/, '')
+            out = out.gsub(/\{\%[^\}]*\%\}/, '')
+
+            # Remove HTML formatting
+            out = out.gsub(/\<[^\>]*\>/, '')
+
+            # Remove URLs
+            out = out.gsub(/http:\/\/[\S]+/, '')
+            out = out.gsub(/https:\/\/[\S]+/, '')
+
+            if out.start_with?('=')
+                # asciidoc
+                out = purifyAsciidoc(out)
+            end
+
+            # Useless characters
+            out = out.gsub(/[\|\#\^\*\~]/, '')
+
+            # shrink whitespace
+            out = out.gsub(/\s+/, ' ')
+            return truncate(out.strip, 256)
+        end
+
+        def purifyAsciidoc(input)
+            out = ""
+            input.lines.each do |line|
+                lineout = ''
+                if line.start_with?('= ')
+                    # Asciidoc title, it is already in the page title metadata, no need to repeat that in description
+                elsif line.match?(/^:[\w\-]+:/)
+                    # Asciidoc variables, not interesting
+                elsif line.match?(/^\+\+[\+]+/) || line.match?(/^\-\-[\-]+/)
+                    # Asciidoc passthrough and similar formatting
+                elsif line.match?(/^\|\=[\=]+/) || line.match?(/^\=[\=]+\|/)
+                    # Table start and end
+                elsif line.match?(/^[\w]+::/)
+                    # block macro
+                else
+                    # Remove heading formatting marks
+                    lineout = line.gsub(/^=+\s+/, '')
+                    # Remove *bold* markup
+                    lineout = lineout.gsub(/\*([\w\s:]+?)\*/, '\1')
+                    # Remove _italics_ markup
+                    lineout = lineout.gsub(/\_([\w\s:]+?)\_/, '\1')
+                    # Remove `code` markup
+                    lineout = lineout.gsub(/\`([\w\s:]+?)\`/, '\1')
+                    # Remove inline macros, keeping the content
+                    lineout = lineout.gsub(/\w+:[\S]+?\[([^\]]+)\]/, '\1')
+                    # Asciidoc variables
+                    lineout = lineout.gsub(/\{[^\}]*\}/, '')
+                    # [cols="1,1,2"] and similar
+                    lineout = lineout.gsub(/^\[[^\]]*\]/, '')
+                    # .labels
+                    lineout = lineout.gsub(/^\./, '')
+                end
+                out << lineout
+            end
+            return out
+        end
+
+        def truncate(s, length)
+          if s.length > length
+            s.to_s[0..length].gsub(/[^\w]\w+\s*$/, '...')
+          else
+            s
+          end
+        end
+    end
+
     class SiteMapGenerator < Jekyll::Generator
         priority :lowest
 
@@ -34,7 +125,7 @@ module Evolveum
 
         MINIFY_REGEX = %r!(?<=>\n|})\s+!.freeze
 
-        SEARCHMAP_PROPS = [ 'title', 'author', 'description', 'keywords' ]
+        SEARCHMAP_PROPS = [ 'title', 'author', 'description', 'keywords', 'preview' ]
 
         def sourceFilePath(filename)
           File.expand_path filename, __dir__
@@ -51,7 +142,7 @@ module Evolveum
           page.data["layout"] = nil
           page.data["visibility"] = "system"
           mappages = []
-          processVisibleNavs { |nav| mappages << nav.page }
+          @nav.processAllVisibleNavs { |nav| mappages << nav.page }
           page.data["mappages"] = mappages
           page
         end
@@ -67,7 +158,7 @@ module Evolveum
 
         def constructSearchMap
             searchmap = []
-            processVisibleNavs do |nav|
+            @nav.processAllVisibleNavs do |nav|
                 page = nav.page
                 pageEntry = { url: page.url, lastModificationDate: page.data['lastModificationDate'] }
                 SEARCHMAP_PROPS.each do |prop|
@@ -96,17 +187,6 @@ module Evolveum
           page.data["layout"] = nil
           page.data["visibility"] = "system"
           page
-        end
-
-        def processVisibleNavs(&block)
-            processVisibleNavsLevel(@nav, &block)
-        end
-
-        def processVisibleNavsLevel(nav, &block)
-            nav.presentable_subnodes.each do |subnav|
-                block.call(subnav)
-                processVisibleNavsLevel(subnav, &block)
-            end
         end
 
     end
@@ -140,11 +220,11 @@ module Evolveum
                 nav.append_label_link(s)
                 s << "</li>\n"
             end
-            presentable_subnodes = nav.presentable_subnodes
-            if (!presentable_subnodes.empty?)
+            presentableSubnodes = nav.presentableSubnodes
+            if (!presentableSubnodes.empty?)
                 s << nav.indent(indent + 1)
                 s << "<ul>\n"
-                presentable_subnodes.each do |subnode|
+                presentableSubnodes.each do |subnode|
                     sitemap_indent(s, subnode, indent + 2)
                 end
                 s << nav.indent(indent + 1)
