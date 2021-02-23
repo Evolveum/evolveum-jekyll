@@ -77,9 +77,9 @@ function searchForPhrase() {
                 if (allTextWithoutWS.includes(normalize(phrase))) {
                     const title = searchMap[i].title.toLowerCase()
 
-                    let previewText = searchMap[i].preview.substring(0, 85);
+                    let previewText = searchMap[i].preview;
 
-                    if (previewText.length === 85) {
+                    if (previewText.length > 85) {
                         previewText += "..."
                     }
 

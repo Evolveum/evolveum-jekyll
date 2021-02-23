@@ -1,6 +1,9 @@
 #autocombox {
     list-style-type: none;
     width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .searchResult {
@@ -16,9 +19,7 @@
 
 .font2 {
    font-size: 0.7rem;
-   text-overflow: ellipsis;
-   overflow: hidden;
-   white-space: nowrap;
+
 }
 
 .notShown {
