@@ -837,6 +837,10 @@ object, svg {
   width: 100%;
 }
 
+code {
+    color: $code-color;
+}
+
 // :not([class^=L]) is for prettify; could also use :not(li)
 :not(pre):not([class^=L]) > code {
   font-size: $code-font-size;
