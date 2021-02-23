@@ -78,14 +78,15 @@ function searchForPhrase() {
                     const title = searchMap[i].title.toLowerCase()
 
                     let previewText = searchMap[i].preview;
+                    let continueText = ""
 
                     if (previewText.length > 85) {
-                        previewText += "..."
+                        continueText = "..."
                     }
 
                     const listItem = '<a href="' + searchMap[i].url + '">' +
-                        '<li class="list-group-item border-0" style="width: 480px;" ><i class="fas fa-align-left"></i><span class="font1">' + ' &nbsp; ' + searchMap[i].title + '<br></span>' +
-                        '<span class="font2">' + previewText + '</span></li></a>';
+                        '<li class="list-group-item border-0" style="width: 450px;" ><i class="fas fa-align-left"></i><span class="font1">' + ' &nbsp; ' + searchMap[i].title + '<br></span>' +
+                        '<span class="font2">' + previewText + '</span></li>continueText</a>';
                     if (title.localeCompare(phrase) === 0) {
                         console.log('input is title')
                         showItemsTitleMatch.push(listItem)
