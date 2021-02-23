@@ -62,6 +62,16 @@ main {
     margin-bottom: 2rem;
 }
 
+.logo-title {
+
+    // Same margin as ordinary h1 title
+    margin-bottom: 2rem;
+
+    img {
+        max-height: 5rem;
+    }
+}
+
 // FOOTER
 
 .footer-logo {
