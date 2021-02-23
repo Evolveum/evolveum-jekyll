@@ -77,11 +77,15 @@ function searchForPhrase() {
                 if (allTextWithoutWS.includes(normalize(phrase))) {
                     const title = searchMap[i].title.toLowerCase()
 
-                    console.log(title);
+                    let previewText = searchMap.preview.substring(0, 85);
+
+                    if (previewText.length === 85) {
+                        previewText += "..."
+                    }
 
                     const listItem = '<a href="' + searchMap[i].url + '">' +
                         '<li class="list-group-item border-0" style="width: 100%"><i class="fas fa-align-left"></i><span class="font1">' + ' &nbsp; ' + searchMap[i].title + '<br></span>' +
-                        '<span class="font2">' + searchMap[i].preview.substring(0, 85) + '</span></li></a>';
+                        '<span class="font2">' + previewText + '</span></li></a>';
                     if (title.localeCompare(phrase) === 0) {
                         console.log('input is title')
                         showItemsTitleMatch.push(listItem)
@@ -109,11 +113,8 @@ function searchForPhrase() {
             for (i = 0; i < arr.length && showItems.length < LIMIT_OF_PAGES_SHOWN + 1; i++) {
                 showItems.push(arr[i]);
             }
-            console.log(showItems)
             numberOfNotShown += arr.length - i
         }
-
-        console.log('not shown ' + numberOfNotShown)
 
         if (numberOfNotShown === 1) {
             showItems.push('<li class="notShown"> additional ' + numberOfNotShown + ' result not shown' + '</li>')
