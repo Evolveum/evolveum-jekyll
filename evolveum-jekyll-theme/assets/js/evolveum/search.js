@@ -80,8 +80,8 @@ function searchForPhrase() {
                     console.log(title);
 
                     const listItem = '<a href="' + searchMap[i].url + '">' +
-                        '<li class="list-group-item border-0"><i class="fas fa-align-left"></i><span class="font1">' + ' &nbsp; ' + searchMap[i].title + '<br></span>' +
-                        '<span class="font2">' + searchMap[i].preview + '</span></li></a>';
+                        '<li class="list-group-item border-0" style="width: 100%"><i class="fas fa-align-left"></i><span class="font1">' + ' &nbsp; ' + searchMap[i].title + '<br></span>' +
+                        '<span class="font2">' + searchMap[i].preview.substring(0, 50); + '</span></li></a>';
                     if (title.localeCompare(phrase) === 0) {
                         console.log('input is title')
                         showItemsTitleMatch.push(listItem)
