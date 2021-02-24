@@ -17,6 +17,12 @@ nav.navbar {
 
 // NAVTREE
 
+.navtree-column {
+    // Stop-gap measure for ridiculously wide browser windows.
+    // We need to figure something better in the future.
+    max-width: 32rem;
+}
+
 .navtree {
     list-style: none;
 
