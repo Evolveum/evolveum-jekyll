@@ -195,14 +195,27 @@ module Evolveum
 
         def initialize(tag_name, text, tokens)
           super
-          @text = text
+          parseParams(text)
+        end
+
+        def parseParams(text)
+            @params = {}
+            text.split(',').each do |piece|
+                m = piece.match(/^\s*([\w\-_]+)\s*:\s*([\w\-_]+)\s*$/)
+                if m
+                    puts("Match! #{m}")
+                    @params[m[1]] = m[2]
+                else
+                    raise ArgumentError, "Malformed parameters in children tag: #{piece}"
+                end
+            end
         end
 
         def render(context)
             navtree = context['site']['data']['nav']
             s = StringIO.new
             s << '<ul class="children">'
-            children = navtree.children(context['page']['url'])
+            children = navtree.children(context['page']['url'], @params)
             children.each do |child|
                 s << '<li class="children-item">'
                 child.append_label_link(s)
@@ -367,13 +380,13 @@ module Evolveum
             breadcrumbs
         end
 
-        def children(url)
+        def children(url, params = {})
             slugs = slugize(url)
             nav = self
             slugs.each do |slug|
                 nav = nav.resolve(slug)
             end
-            nav.presentableSubnodes
+            nav.presentableSubnodes(params)
         end
 
         def uninitializedStubs
@@ -424,8 +437,19 @@ module Evolveum
         end
 
         # NOTE: this may not work well until we have all labels generated correctly
-        def presentableSubnodes
-            subnodes.select{ |node| node.visible? }.sort
+        def presentableSubnodes(params = {})
+            subnodes.select{ |node| node.presentable?(params) }.sort
+        end
+
+        def presentable?(params = {})
+            visibilityReq = params['visibility']
+            if visibilityReq == nil
+                return self.visible?
+            elsif visibilityReq == 'all'
+                return true
+            else
+                return self.visibility == visibilityReq
+            end
         end
 
         def visibleSubnodes
