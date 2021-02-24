@@ -26,7 +26,7 @@ $pre-line-height: 1.45;
 // Tables
 
 $table-head-font-size: inherit;
-$table-head-font-weight: normal;
+$table-head-font-weight: bold;
 $table-head-font-color: $body-color !default;
 $table-head-background-color: whitesmoke;
 $table-row-font-size: inherit;
@@ -319,6 +319,11 @@ table.tableblock {
     tbody {
       th, td {
         padding: $table-padding;
+      }
+
+      th { // header columns
+        background: $table-head-background-color;
+        font-weight: $table-head-font-weight;
       }
     }
 }
