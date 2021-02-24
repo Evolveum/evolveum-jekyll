@@ -76,6 +76,9 @@ $breadcrumb-divider:                quote("/") !default;
 // EVOLVEUM variables
 ///////////////////////////
 
+// Applied to parahraph (p) and all the paragraph-like structrures (e.g. lists)
+// NOT applied to tables, pictures, code listings, etc.
+$paragraph-max-width: 80rem;
 
 $separator-line-color: rgba($light, 0.1);
 
