@@ -51,6 +51,6 @@ module Evolveum
 end
 
 Jekyll::Hooks.register :site, :post_read do |site|
-    puts "=========[ EVOLVEUM GIT ]============== post_read #{site}"
+    puts "=========[ EVOLVEUM GIT ]============== post_read"
     Evolveum::Git.post_read(site)
 end
