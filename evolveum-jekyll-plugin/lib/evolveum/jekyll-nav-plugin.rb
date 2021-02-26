@@ -273,6 +273,9 @@ module Evolveum
                     @visibility = parent.visibility
                 end
             end
+            if self.page != nil && self.page.data['effectiveVisibility'] == nil
+                self.page.data['effectiveVisibility'] = @visibility
+            end
 #            puts("R: #{self.url} : #{self.visibility}")
         end
 
