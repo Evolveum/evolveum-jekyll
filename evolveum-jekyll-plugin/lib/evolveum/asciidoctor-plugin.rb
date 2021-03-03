@@ -42,6 +42,9 @@ module Evolveum
       def findPageByTarget(docdir, target)
         if target.end_with?("/")
             return findPageByUrl(docdir, target)
+        elsif target.match(/\/[^\/\.]+$/)
+            # URL without trailing slash
+            return findPageByUrl(docdir, target + "/")
         else
             return findPageByFilePath(docdir, target)
         end
@@ -73,8 +76,9 @@ module Evolveum
             url = "/" + (relativeSourceDir + targetPathname).to_s
         end
 
-    #    puts "url=#{url}"
-        return findPage { |page| page.url == url }
+        page = findPage { |page| page.url == url }
+        #puts "FFF: #{url} -> #{page&.url}"
+        return page
       end
 
       def getJekyllSite()
@@ -105,7 +109,12 @@ module Evolveum
 
         if targetPage == nil
             sourceFile = parent.document.attributes["docfile"]
-            Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
+            ignore = parent.document.attributes["ignore-broken-links"]
+            if ignore == nil
+                Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
+            else
+                Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
+            end
             return (create_anchor parent, attrs['linktext'], type: :link, target: "/broken_link/").convert
         end
 

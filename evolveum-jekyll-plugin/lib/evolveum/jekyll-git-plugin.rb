@@ -34,7 +34,7 @@ module Evolveum
                     page.data['lastModificationDate'] = lastModDate
                 end
             end
-            puts("  [U] #{page.path}: #{lastModDate}")
+            #puts("  [U] #{page.path}: #{lastModDate}")
         end
 
         def self.git(argString)
@@ -51,6 +51,6 @@ module Evolveum
 end
 
 Jekyll::Hooks.register :site, :post_read do |site|
-    puts "=========[ EVOLVEUM GIT ]============== post_read"
+    #puts "=========[ EVOLVEUM GIT ]============== post_read"
     Evolveum::Git.post_read(site)
 end
