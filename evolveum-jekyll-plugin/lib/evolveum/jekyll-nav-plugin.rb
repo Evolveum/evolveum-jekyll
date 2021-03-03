@@ -203,7 +203,6 @@ module Evolveum
             text.split(',').each do |piece|
                 m = piece.match(/^\s*([\w\-_]+)\s*:\s*([\w\-_]+)\s*$/)
                 if m
-                    puts("Match! #{m}")
                     @params[m[1]] = m[2]
                 else
                     raise ArgumentError, "Malformed parameters in children tag: #{piece}"

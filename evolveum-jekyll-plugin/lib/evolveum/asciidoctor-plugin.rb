@@ -18,7 +18,7 @@ module Evolveum
 
       name_positional_attributes 'linktext'
 
-      def parseFraqment(target)
+      def parseFragment(target)
         targetPath = target
         fragmentSuffix = ""
         if target.include?('#')
@@ -27,6 +27,15 @@ module Evolveum
         end
         return targetPath, fragmentSuffix
       end
+
+      def addFragmentSuffix(path, fragmentSuffix)
+        if fragmentSuffix != nil && !fragmentSuffix.empty?
+          return path + fragmentSuffix
+        else
+          return path
+        end
+      end
+
 
       def createLink(targetUrl, parent, attrs, defaultLinkText)
         if attrs['linktext'] == nil || attrs['linktext'].strip.empty?
@@ -51,19 +60,23 @@ module Evolveum
       end
 
       def findPageByFilePath(docdir, target)
-        site = getJekyllSite()
-        filePathname = Pathname.new(target)
-
-        if filePathname.absolute?
-            relativeFilePath = target[1..-1]
-        else
-            relativeSourceDir = Pathname.new(docdir).relative_path_from(Pathname.new(site.source))
-            relativeFilePath = (relativeSourceDir + filePathname).to_s
-        end
-
+        relativeFilePath = toRelativePathname(docdir, target)
     #    puts "relativeSourceDir=#{relativeSourceDir}, relativeFilePath=#{relativeFilePath}"
-        return findPage { |page| page.path == relativeFilePath }
+        page = findPage { |page| page.path == relativeFilePath }
+        #puts "FFF:FILE: #{relativeFilePath} -> #{page&.url}"
+        return page
       end
+      
+      def toRelativePathname(docdir, target)
+        targetPathname = Pathname.new(target)
+        if targetPathname.absolute?
+            return target[1..-1]
+        else
+            relativeSourceDir = Pathname.new(docdir).relative_path_from(Pathname.new(getJekyllSite().source))
+            return (relativeSourceDir + targetPathname).to_s
+        end
+      end
+
 
       def findPageByUrl(docdir, target)
         site = getJekyllSite()
@@ -77,9 +90,17 @@ module Evolveum
         end
 
         page = findPage { |page| page.url == url }
-        #puts "FFF: #{url} -> #{page&.url}"
+        #puts "FFF:URL: #{url} -> #{page&.url}"
         return page
       end
+
+      def findFile(docdir, target)
+          relativeFilePathname = toRelativePathname(docdir, target)
+          absoluteFilePathname = Pathname.new(getJekyllSite().source) + relativeFilePathname
+          #puts "FFF:FILE: #{target} -> #{absoluteFilePathname}"
+          return absoluteFilePathname
+      end
+
 
       def getJekyllSite()
         return Jekyll.sites[0]
@@ -101,25 +122,32 @@ module Evolveum
       def process(parent, target, attrs)
     #    puts "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXREF -------> Processing #{parent} #{targetFile} #{attrs}"
 
-        targetPath, fragmentSuffix = parseFraqment(target)
+        targetPath, fragmentSuffix = parseFragment(target)
         #puts "targetPath=#{targetPath}, fragment=#{fragmentSuffix}"
 
         targetPage = findPageByTarget(parent.document.attributes["docdir"], targetPath)
 #        puts("XXXREF found page #{targetPage}")
 
         if targetPage == nil
-            sourceFile = parent.document.attributes["docfile"]
-            ignore = parent.document.attributes["ignore-broken-links"]
-            if ignore == nil
-                Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
+            # No page. But there still may be a plain file (e.g. a PDF file)
+            absoluteFilePathname = findFile(parent.document.attributes["docdir"], targetPath)
+            if absoluteFilePathname.exist?
+                createLink(target, parent, attrs, targetPath)
             else
-                Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
+                sourceFile = parent.document.attributes["docfile"]
+                ignore = parent.document.attributes["ignore-broken-links"]
+                if ignore == nil
+                    Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
+                else
+                    Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
+                end
+                return (create_anchor parent, attrs['linktext'], type: :link, target: "/broken_link/").convert
             end
-            return (create_anchor parent, attrs['linktext'], type: :link, target: "/broken_link/").convert
+        else
+            createLink(addFragmentSuffix(targetPage.url,fragmentSuffix), parent, attrs, targetPage.data['title'])
         end
-
-        createLink(targetPage.url, parent, attrs, targetPage.data['title'])
       end
+      
     end
 
 
@@ -130,7 +158,7 @@ module Evolveum
       name_positional_attributes 'linktext'
 
       def process(parent, target, attrs)
-        targetName, fragmentSuffix = parseFraqment(target)
+        targetName, fragmentSuffix = parseFragment(target)
         wikiName = targetName.gsub(/\+/, ' ')
 
         page = findMigratedPage(wikiName)
