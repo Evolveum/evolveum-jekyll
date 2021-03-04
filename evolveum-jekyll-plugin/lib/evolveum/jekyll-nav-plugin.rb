@@ -366,15 +366,17 @@ module Evolveum
             (@title == nil || @title.empty?) ? @slug : @title
         end
 
-        def label_encoded
-            label.encode(:xml => :text)
-        end
+        # Probably not needed, page attributes seem to be HTML-encoded already
+        #def label_encoded
+        #    label.encode(:xml => :text)
+        #end
 
         def append_label_link(s)
                 if (@url != nil)
                     s << "<a href=\"#{@url}\">"
                 end
-                s << label_encoded
+                # Note: page title is HTML-encoded already
+                s << label
                 if (@url != nil)
                     s << "</a>"
                 end
