@@ -913,10 +913,12 @@ kbd {
 
 .menuseq, .menuref {
   color: #000;
+  hyphens: none;
+  font-weight: bold;
 }
 
 .menuseq b:not(.caret), .menuref {
-  font-weight: inherit;
+  //font-weight: inherit;
 }
 
 .menuseq {
