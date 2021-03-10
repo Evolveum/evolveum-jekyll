@@ -27,7 +27,7 @@ module Evolveum
         def generate(site)
             @site = site
             site.data['nav'].uninitializedStubs.each do |nav|
-                puts "Generating stub #{nav.url}"
+                #puts "Generating stub #{nav.url}"
                 site.pages << generateStub(nav)
             end
         end

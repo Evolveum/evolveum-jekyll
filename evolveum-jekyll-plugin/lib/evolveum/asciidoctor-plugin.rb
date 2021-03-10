@@ -231,6 +231,10 @@ module Evolveum
 
     class ImagePathTreeprocessor < JekyllTreeprocessor
         def process(document)
+
+            # ATTENTION! Use this if there is an error in index.adoc file, and you do not know which one it is
+            #Jekyll.logger.info("Processing document #{document.attr("docfile")}")
+
             currentPage = findCurrentPage(document)
             document.find_by(context: :image).each do |image|
                 target = image.attr('target')
