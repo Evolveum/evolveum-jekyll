@@ -11,7 +11,7 @@ layout: default
     <div class="col-md-9 col-sm-12">
         <nav aria-label="breadcrumb">{% breadcrumbs %}</nav>
 
-        {% if page.logo-title %}<div class="logo-title"><img src="{{page.logo-title}}" alt="{{ page.title | escape }}"/></div>{% else %}<h1>{{ page.title | escape }}</h1>{% endif %}
+        {% if page.logo-title %}<div class="logo-title"><img src="{{page.logo-title}}" alt="{{ page.title }}"/></div>{% else %}<h1>{{ page.title }}</h1>{% endif %}
         {% if page.author %}<address class="author" rel="author">{{ page.author }}</address>{% endif %}
         {% if page.lastModificationDate %}<div class="page-meta">Last modified {{ page.lastModificationDate | date: "%d %b %Y %H:%M %Z" }}</div>{% endif %}
 

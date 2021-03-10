@@ -203,7 +203,6 @@ module Evolveum
             text.split(',').each do |piece|
                 m = piece.match(/^\s*([\w\-_]+)\s*:\s*([\w\-_]+)\s*$/)
                 if m
-                    puts("Match! #{m}")
                     @params[m[1]] = m[2]
                 else
                     raise ArgumentError, "Malformed parameters in children tag: #{piece}"
@@ -273,6 +272,21 @@ module Evolveum
                     @visibility = parent.visibility
                 end
             end
+            if self.page != nil && self.page.data['effectiveVisibility'] == nil
+                self.page.data['effectiveVisibility'] = @visibility
+            end
+            if self&.page&.data&.[]('nav-title') == nil && parent&.page&.data&.[]('sub-nav-title-property') != nil
+                propertyName = parent.page.data['sub-nav-title-property']
+                propertyValue = self.page.data[propertyName]
+                if propertyValue != nil
+                    navTitle = ""
+                    if parent&.page&.data&.[]('sub-nav-title-prefix') != nil
+                        navTitle = parent&.page&.data&.[]('sub-nav-title-prefix')
+                    end
+                    navTitle += propertyValue.to_s
+                    self.title = navTitle
+                end
+            end
 #            puts("R: #{self.url} : #{self.visibility}")
         end
 
@@ -281,6 +295,7 @@ module Evolveum
                 nav = index_page(page)
                 #puts("  [U] #{nav.url}: #{nav.title}")
             end
+            recomputeTree()
         end
 
         def index_page(page)
@@ -351,15 +366,17 @@ module Evolveum
             (@title == nil || @title.empty?) ? @slug : @title
         end
 
-        def label_encoded
-            label.encode(:xml => :text)
-        end
+        # Probably not needed, page attributes seem to be HTML-encoded already
+        #def label_encoded
+        #    label.encode(:xml => :text)
+        #end
 
         def append_label_link(s)
                 if (@url != nil)
                     s << "<a href=\"#{@url}\">"
                 end
-                s << label_encoded
+                # Note: page title is HTML-encoded already
+                s << label
                 if (@url != nil)
                     s << "</a>"
                 end
@@ -438,7 +455,71 @@ module Evolveum
 
         # NOTE: this may not work well until we have all labels generated correctly
         def presentableSubnodes(params = {})
-            subnodes.select{ |node| node.presentable?(params) }.sort
+            subnodes.select{ |node| node.presentable?(params) }.sort{ |a,b| sortCompare(a,b) }
+        end
+
+        def sortCompare(a,b)
+            sortBy = self&.page&.data&.[]('sub-sort-by')
+            sortStrategy = self&.page&.data&.[]('sub-sort-strategy')
+            sortDirection = self&.page&.data&.[]('sub-sort-direction')
+            order = 0
+            if sortBy != nil
+                order = sortCompareValue(a&.page&.data&.[](sortBy), b&.page&.data&.[](sortBy), sortStrategy)
+            end
+            if order != 0
+                return adjustSortOrder(order, sortDirection)
+            end
+            order = sortCompareValue(a.display_order, b.display_order)
+            if order != 0
+                return adjustSortOrder(order, sortDirection)
+            end
+            return adjustSortOrder(sortCompareValue(a.label.downcase, b.label.downcase), sortDirection)
+        end
+
+        def adjustSortOrder(order, direction)
+            if direction == nil || direction == 'normal'
+                return order
+            else
+                return -order
+            end
+        end
+
+        def sortCompareValue(a, b, sortStrategy=nil)
+            if sortStrategy == nil
+                return a <=> b
+            end
+            case sortStrategy
+            when 'version'
+                return sortCompareVersion(a, b)
+            else
+                raise ArgumentError, "Unknown sort strategy #{sortStrategy}"
+            end
+        end
+
+        def sortCompareVersion(a,b)
+#            puts("IIIIIIIII: #{a} <=> #{b}")
+            if !a.is_a?(String)
+                raise ArgumentError, "Cannot determine version from #{a.class}: #{a} in #{self.url}"
+            end
+            if !b.is_a?(String)
+                raise ArgumentError, "Cannot determine version from #{b.class}: #{b} in #{self.url}"
+            end
+            al = a.split('.')
+            bl = b.split('.')
+            for i in 0..([al.length, bl.length].max - 1)
+                if i >= al.length
+                    return -1
+                end
+                if i >= bl.length
+                    return 1
+                end
+                order = al[i].to_i <=> bl[i].to_i
+ #               puts("IIIIIIIII: #{i}: #{al[i]} <=> #{bl[i]} -> #{order}")
+                if order != 0
+                    return order
+                end
+            end
+            return 0
         end
 
         def presentable?(params = {})
@@ -492,11 +573,11 @@ Liquid::Template.register_tag('children', Evolveum::ChildrenTag)
 # We update the tree at this point, to have correct page titles later when the pages are rendered.
 
 Jekyll::Hooks.register :site, :post_read do |site|
-    #putsts "=========[ EVOLVEUM ]============== post_read #{site}"
+    #putsts "=========[ EVOLVEUM ]============== post_read"
     site.data['nav'] = Evolveum::Nav.construct(site)
 end
 
 Jekyll::Hooks.register :site, :pre_render do |site|
-    #puts "=========[ EVOLVEUM ]============== pre_render #{site}"
+    #puts "=========[ EVOLVEUM ]============== pre_render"
     site.data['nav'].update(site)
 end
