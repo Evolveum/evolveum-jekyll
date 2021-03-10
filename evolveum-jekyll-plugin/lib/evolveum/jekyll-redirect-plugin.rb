@@ -32,15 +32,15 @@ module Evolveum
             @site.pages.each do |page|
                 if page.data['moved-from']
                     Array(page.data['moved-from']).each do |movedFrom|
-                        redirects << { "pattern" => patternizeMovePath(movedFrom),  "substitution" => page.url }
+                        redirects << createRedirect(movedFrom, page)
                     end
                 end
             end
             return redirects
         end
 
-        def patternizeMovePath(orig)
-            out = orig
+        def createRedirect(movedFrom, page)
+            out = movedFrom
 
             if out.start_with?('/')
                 # We do not want to start pattern with /
@@ -55,7 +55,7 @@ module Evolveum
                 if out.end_with?('/')
                     out = out[0..-2]
                 end
-                return "^" + escapePattern(out) + "(/|$)"
+                return { "pattern" => "^" + escapePattern(out) + "(/|$)(.*)",  "substitution" => page.url + "$2" }
             end
 
             if out.end_with?('/')
@@ -64,7 +64,7 @@ module Evolveum
                 out = out[0..-2]
             end
 
-            return "^" + escapePattern(out) + "/?$"
+            return { "pattern" => "^" + escapePattern(out) + "/?$",  "substitution" => page.url }
         end
 
         def escapePattern(orig)
