@@ -41,14 +41,29 @@ module Evolveum
 
         def patternizeMovePath(orig)
             out = orig
+
             if out.start_with?('/')
                 # We do not want to start pattern with /
                 # This is .htaccess, paths are relative to the directory in which .htaccess is
                 out = out[1..-1]
             end
+
+            if out.end_with?('*')
+                # This is special. We want do not want to redirect one specific document.
+                # We want to redirect whole subtree. We have to leave the pattern open-ended
+                out = out[0..-2]
+                if out.end_with?('/')
+                    out = out[0..-2]
+                end
+                return "^" + escapePattern(out) + "(/|$)"
+            end
+
             if out.end_with?('/')
+                # We do not want the pattern to end with /
+                # We will be adding patter suffix that represents both the URL ending and slash and without slash
                 out = out[0..-2]
             end
+
             return "^" + escapePattern(out) + "/?$"
         end
 
