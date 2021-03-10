@@ -106,7 +106,8 @@ module Evolveum
         if targetPage == nil
             sourceFile = parent.document.attributes["docfile"]
             Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
-            return (create_anchor parent, attrs['linktext'], type: :link, target: "/broken_link/").convert
+            # Leave the target of broken link untouched. Redirects may still be able to handle it.
+            return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert
         end
 
         createLink(targetPage.url, parent, attrs, targetPage.data['title'])
