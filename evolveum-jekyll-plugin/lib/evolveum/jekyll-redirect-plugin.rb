@@ -32,13 +32,21 @@ module Evolveum
             @site.pages.each do |page|
                 if page.data['moved-from']
                     Array(page.data['moved-from']).each do |movedFrom|
-                        # We do not want to start pattern with /
-                        # This is .htaccess, paths are relative to the directory in which .htaccess is
-                        redirects << { "pattern" => "^" + escapePattern(movedFrom) + "$",  "substitution" => page.url }
+                        redirects << { "pattern" => "^" + escapePattern(prepareMovePath(movedFrom)) + "$",  "substitution" => page.url }
                     end
                 end
             end
             return redirects
+        end
+
+        def prepareMovePath(orig)
+            if orig.start_with?('/')
+                # We do not want to start pattern with /
+                # This is .htaccess, paths are relative to the directory in which .htaccess is
+                return orig[1..-1]
+            else
+                return orig
+            end
         end
 
         def escapePattern(orig)
