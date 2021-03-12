@@ -234,7 +234,7 @@ module Evolveum
     # Each node is identified by "slug", which is one part of the URL hierarchy.
     class Nav
         attr_reader :subnodes, :slug
-        attr_accessor :url, :title, :visibility, :display_order, :page
+        attr_accessor :url, :title, :visibility, :display_order, :page, :alias
 
         def initialize(slug)
             @subnodes = []
@@ -310,7 +310,43 @@ module Evolveum
             if (nav.display_order == 0)
                 nav.display_order = 100
             end
+            if page.data['alias'] != nil
+                if page.data['alias'].kind_of?(Array)
+                    page.data['alias'].each { |a| index_alias(a, page)}
+                else
+                    index_alias(page.data['alias'], page)
+                end
+            end
             nav
+        end
+
+        def index_alias(aliasdef, page)
+            parent_url = aliasdef['parent']
+            if parent_url == nil
+                Jekyll.logger.warn("No parent in alias specification in page #{page.url}, ignoring")
+                return
+            end
+            parent_nav = index_path(parent_url)
+            slug = aliasdef['slug']
+            if slug == nil
+                slug = slugize(page.url).last
+            end
+            sub_nav = parent_nav.resolve(slug)
+            if sub_nav != nil
+                Jekyll.logger.warn("Alias slug #{last_slug} is already taken in #{parent_nav}, in alias specification in page #{page.url}. Ignoring.")
+                return
+            end
+            sub_nav = Evolveum::Nav.new(slug)
+            parent_nav.add(sub_nav)
+            sub_nav.url = page.url
+            sub_nav.page = page
+            sub_nav.alias = true
+            sub_nav.title = aliasdef['title'] || page.data['nav-title'] || page.data['title']
+            display_order = aliasdef['display-order'] || page.data['display-order']
+            sub_nav.display_order = display_order.to_i
+            if (sub_nav.display_order == 0)
+                sub_nav.display_order = 100
+            end
         end
 
         def index_path(url)
@@ -437,7 +473,7 @@ module Evolveum
         end
 
         def active?(currentPageUrl)
-            @url != nil && @url == currentPageUrl
+            !@alias && @url != nil && @url == currentPageUrl
         end
 
         def visible?
