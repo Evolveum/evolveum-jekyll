@@ -1,0 +1,3 @@
+{% for redirect in page.redirects %}
+RewriteRule   "{{ redirect.pattern }}" "{{ redirect.substitution }}" [R]
+{% endfor %}

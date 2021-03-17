@@ -104,7 +104,7 @@ module Evolveum
         end
     end
 
-    class SiteMapGenerator < Jekyll::Generator
+    class SiteMapGenerator < Generator
         priority :lowest
 
         FILENAME_SITEMAP_XML = 'sitemap.xml'
@@ -126,15 +126,6 @@ module Evolveum
         MINIFY_REGEX = %r!(?<=>\n|})\s+!.freeze
 
         SEARCHMAP_PROPS = [ 'title', 'author', 'description', 'keywords', 'preview' ]
-
-        def sourceFilePath(filename)
-          File.expand_path filename, __dir__
-        end
-
-        # Checks if a file already exists in the site source
-        def pageExists?(file_path)
-          @site.pages.any? { |p| p.url == "/#{file_path}" }
-        end
 
         def generateSiteMapXml()
           page = Jekyll::PageWithoutAFile.new(@site, __dir__, "", FILENAME_SITEMAP_XML)

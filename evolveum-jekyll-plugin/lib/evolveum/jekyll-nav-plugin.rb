@@ -27,7 +27,7 @@ module Evolveum
         def generate(site)
             @site = site
             site.data['nav'].uninitializedStubs.each do |nav|
-                puts "Generating stub #{nav.url}"
+                #puts "Generating stub #{nav.url}"
                 site.pages << generateStub(nav)
             end
         end
@@ -195,14 +195,26 @@ module Evolveum
 
         def initialize(tag_name, text, tokens)
           super
-          @text = text
+          parseParams(text)
+        end
+
+        def parseParams(text)
+            @params = {}
+            text.split(',').each do |piece|
+                m = piece.match(/^\s*([\w\-_]+)\s*:\s*([\w\-_]+)\s*$/)
+                if m
+                    @params[m[1]] = m[2]
+                else
+                    raise ArgumentError, "Malformed parameters in children tag: #{piece}"
+                end
+            end
         end
 
         def render(context)
             navtree = context['site']['data']['nav']
             s = StringIO.new
             s << '<ul class="children">'
-            children = navtree.children(context['page']['url'])
+            children = navtree.children(context['page']['url'], @params)
             children.each do |child|
                 s << '<li class="children-item">'
                 child.append_label_link(s)
@@ -222,7 +234,7 @@ module Evolveum
     # Each node is identified by "slug", which is one part of the URL hierarchy.
     class Nav
         attr_reader :subnodes, :slug
-        attr_accessor :url, :title, :visibility, :display_order, :page
+        attr_accessor :url, :title, :visibility, :display_order, :page, :alias
 
         def initialize(slug)
             @subnodes = []
@@ -260,6 +272,21 @@ module Evolveum
                     @visibility = parent.visibility
                 end
             end
+            if self.page != nil && self.page.data['effectiveVisibility'] == nil
+                self.page.data['effectiveVisibility'] = @visibility
+            end
+            if self&.page&.data&.[]('nav-title') == nil && parent&.page&.data&.[]('sub-nav-title-property') != nil
+                propertyName = parent.page.data['sub-nav-title-property']
+                propertyValue = self.page.data[propertyName]
+                if propertyValue != nil
+                    navTitle = ""
+                    if parent&.page&.data&.[]('sub-nav-title-prefix') != nil
+                        navTitle = parent&.page&.data&.[]('sub-nav-title-prefix')
+                    end
+                    navTitle += propertyValue.to_s
+                    self.title = navTitle
+                end
+            end
 #            puts("R: #{self.url} : #{self.visibility}")
         end
 
@@ -268,6 +295,7 @@ module Evolveum
                 nav = index_page(page)
                 #puts("  [U] #{nav.url}: #{nav.title}")
             end
+            recomputeTree()
         end
 
         def index_page(page)
@@ -282,7 +310,43 @@ module Evolveum
             if (nav.display_order == 0)
                 nav.display_order = 100
             end
+            if page.data['alias'] != nil
+                if page.data['alias'].kind_of?(Array)
+                    page.data['alias'].each { |a| index_alias(a, page)}
+                else
+                    index_alias(page.data['alias'], page)
+                end
+            end
             nav
+        end
+
+        def index_alias(aliasdef, page)
+            parent_url = aliasdef['parent']
+            if parent_url == nil
+                Jekyll.logger.warn("No parent in alias specification in page #{page.url}, ignoring")
+                return
+            end
+            parent_nav = index_path(parent_url)
+            slug = aliasdef['slug']
+            if slug == nil
+                slug = slugize(page.url).last
+            end
+            sub_nav = parent_nav.resolve(slug)
+            if sub_nav != nil
+                Jekyll.logger.warn("Alias slug #{last_slug} is already taken in #{parent_nav}, in alias specification in page #{page.url}. Ignoring.")
+                return
+            end
+            sub_nav = Evolveum::Nav.new(slug)
+            parent_nav.add(sub_nav)
+            sub_nav.url = page.url
+            sub_nav.page = page
+            sub_nav.alias = true
+            sub_nav.title = aliasdef['title'] || page.data['nav-title'] || page.data['title']
+            display_order = aliasdef['display-order'] || page.data['display-order']
+            sub_nav.display_order = display_order.to_i
+            if (sub_nav.display_order == 0)
+                sub_nav.display_order = 100
+            end
         end
 
         def index_path(url)
@@ -338,15 +402,17 @@ module Evolveum
             (@title == nil || @title.empty?) ? @slug : @title
         end
 
-        def label_encoded
-            label.encode(:xml => :text)
-        end
+        # Probably not needed, page attributes seem to be HTML-encoded already
+        #def label_encoded
+        #    label.encode(:xml => :text)
+        #end
 
         def append_label_link(s)
                 if (@url != nil)
                     s << "<a href=\"#{@url}\">"
                 end
-                s << label_encoded
+                # Note: page title is HTML-encoded already
+                s << label
                 if (@url != nil)
                     s << "</a>"
                 end
@@ -367,13 +433,13 @@ module Evolveum
             breadcrumbs
         end
 
-        def children(url)
+        def children(url, params = {})
             slugs = slugize(url)
             nav = self
             slugs.each do |slug|
                 nav = nav.resolve(slug)
             end
-            nav.presentableSubnodes
+            nav.presentableSubnodes(params)
         end
 
         def uninitializedStubs
@@ -407,7 +473,7 @@ module Evolveum
         end
 
         def active?(currentPageUrl)
-            @url != nil && @url == currentPageUrl
+            !@alias && @url != nil && @url == currentPageUrl
         end
 
         def visible?
@@ -424,8 +490,83 @@ module Evolveum
         end
 
         # NOTE: this may not work well until we have all labels generated correctly
-        def presentableSubnodes
-            subnodes.select{ |node| node.visible? }.sort
+        def presentableSubnodes(params = {})
+            subnodes.select{ |node| node.presentable?(params) }.sort{ |a,b| sortCompare(a,b) }
+        end
+
+        def sortCompare(a,b)
+            sortBy = self&.page&.data&.[]('sub-sort-by')
+            sortStrategy = self&.page&.data&.[]('sub-sort-strategy')
+            sortDirection = self&.page&.data&.[]('sub-sort-direction')
+            order = 0
+            if sortBy != nil
+                order = sortCompareValue(a&.page&.data&.[](sortBy), b&.page&.data&.[](sortBy), sortStrategy)
+            end
+            if order != 0
+                return adjustSortOrder(order, sortDirection)
+            end
+            order = sortCompareValue(a.display_order, b.display_order)
+            if order != 0
+                return adjustSortOrder(order, sortDirection)
+            end
+            return adjustSortOrder(sortCompareValue(a.label.downcase, b.label.downcase), sortDirection)
+        end
+
+        def adjustSortOrder(order, direction)
+            if direction == nil || direction == 'normal'
+                return order
+            else
+                return -order
+            end
+        end
+
+        def sortCompareValue(a, b, sortStrategy=nil)
+            if sortStrategy == nil
+                return a <=> b
+            end
+            case sortStrategy
+            when 'version'
+                return sortCompareVersion(a, b)
+            else
+                raise ArgumentError, "Unknown sort strategy #{sortStrategy}"
+            end
+        end
+
+        def sortCompareVersion(a,b)
+#            puts("IIIIIIIII: #{a} <=> #{b}")
+            if !a.is_a?(String)
+                raise ArgumentError, "Cannot determine version from #{a.class}: #{a} in #{self.url}"
+            end
+            if !b.is_a?(String)
+                raise ArgumentError, "Cannot determine version from #{b.class}: #{b} in #{self.url}"
+            end
+            al = a.split('.')
+            bl = b.split('.')
+            for i in 0..([al.length, bl.length].max - 1)
+                if i >= al.length
+                    return -1
+                end
+                if i >= bl.length
+                    return 1
+                end
+                order = al[i].to_i <=> bl[i].to_i
+ #               puts("IIIIIIIII: #{i}: #{al[i]} <=> #{bl[i]} -> #{order}")
+                if order != 0
+                    return order
+                end
+            end
+            return 0
+        end
+
+        def presentable?(params = {})
+            visibilityReq = params['visibility']
+            if visibilityReq == nil
+                return self.visible?
+            elsif visibilityReq == 'all'
+                return true
+            else
+                return self.visibility == visibilityReq
+            end
         end
 
         def visibleSubnodes
@@ -468,11 +609,11 @@ Liquid::Template.register_tag('children', Evolveum::ChildrenTag)
 # We update the tree at this point, to have correct page titles later when the pages are rendered.
 
 Jekyll::Hooks.register :site, :post_read do |site|
-    #putsts "=========[ EVOLVEUM ]============== post_read #{site}"
+    #putsts "=========[ EVOLVEUM ]============== post_read"
     site.data['nav'] = Evolveum::Nav.construct(site)
 end
 
 Jekyll::Hooks.register :site, :pre_render do |site|
-    #puts "=========[ EVOLVEUM ]============== pre_render #{site}"
+    #puts "=========[ EVOLVEUM ]============== pre_render"
     site.data['nav'].update(site)
 end
