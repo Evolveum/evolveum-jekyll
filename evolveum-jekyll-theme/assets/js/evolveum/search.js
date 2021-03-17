@@ -136,5 +136,6 @@ function normalize(text) {
 
 $("#search-modal").on('shown.bs.modal', function() {
     console.log('triggered')
+    document.getElementById('searchbar').value = document.getElementById('searchToggle').value
     $('#searchbar').trigger('focus')
 })
