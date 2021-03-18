@@ -45,7 +45,7 @@ module Evolveum
         def data()
             @s << "  <tbody>\n"
             if @config['development']
-                develEntry = @versions.filter { |v| v['status'] == 'development'}[0]
+                develEntry = @versions.select { |v| v['status'] == 'development'}[0]
                 versionEntry = develEntry.clone()
                 versionEntry['git-tag'] = "master"
                 versionEntry['maven-version'] = versionEntry['version'] + "-SNAPSHOT"
@@ -59,7 +59,7 @@ module Evolveum
             end
             @versions
                 .reverse
-                .filter { |v| v['status'] != 'development' && v['status'] != 'planned' }
+                .select { |v| v['status'] != 'development' && v['status'] != 'planned' }
                 .each { |v| versionRow(expandVersionEntry(v), @config['columns']) }
             @s << "  </tbody>\n"
         end
