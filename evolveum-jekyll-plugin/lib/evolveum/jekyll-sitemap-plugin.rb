@@ -154,7 +154,11 @@ module Evolveum
                 pageEntry = { url: page.url, lastModificationDate: page.data['lastModificationDate'] }
                 SEARCHMAP_PROPS.each do |prop|
                     if page.data[prop]
-                        pageEntry[prop] = page.data[prop]
+                        if page.data[prop].kind_of?(Array)
+                            pageEntry[prop] = page.data[prop].map { |e| e.to_s }
+                        else
+                            pageEntry[prop] = page.data[prop].to_s
+                        end
                     end
                 end
                 searchmap << pageEntry
