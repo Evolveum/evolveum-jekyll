@@ -65,11 +65,11 @@ function searchForPhrase() {
                 }
 
                 if (searchMap[i].keywords !== undefined) {
-                    allTextWithoutWS += ' ' + normalize(searchMap[i].keywords)
+                    allTextWithoutWS += ' ' + normalize(searchMap[i].keywords.toString())
 
                     // array of single words in keywords item - to be matched with the phrase
                     // TODO implement searching for two words as a phrase
-                    var keyWords = searchMap[i].keywords.replace(/,/g, '').split(' ')
+                    var keyWords = searchMap[i].keywords.toString().replace(/,/g, '').split(' ')
                 }
 
                 // If allTextWithoutWS does not include the phrase, it is useless to check for
