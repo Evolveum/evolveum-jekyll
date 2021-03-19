@@ -1179,7 +1179,7 @@ a.image {
 // AsciiDoc footnote styles
 sup.footnote,
 sup.footnoteref {
-  font-size: 1.5rem; // 80% instead?
+  font-size: 0.75rem;
   position: static;
   vertical-align: super;
   a {
@@ -1203,7 +1203,7 @@ sup.footnoteref {
   .footnote {
     padding: 0 0.375em 0 0.225em; // .15em difference is due to text-indent
     line-height: 1.3334;
-    font-size: 1.5rem;
+    font-size: 1rem;
     margin-left: 1.2em;
     margin-bottom: 0.2em;
     a:first-of-type {
