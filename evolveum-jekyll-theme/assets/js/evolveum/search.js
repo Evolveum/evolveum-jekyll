@@ -131,7 +131,7 @@ function formatDate(dateAndTime) {
 }
 
 function normalize(text) {
-    return text.toLowerCase().replace(/\s/g, "")
+    return text.toString().toLowerCase().replace(/\s/g, "")
 }
 
 $("#search-modal").on('shown.bs.modal', function() {
