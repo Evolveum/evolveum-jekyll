@@ -333,7 +333,11 @@ module Evolveum
             end
             sub_nav = parent_nav.resolve(slug)
             if sub_nav != nil
-                Jekyll.logger.warn("Alias slug #{slug} is already taken in #{parent_nav}, in alias specification in page #{page.url}. Ignoring.")
+                if sub_nav.url == page.url
+                    # Already indexed
+                    return
+                end
+                Jekyll.logger.warn("Alias slug #{slug} is already taken in #{parent_nav.url} by #{sub_nav.url}, in alias specification in page #{page.url}. Ignoring.")
                 return
             end
             sub_nav = Evolveum::Nav.new(slug)
