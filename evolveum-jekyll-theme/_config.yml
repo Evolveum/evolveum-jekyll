@@ -5,11 +5,12 @@ github_username:  Evolveum
 plugins:
   - evolveum-jekyll-plugin
   - jekyll-asciidoc
-  - coderay
 
 asciidoctor:
   base_dir: :docdir
   safe: unsafe
   attributes:
     icons: font
-    source-highlighter: coderay
+    source-highlighter: rouge
+
+highlighter: rouge

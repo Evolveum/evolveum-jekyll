@@ -5,4 +5,3 @@ gemspec
 
 gem "evolveum-jekyll-plugin"
 gem "jekyll-asciidoc"
-gem "coderay"
