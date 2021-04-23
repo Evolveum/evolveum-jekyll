@@ -171,6 +171,8 @@ module Evolveum
 #            puts("WWWIKI-------> found page #{page.url}")
             targetUrl = page.url
         else
+            sourceFile = parent.document.attributes["docfile"]
+            Jekyll.logger.error("BROKEN WIKI LINK wiki:#{target} in #{sourceFile}")
  #           puts("WWWIKI no page for name #{wikiName}")
             targetUrl = "https://wiki.evolveum.com/display/midPoint/#{target}"
         end
