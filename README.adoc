@@ -1,0 +1,17 @@
+= Evolveum Jekyll Theme and Plugins
+
+This repository contains Jekyll theme and plugins used on Evolveum web sites.
+There are also Asciidoctor plugins.
+
+Please see https://docs.evolveum.com/about/writing-documentation/ for details.
+
+== Copyright
+
+(c) 2020-2021 Evolveum
+
+Licensed under the terms of Apache License 2.0
+
+The license does not grant any rights to trademarks included in this project.
+
+This project contains other code and documents that are licensed under different licenses.
+Please see the NOTICE file for details.
