@@ -127,10 +127,11 @@ module Evolveum
     #    puts "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXREF -------> Processing #{parent} #{targetFile} #{attrs}"
 
         targetPath, fragmentSuffix = parseFragment(target)
+        sourceFile = parent.document.attributes["docfile"]
         #puts "targetPath=#{targetPath}, fragment=#{fragmentSuffix}"
 
         targetPage = findPageByTarget(parent.document.attributes["docdir"], targetPath)
-#        puts("XXXREF found page #{targetPage}")
+        #puts("DEBUG XREF #{targetPath} -> found page #{targetPage&.url} in #{sourceFile}")
 
         if targetPage == nil
             # No page. But there still may be a plain file (e.g. a PDF file)
@@ -138,7 +139,6 @@ module Evolveum
             if absoluteFilePathname.exist?
                 createLink(target, parent, attrs, targetPath)
             else
-                sourceFile = parent.document.attributes["docfile"]
                 ignore = parent.document.attributes["ignore-broken-links"]
                 if ignore == nil
                     Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
