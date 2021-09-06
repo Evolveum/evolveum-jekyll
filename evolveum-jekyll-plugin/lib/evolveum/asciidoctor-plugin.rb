@@ -37,14 +37,18 @@ module Evolveum
       end
 
 
-      def createLink(targetUrl, parent, attrs, defaultLinkText)
+      def createLink(targetUrl, parent, attrs, defaultLinkText, role = nil)
         if attrs['linktext'] == nil || attrs['linktext'].strip.empty?
             linktext = defaultLinkText
         else
             linktext = attrs['linktext']
         end
         parent.document.register :links, targetUrl
-        (create_anchor parent, linktext, type: :link, target: targetUrl).convert
+        node = (create_anchor parent, linktext, type: :link, target: targetUrl)
+        if role != nil
+            node.add_role(role)
+        end
+        node.convert
       end
 
       # target can be URL or file path
@@ -104,6 +108,10 @@ module Evolveum
 
       def jekyllSite()
         return Jekyll.sites[0]
+      end
+
+      def jekyllData(dataName)
+        return jekyllSite().data[dataName]
       end
 
       def findPage
@@ -203,6 +211,37 @@ module Evolveum
 
     end
 
+    class GlossrefInlineMacro < JekyllInlineMacro
+      use_dsl
+
+      named :glossref
+      name_positional_attributes 'linktext'
+
+      def process(parent, target, attrs)
+
+        glossentry = findGlossaryEntry(target)
+        if glossentry == nil
+            sourceFile = parent.document.attributes["docfile"]
+            Jekyll.logger.error("BROKEN GLOSSARY ENTRY #{target} in #{sourceFile}")
+            defaultLabel = target
+        else
+            defaultLabel = glossentry['term']
+        end
+        targetUrl = "/glossary/##{target}"
+#        puts "GLOSSREF: #{target} -> #{targetUrl}"
+
+        createLink(targetUrl, parent, attrs, defaultLabel, "glossref")
+      end
+
+      def findGlossaryEntry(entry_id)
+        glossary = jekyllData('glossary')
+        glossentry = glossary.detect {|e| e['id'] == entry_id }
+#        puts "GLOSSREF:entry: #{glossentry}"
+        return glossentry
+      end
+
+    end
+
     class JekyllTreeprocessor < Asciidoctor::Extensions::Treeprocessor
 
         def jekyllSite()
@@ -295,5 +334,6 @@ Asciidoctor::Extensions.register do
   inline_macro Evolveum::XrefInlineMacro
   inline_macro Evolveum::WikiInlineMacro
   inline_macro Evolveum::BugInlineMacro
+  inline_macro Evolveum::GlossrefInlineMacro
   treeprocessor Evolveum::ImagePathTreeprocessor
 end
