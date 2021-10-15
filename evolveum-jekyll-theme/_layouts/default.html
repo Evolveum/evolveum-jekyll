@@ -21,6 +21,27 @@
 <script src="/assets/js/evolveum/multi-source.js"></script>
 <script src="/assets/js/evolveum/search.js"></script>
 
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  messageStyle: "none",
+  tex2jax: {
+    inlineMath: [["\\(","\\)"]],
+    displayMath: [["\\[","\\]"]],
+    ignoreClass: "nostem|nolatexmath"
+  },
+  asciimath2jax: {
+    delimiters: [["\\$","\\$"]],
+    ignoreClass: "nostem|noasciimath"
+  },
+  TeX: {
+      equationNumbers: {
+        autoNumber: "AMS"
+      }
+    }
+});
+</script>
+<script src="/assets/js/mathjax/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+
 {% for script in page.scripts %}
     <script src="/assets/scripts/{{ script }}"></script>
 {% endfor %}
