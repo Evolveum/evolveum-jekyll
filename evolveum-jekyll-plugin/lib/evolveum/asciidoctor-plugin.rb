@@ -13,114 +13,146 @@ require 'pp'
 
 module Evolveum
 
+    module JekyllUtilMixin
+
+        def jekyllSite()
+            return Jekyll.sites[0]
+        end
+
+        def jekyllData(dataName)
+            return jekyllSite().data[dataName]
+        end
+
+        def findPage
+            return jekyllSite().pages.find { |page| yield page }
+        end
+
+        def findCurrentPage(document)
+            docfile = document.attr("docfile")
+            siteDirPathname = Pathname.new(jekyllSite.source)
+            relativeDocfilePath = Pathname.new(docfile).relative_path_from(Pathname.new(jekyllSite.source)).to_s
+            page = findPage { |page| page.path == relativeDocfilePath }
+            #puts("RRRRRRRRRRRRRRRRRRR: #{relativeDocfilePath} -> #{page&.url}")
+            return page
+        end
+
+        def removeLeadingSlash(path)
+            if path.start_with?('/')
+                return path[1..-1]
+            else
+                return path
+            end
+        end
+
+        # target can be URL or file path
+        def findPageByTarget(document, target)
+            if target.end_with?("/")
+                return findPageByUrl(document, target)
+            elsif target.match(/\/[^\/\.]+$/)
+                # URL without trailing slash
+                return findPageByUrl(document, target + "/")
+            else
+                return findPageByFilePath(document, target)
+            end
+        end
+
+        def findPageByFilePath(document, target)
+            docdir = document.attributes["docdir"]
+            relativeFilePath = toRelativePathname(docdir, target)
+        #    puts "relativeSourceDir=#{relativeSourceDir}, relativeFilePath=#{relativeFilePath}"
+            page = findPage { |page| page.path == relativeFilePath }
+            #puts "FFF:FILE: #{relativeFilePath} -> #{page&.url}"
+            return page
+        end
+
+        def toRelativePathname(docdir, target)
+            targetPathname = Pathname.new(target)
+            if targetPathname.absolute?
+                return target[1..-1]
+            else
+                relativeSourceDir = Pathname.new(docdir).relative_path_from(Pathname.new(jekyllSite().source))
+                return (relativeSourceDir + targetPathname).to_s
+            end
+        end
+
+        def findPageByUrl(document, target)
+            docdir = document.attributes["docdir"]
+            site = jekyllSite()
+            targetPathname = Pathname.new(target)
+
+            if targetPathname.absolute?
+                url = target
+                page = findPage { |page| page.url == url }
+            else
+                # Try whether the link is relative to source document path
+                relativeSourceDir = Pathname.new(docdir).relative_path_from(Pathname.new(site.source))
+                url = "/" + (relativeSourceDir + targetPathname).to_s
+                page = findPage { |page| page.url == url }
+                if page == nil
+                    # maybe the author meant the link as relative to URL of source document, not filesystem path
+                    #puts "Cannot find page by filesystem-based relative link, trying URL-based relative link (#{targetPathname})"
+                    currentPage = findCurrentPage(document)
+                    currentPageUrlPathname = Pathname.new(currentPage.url)
+                    url = (currentPageUrlPathname + targetPathname).to_s
+                    page = findPage { |page| page.url == url }
+                end
+            end
+
+            #puts "FFF:URL: #{url} -> #{page&.url}"
+            return page
+        end
+
+        def findFile(docdir, target)
+            relativeFilePathname = toRelativePathname(docdir, target)
+            absoluteFilePathname = Pathname.new(jekyllSite().source) + relativeFilePathname
+            #puts "FFF:FILE: #{target} -> #{absoluteFilePathname}"
+            return absoluteFilePathname
+        end
+
+    end
+
     class JekyllInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
-      use_dsl
+        include JekyllUtilMixin
+        use_dsl
 
-      name_positional_attributes 'linktext'
+        name_positional_attributes 'linktext'
 
-      def parseFragment(target)
-        targetPath = target
-        fragmentSuffix = ""
-        if target.include?('#')
-            targetPath = target[0 .. target.rindex('#')-1]
-            fragmentSuffix = target[target.rindex('#')..-1]
-        end
-        return targetPath, fragmentSuffix
-      end
-
-      def addFragmentSuffix(path, fragmentSuffix)
-        if fragmentSuffix != nil && !fragmentSuffix.empty?
-          return path + fragmentSuffix
-        else
-          return path
-        end
-      end
-
-
-      def createLink(targetUrl, parent, attrs, defaultLinkText, role = nil)
-        if attrs['linktext'] == nil || attrs['linktext'].strip.empty?
-            linktext = defaultLinkText
-        else
-            linktext = attrs['linktext']
-        end
-        parent.document.register :links, targetUrl
-        node = (create_anchor parent, linktext, type: :link, target: targetUrl)
-        if role != nil
-            node.add_role(role)
-        end
-        node.convert
-      end
-
-      # target can be URL or file path
-      def findPageByTarget(docdir, target)
-        if target.end_with?("/")
-            return findPageByUrl(docdir, target)
-        elsif target.match(/\/[^\/\.]+$/)
-            # URL without trailing slash
-            return findPageByUrl(docdir, target + "/")
-        else
-            return findPageByFilePath(docdir, target)
-        end
-      end
-
-      def findPageByFilePath(docdir, target)
-        relativeFilePath = toRelativePathname(docdir, target)
-    #    puts "relativeSourceDir=#{relativeSourceDir}, relativeFilePath=#{relativeFilePath}"
-        page = findPage { |page| page.path == relativeFilePath }
-        #puts "FFF:FILE: #{relativeFilePath} -> #{page&.url}"
-        return page
-      end
-      
-      def toRelativePathname(docdir, target)
-        targetPathname = Pathname.new(target)
-        if targetPathname.absolute?
-            return target[1..-1]
-        else
-            relativeSourceDir = Pathname.new(docdir).relative_path_from(Pathname.new(jekyllSite().source))
-            return (relativeSourceDir + targetPathname).to_s
-        end
-      end
-
-
-      def findPageByUrl(docdir, target)
-        site = jekyllSite()
-        targetPathname = Pathname.new(target)
-
-        if targetPathname.absolute?
-            url = target
-        else
-            relativeSourceDir = Pathname.new(docdir).relative_path_from(Pathname.new(site.source))
-            url = "/" + (relativeSourceDir + targetPathname).to_s
+        def parseFragment(target)
+            targetPath = target
+            fragmentSuffix = ""
+            if target.include?('#')
+                targetPath = target[0 .. target.rindex('#')-1]
+                fragmentSuffix = target[target.rindex('#')..-1]
+            end
+            return targetPath, fragmentSuffix
         end
 
-        page = findPage { |page| page.url == url }
-        #puts "FFF:URL: #{url} -> #{page&.url}"
-        return page
-      end
+        def addFragmentSuffix(path, fragmentSuffix)
+            if fragmentSuffix != nil && !fragmentSuffix.empty?
+                return path + fragmentSuffix
+            else
+                return path
+            end
+        end
 
-      def findFile(docdir, target)
-          relativeFilePathname = toRelativePathname(docdir, target)
-          absoluteFilePathname = Pathname.new(jekyllSite().source) + relativeFilePathname
-          #puts "FFF:FILE: #{target} -> #{absoluteFilePathname}"
-          return absoluteFilePathname
-      end
-
-
-      def jekyllSite()
-        return Jekyll.sites[0]
-      end
-
-      def jekyllData(dataName)
-        return jekyllSite().data[dataName]
-      end
-
-      def findPage
-        return jekyllSite().pages.find { |page| yield page }
-      end
+        def createLink(targetUrl, parent, attrs, defaultLinkText, role = nil)
+            if attrs['linktext'] == nil || attrs['linktext'].strip.empty?
+                linktext = defaultLinkText
+            else
+                linktext = attrs['linktext']
+            end
+            parent.document.register :links, targetUrl
+            node = (create_anchor parent, linktext, type: :link, target: targetUrl)
+            if role != nil
+                node.add_role(role)
+            end
+            node.convert
+        end
 
     end
 
     class JekyllBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
+        include JekyllUtilMixin
         use_dsl
 
     end
@@ -138,7 +170,7 @@ module Evolveum
         sourceFile = parent.document.attributes["docfile"]
         #puts "targetPath=#{targetPath}, fragment=#{fragmentSuffix}"
 
-        targetPage = findPageByTarget(parent.document.attributes["docdir"], targetPath)
+        targetPage = findPageByTarget(parent.document, targetPath)
         #puts("DEBUG XREF #{targetPath} -> found page #{targetPage&.url} in #{sourceFile}")
 
         if targetPage == nil
@@ -160,7 +192,6 @@ module Evolveum
             createLink(addFragmentSuffix(targetPage.url,fragmentSuffix), parent, attrs, targetPage.data['title'])
         end
       end
-      
     end
 
 
@@ -243,31 +274,8 @@ module Evolveum
     end
 
     class JekyllTreeprocessor < Asciidoctor::Extensions::Treeprocessor
+        include JekyllUtilMixin
 
-        def jekyllSite()
-            return Jekyll.sites[0]
-        end
-
-        def findPage
-            return jekyllSite().pages.find { |page| yield page }
-        end
-
-        def findCurrentPage(document)
-            docfile = document.attr("docfile")
-            siteDirPathname = Pathname.new(jekyllSite.source)
-            relativeDocfilePath = Pathname.new(docfile).relative_path_from(Pathname.new(jekyllSite.source)).to_s
-            page = findPage { |page| page.path == relativeDocfilePath }
-            #puts("RRRRRRRRRRRRRRRRRRR: #{relativeDocfilePath} -> #{page&.url}")
-            return page
-        end
-
-        def removeLeadingSlash(path)
-            if path.start_with?('/')
-                return path[1..-1]
-            else
-                return path
-            end
-        end
     end
 
     class ImagePathTreeprocessor < JekyllTreeprocessor
