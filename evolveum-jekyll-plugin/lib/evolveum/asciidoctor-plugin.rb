@@ -102,6 +102,42 @@ module Evolveum
             return page
         end
 
+        def findFileByTarget(document, target)
+            currentPage = findCurrentPage(document)
+            if target.start_with?("/")
+                # All is clear, this is absolute URL from the site root
+                absoluteFilePathname = Pathname.new(jekyllSite().source) + Pathname.new(target[1..-1])
+                Jekyll.logger.debug("File xref trying absolute: #{target} -> #{absoluteFilePathname}")
+                if absoluteFilePathname.exist?
+                    return target
+                else
+                    return nil
+                end
+            end
+
+            # Try if target path is relative to source file first
+            docdir = document.attributes["docdir"]
+            relativeFilePathname = toRelativePathname(docdir, target)
+            absoluteFilePathname = Pathname.new(jekyllSite().source) + relativeFilePathname
+            Jekyll.logger.debug("File xref trying source relative: #{target} -> #{absoluteFilePathname}")
+            if absoluteFilePathname.exist?
+                # target path is relative to source path, but we need to make it relative to page URL now
+                # TODO: should we make it relative to page URL?
+                return target
+            else
+                # target path is not relative to source file, try whether it is relative to current page URL
+                currentPageUrlPathname = Pathname.new(currentPage.url[1..-1])
+                relativeFilePathname = Pathname.new(target)
+                absoluteFilePathname = Pathname.new(jekyllSite().source) + currentPageUrlPathname + relativeFilePathname
+                Jekyll.logger.debug("File xref trying url relative: #{target} -> #{absoluteFilePathname}")
+                if absoluteFilePathname.exist?
+                    return target
+                else
+                    return nil
+                end
+            end
+        end
+
         def findFile(docdir, target)
             relativeFilePathname = toRelativePathname(docdir, target)
             absoluteFilePathname = Pathname.new(jekyllSite().source) + relativeFilePathname
@@ -175,10 +211,8 @@ module Evolveum
 
         if targetPage == nil
             # No page. But there still may be a plain file (e.g. a PDF file)
-            absoluteFilePathname = findFile(parent.document.attributes["docdir"], targetPath)
-            if absoluteFilePathname.exist?
-                createLink(target, parent, attrs, targetPath)
-            else
+            fileUrl = findFileByTarget(parent.document, targetPath)
+            if fileUrl == nil
                 ignore = parent.document.attributes["ignore-broken-links"]
                 if ignore == nil
                     Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
@@ -187,6 +221,8 @@ module Evolveum
                 end
                 # Leave the target of broken link untouched. Redirects may still be able to handle it.
                 return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert
+            else
+                createLink(target, parent, attrs, fileUrl)
             end
         else
             createLink(addFragmentSuffix(targetPage.url,fragmentSuffix), parent, attrs, targetPage.data['title'])
