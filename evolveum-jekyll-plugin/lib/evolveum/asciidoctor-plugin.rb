@@ -213,11 +213,10 @@ module Evolveum
             # No page. But there still may be a plain file (e.g. a PDF file)
             fileUrl = findFileByTarget(parent.document, targetPath)
             if fileUrl == nil
-                ignore = parent.document.attributes["ignore-broken-links"]
-                if ignore == nil
-                    Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
-                else
+                if ignoreLinkBreak?(parent, targetPath)
                     Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
+                else
+                    Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
                 end
                 # Leave the target of broken link untouched. Redirects may still be able to handle it.
                 return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert
@@ -228,6 +227,19 @@ module Evolveum
             createLink(addFragmentSuffix(targetPage.url,fragmentSuffix), parent, attrs, targetPage.data['title'])
         end
       end
+
+      def ignoreLinkBreak?(parent, targetPath)
+        pageIgnore = parent.document.attributes["ignore-broken-links"]
+        if pageIgnore != nil
+            return true
+        end
+        ignoredPrefixes = parent.document.attributes["xref-ignored-prefixes"]
+        if ignoredPrefixes == nil
+            return false
+        end
+        return ignoredPrefixes.any? { |prefix|  targetPath.start_with?(prefix) }
+      end
+
     end
 
 
