@@ -156,7 +156,10 @@ module Evolveum
         def parseFragment(target)
             targetPath = target
             fragmentSuffix = ""
-            if target.include?('#')
+            if target.start_with?('#')
+                targetPath = nil
+                fragmentSuffix = target
+            elsif target.include?('#')
                 targetPath = target[0 .. target.rindex('#')-1]
                 fragmentSuffix = target[target.rindex('#')..-1]
             end
@@ -204,7 +207,12 @@ module Evolveum
 
         targetPath, fragmentSuffix = parseFragment(target)
         sourceFile = parent.document.attributes["docfile"]
-        #puts "targetPath=#{targetPath}, fragment=#{fragmentSuffix}"
+        # puts "targetPath=#{targetPath}, fragment=#{fragmentSuffix}"
+
+        if targetPath == nil
+            # document-local link, use as is
+            return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert
+        end
 
         targetPage = findPageByTarget(parent.document, targetPath)
         #puts("DEBUG XREF #{targetPath} -> found page #{targetPage&.url} in #{sourceFile}")
