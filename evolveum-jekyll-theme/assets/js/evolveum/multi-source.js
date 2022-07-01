@@ -22,7 +22,7 @@ var repeatedLanguage = false; // True if some language is more than once in a gr
 for (var i = 0; i < groups.length; i++) {
     try {
         var div = groups[i].getElementsByClassName("content");
-        var pre = div[0].getElementsByClassName("CodeRay highlight");
+        var pre = div[0].getElementsByClassName("rouge highlight");
         var code = pre[0].getElementsByTagName("code");
 
         codeSnippets.push(groups[i]);
