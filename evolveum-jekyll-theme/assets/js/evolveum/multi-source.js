@@ -1,7 +1,7 @@
 /*
  * This script finds groups of code snippets in different languages and turns them into navbars.
  *
- * Groups must fulfill these requiments:
+ * Groups must fulfill these requirements:
  *      1. Must have more than 1 code snippet.
  *      2. Code snippets must be in divisions with class name "listingblock" (and with specific DOM structure - please see the code).
  *      3. Code snippets must not have other DOM elements between them.
@@ -19,11 +19,15 @@ var languageNames = []; // Contains names of languages of actual listings.
 var codeSnippets = []; // Contains HTML divisions of actual listings.
 var repeatedLanguage = false; // True if some language is more than once in a group.
 
+const CONTENT_CLASS = "content";
+const CODE_HIGHLIGHTER_CLASS = "rouge highlight";
+const CODE_CLASS = "code";
+
 for (var i = 0; i < groups.length; i++) {
     try {
-        var div = groups[i].getElementsByClassName("content");
-        var pre = div[0].getElementsByClassName("rouge highlight");
-        var code = pre[0].getElementsByTagName("code");
+        var div = groups[i].getElementsByClassName(CONTENT_CLASS);
+        var pre = div[0].getElementsByClassName(CODE_HIGHLIGHTER_CLASS);
+        var code = pre[0].getElementsByTagName(CODE_CLASS);
 
         codeSnippets.push(groups[i]);
         languageNames.push(code[0].getAttribute('data-lang'));
@@ -31,9 +35,9 @@ for (var i = 0; i < groups.length; i++) {
         // Find next element. If it does not have appropriate DOM elements, an error is thrown
         // (by DOM methods).
         var nextCodeSnippet = $(groups[i]).next();
-        var nextDiv = nextCodeSnippet[0].getElementsByClassName("content");
-        var nextPre = nextDiv[0].getElementsByClassName("CodeRay highlight");
-        var nextCode = nextPre[0].getElementsByTagName("code");
+        var nextDiv = nextCodeSnippet[0].getElementsByClassName(CONTENT_CLASS);
+        var nextPre = nextDiv[0].getElementsByClassName(CODE_HIGHLIGHTER_CLASS);
+        var nextCode = nextPre[0].getElementsByTagName(CODE_CLASS);
         var atr = nextCode[0].getAttribute('data-lang');
 
         if (atr == null || atr == undefined) {
