@@ -1,141 +1,257 @@
-/*
- * This script looks for pages that contain given phrase.
- *
- * It load titles and other info from https://docs.evolveum.com/searchmap.json
- *
- * It works like this:
- *
- * This script lists all pages in searchmap.json.
- *
- * 1. If a page has identical title with the given phrase, it will have the top priority in the list of suggestions.
- * 2. If a page has a key word identical to the searched phrase, it will have the second priority.
- * 3. If its title contains given phrase, it will have the third priority.
- * 4. Everything else will have the lowest priority.
- *
- * When the pages are sorted, the script will get first 5 pages and display them in the suggestion bar.
- *
- * User input is not case sensitive.
- */
+(function() {
 
-const LIMIT_OF_PAGES_SHOWN = 7;
+    let charsBeforeSearch = "";
 
-var searchMap = '';
+    $("#search-modal").on('shown.bs.modal', function() {
+        console.log('triggered')
+        document.getElementById('searchbar').value = charsBeforeSearch;
+        $('#searchbar').trigger('focus')
+        charsBeforeSearch = "";
+    });
 
-function searchForPhrase() {
+    $(document).on('keypress', function(e) {
+        charsBeforeSearch += e.key;
+        console.log(charsBeforeSearch)
+        if (!$("#search-modal").hasClass('show')) {
+            $("#search-modal").modal()
+        }
+    });
 
-    if (searchMap === '') {
+    $("#search-modal").on('hidden.bs.modal', function() {
+        document.getElementById("autocombox").innerHTML = "";
+        document.getElementById("autocombox").style.display = "none";
+        document.getElementById('searchToggle').value = "";
+        document.getElementById('searchbar').value = "";
+        charsBeforeSearch = "";
+    });
+})();
+
+(function() {
+
+    function OSrequest(method, url, query, username, password, async, callback) {
         $.ajax({
-            dataType: "json",
-            url: "/searchmap.json",
-            async: false,
-            success: function(data) {
-                searchMap = data
+            method: method,
+            url: url,
+            crossDomain: true,
+            xhrFields: {
+                withCredentials: true
+            },
+            headers: {
+                "Authorization": "Basic " + btoa(username + ":" + password)
+            },
+            async: async,
+            data: JSON.stringify(query),
+            dataType: 'json',
+            contentType: 'application/json',
+        }).done(function(data) {
+            if (typeof callback !== 'undefined' && callback) {
+                callback(data)
             }
+        }).fail(function(data) {
+            console.log(data);
         });
     }
 
-    const suggestionBox = document.getElementById("autocombox")
+    let searchQuery = {}
 
-    const phrase = document.getElementById('searchbar').value.toLowerCase()
+    OSrequest("GET", "https://osdocs.example.com/search_settings/_doc/1", undefined, "search", "search", true, setSearchQuery)
 
-    if (phrase !== "") {
-        console.log("Searched phrase: " + phrase)
-
-        const showItemsTitleMatch = [] // pages whose titles are the same as searched phrase
-        const showItemsKeyWordMatch = [] // pages whose some key word is same as searched phrase
-        const showItemsTitleSubstringMatch = [] // pages whose titles contain searched phrase
-        const showItemsOther = [] // all other pages that somewhere contain searched phrase
-        const showItems = [] // list of top suggestions for user
-
-        let numberOfNotShown = 0 // number of pages not shown to the user because of limit
-        let numberOfItems = 0; // number of all found pages
-
-        for (let i = 0; i < searchMap.length; i++) {
-            if (searchMap[i].title !== undefined) {
-
-                // combines all the data from searchMap entry
-                let allTextWithoutWS = normalize(searchMap[i].title)
-
-                if (searchMap[i].description !== undefined) {
-                    allTextWithoutWS += ' ' + normalize(searchMap[i].description)
-                }
-
-                if (searchMap[i].author !== undefined) {
-                    allTextWithoutWS += ' ' + normalize(searchMap[i].author)
-                }
-
-                if (searchMap[i].keywords !== undefined) {
-                    allTextWithoutWS += ' ' + normalize(searchMap[i].keywords.toString())
-
-                    // array of single words in keywords item - to be matched with the phrase
-                    // TODO implement searching for two words as a phrase
-                    var keyWords = searchMap[i].keywords.toString().replace(/,/g, '').split(' ')
-                }
-
-                // If allTextWithoutWS does not include the phrase, it is useless to check for
-                // more specific matches, like title match or keywords match.
-                if (allTextWithoutWS.includes(normalize(phrase))) {
-                    const title = searchMap[i].title.toLowerCase()
-
-                    const listItem = '<a href="' + searchMap[i].url + '">' +
-                        '<li class="list-group-item border-0" style="width: 450px;text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" ><i class="fas fa-align-left"></i><span class="font1">' + ' &nbsp; ' + searchMap[i].title + '<br></span>' +
-                        '<span class="font2">' + searchMap[i].preview + '</span></li></a>';
-                    if (title.localeCompare(phrase) === 0) {
-                        console.log('input is title')
-                        showItemsTitleMatch.push(listItem)
-                    } else if (keyWords !== undefined && keyWords.includes(phrase)) {
-                        showItemsKeyWordMatch.push(listItem)
-                    } else if (title.includes(phrase)) {
-                        console.log('input is substring')
-                        showItemsTitleSubstringMatch.push(listItem)
-                    } else {
-                        showItemsOther.push(listItem)
+    function setSearchQuery(data) {
+        searchQuery = {
+            query: {
+                function_score: {
+                    script_score: {
+                        script: { // TODO update script
+                            source: `
+                                double totalScore = _score;
+                                if (doc.upvotes.size()!=0) {
+                                    totalScore = totalScore*(1+${data._source.multipliers.upvotes}*doc.upvotes.value/100);
+                                }
+                                if (doc['upkeep-status.keyword'].size()!=0) {
+                                    if (doc['upkeep-status.keyword'].value == "yellow") {
+                                        totalScore = totalScore*${data._source.multipliers.status_yellow};
+                                    } else if (doc['upkeep-status.keyword'].value == "green") {
+                                        totalScore = totalScore*${data._source.multipliers.status_green};
+                                    } else if (doc['upkeep-status.keyword'].value == "red") {
+                                        totalScore = totalScore*${data._source.multipliers.status_red};
+                                    } else if (doc['upkeep-status.keyword'].value == "orange") {
+                                        totalScore = totalScore*${data._source.multipliers.status_orange};
+                                    }
+                                } else {
+                                    totalScore = totalScore*${data._source.multipliers.status_absent};
+                                }
+                                if (doc.lastModificationDate.size()!=0) {
+                                    double timestampNow = (double)new Date().getTime();
+                                    totalScore = totalScore*Math.max(${data._source.values.last_modification_min}, ${data._source.multipliers.last_modification_im}/(1+(timestampNow - doc.lastModificationDate.value.getMillis())/${data._source.values.last_modification * 24 * 60 * 60 * 1000}.0))
+                                } else {
+                                    totalScore = totalScore*${data._source.multipliers.age_absent};
+                                }
+                                if (doc.obsolete.size()!=0) {
+                                    if (doc.obsolete.value == true) {
+                                        totalScore = totalScore*${data._source.multipliers.obsolete_true};
+                                    }
+                                }
+                                return totalScore;
+                            `
+                        }
+                    },
+                    query: {
+                        multi_match: {
+                            query: "",
+                            analyzer: "standard",
+                            fields: [
+                                "text",
+                                "title^2",
+                                "preview^0.1"
+                            ],
+                            fuzziness: "AUTO",
+                            prefix_length: 2,
+                        }
                     }
-                    numberOfItems++;
+                }
+
+            },
+            highlight: {
+                pre_tags: [
+                    "<strong>"
+                ],
+                post_tags: [
+                    "</strong>"
+                ],
+                fields: {
+                    title: {},
+                    text: {},
+                    preview: {}
                 }
             }
         }
-
-        if (numberOfItems === 1) {
-            showItems.push('<li class="notShown">' + numberOfItems + ' search result' + '</li>')
-        } else if (numberOfItems > 0) {
-            showItems.push('<li class="notShown">' + numberOfItems + ' search results' + '</li>')
-        }
-
-        for (let arr of[showItemsTitleMatch, showItemsKeyWordMatch, showItemsTitleSubstringMatch, showItemsOther]) {
-            let i
-            for (i = 0; i < arr.length && showItems.length < LIMIT_OF_PAGES_SHOWN + 1; i++) {
-                showItems.push(arr[i]);
-            }
-            numberOfNotShown += arr.length - i
-        }
-
-        if (numberOfNotShown === 1) {
-            showItems.push('<li class="notShown"> additional ' + numberOfNotShown + ' result not shown' + '</li>')
-        } else if (numberOfNotShown > 0) {
-            showItems.push('<li class="notShown"> additional ' + numberOfNotShown + ' results not shown' + '</li>')
-        }
-
-        suggestionBox.innerHTML = showItems.join("")
-        suggestionBox.style.display = "table";
-
-    } else {
-        suggestionBox.innerHTML = ""
-        suggestionBox.style.display = "none";
     }
-}
 
-// converts date and time into date
-function formatDate(dateAndTime) {
-    return dateAndTime?.replace(/T.+/g, " ") // Will be improved later.
-}
+    var typingTimer = null;
 
-function normalize(text) {
-    return text.toLowerCase().replace(/\s/g, "")
-}
+    $('#searchbar').keyup(function() {
+        if (typingTimer) {
+            clearTimeout(typingTimer);
+            typingTimer = null;
+            console.log("timer removed")
+        }
+        if ($('#searchbar').val()) {
+            typingTimer = setTimeout(searchForPhrase, 200);
+            console.log("timer added")
+        }
+    });
 
-$("#search-modal").on('shown.bs.modal', function() {
-    console.log('triggered')
-    document.getElementById('searchbar').value = document.getElementById('searchToggle').value
-    $('#searchbar').trigger('focus')
-})
+    function searchForPhrase(pagesShown = 7) {
+
+        console.log("function started")
+
+        searchQuery.size = pagesShown;
+        searchQuery.query.function_score.query.multi_match.query = document.getElementById('searchbar').value.toLowerCase();
+
+        const showResults = function(data) {
+            const showItems = []
+            const numberOfItems = data.hits.total.value
+            const suggestionBox = document.getElementById("autocombox")
+            if (numberOfItems > 0) {
+
+                if (numberOfItems > 0) {
+                    showItems.push('<li class="notShown">' + numberOfItems + ' search results' + '</li>')
+                } else if (numberOfItems === 1) {
+                    showItems.push('<li class="notShown">' + numberOfItems + ' search result' + '</li>')
+                }
+
+                for (let i = 0; i < pagesShown && i < numberOfItems; i++) {
+                    const text = data.hits.hits[i].highlight.text
+                    let preview = ""
+                    if (typeof text !== 'undefined' && text) {
+                        const textArray = text.toString().replace(/([.?!])\s*(?=[A-Z])/g, "$1|").split("|")
+                        for (const sentence of textArray) {
+                            if (sentence.includes("<strong>")) {
+                                preview = preview.concat(" ", sentence)
+                                if (preview.length > 115) {
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        preview = data.hits.hits[i].highlight.preview
+                        console.log("notext " + preview + " test " + data.hits.hits[i]._source.preview)
+                    }
+
+                    setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id), 30);
+
+                    const parsedDate = Date.parse(data.hits.hits[i]._source.lastModificationDate)
+                    const date = new Date(parsedDate)
+
+                    showItems.push('<div><span class="trigger-details" style="display: inline-block;width: 430px" data-toggle="tooltip" data-placement="left" data-html="true" title="<span><p>Last modification date: ' +
+                        date.toLocaleDateString('en-GB', { timeZone: 'UTC' }) + '</p><p>Upkeep status: ' + data.hits.hits[i]._source["upkeep-status"] + '</p><p>Likes: ' + data.hits.hits[i]._source.upvotes + '</p><p>Author: ' + data.hits.hits[i]._source.author + '</p></span>"><a href="' + data.hits.hits[i]._source.url + '" id="' + data.hits.hits[i]._id + 'site">' + '<li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i><span class="font1">' + ' &nbsp; ' + data.hits.hits[i].highlight.title + '<br></span>' +
+                        '<span class="font2">' + preview + '</span></li></a></span><span class="vote" id="' + data.hits.hits[i]._id + 'up"><i class="fas fa-thumbs-up"></i></span></div>');
+                }
+
+                const numberOfNotShown = numberOfItems - pagesShown
+
+                if (numberOfNotShown === 1) {
+                    showItems.push('<li class="notShown" id="moreResults"> additional ' + numberOfNotShown + ' result not shown (click here for more results)' + '</li>')
+                } else if (numberOfNotShown > 0) {
+                    showItems.push('<li class="notShown" id="moreResults"> additional ' + numberOfNotShown + ' results not shown (click here for more results)' + '</li>')
+                }
+
+                suggestionBox.innerHTML = showItems.join("")
+                suggestionBox.style.display = "table";
+
+                $("#moreResults").click(function() {
+                    searchForPhrase(pagesShown + 7)
+                });
+
+            } else {
+                suggestionBox.innerHTML = ""
+                suggestionBox.style.display = "none";
+            }
+
+            $('[data-toggle="tooltip"]').tooltip();
+        }
+
+        OSrequest("POST", "https://osdocs.example.com/docs/_search", searchQuery, "search", "search", true, showResults)
+    }
+
+    function setSearchItemOnclick(id) {
+
+        $("#" + id + "up").click(function() {
+            let modify = "+"
+
+            console.log($(this))
+
+            if ($(this).prop("classList").contains('on')) {
+                modify = "-"
+            }
+
+            let queryUpvote = {
+                script: {
+                    source: "if (ctx._source['upvotes'] != null) { ctx._source['upvotes'] " + modify + "= 1 } else { ctx._source['upvotes'] = 1 }"
+                }
+            }
+
+            OSrequest("POST", "https://osdocs.example.com/docs/_update/" + id + "?refresh", queryUpvote, "admin", "admin", true)
+
+            $(this).toggleClass('on');
+        });
+
+        $("#" + id + "site").click(function() {
+            console.log("clicked" + id)
+
+            var date = new Date();
+
+            let queryClick = {
+                "doc_id": id,
+                "timestamp": date.toISOString(),
+                "query": document.getElementById('searchbar').value.toLowerCase()
+            }
+
+            console.log(queryClick)
+
+            // This ajax is async because otherwise new site would load and ajax request would not be completed.
+            OSrequest("POST", "https://osdocs.example.com/click_logs/_doc/", queryClick, "clicklog", "clicklog", false)
+        });
+    }
+
+})();
