@@ -178,7 +178,7 @@
                         console.log("notext " + preview + " test " + data.hits.hits[i]._source.preview)
                     }
 
-                    setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id), 30);
+                    setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id, data.hits.hits[i]._source.title), 30);
 
                     const parsedDate = Date.parse(data.hits.hits[i]._source.lastModificationDate)
                     const date = new Date(parsedDate)
@@ -214,7 +214,7 @@
         OSrequest("POST", "https://osdocs.example.com/docs/_search", searchQuery, "search", "search", true, showResults)
     }
 
-    function setSearchItemOnclick(id) {
+    function setSearchItemOnclick(id, title) {
 
         $("#" + id + "up").click(function() {
             let modify = "+"
@@ -231,7 +231,7 @@
                 }
             }
 
-            OSrequest("POST", "https://osdocs.example.com/docs/_update/" + id + "?refresh", queryUpvote, "admin", "admin", true)
+            OSrequest("POST", "https://osdocs.example.com/docs/_update/" + id + "?refresh", queryUpvote, "upvotes", "upvotes", true)
 
             $(this).toggleClass('on');
         });
@@ -242,6 +242,7 @@
             var date = new Date();
 
             let queryClick = {
+                "title": title,
                 "doc_id": id,
                 "timestamp": date.toISOString(),
                 "query": document.getElementById('searchbar').value.toLowerCase()
