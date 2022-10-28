@@ -237,9 +237,9 @@
         });
 
         $("#" + id + "site").on('mousedown', function(ev) {
-            console.log("mousedown");
+            console.log("mousedown" + ev.button);
             // TODO for now, we suppose that cases in which the user did not select "open in a new tab" or just triggered the "mousedown" event and did not click are statistically insignificant
-            if (ev.keyCode == 1 || ev.keyCode == 3) {
+            if (ev.button == 0 || ev.button == 2) {
                 console.log("clicked" + id)
 
                 var date = new Date();
