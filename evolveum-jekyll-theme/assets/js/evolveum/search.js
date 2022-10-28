@@ -236,22 +236,25 @@
             $(this).toggleClass('on');
         });
 
-        $("#" + id + "site").click(function() {
-            console.log("clicked" + id)
+        $("#" + id + "site").mousedown(function(ev) {
+            // TODO for now, we suppose that cases in which the user did not select "open in a new tab" or just triggered the "mousedown" event and did not click are statistically insignificant
+            if (ev.keyCode == 1 || ev.keyCode == 3) {
+                console.log("clicked" + id)
 
-            var date = new Date();
+                var date = new Date();
 
-            let queryClick = {
-                "title": title,
-                "doc_id": id,
-                "timestamp": date.toISOString(),
-                "query": document.getElementById('searchbar').value.toLowerCase()
+                let queryClick = {
+                    "title": title,
+                    "doc_id": id,
+                    "timestamp": date.toISOString(),
+                    "query": document.getElementById('searchbar').value.toLowerCase()
+                }
+
+                console.log(queryClick)
+
+                // This ajax is async because otherwise new site would load and ajax request would not be completed.
+                OSrequest("POST", "https://osdocs.example.com/click_logs/_doc/", queryClick, "clicklog", "clicklog", false)
             }
-
-            console.log(queryClick)
-
-            // This ajax is async because otherwise new site would load and ajax request would not be completed.
-            OSrequest("POST", "https://osdocs.example.com/click_logs/_doc/", queryClick, "clicklog", "clicklog", false)
         });
     }
 
