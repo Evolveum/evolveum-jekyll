@@ -236,7 +236,8 @@
             $(this).toggleClass('on');
         });
 
-        $("#" + id + "site").mousedown(function(ev) {
+        $("#" + id + "site").on('mousedown', function(ev) {
+            console.log("mousedown");
             // TODO for now, we suppose that cases in which the user did not select "open in a new tab" or just triggered the "mousedown" event and did not click are statistically insignificant
             if (ev.keyCode == 1 || ev.keyCode == 3) {
                 console.log("clicked" + id)
