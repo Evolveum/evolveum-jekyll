@@ -219,8 +219,6 @@
         $("#" + id + "up").click(function() {
             let modify = "+"
 
-            console.log($(this))
-
             if ($(this).prop("classList").contains('on')) {
                 modify = "-"
             }
@@ -236,13 +234,12 @@
             $(this).toggleClass('on');
         });
 
+        // TODO for now, we suppose that cases in which the user did not select "open in a new tab" or just triggered the "mousedown" event and did not click are statistically insignificant
         $("#" + id + "site").on('mousedown', function(ev) {
-            console.log("mousedown" + ev.button);
-            // TODO for now, we suppose that cases in which the user did not select "open in a new tab" or just triggered the "mousedown" event and did not click are statistically insignificant
             if (ev.button == 0 || ev.button == 2) {
-                console.log("clicked" + id)
+                console.log("mousedown" + ev.button);
 
-                var date = new Date();
+                const date = new Date();
 
                 let queryClick = {
                     "title": title,
@@ -251,10 +248,12 @@
                     "query": document.getElementById('searchbar').value.toLowerCase()
                 }
 
-                console.log(queryClick)
-
-                // This ajax is async because otherwise new site would load and ajax request would not be completed.
-                OSrequest("POST", "https://osdocs.example.com/click_logs/_doc/", queryClick, "clicklog", "clicklog", false)
+                if (ev.button == 0) {
+                    // This ajax is async because otherwise new site would load and ajax request would not be completed.
+                    OSrequest("POST", "https://osdocs.example.com/click_logs/_doc/", queryClick, "clicklog", "clicklog", false)
+                } else if (ev.button == 2) {
+                    OSrequest("POST", "https://osdocs.example.com/click_logs/_doc/", queryClick, "clicklog", "clicklog", true)
+                }
             }
         });
     }
