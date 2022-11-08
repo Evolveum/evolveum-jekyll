@@ -9,7 +9,7 @@
         charsBeforeSearch = "";
     });
 
-    $(document).on('keypress', function(e) {
+    $(document).on('keyup', function(e) {
         charsBeforeSearch += e.key;
         console.log(charsBeforeSearch)
         if (!$("#search-modal").hasClass('show')) {
