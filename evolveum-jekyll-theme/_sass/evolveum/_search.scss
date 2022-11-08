@@ -50,7 +50,11 @@
     color: #eaeff1;
     /*text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;*/
     -webkit-text-stroke: 1px #0096FF;
-    top: calc(50% - 18px);
+    position: relative;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
     z-index: 100;
     margin-right: 15px;
     margin-left: 2px;

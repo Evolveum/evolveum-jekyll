@@ -182,6 +182,10 @@
 
                     const parsedDate = Date.parse(data.hits.hits[i]._source.lastModificationDate)
                     const date = new Date(parsedDate)
+                    let author = data.hits.hits[i]._source.author
+                    if (typeof author == 'undefined' || !author) {
+                        author = data.hits.hits[i]._source["page-wiki-metadata-create-user"]
+                    }
 
                     showItems.push('<div><span class="trigger-details" style="display: inline-block;width: 430px" data-toggle="tooltip" data-placement="left" data-html="true" title="<span><p>Last modification date: ' +
                         date.toLocaleDateString('en-GB', { timeZone: 'UTC' }) + '</p><p>Upkeep status: ' + data.hits.hits[i]._source["upkeep-status"] + '</p><p>Likes: ' + data.hits.hits[i]._source.upvotes + '</p><p>Author: ' + data.hits.hits[i]._source.author + '</p></span>"><a href="' + data.hits.hits[i]._source.url + '" id="' + data.hits.hits[i]._id + 'site">' + '<li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i><span class="font1">' + ' &nbsp; ' + data.hits.hits[i].highlight.title + '<br></span>' +
@@ -248,12 +252,7 @@
                     "query": document.getElementById('searchbar').value.toLowerCase()
                 }
 
-                if (ev.button == 0) {
-                    // This ajax is async because otherwise new site would load and ajax request would not be completed.
-                    OSrequest("POST", "https://osdocs.example.com/click_logs/_doc/", queryClick, "clicklog", "clicklog", false)
-                } else if (ev.button == 2) {
-                    OSrequest("POST", "https://osdocs.example.com/click_logs/_doc/", queryClick, "clicklog", "clicklog", true)
-                }
+                ev.button == 0 ? OSrequest("POST", "https://osdocs.example.com/click_logs/_doc/", queryClick, "clicklog", "clicklog", false) : OSrequest("POST", "https://osdocs.example.com/click_logs/_doc/", queryClick, "clicklog", "clicklog", true);
             }
         });
     }
