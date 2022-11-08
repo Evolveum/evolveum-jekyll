@@ -184,12 +184,16 @@
                     const date = new Date(parsedDate)
                     let author = data.hits.hits[i]._source.author
                     if (typeof author == 'undefined' || !author) {
-                        author = data.hits.hits[i]._source["page-wiki-metadata-create-user"]
+                        author = data.hits.hits[i]._source["wiki-metadata-create-user"]
                     }
 
-                    showItems.push('<div><span class="trigger-details" style="display: inline-block;width: 430px" data-toggle="tooltip" data-placement="left" data-html="true" title="<span><p>Last modification date: ' +
-                        date.toLocaleDateString('en-GB', { timeZone: 'UTC' }) + '</p><p>Upkeep status: ' + data.hits.hits[i]._source["upkeep-status"] + '</p><p>Likes: ' + data.hits.hits[i]._source.upvotes + '</p><p>Author: ' + data.hits.hits[i]._source.author + '</p></span>"><a href="' + data.hits.hits[i]._source.url + '" id="' + data.hits.hits[i]._id + 'site">' + '<li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i><span class="font1">' + ' &nbsp; ' + data.hits.hits[i].highlight.title + '<br></span>' +
-                        '<span class="font2">' + preview + '</span></li></a></span><span class="vote" id="' + data.hits.hits[i]._id + 'up"><i class="fas fa-thumbs-up"></i></span></div>');
+                    showItems.push(`<div><span class="trigger-details" style="display: inline-block;width: 430px" data-toggle="tooltip" data-placement="left" 
+                    data-html="true" title="<span class="tooltip-preview"><p>Last modification date: ${date.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</p>
+                    <p>Upkeep status: ${data.hits.hits[i]._source["upkeep-status"]} <i class="fa fa-circle" style="color:${data.hits.hits[i]._source["upkeep-status"]}"></i>
+                    </p><p>Likes: ${data.hits.hits[i]._source.upvotes}</p><p>Author: ${author}</p></span>"><a href="${data.hits.hits[i]._source.url}" 
+                    id="${data.hits.hits[i]._id}site"><li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i>
+                    <span class="font1">&nbsp;${data.hits.hits[i].highlight.title}<br></span><span class="font2">${preview}</span></li></a></span>
+                    <span class="vote" id="${data.hits.hits[i]._id}up"><i class="fas fa-thumbs-up"></i></span></div>`);
                 }
 
                 const numberOfNotShown = numberOfItems - pagesShown
