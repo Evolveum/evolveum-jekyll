@@ -9,7 +9,7 @@
         charsBeforeSearch = "";
     });
 
-    $(document).on('keyup', function(e) {
+    $(document).on('keypress', function(e) {
         charsBeforeSearch += e.key;
         console.log(charsBeforeSearch)
         if (!$("#search-modal").hasClass('show')) {
@@ -129,7 +129,7 @@
 
     var typingTimer = null;
 
-    $('#searchbar').keyup(function() {
+    $('#searchbar').keydown(function() {
         if (typingTimer) {
             clearTimeout(typingTimer);
             typingTimer = null;
