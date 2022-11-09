@@ -11,7 +11,7 @@
         charsBeforeSearch = "";
     });
 
-    $(document).on('keyup', function(e) {
+    $(document).on('keydown', function(e) {
         if (e.key.length == 1) {
             charsBeforeSearch += e.key;
             console.log(charsBeforeSearch)
