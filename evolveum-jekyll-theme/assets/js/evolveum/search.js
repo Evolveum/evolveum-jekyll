@@ -4,6 +4,7 @@
 
     $("#search-modal").on('shown.bs.modal', function() {
         console.log('triggered')
+        console.log(charsBeforeSearch + " second")
         document.getElementById('searchbar').value = charsBeforeSearch;
         $('#searchbar').trigger('focus')
         charsBeforeSearch = "";
