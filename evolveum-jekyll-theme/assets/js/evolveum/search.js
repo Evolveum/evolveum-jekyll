@@ -149,6 +149,8 @@
 
         console.log("function started")
 
+        $('[data-toggle="tooltip"]').tooltip('hide')
+
         searchQuery.size = pagesShown;
         searchQuery.query.function_score.query.multi_match.query = document.getElementById('searchbar').value.toLowerCase();
 
