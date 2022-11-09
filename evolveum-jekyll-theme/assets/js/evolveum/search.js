@@ -11,11 +11,13 @@
         charsBeforeSearch = "";
     });
 
-    $(document).on('keypress', function(e) {
-        charsBeforeSearch += e.key;
-        console.log(charsBeforeSearch)
-        if (!$("#search-modal").hasClass('show')) {
-            $("#search-modal").modal()
+    $(document).on('keyup', function(e) {
+        if (e.key.length == 1) {
+            charsBeforeSearch += e.key;
+            console.log(charsBeforeSearch)
+            if (!$("#search-modal").hasClass('show')) {
+                $("#search-modal").modal()
+            }
         }
     });
 
