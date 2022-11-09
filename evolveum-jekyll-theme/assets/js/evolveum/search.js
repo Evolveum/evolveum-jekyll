@@ -7,6 +7,7 @@
         console.log(charsBeforeSearch + " second")
         document.getElementById('searchbar').value = charsBeforeSearch;
         $('#searchbar').trigger('focus')
+        console.log(document.getElementById('searchbar').value)
         charsBeforeSearch = "";
     });
 
