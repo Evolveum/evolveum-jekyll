@@ -1,23 +1,14 @@
 (function() {
 
-    let charsBeforeSearch = "";
-
     $("#search-modal").on('shown.bs.modal', function() {
         console.log('triggered')
-        console.log(charsBeforeSearch + " second")
-        document.getElementById('searchbar').value = charsBeforeSearch;
         $('#searchbar').trigger('focus')
         console.log(document.getElementById('searchbar').value)
-        charsBeforeSearch = "";
     });
 
     $(document).on('keydown', function(e) {
-        if (e.key.length == 1) {
-            charsBeforeSearch += e.key;
-            console.log(charsBeforeSearch)
-            if (!$("#search-modal").hasClass('show')) {
-                $("#search-modal").modal()
-            }
+        if (!$("#search-modal").hasClass('show')) {
+            $("#search-modal").modal()
         }
     });
 
@@ -26,7 +17,6 @@
         document.getElementById("autocombox").style.display = "none";
         document.getElementById('searchToggle').value = "";
         document.getElementById('searchbar').value = "";
-        charsBeforeSearch = "";
     });
 })();
 
