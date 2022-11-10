@@ -7,8 +7,10 @@
     });
 
     $(document).on('keydown', function(e) {
-        if (!$("#search-modal").hasClass('show')) {
-            $("#search-modal").modal()
+        if (e.key.length == 1) {
+            if (!$("#search-modal").hasClass('show')) {
+                $("#search-modal").modal()
+            }
         }
     });
 
