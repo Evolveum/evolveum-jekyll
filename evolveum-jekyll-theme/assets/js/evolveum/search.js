@@ -20,9 +20,6 @@
         document.getElementById('searchToggle').value = "";
         document.getElementById('searchbar').value = "";
     });
-})();
-
-(function() {
 
     function OSrequest(method, url, query, username, password, async, callback) {
         $.ajax({
@@ -180,15 +177,29 @@
 
                     const parsedDate = Date.parse(data.hits.hits[i]._source.lastModificationDate)
                     const date = new Date(parsedDate)
+
                     let author = data.hits.hits[i]._source.author
                     if (typeof author == 'undefined' || !author) {
                         author = data.hits.hits[i]._source["wiki-metadata-create-user"]
+                        if (typeof author == 'undefined' || !author) {
+                            author = "unknown"
+                        }
+                    }
+
+                    let upvotes = data.hits.hits[i]._source.upvotes
+                    if (typeof upvotes == 'undefined' || !upvotes) {
+                        upvotes = 0
+                    }
+
+                    let upkeepStatus = data.hits.hits[i]._source["upkeep-status"]
+                    if (typeof upkeepStatus == 'undefined' || !upkeepStatus) {
+                        upkeepStatus = "unknown"
                     }
 
                     showItems.push(`<div><span class="trigger-details" style="display: inline-block;width: 430px" data-toggle="tooltip" data-placement="left" 
                     data-html="true" title='<span class="tooltip-preview"><p>Last modification date: ${date.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</p>
-                    <p>Upkeep status: ${data.hits.hits[i]._source["upkeep-status"]} <i id="upkeep${data.hits.hits[i]._source["upkeep-status"]}" class="fa fa-circle"></i>
-                    </p><p>Likes: ${data.hits.hits[i]._source.upvotes}</p><p>Author: ${author}</p></span>'><a href="${data.hits.hits[i]._source.url}" 
+                    <p>Upkeep status: ${upkeepStatus} <i id="upkeep${upkeepStatus}" class="fa fa-circle"></i>
+                    </p><p>Likes: ${upvotes}</p><p>Author: ${author}</p></span>'><a href="${data.hits.hits[i]._source.url}" 
                     id="${data.hits.hits[i]._id}site"><li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i>
                     <span class="font1">&nbsp;${data.hits.hits[i].highlight.title}<br></span><span class="font2">${preview}</span></li></a></span>
                     <span class="vote" id="${data.hits.hits[i]._id}up"><i class="fas fa-thumbs-up"></i></span></div>`);
