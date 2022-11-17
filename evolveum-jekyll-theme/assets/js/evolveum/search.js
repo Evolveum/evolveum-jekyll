@@ -47,7 +47,7 @@
 
     let searchQuery = {}
 
-    OSrequest("GET", "https://osdocs.example.com/search_settings/_doc/1", undefined, "search", "search", true, setSearchQuery)
+    OSrequest("GET", "https://osdocs.lab.evolveum.com/search_settings/_doc/1", undefined, "search", "search", true, setSearchQuery)
 
     function setSearchQuery(data) {
         searchQuery = {
@@ -228,7 +228,7 @@
             $('[data-toggle="tooltip"]').tooltip();
         }
 
-        OSrequest("POST", "https://osdocs.example.com/docs/_search", searchQuery, "search", "search", true, showResults)
+        OSrequest("POST", "https://osdocs.lab.evolveum.com/docs/_search", searchQuery, "search", "search", true, showResults)
     }
 
     function setSearchItemOnclick(id, title) {
@@ -246,7 +246,7 @@
                 }
             }
 
-            OSrequest("POST", "https://osdocs.example.com/docs/_update/" + id + "?refresh", queryUpvote, "upvotes", "upvotes", true)
+            OSrequest("POST", "https://osdocs.lab.evolveum.com/docs/_update/" + id + "?refresh", queryUpvote, "upvotes", "upvotes", true)
 
             $(this).toggleClass('on');
         });
@@ -265,7 +265,7 @@
                     "query": document.getElementById('searchbar').value.toLowerCase()
                 }
 
-                ev.button == 0 ? OSrequest("POST", "https://osdocs.example.com/click_logs/_doc/", queryClick, "clicklog", "clicklog", false) : OSrequest("POST", "https://osdocs.example.com/click_logs/_doc/", queryClick, "clicklog", "clicklog", true);
+                ev.button == 0 ? OSrequest("POST", "https://osdocs.lab.evolveum.com/click_logs/_doc/", queryClick, "clicklog", "clicklog", false) : OSrequest("POST", "https://osdocs.lab.evolveum.com/click_logs/_doc/", queryClick, "clicklog", "clicklog", true);
             }
         });
     }
