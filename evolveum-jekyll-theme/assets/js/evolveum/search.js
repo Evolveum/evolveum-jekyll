@@ -47,7 +47,7 @@
 
     let searchQuery = {}
 
-    OSrequest("GET", "https://osdocs.lab.evolveum.com/search_settings/_doc/1", undefined, "search", "YvHY6hR8Zets+fGQ", true, setSearchQuery)
+    OSrequest("GET", "https://osdocs.lab.evolveum.com/search_settings/_doc/1:9200", undefined, "search", "YvHY6hR8Zets+fGQ", true, setSearchQuery)
 
     function setSearchQuery(data) {
         searchQuery = {
