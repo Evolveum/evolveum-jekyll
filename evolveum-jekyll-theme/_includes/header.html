@@ -15,8 +15,8 @@
         <div class="modal fade2" id="search-modal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <div>
+                    <div class="modal-header" id="modalHeader">
+                        <div class="modal-h-frow">
                             <form autocomplete="off" class="form-inline mt-2 mt-md-0 navbar-search" method="get" id="search-ddg">
                                 <input autocomplete="off" type="hidden" name="sites" value="docs.evolveum.com">
                                 <input autocomplete="off" class="form-control form-control-sm mr-sm-2" id="searchbar" type="search" placeholder="Search" name="q" aria-label="Search"> {% if site['evolveum']['search-ddg-disable'] != true %}

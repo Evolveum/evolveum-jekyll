@@ -141,3 +141,19 @@
     color: antiquewhite;
     background-color: #FFC0CB;
 }
+
+.modal-h-frow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+#modalHeader {
+    display: block !important;
+}
+
+#checkboxes {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
