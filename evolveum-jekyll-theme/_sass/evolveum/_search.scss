@@ -89,3 +89,55 @@
     overflow: hidden;
     white-space: nowrap;
 }
+
+.oval {
+    outline-style: solid;
+    outline-width: 2px;
+    margin: 10px;
+    padding: 5;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 40px;
+    justify-content: center;
+    align-items: center;
+}
+
+#ovalGuide {
+    outline-color: #DAA06D;
+    color: #DAA06D;
+}
+
+#ovalGuide.on {
+    color: antiquewhite;
+    background-color: #DAA06D;
+}
+
+#ovalReference {
+    outline-color: #87CEFA;
+    color: #87CEFA;
+}
+
+#ovalReference.on {
+    color: antiquewhite;
+    background-color: #87CEFA;
+}
+
+#ovalDeveloper {
+    outline-color: #9FE2BF;
+    color: #9FE2BF;
+}
+
+#ovalDeveloper.on {
+    color: antiquewhite;
+    background-color: #9FE2BF;
+}
+
+#ovalOther {
+    outline-color: #FFC0CB;
+    color: #FFC0CB;
+}
+
+#ovalOther.on {
+    color: antiquewhite;
+    background-color: #FFC0CB;
+}

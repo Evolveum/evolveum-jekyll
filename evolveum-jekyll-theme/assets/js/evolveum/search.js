@@ -1,5 +1,9 @@
 (function() {
 
+    $('.oval').click(function() {
+        $(this).toggleClass('on');
+    });
+
     $("#search-modal").on('shown.bs.modal', function() {
         console.log('triggered')
         $('#searchbar').trigger('focus')
