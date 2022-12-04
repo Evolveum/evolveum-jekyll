@@ -23,6 +23,8 @@
                                 <button class="btn btn-outline-secondary btn-sm my-2 my-sm-0" type="submit">Search</button> {% endif %}
                             </form>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
                         <div id="checkboxes">
                             <span id="ovalGuide" class="oval on">GUIDE</span>
@@ -30,24 +32,22 @@
                             <span id="ovalDeveloper" class="oval on">DEVELOPER</span>
                             <span id="ovalOther" class="oval on">OTHER</span>
                         </div>
-            <span aria-hidden="true">&times;</span>
-          </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="list-group" id="autocombox">
+                            <!-- here list is inserted from javascript -->
                         </div>
-                        <div class="modal-body">
-                            <div class="list-group" id="autocombox">
-                                <!-- here list is inserted from javascript -->
-                            </div>
-                        </div>
-                        <div class="modal-footer">
+                    </div>
+                    <div class="modal-footer">
 
-                        </div>
                     </div>
                 </div>
             </div>
-
-            <form class="form-inline mt-2 mt-md-0 navbar-search" method="get" id="search" action="https://duckduckgo.com/">
-                <input type="hidden" name="sites" value="{{ site.fqdn }}" />
-                <input class="form-control form-control-sm mr-sm-2" id="searchToggle" type="text" name="q" placeholder="Search" aria-label="Search" data-toggle="modal" data-target="#search-modal">
-            </form>
         </div>
+
+        <form class="form-inline mt-2 mt-md-0 navbar-search" method="get" id="search" action="https://duckduckgo.com/">
+            <input type="hidden" name="sites" value="{{ site.fqdn }}" />
+            <input class="form-control form-control-sm mr-sm-2" id="searchToggle" type="text" name="q" placeholder="Search" aria-label="Search" data-toggle="modal" data-target="#search-modal">
+        </form>
+    </div>
 </nav>
