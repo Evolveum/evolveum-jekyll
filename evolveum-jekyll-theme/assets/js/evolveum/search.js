@@ -5,8 +5,12 @@
         let name = this.id.replace('oval', '')
         if (this.classList.contains('on')) {
             document.getElementById("check" + name).className = 'fas fa-check'
+            this.innerHTML = this.innerHTML.replace(name.toUpperCase(), "&nbsp;" + name.toUpperCase())
+            console.log(this.innerHTML)
         } else {
-            document.getElementById("check" + name).className = 'far fa-circle'
+            document.getElementById("check" + name).className = ''
+            this.innerHTML = this.innerHTML.replace("&nbsp;" + name.toUpperCase(), name.toUpperCase())
+            console.log(this.innerHTML + name.toUpperCase())
         }
     });
 

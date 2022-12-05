@@ -100,6 +100,11 @@
     border-radius: 40px;
     justify-content: center;
     align-items: center;
+    transition: all .1s linear, color 0s;
+    -webkit-transition: all .1s linear, color 0s;
+    -moz-transition: all .1s linear, color 0s;
+    -o-transition: all .1s linear, color 0s;
+    max-width: 200px;
 }
 
 #ovalGuide {
