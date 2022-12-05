@@ -94,7 +94,7 @@
     outline-style: solid;
     outline-width: 2px;
     margin: 10px;
-    padding: 5;
+    padding: 2.5px 7px;
     font-size: 12px;
     font-weight: bold;
     border-radius: 40px;
@@ -150,10 +150,18 @@
 
 #modalHeader {
     display: block !important;
+    padding: 1rem 1rem 0.5rem;
 }
 
 #checkboxes {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#searchbar {
+    width: 270px;
 }
