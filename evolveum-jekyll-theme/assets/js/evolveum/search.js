@@ -21,7 +21,7 @@
     });
 
     $(document).on('keydown', function(e) {
-        if (e.key.length == 1) {
+        if (e.key.length == 1 && !e.ctrlKey) {
             if (!$("#search-modal").hasClass('show')) {
                 $("#search-modal").modal()
             }
