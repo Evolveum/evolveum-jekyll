@@ -2,6 +2,12 @@
 
     $('.oval').click(function() {
         $(this).toggleClass('on');
+        let name = this.id.replace('oval', '')
+        if (this.classList.contains('on')) {
+            document.getElementById("check" + name).className = 'fas fa-check'
+        } else {
+            document.getElementById("check" + name).className = 'far fa-circle'
+        }
     });
 
     $("#search-modal").on('shown.bs.modal', function() {
