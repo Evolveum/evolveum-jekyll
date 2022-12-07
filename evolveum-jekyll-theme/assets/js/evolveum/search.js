@@ -16,6 +16,8 @@
             console.log(this.innerHTML + name.toUpperCase())
             letters.delete(name)
         }
+        searchQuery.query.bool.filter[0].terms["type.keyword"] = Array.from(letters)
+        searchForPhrase()
     });
 
     $("#search-modal").on('shown.bs.modal', function() {
