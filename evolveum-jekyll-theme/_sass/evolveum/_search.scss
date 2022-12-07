@@ -26,6 +26,12 @@
 }
 
 .font1 {
+    display: inline-block;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    margin-bottom: 2px;
     font-size: 0.9rem;
 }
 
@@ -195,6 +201,7 @@
     align-items: center;
     vertical-align: middle;
     text-decoration: none;
+    display: inline-block;
 }
 
 .typeLabel:hover {
