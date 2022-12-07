@@ -1,5 +1,7 @@
 (function() {
 
+    let letters = new Set(["Guide", "Reference", "Developer", "Other"]);
+
     $('.oval').click(function() {
         $(this).toggleClass('on');
         let name = this.id.replace('oval', '')
@@ -7,10 +9,12 @@
             document.getElementById("check" + name).className = 'fas fa-check'
             this.innerHTML = this.innerHTML.replace(name.toUpperCase(), "&nbsp;" + name.toUpperCase())
             console.log(this.innerHTML)
+            letters.add(name)
         } else {
             document.getElementById("check" + name).className = ''
             this.innerHTML = this.innerHTML.replace("&nbsp;" + name.toUpperCase(), name.toUpperCase())
             console.log(this.innerHTML + name.toUpperCase())
+            letters.delete(name)
         }
     });
 
@@ -66,57 +70,65 @@
     function setSearchQuery(data) {
         searchQuery = {
             query: {
-                function_score: {
-                    script_score: {
-                        script: { // TODO update script
-                            source: `
-                                double totalScore = _score;
-                                if (doc.upvotes.size()!=0) {
-                                    totalScore = totalScore*(1+${data._source.multipliers.upvotes}*doc.upvotes.value/100);
-                                }
-                                if (doc['upkeep-status.keyword'].size()!=0) {
-                                    if (doc['upkeep-status.keyword'].value == "yellow") {
-                                        totalScore = totalScore*${data._source.multipliers.status_yellow};
-                                    } else if (doc['upkeep-status.keyword'].value == "green") {
-                                        totalScore = totalScore*${data._source.multipliers.status_green};
-                                    } else if (doc['upkeep-status.keyword'].value == "red") {
-                                        totalScore = totalScore*${data._source.multipliers.status_red};
-                                    } else if (doc['upkeep-status.keyword'].value == "orange") {
-                                        totalScore = totalScore*${data._source.multipliers.status_orange};
-                                    }
-                                } else {
-                                    totalScore = totalScore*${data._source.multipliers.status_absent};
-                                }
-                                if (doc.lastModificationDate.size()!=0) {
-                                    double timestampNow = (double)new Date().getTime();
-                                    totalScore = totalScore*Math.max(${data._source.values.last_modification_min}, ${data._source.multipliers.last_modification_im}/(1+(timestampNow - doc.lastModificationDate.value.getMillis())/${data._source.values.last_modification * 24 * 60 * 60 * 1000}.0))
-                                } else {
-                                    totalScore = totalScore*${data._source.multipliers.age_absent};
-                                }
-                                if (doc.obsolete.size()!=0) {
-                                    if (doc.obsolete.value == true) {
-                                        totalScore = totalScore*${data._source.multipliers.obsolete_true};
-                                    }
-                                }
-                                return totalScore;
-                            `
+                bool: {
+                    filter: [{
+                        term: {
+                            type: [letters.keys()]
                         }
-                    },
-                    query: {
-                        multi_match: {
-                            query: "",
-                            analyzer: "standard",
-                            fields: [
-                                "text",
-                                "title^2",
-                                "preview^0.1"
-                            ],
-                            fuzziness: "AUTO",
-                            prefix_length: 2,
+                    }],
+                    must: [{
+                        function_score: {
+                            script_score: {
+                                script: { // TODO update script
+                                    source: `
+                                        double totalScore = _score;
+                                        if (doc.upvotes.size()!=0) {
+                                            totalScore = totalScore*(1+${data._source.multipliers.upvotes}*doc.upvotes.value/100);
+                                        }
+                                        if (doc['upkeep-status.keyword'].size()!=0) {
+                                            if (doc['upkeep-status.keyword'].value == "yellow") {
+                                                totalScore = totalScore*${data._source.multipliers.status_yellow};
+                                            } else if (doc['upkeep-status.keyword'].value == "green") {
+                                                totalScore = totalScore*${data._source.multipliers.status_green};
+                                            } else if (doc['upkeep-status.keyword'].value == "red") {
+                                                totalScore = totalScore*${data._source.multipliers.status_red};
+                                            } else if (doc['upkeep-status.keyword'].value == "orange") {
+                                                totalScore = totalScore*${data._source.multipliers.status_orange};
+                                            }
+                                        } else {
+                                            totalScore = totalScore*${data._source.multipliers.status_absent};
+                                        }
+                                        if (doc.lastModificationDate.size()!=0) {
+                                            double timestampNow = (double)new Date().getTime();
+                                            totalScore = totalScore*Math.max(${data._source.values.last_modification_min}, ${data._source.multipliers.last_modification_im}/(1+(timestampNow - doc.lastModificationDate.value.getMillis())/${data._source.values.last_modification * 24 * 60 * 60 * 1000}.0))
+                                        } else {
+                                            totalScore = totalScore*${data._source.multipliers.age_absent};
+                                        }
+                                        if (doc.obsolete.size()!=0) {
+                                            if (doc.obsolete.value == true) {
+                                                totalScore = totalScore*${data._source.multipliers.obsolete_true};
+                                            }
+                                        }
+                                        return totalScore;
+                                    `
+                                }
+                            },
+                            query: {
+                                multi_match: {
+                                    query: "",
+                                    analyzer: "standard",
+                                    fields: [
+                                        "text",
+                                        "title^2",
+                                        "preview^0.1"
+                                    ],
+                                    fuzziness: "AUTO",
+                                    prefix_length: 2,
+                                }
+                            }
                         }
-                    }
+                    }]
                 }
-
             },
             highlight: {
                 pre_tags: [
@@ -132,6 +144,7 @@
                 }
             }
         }
+        console.log(searchQuery)
     }
 
     var typingTimer = null;
@@ -215,7 +228,7 @@
                     <p>Upkeep status: ${upkeepStatus} <i id="upkeep${upkeepStatus}" class="fa fa-circle"></i>
                     </p><p>Likes: ${upvotes}</p><p>Author: ${author}</p></span>'><a href="${data.hits.hits[i]._source.url}" 
                     id="${data.hits.hits[i]._id}site"><li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i>
-                    <span class="font1">&nbsp;${data.hits.hits[i].highlight.title}<br></span><span class="font2">${preview}</span></li></a></span>
+                    <span class="font1">&nbsp;${data.hits.hits[i].highlight.title}<span id="label${data.hits.hits[i]._source.type}" class="typeLabel">${data.hits.hits[i]._source.type.toUpperCase()}</span><br></span><span class="font2">${preview}</span></li></a></span>
                     <span class="vote" id="${data.hits.hits[i]._id}up"><i class="fas fa-thumbs-up"></i></span></div>`);
                 }
 

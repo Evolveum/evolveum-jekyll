@@ -176,3 +176,41 @@
 #searchbar {
     width: 270px;
 }
+
+.typeLabel {
+    -webkit-user-select: none;
+    /* Safari */
+    -ms-user-select: none;
+    /* IE 10 and IE 11 */
+    user-select: none;
+    /* Standard syntax */
+    outline-style: solid;
+    outline-width: 2px;
+    margin-left: 10px;
+    padding: 2.5px 7px;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 40px;
+    justify-content: center;
+    align-items: center;
+}
+
+#labelGuide {
+    outline-color: #DAA06D;
+    color: #DAA06D;
+}
+
+#labelReference {
+    outline-color: #87CEFA;
+    color: #87CEFA;
+}
+
+#labelDeveloper {
+    outline-color: #9FE2BF;
+    color: #9FE2BF;
+}
+
+#labelOther {
+    outline-color: #FFC0CB;
+    color: #FFC0CB;
+}
