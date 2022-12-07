@@ -73,7 +73,7 @@
                 bool: {
                     filter: [{
                         terms: {
-                            type: Array.from(letters)
+                            "type.keyword": Array.from(letters)
                         }
                     }],
                     must: [{
