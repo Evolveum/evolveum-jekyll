@@ -72,7 +72,7 @@
             query: {
                 bool: {
                     filter: [{
-                        term: {
+                        terms: {
                             type: Array.from(letters)
                         }
                     }],
