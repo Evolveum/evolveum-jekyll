@@ -230,7 +230,7 @@
                     <p>Upkeep status: ${upkeepStatus} <i id="upkeep${upkeepStatus}" class="fa fa-circle"></i>
                     </p><p>Likes: ${upvotes}</p><p>Author: ${author}</p></span>'><div id="${data.hits.hits[i]._id}site"><a href="${data.hits.hits[i]._source.url}" 
                     ><li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i>
-                    <span class="font1">&nbsp;${data.hits.hits[i].highlight.title}</a><span id="label${data.hits.hits[i]._source.type}" class="typeLabel">${data.hits.hits[i]._source.type.toUpperCase()}</span><a><br></span><span class="font2">${preview}</span></li></a></div></span>
+                    <span class="font1">&nbsp;${data.hits.hits[i].highlight.title}</a><span id="label${data.hits.hits[i]._source.type}" class="typeLabel">${data.hits.hits[i]._source.type.toUpperCase()}</span><a href="${data.hits.hits[i]._source.url}"><br></span><span class="font2">${preview}</span></li></a></div></span>
                     <span class="vote" id="${data.hits.hits[i]._id}up"><i class="fas fa-thumbs-up"></i></span></div>`);
                 }
 
