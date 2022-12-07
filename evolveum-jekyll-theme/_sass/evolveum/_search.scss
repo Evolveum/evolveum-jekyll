@@ -187,12 +187,19 @@
     outline-style: solid;
     outline-width: 2px;
     margin-left: 10px;
-    padding: 2.5px 7px;
-    font-size: 12px;
+    padding: 1px 4px;
+    font-size: 9px;
     font-weight: bold;
     border-radius: 40px;
     justify-content: center;
     align-items: center;
+    vertical-align: middle;
+    text-decoration: none;
+}
+
+.typeLabel:hover {
+    text-decoration: none;
+    cursor: pointer;
 }
 
 #labelGuide {
