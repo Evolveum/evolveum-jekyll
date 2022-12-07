@@ -222,14 +222,14 @@
     color: #FFC0CB;
 }
 
-.font1:hover {
+.search-list-item:hover>.font1 {
     text-decoration: underline;
 }
 
-.font2:hover {
+.search-list-item:hover>.font2 {
     text-decoration: underline;
 }
 
-.aWithoutUnderline {
+.aWithoutUnderline:hover {
     text-decoration: none;
 }
