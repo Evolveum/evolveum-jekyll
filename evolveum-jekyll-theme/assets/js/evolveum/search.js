@@ -249,7 +249,7 @@
                     contentStatusArray = [data.hits.hits[i]._source.obsolete, data.hits.hits[i]._source.deprecated, data.hits.hits[i]._source.experimental, data.hits.hits[i]._source.planned, data.hits.hits[i]._source.outdated]
                     contentStatusValuesArray = ["obsolete", "deprecated", "experimental", "planned", "outdated"]
                     contentStatus = "" // TODO as array
-                    source = source.filter(function(element, index) {
+                    filtredArray = contentStatusArray.filter(function(element, index) {
                         if (element != undefined && (element || element == "true")) {
                             contentStatus = contentStatusValuesArray[index]
                             return true;
