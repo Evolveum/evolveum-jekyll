@@ -108,27 +108,27 @@
                                         }
                                         if (doc.deprecated.size()!=0) {
                                             if (doc.deprecated.value == true) {
-                                                totalScore = totalScore*${data._source.multipliers.deprecated_true};
+                                                totalScore = totalScore*${data._source.multipliers.deprecated};
                                             }
                                         }
                                         if (doc.experimental.size()!=0) {
                                             if (doc.experimental.value == true) {
-                                                totalScore = totalScore*${data._source.multipliers.experimental_true};
+                                                totalScore = totalScore*${data._source.multipliers.experimental};
                                             }
                                         }
                                         if (doc.planned.size()!=0) {
                                             if (doc.planned.value == true) {
-                                                totalScore = totalScore*${data._source.multipliers.planned_true};
+                                                totalScore = totalScore*${data._source.multipliers.planned};
                                             }
                                         }
                                         if (doc.outdated.size()!=0) {
                                             if (doc.outdated.value == true) {
-                                                totalScore = totalScore*${data._source.multipliers.outdated_true};
+                                                totalScore = totalScore*${data._source.multipliers.outdated};
                                             }
                                         }
                                         if (doc.obsolete.size()!=0) {
                                             if (doc.obsolete.value == true) {
-                                                totalScore = totalScore*${data._source.multipliers.obsolete_true};
+                                                totalScore = totalScore*${data._source.multipliers.obsolete};
                                             }
                                         }
                                         return totalScore;
