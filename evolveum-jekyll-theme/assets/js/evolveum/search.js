@@ -245,7 +245,7 @@
                         upkeepStatus = "unknown"
                     }
 
-                    contentTriangleDisplay = "on"
+                    contentTriangleDisplay = "initial"
                     contentStatusArray = [data.hits.hits[i]._source.obsolete, data.hits.hits[i]._source.deprecated, data.hits.hits[i]._source.experimental, data.hits.hits[i]._source.planned, data.hits.hits[i]._source.outdated]
                     contentStatusValuesArray = ["obsolete", "deprecated", "experimental", "planned", "outdated"]
                     contentStatus = "" // TODO as array
@@ -260,7 +260,7 @@
 
                     if (contentStatus == "") {
                         contentStatus = "up-to-date"
-                        contentTriangleDisplay = "off"
+                        contentTriangleDisplay = "none"
                     }
 
                     showItems.push(`<div><span class="trigger-details" style="display: inline-block;width: 430px" data-toggle="tooltip" data-placement="left" 

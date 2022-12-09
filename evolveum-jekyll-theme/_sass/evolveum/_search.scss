@@ -247,15 +247,14 @@
     vertical-align: middle;
 }
 
-.condition-triangleon {
+.condition-triangleinitial {
     margin-left: 5px;
-    color: #FFD700;
+    color: #FFD700 !important;
     vertical-align: middle;
 }
 
-.condition-triangleoff {
-    margin-left: 5px;
-    color: #FFD700;
+.condition-trianglenone {
     display: none !important;
-    vertical-align: middle;
+    visibility: none !important;
+    z-index: -100 !important;
 }
