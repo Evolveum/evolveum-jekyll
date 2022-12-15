@@ -27,7 +27,7 @@
 
 .font1 {
     display: inline-block;
-    max-width: 300px;
+    max-width: 280px;
     overflow: hidden;
     text-overflow: ellipsis;
     vertical-align: middle;
@@ -97,8 +97,7 @@
 }
 
 .oval {
-    outline-style: solid;
-    outline-width: 2px;
+    border: 2px solid;
     margin: 10px;
     padding: 2.5px 7px;
     font-size: 12px;
@@ -119,8 +118,9 @@
 }
 
 #ovalGuide.on {
-    color: antiquewhite;
+    color: white;
     background-color: #DAA06D;
+    border-color: #DAA06D;
 }
 
 #ovalReference {
@@ -129,8 +129,9 @@
 }
 
 #ovalReference.on {
-    color: antiquewhite;
+    color: white;
     background-color: #87CEFA;
+    border-color: #87CEFA;
 }
 
 #ovalDeveloper {
@@ -139,8 +140,9 @@
 }
 
 #ovalDeveloper.on {
-    color: antiquewhite;
+    color: white;
     background-color: #9FE2BF;
+    border-color: #9FE2BF;
 }
 
 #ovalOther {
@@ -149,8 +151,9 @@
 }
 
 #ovalOther.on {
-    color: antiquewhite;
+    color: white;
     background-color: #FFC0CB;
+    border-color: #FFC0CB;
 }
 
 .modal-h-frow {
@@ -190,8 +193,7 @@
     /* IE 10 and IE 11 */
     user-select: none;
     /* Standard syntax */
-    outline-style: solid;
-    outline-width: 2px;
+    border: 2px solid;
     margin-left: 10px;
     padding: 1px 4px;
     font-size: 9px;
