@@ -142,7 +142,7 @@
                                     fields: [
                                         "text",
                                         "title^2",
-                                        "preview^0.1"
+                                        "alternative_text^0.5" // TODO
                                     ],
                                     fuzziness: "AUTO",
                                     prefix_length: 2,
@@ -161,8 +161,7 @@
                 ],
                 fields: {
                     title: {},
-                    text: {},
-                    preview: {}
+                    text: {}
                 }
             }
         }
@@ -219,10 +218,13 @@
                         }
                     } else {
                         preview = data.hits.hits[i]._source.text.substring(0, 115)
+                        if (preview == undefined || !preview) {
+                            preview = data.hits.hits[i]._source.alternative_text
+                        }
                     }
 
-                    preview.replace("<", "&lt;")
-                    preview.replace(">", "&lt;")
+                    preview.replaceAll("<", "&lt;")
+                    preview.replaceAll(">", "&gt;")
 
                     let title = data.hits.hits[i].highlight.title
 
