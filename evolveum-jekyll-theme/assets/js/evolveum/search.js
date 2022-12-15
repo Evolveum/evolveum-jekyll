@@ -224,8 +224,12 @@
                     }
 
                     if (preview != undefined && preview) {
+                        preview = preview.replaceAll("<strong>", "vQU0nfuawhKCT38fZDcSl0hnWMfXcrOq7VydIETdqMde8wmTzxnaZQ==")
+                        preview = preview.replaceAll("</strong>", "7U3pTwKZCEwGRrgirF9cydI9cQWP2mzOiofD2Pl/HjFwxoekr5fRpg==")
                         preview = preview.replaceAll("<", "&lt;")
                         preview = preview.replaceAll(">", "&gt;")
+                        preview = preview.replaceAll("vQU0nfuawhKCT38fZDcSl0hnWMfXcrOq7VydIETdqMde8wmTzxnaZQ==", "<strong>")
+                        preview = preview.replaceAll("7U3pTwKZCEwGRrgirF9cydI9cQWP2mzOiofD2Pl/HjFwxoekr5fRpg==", "</strong>")
                     }
 
                     let title = data.hits.hits[i].highlight.title
