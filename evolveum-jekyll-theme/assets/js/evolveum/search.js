@@ -223,8 +223,10 @@
                         }
                     }
 
-                    preview.replaceAll("<", "&lt;")
-                    preview.replaceAll(">", "&gt;")
+                    if (preview != undefined && preview) {
+                        preview.replaceAll("<", "&lt;")
+                        preview.replaceAll(">", "&gt;")
+                    }
 
                     let title = data.hits.hits[i].highlight.title
 
