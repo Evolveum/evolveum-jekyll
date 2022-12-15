@@ -195,15 +195,16 @@
     /* Standard syntax */
     border: 2px solid;
     margin-left: 10px;
-    padding: 0px 4px 0px 4px;
-    font-size: 9px;
+    padding: 2.5px 4px 2.5px 4px;
+    font-size: 9.3px;
     font-weight: bold;
     border-radius: 40px;
     justify-content: center;
     align-items: center;
-    vertical-align: middle;
+    vertical-align: text-top;
     text-decoration: none;
     display: inline-block;
+    line-height: 1;
 }
 
 .typeLabel:hover {
