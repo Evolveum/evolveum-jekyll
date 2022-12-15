@@ -224,8 +224,8 @@
                     }
 
                     if (preview != undefined && preview) {
-                        preview.replaceAll("<", "&lt;|")
-                        preview.replaceAll(">", "|&gt;")
+                        preview = preview.replaceAll("<", "&lt;")
+                        preview = preview.replaceAll(">", "&gt;")
                     }
 
                     let title = data.hits.hits[i].highlight.title
