@@ -27,11 +27,9 @@
     });
 
     $(document).on('keydown', function(e) {
-        if (event.keyCode != 38 && event.keyCode != 40) {
-            if (e.key.length == 1 && !e.ctrlKey) {
-                if (!$("#search-modal").hasClass('show')) {
-                    $("#search-modal").modal()
-                }
+        if (e.key.length == 1 && !e.ctrlKey) {
+            if (!$("#search-modal").hasClass('show')) {
+                $("#search-modal").modal()
             }
         }
     });
@@ -173,14 +171,16 @@
     var typingTimer = null;
 
     $('#searchbar').keydown(function() {
-        if (typingTimer) {
-            clearTimeout(typingTimer);
-            typingTimer = null;
-            console.log("timer removed")
-        }
-        if ($('#searchbar').val()) {
-            typingTimer = setTimeout(searchForPhrase, 200);
-            console.log("timer added")
+        if (event.keyCode != 38 && event.keyCode != 40) {
+            if (typingTimer) {
+                clearTimeout(typingTimer);
+                typingTimer = null;
+                console.log("timer removed")
+            }
+            if ($('#searchbar').val()) {
+                typingTimer = setTimeout(searchForPhrase, 200);
+                console.log("timer added")
+            }
         }
     });
 
