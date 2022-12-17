@@ -331,7 +331,7 @@
 
                         currentLI = currentLI > 0 ? --currentLI : 0; // Decrease the counter      
                         listItems[currentLI].classList.add("highlightSearch"); // Highlight the new element
-                        listItems[currentLI].focus()
+                        listItems[currentLI].focus({ focusVisible: true })
                         break;
                     case 40: // Down arrow
                         // Remove the highlighting from the previous element
@@ -340,7 +340,7 @@
 
                         currentLI = currentLI < listItems.length - 1 ? ++currentLI : listItems.length - 1; // Increase counter 
                         listItems[currentLI].classList.add("highlightSearch"); // Highlight the new element
-                        listItems[currentLI].focus()
+                        listItems[currentLI].focus({ focusVisible: true })
                         break;
                 }
             });
