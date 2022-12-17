@@ -312,7 +312,7 @@
 
             $('[data-toggle="tooltip"]').tooltip();
 
-            let listItems = document.querySelectorAll("#searchbar, .search-list-item");
+            let listItems = document.querySelectorAll("#searchbar, .aWithoutUnderline");
 
             // Set up a counter to keep track of which <li> is selected
             let currentLI = 0;
