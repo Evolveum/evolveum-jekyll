@@ -27,9 +27,11 @@
     });
 
     $(document).on('keydown', function(e) {
-        if (e.key.length == 1 && !e.ctrlKey) {
-            if (!$("#search-modal").hasClass('show')) {
-                $("#search-modal").modal()
+        if (event.keyCode != 38 && event.keyCode != 40) {
+            if (e.key.length == 1 && !e.ctrlKey) {
+                if (!$("#search-modal").hasClass('show')) {
+                    $("#search-modal").modal()
+                }
             }
         }
     });
