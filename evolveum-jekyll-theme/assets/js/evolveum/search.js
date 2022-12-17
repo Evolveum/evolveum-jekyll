@@ -309,6 +309,37 @@
             }
 
             $('[data-toggle="tooltip"]').tooltip();
+
+            let listItems = document.querySelectorAll("#searchbar, .search-list-item");
+
+            // Set up a counter to keep track of which <li> is selected
+            let currentLI = 0;
+
+            // Initialize first li as the selected (focused) one:
+            listItems[currentLI].classList.add("highlightSearch");
+
+            // Set up a key event handler for the document
+            document.addEventListener("keydown", function(event) {
+                // Check for up/down key presses
+                switch (event.keyCode) {
+                    case 38: // Up arrow    
+                        // Remove the highlighting from the previous element
+                        listItems[currentLI].classList.remove("highlightSearch");
+
+                        currentLI = currentLI > 0 ? --currentLI : 0; // Decrease the counter      
+                        listItems[currentLI].classList.add("highlightSearch"); // Highlight the new element
+                        listItems[currentLI].trigger('focus')
+                        break;
+                    case 40: // Down arrow
+                        // Remove the highlighting from the previous element
+                        listItems[currentLI].classList.remove("highlightSearch");
+
+                        currentLI = currentLI < listItems.length - 1 ? ++currentLI : listItems.length - 1; // Increase counter 
+                        listItems[currentLI].classList.add("highlightSearch"); // Highlight the new element
+                        listItems[currentLI].trigger('focus')
+                        break;
+                }
+            });
         }
 
         OSrequest("POST", "https://osdocs.lab.evolveum.com/docs/_search", searchQuery, "search", "YvHY6hR8Zets+fGQ", true, showResults)
