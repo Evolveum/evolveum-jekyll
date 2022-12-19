@@ -275,7 +275,6 @@
 */
 
 .highlightSearch:focus {
-    background-color: #D5F3FE;
     border: none;
     outline: none;
 }
@@ -283,4 +282,9 @@
 #moreResults:hover {
     text-decoration: underline;
     cursor: pointer;
+}
+
+.highlightParentSearch {
+    background-color: #D5F3FE;
+    border-radius: 20px;
 }
