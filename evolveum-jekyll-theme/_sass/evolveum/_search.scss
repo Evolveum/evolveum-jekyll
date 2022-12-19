@@ -274,8 +274,10 @@
 }
 */
 
-.highlightSearch {
+.highlightSearch:focus {
     background-color: #D5F3FE;
+    border: none;
+    outline: none;
 }
 
 #moreResults:hover {

@@ -346,7 +346,7 @@
             });
         }
 
-        OSrequest("POST", "https://osdocs.lab.evolveum.com/docs/_search", searchQuery, "search", "YvHY6hR8Zets+fGQ", true, showResults)
+        OSrequest("POST", "https://osdocs.lab.evolveum.com/docs,mpbook/_search", searchQuery, "search", "YvHY6hR8Zets+fGQ", true, showResults)
     }
 
     function setSearchItemOnclick(id, title) {
