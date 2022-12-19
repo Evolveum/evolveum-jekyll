@@ -328,14 +328,14 @@
                         // Remove the highlighting from the previous element
                         listItems[currentLI].classList.remove("highlightSearch");
                         if (listItems[currentLI].className == "aWithoutUnderline") {
-                            listItems[currentLI].parentElement.classList.remove("highlightParentSearch");
+                            listItems[currentLI].parentElement.parentElement.classList.remove("highlightParentSearch");
                         }
                         listItems[currentLI].blur()
 
                         currentLI = currentLI > 0 ? --currentLI : 0; // Decrease the counter      
                         listItems[currentLI].classList.add("highlightSearch"); // Highlight the new element
                         if (listItems[currentLI].className == "aWithoutUnderline") {
-                            listItems[currentLI].parentElement.classList.add("highlightParentSearch");
+                            listItems[currentLI].parentElement.parentElement.classList.add("highlightParentSearch");
                         }
                         listItems[currentLI].focus({ focusVisible: true })
                         break;
@@ -343,14 +343,14 @@
                         // Remove the highlighting from the previous element
                         listItems[currentLI].classList.remove("highlightSearch");
                         if (listItems[currentLI].className == "aWithoutUnderline") {
-                            listItems[currentLI].parentElement.classList.remove("highlightParentSearch");
+                            listItems[currentLI].parentElement.parentElement.classList.remove("highlightParentSearch");
                         }
                         listItems[currentLI].blur()
 
                         currentLI = currentLI < listItems.length - 1 ? ++currentLI : listItems.length - 1; // Increase counter 
                         listItems[currentLI].classList.add("highlightSearch"); // Highlight the new element
                         if (listItems[currentLI].className == "aWithoutUnderline") {
-                            listItems[currentLI].parentElement.classList.add("highlightParentSearch");
+                            listItems[currentLI].parentElement.parentElement.classList.add("highlightParentSearch");
                         }
                         listItems[currentLI].focus({ focusVisible: true })
                         break;
