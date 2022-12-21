@@ -194,6 +194,7 @@
         searchQuery.query.bool.must[0].function_score.query.multi_match.query = document.getElementById('searchbar').value.toLowerCase();
 
         const showResults = function(data) {
+            console.log(data)
             const showItems = []
             const numberOfItems = data.hits.total.value
             const suggestionBox = document.getElementById("autocombox")
@@ -337,18 +338,14 @@
                     listItems[currentLI].classList.remove("highlightSearch");
                     if (listItems[currentLI].className == "aWithoutUnderline") {
                         listItems[currentLI].parentElement.parentElement.classList.remove("highlightParentSearch");
-                        console.log("I am here")
                     }
-                    console.log("before " + listItems[currentLI])
                     listItems[currentLI].blur()
 
                     currentLI = currentLI > 0 ? --currentLI : 0; // Decrease the counter      
                     listItems[currentLI].classList.add("highlightSearch"); // Highlight the new element
                     if (listItems[currentLI].id != "searchbar") {
                         listItems[currentLI].parentElement.parentElement.classList.add("highlightParentSearch");
-                        console.log("I am here too")
                     }
-                    console.log("after" + listItems[currentLI])
                     listItems[currentLI].focus({ focusVisible: true })
                     break;
                 case 40: // Down arrow
