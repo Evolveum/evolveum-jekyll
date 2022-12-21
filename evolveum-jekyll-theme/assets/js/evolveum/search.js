@@ -312,53 +312,62 @@
 
             $('[data-toggle="tooltip"]').tooltip();
 
-            let listItems = document.querySelectorAll("#searchbar, .aWithoutUnderline");
+            setTimeout(setHighlighting, 30);
 
-            // Set up a counter to keep track of which <li> is selected
-            let currentLI = 0;
-
-            // Initialize first li as the selected (focused) one:
-            listItems[currentLI].classList.add("highlightSearch");
-
-            // Set up a key event handler for the document
-            document.addEventListener("keydown", function(event) {
-                // Check for up/down key presses
-                switch (event.keyCode) {
-                    case 38: // Up arrow    
-                        // Remove the highlighting from the previous element
-                        listItems[currentLI].classList.remove("highlightSearch");
-                        if (listItems[currentLI].className == "aWithoutUnderline") {
-                            listItems[currentLI].parentElement.parentElement.classList.remove("highlightParentSearch");
-                        }
-                        listItems[currentLI].blur()
-
-                        currentLI = currentLI > 0 ? --currentLI : 0; // Decrease the counter      
-                        listItems[currentLI].classList.add("highlightSearch"); // Highlight the new element
-                        if (listItems[currentLI].className == "aWithoutUnderline") {
-                            listItems[currentLI].parentElement.parentElement.classList.add("highlightParentSearch");
-                        }
-                        listItems[currentLI].focus({ focusVisible: true })
-                        break;
-                    case 40: // Down arrow
-                        // Remove the highlighting from the previous element
-                        listItems[currentLI].classList.remove("highlightSearch");
-                        if (listItems[currentLI].className == "aWithoutUnderline") {
-                            listItems[currentLI].parentElement.parentElement.classList.remove("highlightParentSearch");
-                        }
-                        listItems[currentLI].blur()
-
-                        currentLI = currentLI < listItems.length - 1 ? ++currentLI : listItems.length - 1; // Increase counter 
-                        listItems[currentLI].classList.add("highlightSearch"); // Highlight the new element
-                        if (listItems[currentLI].className == "aWithoutUnderline") {
-                            listItems[currentLI].parentElement.parentElement.classList.add("highlightParentSearch");
-                        }
-                        listItems[currentLI].focus({ focusVisible: true })
-                        break;
-                }
-            });
         }
 
         OSrequest("POST", "https://osdocs.lab.evolveum.com/docs,mpbook/_search", searchQuery, "search", "YvHY6hR8Zets+fGQ", true, showResults)
+    }
+
+    function setHighlighting() {
+        let listItems = document.querySelectorAll("#searchbar, .aWithoutUnderline");
+
+        // Set up a counter to keep track of which <li> is selected
+        let currentLI = 0;
+
+        // Initialize first li as the selected (focused) one:
+        listItems[currentLI].classList.add("highlightSearch");
+
+        // Set up a key event handler for the document
+        document.addEventListener("keydown", function(event) {
+            // Check for up/down key presses
+            switch (event.keyCode) {
+                case 38: // Up arrow    
+                    // Remove the highlighting from the previous element
+                    listItems[currentLI].classList.remove("highlightSearch");
+                    if (listItems[currentLI].className == "aWithoutUnderline") {
+                        listItems[currentLI].parentElement.parentElement.classList.remove("highlightParentSearch");
+                        console.log("I am here")
+                    }
+                    console.log("before " + listItems[currentLI])
+                    listItems[currentLI].blur()
+
+                    currentLI = currentLI > 0 ? --currentLI : 0; // Decrease the counter      
+                    listItems[currentLI].classList.add("highlightSearch"); // Highlight the new element
+                    if (listItems[currentLI].id != "searchbar") {
+                        listItems[currentLI].parentElement.parentElement.classList.add("highlightParentSearch");
+                        console.log("I am here too")
+                    }
+                    console.log("after" + listItems[currentLI])
+                    listItems[currentLI].focus({ focusVisible: true })
+                    break;
+                case 40: // Down arrow
+                    // Remove the highlighting from the previous element
+                    listItems[currentLI].classList.remove("highlightSearch");
+                    if (listItems[currentLI].className == "aWithoutUnderline") {
+                        listItems[currentLI].parentElement.parentElement.classList.remove("highlightParentSearch");
+                    }
+                    listItems[currentLI].blur()
+
+                    currentLI = currentLI < listItems.length - 1 ? ++currentLI : listItems.length - 1; // Increase counter 
+                    listItems[currentLI].classList.add("highlightSearch"); // Highlight the new element
+                    if (listItems[currentLI].id != "searchbar") {
+                        listItems[currentLI].parentElement.parentElement.classList.add("highlightParentSearch");
+                    }
+                    listItems[currentLI].focus({ focusVisible: true })
+                    break;
+            }
+        });
     }
 
     function setSearchItemOnclick(id, title) {
