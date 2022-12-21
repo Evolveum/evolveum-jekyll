@@ -88,7 +88,7 @@
                                             totalScore = totalScore*(1+${data._source.multipliers.upvotes}*doc.upvotes.value/100);
                                         }
                                         if (doc['_index'].value == "mpbook") {
-                                            totalScore = totalScore*${data._source.multipliers.book}
+                                            totalScore = totalScore*${data._source.multipliers.book};
                                         }
                                         if (doc.containsKey('upkeep-status.keyword') && doc['upkeep-status.keyword'].size()!=0) {
                                             if (doc['upkeep-status.keyword'].value == "yellow") {
