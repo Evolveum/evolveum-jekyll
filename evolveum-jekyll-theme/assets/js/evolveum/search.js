@@ -1,27 +1,3 @@
-var OSrequest = function(method, url, query, username, password, async, callback) {
-    $.ajax({
-        method: method,
-        url: url,
-        crossDomain: true,
-        xhrFields: {
-            withCredentials: true
-        },
-        headers: {
-            "Authorization": "Basic " + btoa(username + ":" + password)
-        },
-        async: async,
-        data: JSON.stringify(query),
-        dataType: 'json',
-        contentType: 'application/json',
-    }).done(function(data) {
-        if (typeof callback !== 'undefined' && callback) {
-            callback(data)
-        }
-    }).fail(function(data) {
-        console.log(data);
-    });
-}
-
 (function() {
 
     let letters = new Set(["Guide", "Reference", "Developer", "Other"]);
@@ -64,6 +40,30 @@ var OSrequest = function(method, url, query, username, password, async, callback
         document.getElementById('searchToggle').value = "";
         document.getElementById('searchbar').value = "";
     });
+
+    function OSrequest(method, url, query, username, password, async, callback) {
+        $.ajax({
+            method: method,
+            url: url,
+            crossDomain: true,
+            xhrFields: {
+                withCredentials: true
+            },
+            headers: {
+                "Authorization": "Basic " + btoa(username + ":" + password)
+            },
+            async: async,
+            data: JSON.stringify(query),
+            dataType: 'json',
+            contentType: 'application/json',
+        }).done(function(data) {
+            if (typeof callback !== 'undefined' && callback) {
+                callback(data)
+            }
+        }).fail(function(data) {
+            console.log(data);
+        });
+    }
 
     let searchQuery = {}
 
