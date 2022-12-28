@@ -2,7 +2,7 @@
 
     let letters = new Set(["Guide", "Reference", "Developer", "Other"]);
 
-    $('.oval').click(function() {
+    $('.ovalSearch').click(function() {
         $(this).toggleClass('on');
         let name = this.id.replace('oval', '')
         if (this.classList.contains('on')) {

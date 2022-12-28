@@ -160,6 +160,28 @@
     border-color: #FFC0CB;
 }
 
+#ovalText.on {
+    color: white;
+    background-color: #75E6DA;
+    border-color: #75E6DA;
+}
+
+#ovalText {
+    color: #75E6DA;
+    outline-color: #75E6DA;
+}
+
+#ovalTitle.on {
+    color: white;
+    background-color: #189AB4;
+    border-color: #189AB4;
+}
+
+#ovalTitle {
+    color: #189AB4;
+    outline-color: #189AB4;
+}
+
 .modal-h-frow {
     display: flex;
     align-items: flex-start;
