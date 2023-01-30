@@ -204,6 +204,39 @@
     outline-color: #189AB4;
 }
 
+.ovalMajor.on {
+    color: white;
+    background-color: #ff8167;
+    border-color: #ff8167;
+}
+
+.ovalMajor {
+    color: #ff8167;
+    outline-color: #ff8167;
+}
+
+.ovalSignificant.on {
+    color: white;
+    background-color: #ffaf56;
+    border-color: #ffaf56;
+}
+
+.ovalSignificant {
+    color: #ffaf56;
+    outline-color: #ffaf56;
+}
+
+.ovalMinor.on {
+    color: white;
+    background-color: #ffe32c;
+    border-color: #ffe32c;
+}
+
+.ovalMinor {
+    color: #ffe32c;
+    outline-color: #ffe32c;
+}
+
 .modal-h-frow {
     display: flex;
     align-items: flex-start;
@@ -339,4 +372,27 @@
 
 .tableCentered {
     text-align: center;
+}
+
+.LMDLimpactMajor {
+    color: #ff8167;
+}
+
+.LMDLimpactSignificant {
+    color: #ffaf56;
+}
+
+.LMDLimpactMinor {
+    color: #ffe32c;
+}
+
+.LMDLimpact {
+    font-size: 0.856rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.btn-light{
+    background-color: #FFF;
+    color: #000;
 }
