@@ -228,24 +228,24 @@
 
 #ovalText.on {
     color: white;
-    background-color: #AC9B29;
-    border-color: #AC9B29;
+    background-color: #555;
+    border-color: #555;
 }
 
 #ovalText {
-    color: #AC9B29;
-    outline-color: #AC9B29;
+    color: #555;
+    outline-color: #555;
 }
 
 #ovalTitle.on {
     color: white;
-    background-color: #3C3400;
-    border-color: #3C3400;
+    background-color: #202020;
+    border-color: #202020;
 }
 
 #ovalTitle {
-    color: #3C3400;
-    outline-color: #3C3400;
+    color: #202020;
+    outline-color: #202020;
 }
 
 .ovalMajor.on {
@@ -436,10 +436,11 @@
     text-align: center;
 }
 
-.btn-light {
+
+/*.btn-light {
     background-color: #FFF;
     color: #000;
-}
+}*/
 
 .btnLMDLsearch {
     color: #000;
@@ -458,7 +459,7 @@
     border-width: 0.5px;
     padding: 5px 10px;
     border-radius: 6px;
-    color: #909090;
+    color: #909090 !important;
 }
 
 .LMDLDatePickerIcon {
