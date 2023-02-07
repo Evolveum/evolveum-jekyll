@@ -123,19 +123,63 @@
 }
 
 .LMDLcategoryGuide {
-    color: #d6955c;
+    color: #020929;
 }
 
 .LMDLcategoryReference {
-    color: #61bdf7;
+    color: #071145;
 }
 
 .LMDLcategoryDeveloper {
-    color: #57c08a;
+    color: #273376;
 }
 
 .LMDLcategoryOther {
-    color: #fb99aa;
+    color: #3F4B8C;
+}
+
+#ovalLMDLGuide {
+    outline-color: #020929;
+    color: #020929;
+}
+
+#ovalLMDLGuide.on {
+    color: white;
+    background-color: #020929;
+    border-color: #020929;
+}
+
+#ovalLMDLReference {
+    outline-color: #071145;
+    color: #071145;
+}
+
+#ovalLMDLReference.on {
+    color: white;
+    background-color: #071145;
+    border-color: #071145;
+}
+
+#ovalLMDLDeveloper {
+    outline-color: #273376;
+    color: #273376;
+}
+
+#ovalLMDLDeveloper.on {
+    color: white;
+    background-color: #273376;
+    border-color: #273376;
+}
+
+#ovalLMDLOther {
+    outline-color: #3F4B8C;
+    color: #3F4B8C;
+}
+
+#ovalLMDLOther.on {
+    color: white;
+    background-color: #3F4B8C;
+    border-color: #3F4B8C;
 }
 
 #ovalGuide {
@@ -184,57 +228,57 @@
 
 #ovalText.on {
     color: white;
-    background-color: #75E6DA;
-    border-color: #75E6DA;
+    background-color: #AC9B29;
+    border-color: #AC9B29;
 }
 
 #ovalText {
-    color: #75E6DA;
-    outline-color: #75E6DA;
+    color: #AC9B29;
+    outline-color: #AC9B29;
 }
 
 #ovalTitle.on {
     color: white;
-    background-color: #189AB4;
-    border-color: #189AB4;
+    background-color: #3C3400;
+    border-color: #3C3400;
 }
 
 #ovalTitle {
-    color: #189AB4;
-    outline-color: #189AB4;
+    color: #3C3400;
+    outline-color: #3C3400;
 }
 
 .ovalMajor.on {
     color: white;
-    background-color: #ff8167;
-    border-color: #ff8167;
+    background-color: #74481a;
+    border-color: #74481a;
 }
 
 .ovalMajor {
-    color: #ff8167;
-    outline-color: #ff8167;
+    color: #74481a;
+    outline-color: #74481a;
 }
 
 .ovalSignificant.on {
     color: white;
-    background-color: #ffaf56;
-    border-color: #ffaf56;
+    background-color: #AC6D29;
+    border-color: #AC6D29;
 }
 
 .ovalSignificant {
-    color: #ffaf56;
-    outline-color: #ffaf56;
+    color: #AC6D29;
+    outline-color: #AC6D29;
 }
 
 .ovalMinor.on {
     color: white;
-    background-color: #ffe32c;
-    border-color: #ffe32c;
+    background-color: #CC8F4C;
+    border-color: #CC8F4C;
 }
 
 .ovalMinor {
-    color: #ffe32c;
-    outline-color: #ffe32c;
+    color: #CC8F4C;
+    outline-color: #CC8F4C;
 }
 
 .modal-h-frow {
@@ -375,15 +419,15 @@
 }
 
 .LMDLimpactMajor {
-    color: #ff8167;
+    color: #74481a;
 }
 
 .LMDLimpactSignificant {
-    color: #ffaf56;
+    color: #AC6D29;
 }
 
 .LMDLimpactMinor {
-    color: #ffe32c;
+    color: #CC8F4C;
 }
 
 .LMDLimpact {
@@ -392,7 +436,32 @@
     text-align: center;
 }
 
-.btn-light{
+.btn-light {
     background-color: #FFF;
     color: #000;
+}
+
+.btnLMDLsearch {
+    color: #000;
+    border-color: #000;
+}
+
+.btnLMDLsearch:hover {
+    color: #212529;
+    background-color: #A3CCDC;
+    border-color: #A3CCDC;
+}
+
+.LMDLDatePickerButton {
+    border-color: #6f6f6f;
+    border-style: solid;
+    border-width: 0.5px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    color: #909090;
+}
+
+.LMDLDatePickerIcon {
+    margin-right: 10px;
+    color: #303030;
 }
