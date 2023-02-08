@@ -56,7 +56,7 @@
             },
             headers: {
                 "Authorization": "Basic " + btoa(username + ":" + password),
-                "X-Opaque-ID": location
+                "X-Opaque-ID": location.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
             },
             async: async,
             data: JSON.stringify(query),
