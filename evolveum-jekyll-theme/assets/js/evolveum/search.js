@@ -2,6 +2,8 @@
 
     let letters = new Set(["Guide", "Reference", "Developer", "Other"]);
 
+    let location = ""
+
     $('.ovalSearch').click(function() {
         $(this).toggleClass('on');
         let name = this.id.replace('oval', '')
@@ -20,10 +22,13 @@
         searchForPhrase()
     });
 
-    $("#search-modal").on('shown.bs.modal', function() {
+    $("#search-modal").on('shown.bs.modal', async function() {
         console.log('triggered')
         $('#searchbar').trigger('focus')
         console.log(document.getElementById('searchbar').value)
+        const request = await fetch("https://ipinfo.io/json?token=102db5f7d4c840")
+        const jsonResponse = await request.json()
+        location = jsonResponse.city + " " + jsonResponse.region + " " + jsonResponse.country + " && " + jsonResponse.loc
     });
 
     $(document).on('keydown', function(e) {
@@ -50,7 +55,8 @@
                 withCredentials: true
             },
             headers: {
-                "Authorization": "Basic " + btoa(username + ":" + password)
+                "Authorization": "Basic " + btoa(username + ":" + password),
+                "X-Opaque-ID": location
             },
             async: async,
             data: JSON.stringify(query),
