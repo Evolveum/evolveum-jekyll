@@ -28,7 +28,7 @@
         console.log(document.getElementById('searchbar').value)
         const request = await fetch("https://ipinfo.io/json?token=102db5f7d4c840")
         const jsonResponse = await request.json()
-        location = jsonResponse.city + " " + jsonResponse.region + " " + jsonResponse.country + " && " + jsonResponse.loc
+        location = "GEODATA " + jsonResponse.city + " " + jsonResponse.region + " " + jsonResponse.country + " && " + jsonResponse.loc
     });
 
     $(document).on('keydown', function(e) {
