@@ -459,7 +459,11 @@
     border-width: 0.5px;
     padding: 5px 10px;
     border-radius: 6px;
-    color: #909090 !important;
+    color: #909090;
+}
+
+#LMDLPickedDate {
+    color: #999;
 }
 
 .LMDLDatePickerIcon {
