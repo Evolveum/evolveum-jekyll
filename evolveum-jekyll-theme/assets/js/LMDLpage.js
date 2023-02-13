@@ -378,12 +378,14 @@ $(document).ready(function() {
                 }
             }
         })
+        searchLMDP()
     });
 
     $('.LMDLDatePickerButton').on('cancel.daterangepicker', function(ev, picker) {
         document.getElementById("LMDLPickedDate").innerHTML = 'Pick a date range'
         document.getElementById("LMDLPickedDate").style.color = "#909090"
         afterSearchQuery.query.bool.must[0].bool.filter.pop()
+        searchLMDP()
     });
 });
 
