@@ -44,7 +44,7 @@ $('.ovalChange').click(function() {
 
 $('.ovalSearchIn').click(function() {
     $(this).toggleClass('on');
-    name = ""
+    let name = ""
     if (this.id == "ovalText") {
         searchText = !searchText
         name = "text"
@@ -372,7 +372,7 @@ $(document).ready(function() {
         document.getElementById("LMDLPickedDate").style.color = "#000"
         afterSearchQuery.query.bool.must[0].bool.filter.push({
             range: {
-                "timestamp": {
+                "date": {
                     gte: picker.startDate.format('YYYY-MM-DD'),
                     lte: picker.endDate.format('YYYY-MM-DD')
                 }
