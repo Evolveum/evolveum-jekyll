@@ -402,44 +402,44 @@ $('#LMDLsearchbar').on('blur', function() {
     });
 });
 
-// function setAuthors(data) {
-//     let authorsArray = data.aggregations.authors.buckets
-//     let authorsList = []
-//     authorsArray.forEach(element => {
-//         allAuthors.push(element.key)
-//         authorsList.push("<option>" + element.key.replace(/<.*>/, "") + "</option>")
-//     });
-//     let selectObjects = document.getElementById("selectpickerauthor")
-//     selectObjects.innerHTML = authorsList.join("")
-//     afterSearchQuery.query.bool.must[0].bool.filter[1].terms["author.keyword"] = allAuthors
-//     $('#selectpickerauthor').selectpicker();
-//     $('#selectpickerauthor').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
-//         if (isSelected) {
-//             if (authors.size == allAuthors.length) {
-//                 authors = new Set([])
-//             }
-//             authors.add(allAuthors[clickedIndex])
-//         } else {
-//             authors.delete(allAuthors[clickedIndex])
-//             if (authors.size == 0) {
-//                 authors = new Set(allAuthors)
-//             }
-//         }
-//         afterSearchQuery.query.bool.must[0].bool.filter[1].terms["author.keyword"] = Array.from(authors)
-//         searchLMDP()
-//     });
-//     $("#selectpickerauthor").on("shown.bs.select", function() {
-//         $(document).off('keydown')
-//     });
-//     $('#selectpickerauthor').on('hidden.bs.select', function() {
-//         $(document).on('keydown', function(e) {
-//             if (e.key.length == 1 && !e.ctrlKey) {
-//                 if (!$("#search-modal").hasClass('show')) {
-//                     $("#search-modal").modal()
-//                 }
-//             }
-//         });
-//     });
+function setAuthors(data) {
+    let authorsArray = data.aggregations.authors.buckets
+    let authorsList = []
+    authorsArray.forEach(element => {
+        allAuthors.push(element.key)
+        authorsList.push("<option>" + element.key.replace(/<.*>/, "") + "</option>")
+    });
+    let selectObjects = document.getElementById("selectpickerauthor")
+    selectObjects.innerHTML = authorsList.join("")
+    afterSearchQuery.query.bool.must[0].bool.filter[1].terms["author.keyword"] = allAuthors
+    $('#selectpickerauthor').selectpicker();
+    $('#selectpickerauthor').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
+        if (isSelected) {
+            if (authors.size == allAuthors.length) {
+                authors = new Set([])
+            }
+            authors.add(allAuthors[clickedIndex])
+        } else {
+            authors.delete(allAuthors[clickedIndex])
+            if (authors.size == 0) {
+                authors = new Set(allAuthors)
+            }
+        }
+        afterSearchQuery.query.bool.must[0].bool.filter[1].terms["author.keyword"] = Array.from(authors)
+        searchLMDP()
+    });
+    $("#selectpickerauthor").on("shown.bs.select", function() {
+        $(document).off('keydown')
+    });
+    $('#selectpickerauthor').on('hidden.bs.select', function() {
+        $(document).on('keydown', function(e) {
+            if (e.key.length == 1 && !e.ctrlKey) {
+                if (!$("#search-modal").hasClass('show')) {
+                    $("#search-modal").modal()
+                }
+            }
+        });
+    });
 
 
 }
