@@ -2,8 +2,6 @@
 
     let letters = new Set(["Guide", "Reference", "Developer", "Other"]);
 
-    let location = ""
-
     $('.ovalSearch').click(function() {
         $(this).toggleClass('on');
         let name = this.id.replace('oval', '')
@@ -20,15 +18,6 @@
         }
         searchQuery.query.bool.filter[0].terms["type.keyword"] = Array.from(letters)
         searchForPhrase()
-    });
-
-    $("#search-modal").on('shown.bs.modal', async function() {
-        console.log('triggered')
-        $('#searchbar').trigger('focus')
-        console.log(document.getElementById('searchbar').value)
-        const request = await fetch("https://ipinfo.io/json?token=102db5f7d4c840")
-        const jsonResponse = await request.json()
-        location = "GEODATA " + jsonResponse.city + " " + jsonResponse.region + " " + jsonResponse.country + " && " + jsonResponse.loc
     });
 
     $(document).on('keydown', function(e) {
@@ -53,9 +42,6 @@
             crossDomain: true,
             xhrFields: {
                 withCredentials: true
-            },
-            headers: {
-                "X-Opaque-ID": location.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
             },
             async: async,
             data: JSON.stringify(query),
