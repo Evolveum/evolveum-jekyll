@@ -28,6 +28,10 @@
         }
     });
 
+    $("#search-modal").on('shown.bs.modal', async function() {
+        $('#searchbar').trigger('focus')
+    });
+
     $("#search-modal").on('hidden.bs.modal', function() {
         document.getElementById("autocombox").innerHTML = "";
         document.getElementById("autocombox").style.display = "none";
@@ -40,6 +44,9 @@
             method: method,
             url: url,
             crossDomain: true,
+            xhrFields: {
+                withCredentials: true
+            },
             async: async,
             data: JSON.stringify(query),
             dataType: 'json',
