@@ -46,7 +46,7 @@
         document.getElementById('searchbar').value = "";
     });
 
-    function OSrequest(method, url, query, username, password, async, callback) {
+    function OSrequest(method, url, query, async, callback) {
         $.ajax({
             method: method,
             url: url,
@@ -55,7 +55,6 @@
                 withCredentials: true
             },
             headers: {
-                "Authorization": "Basic " + btoa(username + ":" + password),
                 "X-Opaque-ID": location.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
             },
             async: async,
@@ -73,7 +72,7 @@
 
     let searchQuery = {}
 
-    OSrequest("GET", "https://osdocs.lab.evolveum.com/search_settings/_doc/1", undefined, "search", "YvHY6hR8Zets+fGQ", true, setSearchQuery)
+    OSrequest("GET", "https://opensearch.lab.evolveum.com/search_settings/_doc/1", undefined, true, setSearchQuery)
 
     function setSearchQuery(data) {
         searchQuery = {
@@ -326,7 +325,7 @@
 
         }
 
-        OSrequest("POST", "https://osdocs.lab.evolveum.com/docs,mpbook/_search", searchQuery, "search", "YvHY6hR8Zets+fGQ", true, showResults)
+        OSrequest("POST", "https://opensearch.lab.evolveum.com/docs,mpbook/_search", searchQuery, true, showResults)
     }
 
     function setHighlighting() {
@@ -391,7 +390,7 @@
                 }
             }
 
-            OSrequest("POST", "https://osdocs.lab.evolveum.com/docs/_update/" + id + "?refresh", queryUpvote, "upvotes", "VYIWUwo5sJ/plOIC", true)
+            OSrequest("POST", "https://opensearch.lab.evolveum.com/docs/_update/" + id + "?refresh", queryUpvote, true)
 
             $(this).toggleClass('on');
         });
@@ -410,7 +409,7 @@
                     "query": document.getElementById('searchbar').value.toLowerCase()
                 }
 
-                ev.button == 0 ? OSrequest("POST", "https://osdocs.lab.evolveum.com/click_logs/_doc/", queryClick, "clicklog", "YBSbhSKDzBxGCXtl", false) : OSrequest("POST", "https://osdocs.lab.evolveum.com/click_logs/_doc/", queryClick, "clicklog", "YBSbhSKDzBxGCXtl", true);
+                ev.button == 0 ? OSrequest("POST", "https://opensearch.lab.evolveum.com/click_logs/_doc/", queryClick, false) : OSrequest("POST", "https://opensearch.lab.evolveum.com/click_logs/_doc/", queryClick, true);
             }
         });
     }
