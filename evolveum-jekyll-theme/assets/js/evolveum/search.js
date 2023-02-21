@@ -40,9 +40,6 @@
             method: method,
             url: url,
             crossDomain: true,
-            xhrFields: {
-                withCredentials: true
-            },
             async: async,
             data: JSON.stringify(query),
             dataType: 'json',
