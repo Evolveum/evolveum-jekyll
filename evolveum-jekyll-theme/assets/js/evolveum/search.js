@@ -312,7 +312,7 @@
 
         }
 
-        OSrequest("GET", "https://opensearch.lab.evolveum.com/docs,mpbook/_search", searchQuery, true, showResults)
+        OSrequest("POST", "https://opensearch.lab.evolveum.com/docs,mpbook/_search", searchQuery, true, showResults)
     }
 
     function setHighlighting() {
