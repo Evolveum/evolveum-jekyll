@@ -40,6 +40,10 @@
     });
 
     function OSrequest(method, url, query, async, callback) {
+        if (method == "GET" && query != "") {
+            url = url + "?source_content_type=application/json&source=" + JSON.stringify(query)
+            query = undefined
+        }
         $.ajax({
             method: method,
             url: url,
@@ -312,7 +316,7 @@
 
         }
 
-        OSrequest("POST", "https://opensearch.lab.evolveum.com/docs,mpbook/_search", searchQuery, true, showResults)
+        OSrequest("GET", "https://opensearch.lab.evolveum.com/docs,mpbook/_search", searchQuery, true, showResults)
     }
 
     function setHighlighting() {
