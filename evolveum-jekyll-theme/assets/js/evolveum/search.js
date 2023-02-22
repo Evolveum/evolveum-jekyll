@@ -41,7 +41,7 @@
 
     function OSrequest(method, url, query, async, callback) {
         if (method == "GET" && query != undefined) {
-            url = url + "?source_content_type=application/json&source=" + JSON.stringify(query)
+            url = url + "?source_content_type=application/json&source=" + JSON.stringify(query.replaceAll("/\n/", ""))
             query = undefined
         }
         $.ajax({
