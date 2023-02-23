@@ -83,49 +83,49 @@
                                         if (doc.upvotes.size()!=0) {
                                             totalScore = totalScore*(1+${data._source.multipliers.upvotes}*doc.upvotes.value/100);
                                         }
-                                        if (doc['_index'].value == "mpbook") {
+                                        if (doc["_index"].value == "mpbook") {
                                             totalScore = totalScore*${data._source.multipliers.book};
                                         }
-                                        if (doc.containsKey('upkeep-status.keyword') && doc['upkeep-status.keyword'].size()!=0) {
-                                            if (doc['upkeep-status.keyword'].value == "yellow") {
+                                        if (doc.containsKey("upkeep-status.keyword") && doc["upkeep-status.keyword"].size()!=0) {
+                                            if (doc["upkeep-status.keyword"].value == "yellow") {
                                                 totalScore = totalScore*${data._source.multipliers.status_yellow};
-                                            } else if (doc['upkeep-status.keyword'].value == "green") {
+                                            } else if (doc["upkeep-status.keyword"].value == "green") {
                                                 totalScore = totalScore*${data._source.multipliers.status_green};
-                                            } else if (doc['upkeep-status.keyword'].value == "red") {
+                                            } else if (doc["upkeep-status.keyword"].value == "red") {
                                                 totalScore = totalScore*${data._source.multipliers.status_red};
-                                            } else if (doc['upkeep-status.keyword'].value == "orange") {
+                                            } else if (doc["upkeep-status.keyword"].value == "orange") {
                                                 totalScore = totalScore*${data._source.multipliers.status_orange};
                                             }
                                         } else {
                                             totalScore = totalScore*${data._source.multipliers.status_absent};
                                         }
-                                        if (doc.containsKey('lastModificationDate') && doc.lastModificationDate.size()!=0) {
+                                        if (doc.containsKey("lastModificationDate") && doc.lastModificationDate.size()!=0) {
                                             double timestampNow = (double)new Date().getTime();
                                             totalScore = totalScore*Math.max(${data._source.values.last_modification_min}, ${data._source.multipliers.last_modification_im}/(1+(timestampNow - doc.lastModificationDate.value.getMillis())/${data._source.values.last_modification * 24 * 60 * 60 * 1000}.0))
                                         } else {
                                             totalScore = totalScore*${data._source.multipliers.age_absent};
                                         }
-                                        if (doc.containsKey('deprecated') && doc.deprecated.size()!=0) {
+                                        if (doc.containsKey("deprecated") && doc.deprecated.size()!=0) {
                                             if (doc.deprecated.value == true) {
                                                 totalScore = totalScore*${data._source.multipliers.deprecated};
                                             }
                                         }
-                                        if (doc.containsKey('experimental') && doc.experimental.size()!=0) {
+                                        if (doc.containsKey("experimental") && doc.experimental.size()!=0) {
                                             if (doc.experimental.value == true) {
                                                 totalScore = totalScore*${data._source.multipliers.experimental};
                                             }
                                         }
-                                        if (doc.containsKey('planned') && doc.planned.size()!=0) {
+                                        if (doc.containsKey("planned") && doc.planned.size()!=0) {
                                             if (doc.planned.value == true) {
                                                 totalScore = totalScore*${data._source.multipliers.planned};
                                             }
                                         }
-                                        if (doc.containsKey('outdated') && doc.outdated.size()!=0) {
+                                        if (doc.containsKey("outdated") && doc.outdated.size()!=0) {
                                             if (doc.outdated.value == true) {
                                                 totalScore = totalScore*${data._source.multipliers.outdated};
                                             }
                                         }
-                                        if (doc.containsKey('obsolete') && doc.obsolete.size()!=0) {
+                                        if (doc.containsKey("obsolete") && doc.obsolete.size()!=0) {
                                             if (doc.obsolete.value == true) {
                                                 totalScore = totalScore*${data._source.multipliers.obsolete};
                                             }
