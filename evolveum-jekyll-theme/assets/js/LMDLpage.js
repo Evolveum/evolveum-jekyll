@@ -312,11 +312,11 @@ function searchLMDP(beginningIndex = 0) {
     $(window).scroll(scrollEvent); // TODO DO NOT REPEAT
 
 
-    OSrequest("POST", "https://osdocs.lab.evolveum.com/docs_commits/_search", afterSearchQuery, "search", "YvHY6hR8Zets+fGQ", true, updateList)
+    OSrequest("POST", "https://opensearch.lab.evolveum.com/docs_commits/_search", afterSearchQuery, "search", "YvHY6hR8Zets+fGQ", true, updateList)
 }
 
 $(document).ready(function() {
-    OSrequest("POST", "https://osdocs.lab.evolveum.com/docs/_search", initialSearchQuery, "search", "YvHY6hR8Zets+fGQ", true, updateList)
+    OSrequest("POST", "https://opensearch.lab.evolveum.com/docs/_search", initialSearchQuery, "search", "YvHY6hR8Zets+fGQ", true, updateList)
 
     let request = {
         "aggs": {
@@ -334,7 +334,7 @@ $(document).ready(function() {
         "size": 0
     }
 
-    OSrequest("POST", "https://osdocs.lab.evolveum.com/docs_commits/_search", request, "search", "YvHY6hR8Zets+fGQ", true, setAuthors)
+    OSrequest("POST", "https://opensearch.lab.evolveum.com/docs_commits/_search", request, "search", "YvHY6hR8Zets+fGQ", true, setAuthors)
 
     $(window).scroll(function() {
         if ($(window).scrollTop() >= $(document).height() - $(window).height() - 10) {
@@ -449,7 +449,7 @@ function setAuthors(data) {
 //     if (authors.size == allAuthors.length && importance.size == 3) {
 //         searchLMDP()
 //     }
-//     OSrequest("POST", "https://osdocs.lab.evolveum.com/docs_commits/_search", commitsFilterQuery, "search", "YvHY6hR8Zets+fGQ", true, filterByIds)
+//     OSrequest("POST", "https://opensearch.lab.evolveum.com/docs_commits/_search", commitsFilterQuery, "search", "YvHY6hR8Zets+fGQ", true, filterByIds)
 // }
 
 // function filterByIds(data) {
