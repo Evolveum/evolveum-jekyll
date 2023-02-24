@@ -148,17 +148,17 @@ let afterSearchQuery = {
 //     }
 // }
 
-function OSrequest(method, url, query, username, password, async, callback) {
+function OSrequest(method, url, query, async, callback) {
     $.ajax({
         method: method,
         url: url,
         crossDomain: true,
-        xhrFields: {
-            withCredentials: true
-        },
-        headers: {
-            "Authorization": "Basic " + btoa(username + ":" + password)
-        },
+        // xhrFields: {
+        //     withCredentials: true
+        // },
+        // headers: {
+        //     "Authorization": "Basic " + btoa(username + ":" + password)
+        // },
         async: async,
         data: JSON.stringify(query),
         dataType: 'json',
@@ -312,11 +312,11 @@ function searchLMDP(beginningIndex = 0) {
     $(window).scroll(scrollEvent); // TODO DO NOT REPEAT
 
 
-    OSrequest("POST", "https://opensearch.lab.evolveum.com/docs_commits/_search", afterSearchQuery, "search", "YvHY6hR8Zets+fGQ", true, updateList)
+    OSrequest("POST", "https://opensearch.lab.evolveum.com/docs_commits/_search", afterSearchQuery, true, updateList)
 }
 
 $(document).ready(function() {
-    OSrequest("POST", "https://opensearch.lab.evolveum.com/docs/_search", initialSearchQuery, "search", "YvHY6hR8Zets+fGQ", true, updateList)
+    OSrequest("POST", "https://opensearch.lab.evolveum.com/docs/_search", initialSearchQuery, true, updateList)
 
     let request = {
         "aggs": {
@@ -334,7 +334,7 @@ $(document).ready(function() {
         "size": 0
     }
 
-    OSrequest("POST", "https://opensearch.lab.evolveum.com/docs_commits/_search", request, "search", "YvHY6hR8Zets+fGQ", true, setAuthors)
+    OSrequest("POST", "https://opensearch.lab.evolveum.com/docs_commits/_search", request, true, setAuthors)
 
     $(window).scroll(function() {
         if ($(window).scrollTop() >= $(document).height() - $(window).height() - 10) {
