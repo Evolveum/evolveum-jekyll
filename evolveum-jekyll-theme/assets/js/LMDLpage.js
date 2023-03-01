@@ -6,63 +6,63 @@ let searchTitle = true
 let searchText = true
 var shouldIgnoreScroll = false;
 
-$('.ovalCategory').click(function() {
-    $(this).toggleClass('on');
-    let name = this.id.replace('ovalLMDL', '')
-    if (this.classList.contains('on')) {
-        document.getElementById("check" + name).className = 'fas fa-check'
-        this.innerHTML = this.innerHTML.replace(name.toUpperCase(), "&nbsp;" + name.toUpperCase())
-        console.log(this.innerHTML)
-        searchCategory.add(name)
-    } else {
-        document.getElementById("check" + name).className = ''
-        this.innerHTML = this.innerHTML.replace("&nbsp;" + name.toUpperCase(), name.toUpperCase())
-        console.log(this.innerHTML + name.toUpperCase())
-        searchCategory.delete(name)
-    }
-    afterSearchQuery.query.bool.must[0].bool.filter[2].terms["contentType.keyword"] = Array.from(searchCategory)
-    searchLMDP()
-});
+// $('.ovalCategory').click(function() {
+//     $(this).toggleClass('on');
+//     let name = this.id.replace('ovalLMDL', '')
+//     if (this.classList.contains('on')) {
+//         document.getElementById("check" + name).className = 'fas fa-check'
+//         this.innerHTML = this.innerHTML.replace(name.toUpperCase(), "&nbsp;" + name.toUpperCase())
+//         console.log(this.innerHTML)
+//         searchCategory.add(name)
+//     } else {
+//         document.getElementById("check" + name).className = ''
+//         this.innerHTML = this.innerHTML.replace("&nbsp;" + name.toUpperCase(), name.toUpperCase())
+//         console.log(this.innerHTML + name.toUpperCase())
+//         searchCategory.delete(name)
+//     }
+//     afterSearchQuery.query.bool.must[0].bool.filter[2].terms["contentType.keyword"] = Array.from(searchCategory)
+//     searchLMDP()
+// });
 
-$('.ovalChange').click(function() {
-    $(this).toggleClass('on');
-    let name = this.id.replace('oval', '')
-    if (this.classList.contains('on')) {
-        document.getElementById("check" + name).className = 'fas fa-check'
-        this.innerHTML = this.innerHTML.replace(name.toUpperCase(), "&nbsp;" + name.toUpperCase())
-        console.log(this.innerHTML)
-        importance.add(name)
-    } else {
-        document.getElementById("check" + name).className = ''
-        this.innerHTML = this.innerHTML.replace("&nbsp;" + name.toUpperCase(), name.toUpperCase())
-        console.log(this.innerHTML + name.toUpperCase())
-        importance.delete(name)
-    }
-    afterSearchQuery.query.bool.must[0].bool.filter[0].terms["importance.keyword"] = Array.from(importance)
-    searchLMDP()
-});
+// $('.ovalChange').click(function() {
+//     $(this).toggleClass('on');
+//     let name = this.id.replace('oval', '')
+//     if (this.classList.contains('on')) {
+//         document.getElementById("check" + name).className = 'fas fa-check'
+//         this.innerHTML = this.innerHTML.replace(name.toUpperCase(), "&nbsp;" + name.toUpperCase())
+//         console.log(this.innerHTML)
+//         importance.add(name)
+//     } else {
+//         document.getElementById("check" + name).className = ''
+//         this.innerHTML = this.innerHTML.replace("&nbsp;" + name.toUpperCase(), name.toUpperCase())
+//         console.log(this.innerHTML + name.toUpperCase())
+//         importance.delete(name)
+//     }
+//     afterSearchQuery.query.bool.must[0].bool.filter[0].terms["importance.keyword"] = Array.from(importance)
+//     searchLMDP()
+// });
 
-$('.ovalSearchIn').click(function() {
-    $(this).toggleClass('on');
-    let name = ""
-    if (this.id == "ovalText") {
-        searchText = !searchText
-        name = "text"
-    } else {
-        searchTitle = !searchTitle
-        name = "title"
-    }
-    if (this.classList.contains('on')) {
-        document.getElementById("check" + name).className = 'fas fa-check'
-        this.innerHTML = this.innerHTML.replace(name.toUpperCase(), "&nbsp;" + name.toUpperCase())
-        console.log(this.innerHTML)
-    } else {
-        document.getElementById("check" + name).className = ''
-        this.innerHTML = this.innerHTML.replace("&nbsp;" + name.toUpperCase(), name.toUpperCase())
-        console.log(this.innerHTML + name.toUpperCase())
-    }
-    searchLMDP()
-});
+// $('.ovalSearchIn').click(function() {
+//     $(this).toggleClass('on');
+//     let name = ""
+//     if (this.id == "ovalText") {
+//         searchText = !searchText
+//         name = "text"
+//     } else {
+//         searchTitle = !searchTitle
+//         name = "title"
+//     }
+//     if (this.classList.contains('on')) {
+//         document.getElementById("check" + name).className = 'fas fa-check'
+//         this.innerHTML = this.innerHTML.replace(name.toUpperCase(), "&nbsp;" + name.toUpperCase())
+//         console.log(this.innerHTML)
+//     } else {
+//         document.getElementById("check" + name).className = ''
+//         this.innerHTML = this.innerHTML.replace("&nbsp;" + name.toUpperCase(), name.toUpperCase())
+//         console.log(this.innerHTML + name.toUpperCase())
+//     }
+//     searchLMDP()
+// });
 
 let initialSearchQuery = {
     query: {
@@ -248,7 +248,7 @@ const updateList = function(data) {
         <td class="tableCentered LMDLimpact${impactOfChange} LMDLimpact">${impactOfChange.toUpperCase()}</td>
         <td class="tableCentered">${author}</td>
         <td class="tableCentered">${contentStatus}</td>
-        <td class="tableCentered">${upkeepStatus}&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle"></td>
+        <td class="tableCentered">${upkeepStatus}&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></td>
         <td>${commitMessage}</td>
         </tr>`);
     }
@@ -316,6 +316,10 @@ function searchLMDP(beginningIndex = 0) {
 }
 
 $(document).ready(function() {
+    setLMDLSearchIn()
+    setLMDLCategory()
+    setLMDLImpact()
+
     OSrequest("POST", "https://opensearch.lab.evolveum.com/docs/_search", initialSearchQuery, true, updateList)
 
     let request = {
@@ -402,12 +406,24 @@ $('#LMDLsearchbar').on('blur', function() {
     });
 });
 
+function setLMDLSearchIn() {
+    $('#selectpickersearchin').selectpicker();
+}
+
+function setLMDLCategory() {
+    $('#selectpickercategory').selectpicker();
+}
+
+function setLMDLImpact() {
+    $('#selectpickerimpact').selectpicker();
+}
+
 function setAuthors(data) {
     let authorsArray = data.aggregations.authors.buckets
     let authorsList = []
     authorsArray.forEach(element => {
         allAuthors.push(element.key)
-        authorsList.push("<option>" + element.key.replace(/<.*>/, "") + "</option>")
+        authorsList.push("<option>" + element.key + "</option>")
     });
     let selectObjects = document.getElementById("selectpickerauthor")
     selectObjects.innerHTML = authorsList.join("")
