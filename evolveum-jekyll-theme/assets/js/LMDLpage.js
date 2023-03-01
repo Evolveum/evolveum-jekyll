@@ -1,28 +1,12 @@
-let searchCategory = new Set(["Guide", "Reference", "Developer", "Other"]);
-let importance = new Set(["Major", "Significant", "Minor"]);
+let allSearchCategory = ["Guide", "Reference", "Developer", "Other"]
+let searchCategory = new Set(allSearchCategory);
+let allImportance = ["Major", "Significant", "Minor"]
+let importance = new Set(allImportance);
+let allSearchIn = ["Title", "Text"]
+let searchIn = new Set(allSearchIn)
 let authors = new Set([])
 let allAuthors = []
-let searchTitle = true
-let searchText = true
 var shouldIgnoreScroll = false;
-
-// $('.ovalCategory').click(function() {
-//     $(this).toggleClass('on');
-//     let name = this.id.replace('ovalLMDL', '')
-//     if (this.classList.contains('on')) {
-//         document.getElementById("check" + name).className = 'fas fa-check'
-//         this.innerHTML = this.innerHTML.replace(name.toUpperCase(), "&nbsp;" + name.toUpperCase())
-//         console.log(this.innerHTML)
-//         searchCategory.add(name)
-//     } else {
-//         document.getElementById("check" + name).className = ''
-//         this.innerHTML = this.innerHTML.replace("&nbsp;" + name.toUpperCase(), name.toUpperCase())
-//         console.log(this.innerHTML + name.toUpperCase())
-//         searchCategory.delete(name)
-//     }
-//     afterSearchQuery.query.bool.must[0].bool.filter[2].terms["contentType.keyword"] = Array.from(searchCategory)
-//     searchLMDP()
-// });
 
 // $('.ovalChange').click(function() {
 //     $(this).toggleClass('on');
@@ -262,7 +246,7 @@ function searchLMDP(beginningIndex = 0) {
     afterSearchQuery.query.bool.must[1].bool.should = []
 
     if (document.getElementById('LMDLsearchbar').value.toLowerCase() != undefined && document.getElementById('LMDLsearchbar').value.toLowerCase() != "") {
-        if (searchTitle) {
+        if (searchIn.has("Title")) {
             afterSearchQuery.query.bool.must[1].bool.should.push({
                 bool: {
                     filter: [{
@@ -273,7 +257,7 @@ function searchLMDP(beginningIndex = 0) {
                 }
             });
         }
-        if (searchText) {
+        if (searchIn.has("Text")) {
             afterSearchQuery.query.bool.must[1].bool.should.push({
                 bool: {
                     filter: [{
@@ -408,15 +392,67 @@ $('#LMDLsearchbar').on('blur', function() {
 
 function setLMDLSearchIn() {
     $('#selectpickersearchin').selectpicker();
+    $('#selectpickercategory').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
+        if (isSelected) {
+            searchIn.add(allSearchIn[clickedIndex])
+        } else {
+            searchIn.delete(allSearchIn[clickedIndex])
+            if (searchIn.size == 0) {
+                searchIn = new Set(allSearchIn)
+            }
+        }
+    });
 }
 
 function setLMDLCategory() {
     $('#selectpickercategory').selectpicker();
+    $('#selectpickercategory').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
+        if (isSelected) {
+            searchCategory.add(allSearchCategory[clickedIndex])
+        } else {
+            searchCategory.delete(allSearchCategory[clickedIndex])
+            if (searchCategory.size == 0) {
+                searchCategory = new Set(allSearchCategory)
+            }
+        }
+        afterSearchQuery.query.bool.must[0].bool.filter[2].terms["contentType.keyword"] = Array.from(searchCategory)
+        searchLMDP()
+    });
 }
 
 function setLMDLImpact() {
     $('#selectpickerimpact').selectpicker();
+    $('#selectpickerimpact').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
+        if (isSelected) {
+            importance.add(allImportance[clickedIndex])
+        } else {
+            importance.delete(allImportance[clickedIndex])
+            if (importance.size == 0) {
+                importance = new Set(allImportance)
+            }
+        }
+        afterSearchQuery.query.bool.must[0].bool.filter[0].terms["importance.keyword"] = Array.from(importance)
+        searchLMDP()
+    });
 }
+
+// $('.ovalCategory').click(function() {
+//     $(this).toggleClass('on');
+//     let name = this.id.replace('ovalLMDL', '')
+//     if (this.classList.contains('on')) {
+//         document.getElementById("check" + name).className = 'fas fa-check'
+//         this.innerHTML = this.innerHTML.replace(name.toUpperCase(), "&nbsp;" + name.toUpperCase())
+//         console.log(this.innerHTML)
+//         searchCategory.add(name)
+//     } else {
+//         document.getElementById("check" + name).className = ''
+//         this.innerHTML = this.innerHTML.replace("&nbsp;" + name.toUpperCase(), name.toUpperCase())
+//         console.log(this.innerHTML + name.toUpperCase())
+//         searchCategory.delete(name)
+//     }
+//     afterSearchQuery.query.bool.must[0].bool.filter[2].terms["contentType.keyword"] = Array.from(searchCategory)
+//     searchLMDP()
+// });
 
 function setAuthors(data) {
     let authorsArray = data.aggregations.authors.buckets
@@ -431,9 +467,6 @@ function setAuthors(data) {
     $('#selectpickerauthor').selectpicker();
     $('#selectpickerauthor').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         if (isSelected) {
-            if (authors.size == allAuthors.length) {
-                authors = new Set([])
-            }
             authors.add(allAuthors[clickedIndex])
         } else {
             authors.delete(allAuthors[clickedIndex])

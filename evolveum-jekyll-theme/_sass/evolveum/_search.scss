@@ -463,7 +463,6 @@
     border-color: #6f6f6f;
     border-style: solid;
     border-width: 0.5px;
-    padding: 5px 10px;
     border-radius: 6px;
     color: #909090;
 }
@@ -475,4 +474,10 @@
 .LMDLDatePickerIcon {
     margin-right: 10px;
     color: #303030;
+}
+
+.LMDLfilters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
 }
