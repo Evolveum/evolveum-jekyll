@@ -1,9 +1,9 @@
 let allSearchCategory = ["Guide", "Reference", "Developer", "Other"]
-let searchCategory = new Set(allSearchCategory);
+let searchCategory = new Set([]);
 let allImportance = ["Major", "Significant", "Minor"]
-let importance = new Set(allImportance);
+let importance = new Set([]);
 let allSearchIn = ["Title", "Text"]
-let searchIn = new Set(allSearchIn)
+let searchIn = new Set([])
 let authors = new Set([])
 let allAuthors = []
 var shouldIgnoreScroll = false;
@@ -67,7 +67,7 @@ let afterSearchQuery = {
                     bool: {
                         filter: [{
                             terms: {
-                                "importance.keyword": Array.from(importance)
+                                "importance.keyword": allImportance
                             }
                         }, {
                             terms: {
@@ -75,7 +75,7 @@ let afterSearchQuery = {
                             }
                         }, {
                             terms: {
-                                "contentType.keyword": Array.from(searchCategory)
+                                "contentType.keyword": allSearchCategory
                             }
                         }]
                     }
