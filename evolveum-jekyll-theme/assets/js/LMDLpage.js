@@ -392,7 +392,7 @@ $('#LMDLsearchbar').on('blur', function() {
 
 function setLMDLSearchIn() {
     $('#selectpickersearchin').selectpicker();
-    $('#selectpickercategory').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
+    $('#selectpickersearchin').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         if (isSelected) {
             searchIn.add(allSearchIn[clickedIndex])
         } else {
