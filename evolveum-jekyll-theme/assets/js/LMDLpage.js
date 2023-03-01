@@ -246,7 +246,7 @@ function searchLMDP(beginningIndex = 0) {
     afterSearchQuery.query.bool.must[1].bool.should = []
 
     if (document.getElementById('LMDLsearchbar').value.toLowerCase() != undefined && document.getElementById('LMDLsearchbar').value.toLowerCase() != "") {
-        if (searchIn.has("Title")) {
+        if (searchIn.has("Title") || searchIn.size == 0) {
             afterSearchQuery.query.bool.must[1].bool.should.push({
                 bool: {
                     filter: [{
@@ -257,7 +257,7 @@ function searchLMDP(beginningIndex = 0) {
                 }
             });
         }
-        if (searchIn.has("Text")) {
+        if (searchIn.has("Text") || searchIn.size == 0) {
             afterSearchQuery.query.bool.must[1].bool.should.push({
                 bool: {
                     filter: [{
@@ -397,9 +397,6 @@ function setLMDLSearchIn() {
             searchIn.add(allSearchIn[clickedIndex])
         } else {
             searchIn.delete(allSearchIn[clickedIndex])
-            if (searchIn.size == 0) {
-                searchIn = new Set(allSearchIn)
-            }
         }
     });
 }
@@ -411,11 +408,13 @@ function setLMDLCategory() {
             searchCategory.add(allSearchCategory[clickedIndex])
         } else {
             searchCategory.delete(allSearchCategory[clickedIndex])
-            if (searchCategory.size == 0) {
-                searchCategory = new Set(allSearchCategory)
-            }
         }
-        afterSearchQuery.query.bool.must[0].bool.filter[2].terms["contentType.keyword"] = Array.from(searchCategory)
+
+        if (searchCategory.size == 0) {
+            afterSearchQuery.query.bool.must[0].bool.filter[2].terms["contentType.keyword"] = allSearchCategory
+        } else {
+            afterSearchQuery.query.bool.must[0].bool.filter[2].terms["contentType.keyword"] = Array.from(searchCategory)
+        }
         searchLMDP()
     });
 }
@@ -427,11 +426,13 @@ function setLMDLImpact() {
             importance.add(allImportance[clickedIndex])
         } else {
             importance.delete(allImportance[clickedIndex])
-            if (importance.size == 0) {
-                importance = new Set(allImportance)
-            }
         }
-        afterSearchQuery.query.bool.must[0].bool.filter[0].terms["importance.keyword"] = Array.from(importance)
+
+        if (importance.size == 0) {
+            afterSearchQuery.query.bool.must[0].bool.filter[0].terms["importance.keyword"] = allImportance
+        } else {
+            afterSearchQuery.query.bool.must[0].bool.filter[0].terms["importance.keyword"] = Array.from(importance)
+        }
         searchLMDP()
     });
 }
@@ -470,11 +471,14 @@ function setAuthors(data) {
             authors.add(allAuthors[clickedIndex])
         } else {
             authors.delete(allAuthors[clickedIndex])
-            if (authors.size == 0) {
-                authors = new Set(allAuthors)
-            }
         }
-        afterSearchQuery.query.bool.must[0].bool.filter[1].terms["author.keyword"] = Array.from(authors)
+
+        if (authors.size == 0) {
+            afterSearchQuery.query.bool.must[0].bool.filter[1].terms["author.keyword"] = allAuthors
+        } else {
+            afterSearchQuery.query.bool.must[0].bool.filter[1].terms["author.keyword"] = Array.from(authors)
+        }
+
         searchLMDP()
     });
     $("#selectpickerauthor").on("shown.bs.select", function() {
