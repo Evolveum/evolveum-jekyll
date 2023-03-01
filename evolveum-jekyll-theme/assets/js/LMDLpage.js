@@ -392,6 +392,7 @@ $('#LMDLsearchbar').on('blur', function() {
 
 function setLMDLSearchIn() {
     $('#selectpickersearchin').selectpicker();
+    $('#selectpickersearchin').selectpicker('deselectAll');
     $('#selectpickersearchin').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         if (isSelected) {
             searchIn.add(allSearchIn[clickedIndex])
@@ -403,6 +404,7 @@ function setLMDLSearchIn() {
 
 function setLMDLCategory() {
     $('#selectpickercategory').selectpicker();
+    $('#selectpickercategory').selectpicker('deselectAll');
     $('#selectpickercategory').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         if (isSelected) {
             searchCategory.add(allSearchCategory[clickedIndex])
@@ -421,6 +423,7 @@ function setLMDLCategory() {
 
 function setLMDLImpact() {
     $('#selectpickerimpact').selectpicker();
+    $('#selectpickerimpact').selectpicker('deselectAll');
     $('#selectpickerimpact').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         if (isSelected) {
             importance.add(allImportance[clickedIndex])
