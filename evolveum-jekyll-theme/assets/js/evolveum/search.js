@@ -208,8 +208,10 @@
 
                 for (let i = 0; i < pagesShown && i < numberOfItems; i++) {
                     let text = undefined
+                    let title = undefined
                     if (data.hits.hits[i].highlight != undefined) {
                         text = data.hits.hits[i].highlight.text
+                        title = data.hits.hits[i].highlight.title
                     }
                     let preview = ""
                     if (typeof text !== 'undefined' && text) {
@@ -237,8 +239,6 @@
                         preview = preview.replaceAll("vQU0nfuawhKCT38fZDcSl0hnWMfXcrOq7VydIETdqMde8wmTzxnaZQ==", "<strong>")
                         preview = preview.replaceAll("7U3pTwKZCEwGRrgirF9cydI9cQWP2mzOiofD2Pl/HjFwxoekr5fRpg==", "</strong>")
                     }
-
-                    let title = data.hits.hits[i].highlight.title
 
                     if (title == undefined || !title) {
                         title = data.hits.hits[i]._source.title
