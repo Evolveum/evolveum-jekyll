@@ -207,7 +207,10 @@
                 }
 
                 for (let i = 0; i < pagesShown && i < numberOfItems; i++) {
-                    const text = data.hits.hits[i].highlight.text
+                    let text = undefined
+                    if (Object.hasOwn(object1, 'data.hits.hits[i].highlight.text')) {
+                        text = data.hits.hits[i].highlight.text
+                    }
                     let preview = ""
                     if (typeof text !== 'undefined' && text) {
                         const textArray = text.toString().replace(/([.?!])\s*(?=[A-Z])/g, "$1|").split("|")
