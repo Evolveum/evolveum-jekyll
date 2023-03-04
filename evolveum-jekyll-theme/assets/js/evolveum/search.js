@@ -20,10 +20,13 @@
         searchForPhrase()
     });
 
+    var typingTimer = null;
+
     $(document).on('keydown', function(e) {
         if (e.key.length == 1 && !e.ctrlKey) {
             if (!$("#search-modal").hasClass('show')) {
                 $("#search-modal").modal()
+                typingTimer = setTimeout(searchForPhrase, 200)
             }
         }
     });
@@ -166,8 +169,6 @@
         }
         console.log(searchQuery)
     }
-
-    var typingTimer = null;
 
     $('#searchbar').keydown(function() {
         if (event.keyCode != 38 && event.keyCode != 40) {
