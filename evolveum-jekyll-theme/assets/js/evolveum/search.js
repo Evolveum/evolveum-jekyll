@@ -208,7 +208,7 @@
 
                 for (let i = 0; i < pagesShown && i < numberOfItems; i++) {
                     let text = undefined
-                    if (Object.hasOwn(object1, 'data.hits.hits[i].highlight.text')) {
+                    if (Object.hasOwn(data.hits.hits[i].highlight, 'text')) {
                         text = data.hits.hits[i].highlight.text
                     }
                     let preview = ""
