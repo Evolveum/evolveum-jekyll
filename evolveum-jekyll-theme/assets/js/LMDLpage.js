@@ -228,9 +228,9 @@ const updateList = function(data) {
         listitems.push(`<tr>
         <th scope="row"><a href="${data.hits.hits[i]._source.url}">${title}</a></th>
         <td class="LMDLcategory${contentType} LMDLcategory">${contentType.toUpperCase()}</td>
-        <td class="tableCentered">${date.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</td>
         <td class="tableCentered LMDLimpact${impactOfChange} LMDLimpact">${impactOfChange.toUpperCase()}</td>
         <td class="tableCentered">${author}</td>
+        <td class="tableCentered">${date.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</td>
         <td class="tableCentered">${contentStatus}</td>
         <td class="tableCentered">${upkeepStatus}&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></td>
         <td>${commitMessage}</td>
