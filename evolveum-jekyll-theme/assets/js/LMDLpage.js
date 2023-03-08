@@ -226,7 +226,7 @@ const updateList = function(data) {
             //changedContext = data.hits.hits[i]._source.latest_commit.changedContext
 
         listitems.push(`<tr>
-        <th scope="row"><a href="${data.hits.hits[i]._source.url}">${title}</a></th>
+        <th scope="row"><a href="https://github.com/Evolveum/docs/commits/master${data.hits.hits[i]._source.gitUrl}">${title}</a></th>
         <td class="LMDLcategory${contentType} LMDLcategory">${contentType.toUpperCase()}</td>
         <td class="tableCentered LMDLimpact${impactOfChange} LMDLimpact">${impactOfChange.toUpperCase()}</td>
         <td class="tableCentered">${author}</td>
