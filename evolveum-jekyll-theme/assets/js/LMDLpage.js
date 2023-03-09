@@ -191,7 +191,7 @@ const updateList = function(data) {
             upkeepStatus = "unknown"
         }
 
-        contentTriangleClass = "fas fa-exclamation-triangle conditionTriangle"
+        contentTriangleClass = ""
         contentStatusArray = [data.hits.hits[i]._source.obsolete, data.hits.hits[i]._source.deprecated, data.hits.hits[i]._source.experimental, data.hits.hits[i]._source.planned, data.hits.hits[i]._source.outdated]
         contentStatusValuesArray = ["obsolete", "deprecated", "experimental", "planned", "outdated"]
         contentStatus = "" // TODO as array
@@ -204,9 +204,8 @@ const updateList = function(data) {
             }
         });
 
-        if (contentStatus == "") {
-            contentStatus = "up-to-date"
-            contentTriangleClass = ""
+        if (contentStatus != "") {
+            contentTriangleClass = "fas fa-exclamation-triangle conditionTriangle"
         }
 
         let contentType = data.hits.hits[i]._source.contentType
@@ -226,7 +225,7 @@ const updateList = function(data) {
             //changedContext = data.hits.hits[i]._source.latest_commit.changedContext
 
         listitems.push(`<tr>
-        <th scope="row"><a href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i]._source.latest_commit.gitUrl}">${title}</a></th>
+        <th scope="row"><a href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i]._source.latest_commit.gitUrl}">${title}</a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
         <td class="LMDLcategory${contentType} LMDLcategory">${contentType.toUpperCase()}</td>
         <td class="tableCentered LMDLimpact${impactOfChange} LMDLimpact">${impactOfChange.toUpperCase()}</td>
         <td class="tableCentered">${author}</td>
