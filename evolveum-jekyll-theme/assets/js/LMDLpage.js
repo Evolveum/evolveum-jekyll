@@ -231,7 +231,6 @@ const updateList = function(data) {
         <td class="tableCentered LMDLimpact${impactOfChange} LMDLimpact">${impactOfChange.toUpperCase()}</td>
         <td class="tableCentered">${author}</td>
         <td class="tableCentered">${date.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</td>
-        <td class="tableCentered">${contentStatus}</td>
         <td class="tableCentered">${upkeepStatus}&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></td>
         <td>${commitMessage}</td>
         </tr>`);
