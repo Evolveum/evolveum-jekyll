@@ -161,10 +161,10 @@ const updateList = function(data) {
     let listitems = []
     console.log(data)
     for (let i = 0; i < data.hits.hits.length && i < data.hits.total.value; i++) { // TODO
-        let commitMessage = data.hits.hits[i]._source.commitMessage
-        if (commitMessage == undefined) {
-            commitMessage = data.hits.hits[i]._source.commitMessage
-        }
+        let commitMessage = data.hits.hits[i]._source.commitMessage;
+        // if (commitMessage == undefined) {
+        //     commitMessage = data.hits.hits[i]._source.commitMessage
+        // }
 
         if (commitMessage != undefined && commitMessage) {
             commitMessage = commitMessage.replaceAll("<", "&lt;")
@@ -180,9 +180,9 @@ const updateList = function(data) {
         }
 
         let rawDate = data.hits.hits[i]._source.date
-        if (rawDate == undefined) {
-            rawDate = data.hits.hits[i]._source.lastModificationDate
-        }
+            // if (rawDate == undefined) {
+            //     rawDate = data.hits.hits[i]._source.lastModificationDate
+            // }
         const parsedDate = Date.parse(rawDate)
         const date = new Date(parsedDate)
 
@@ -208,19 +208,15 @@ const updateList = function(data) {
             contentTriangleClass = "fas fa-exclamation-triangle conditionTriangle"
         }
 
-        let contentType = data.hits.hits[i]._source.contentType
-        if (contentType == undefined) {
-            contentType = data.hits.hits[i]._source.type
-        }
+        let contentType = data.hits.hits[i]._source.contentType;
+        // if (contentType == undefined) {
+        //     contentType = data.hits.hits[i]._source.type
+        // }
 
         impactOfChange = data.hits.hits[i]._source.importance
-        if (impactOfChange == undefined) {
-            impactOfChange = data.hits.hits[i]._source.importance
-        }
+
         let author = data.hits.hits[i]._source.author
-        if (author == undefined) {
-            author = data.hits.hits[i]._source.author
-        }
+
         author = author.replace(/<.*>/, "")
             //changedContext = data.hits.hits[i]._source.changedContext
 
@@ -302,7 +298,7 @@ $(document).ready(function() {
     setLMDLCategory()
     setLMDLImpact()
 
-    OSrequest("POST", "https://opensearch.lab.evolveum.com/docs/_search", initialSearchQuery, true, updateList)
+    OSrequest("POST", "https://opensearch.lab.evolveum.com/docs_commits/_search", initialSearchQuery, true, updateList)
 
     let request = {
         "aggs": {
