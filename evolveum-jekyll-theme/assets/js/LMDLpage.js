@@ -54,7 +54,7 @@ let initialSearchQuery = {
     },
     size: 30,
     sort: [{
-        lastModificationDate: {
+        date: {
             order: "desc"
         }
     }]
