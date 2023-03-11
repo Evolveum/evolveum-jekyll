@@ -478,11 +478,23 @@
 
 .LMDLfilters {
     display: flex;
-    flex-wrap: wrap;
     gap: 20px;
     margin-bottom: 10px;
+    justify-content: space-between;
 }
 
 .LMDLupkeepunknown {
     display: none !important;
+}
+
+.LMDLtypefilters {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.LMDLfiltersearch {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
 }

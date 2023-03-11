@@ -163,7 +163,7 @@ const updateList = function(data) {
     for (let i = 0; i < data.hits.hits.length && i < data.hits.total.value; i++) { // TODO
         let commitMessage = data.hits.hits[i]._source.commitMessage
         if (commitMessage == undefined) {
-            commitMessage = data.hits.hits[i]._source.latest_commit.commitMessage
+            commitMessage = data.hits.hits[i]._source.commitMessage
         }
 
         if (commitMessage != undefined && commitMessage) {
@@ -215,17 +215,17 @@ const updateList = function(data) {
 
         impactOfChange = data.hits.hits[i]._source.importance
         if (impactOfChange == undefined) {
-            impactOfChange = data.hits.hits[i]._source.latest_commit.importance
+            impactOfChange = data.hits.hits[i]._source.importance
         }
         let author = data.hits.hits[i]._source.author
         if (author == undefined) {
-            author = data.hits.hits[i]._source.latest_commit.author
+            author = data.hits.hits[i]._source.author
         }
         author = author.replace(/<.*>/, "")
-            //changedContext = data.hits.hits[i]._source.latest_commit.changedContext
+            //changedContext = data.hits.hits[i]._source.changedContext
 
         listitems.push(`<tr>
-        <th scope="row"><a href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i]._source.latest_commit.gitUrl}">${title}</a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
+        <th scope="row"><a href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i]._source.gitUrl}">${title}</a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
         <td class="LMDLcategory${contentType} LMDLcategory">${contentType.toUpperCase()}</td>
         <td class="tableCentered LMDLimpact${impactOfChange} LMDLimpact">${impactOfChange.toUpperCase()}</td>
         <td class="tableCentered">${author}</td>
