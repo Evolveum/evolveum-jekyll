@@ -2,7 +2,7 @@ let allSearchCategory = ["Guide", "Reference", "Developer", "Other"]
 let searchCategory = new Set([]);
 let allImportance = ["Major", "Significant", "Minor"]
 let importance = new Set([]);
-let allSearchIn = ["Title", "Text"]
+let allSearchIn = ["Title", "Text", "Commit message"]
 let searchIn = new Set([])
 let authors = new Set([])
 let allAuthors = []
@@ -257,6 +257,17 @@ function searchLMDP(beginningIndex = 0) {
                     filter: [{
                         term: {
                             text: document.getElementById('LMDLsearchbar').value.toLowerCase()
+                        }
+                    }]
+                }
+            });
+        }
+        if (searchIn.has("Commit message") || searchIn.size == 0) {
+            afterSearchQuery.query.bool.must[1].bool.should.push({
+                bool: {
+                    filter: [{
+                        term: {
+                            commitMessage: document.getElementById('LMDLsearchbar').value.toLowerCase()
                         }
                     }]
                 }
