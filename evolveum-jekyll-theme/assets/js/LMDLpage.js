@@ -452,11 +452,11 @@ function setLMDLImpact() {
         console.log(el.data('selectpicker'))
 
         // the list items with the options
-        let lis = el.data('selectpicker').$lis;
+        let lis = el.data('selectpicker').selectpicker.main.data;
 
         lis.each(function(i) {
-
-            let optionText = i.innerHTML
+            let option = i.element
+            let optionText = option.innerHTML
             let tooltipText = ""
 
             switch (optionText) {
@@ -471,7 +471,7 @@ function setLMDLImpact() {
                     break;
             }
 
-            $(this).tooltip({
+            option.tooltip({
                 'title': tooltipText,
                 'placement': 'right'
             });
