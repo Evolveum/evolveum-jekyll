@@ -454,7 +454,7 @@ function setLMDLImpact() {
         // the list items with the options
         let lis = el.data('selectpicker').selectpicker.main.data;
 
-        lis.each(function(i) {
+        lis.forEach(function(i) {
             let option = i.element
             let optionText = option.innerHTML
             let tooltipText = ""
