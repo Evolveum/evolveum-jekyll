@@ -445,12 +445,16 @@ function setLMDLImpact() {
     }).on('loaded.bs.select', function(e) {
 
         // save the element
-        var $el = $(this);
+        let el = $(this);
+
+        console.log(el)
+
+        console.log(el.data('selectpicker'))
 
         // the list items with the options
-        var $lis = $el.data('selectpicker').$lis;
+        let lis = el.data('selectpicker').$lis;
 
-        $lis.each(function(i) {
+        lis.each(function(i) {
 
             let optionText = i.innerHTML
             let tooltipText = ""
