@@ -471,7 +471,7 @@ function setLMDLImpact() {
                     break;
             }
 
-            option.tooltip({
+            $(option).tooltip({
                 'title': tooltipText,
                 'placement': 'right'
             });
