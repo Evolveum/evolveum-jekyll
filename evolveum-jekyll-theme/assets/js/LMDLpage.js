@@ -442,6 +442,38 @@ function setLMDLImpact() {
             afterSearchQuery.query.bool.must[0].bool.filter[0].terms["importance.keyword"] = Array.from(importance)
         }
         searchLMDP()
+    }).on('loaded.bs.select', function(e) {
+
+        // save the element
+        var $el = $(this);
+
+        // the list items with the options
+        var $lis = $el.data('selectpicker').$lis;
+
+        $lis.each(function(i) {
+
+            let optionText = i.innerHTML
+            let tooltipText = ""
+
+            switch (optionText) {
+                case "Major":
+                    tooltipText = "More than 30% of lines have been edited"
+                    break;
+                case "Significant":
+                    tooltipText = "More than 10% and less than 30% of lines have been edited"
+                    break;
+                case "Minor":
+                    tooltipText = "Less than 10% of lines have been edited"
+                    break;
+            }
+
+            $(this).tooltip({
+                'title': tooltipText,
+                'placement': 'right'
+            });
+
+        });
+
     });
 }
 
@@ -501,8 +533,6 @@ function setAuthors(data) {
             }
         });
     });
-
-
 }
 
 // function firstFilter(beginningIndex = 0) {
