@@ -309,6 +309,8 @@ $(document).ready(function() {
     setLMDLCategory()
     setLMDLImpact()
 
+    $(".LMDLtooltipTh").tooltip()
+
     OSrequest("POST", "https://opensearch.lab.evolveum.com/docs_commits/_search", initialSearchQuery, true, updateList)
 
     let request = {
