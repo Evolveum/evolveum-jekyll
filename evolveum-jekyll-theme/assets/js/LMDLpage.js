@@ -455,8 +455,9 @@ function setLMDLImpact() {
         let lis = el.data('selectpicker').selectpicker.main.data;
 
         lis.forEach(function(i) {
-            let option = i.element
-            let optionText = option.innerText
+            let optionLi = i.element
+            let optionA = optionLi.children[0]
+            let optionText = optionLi.innerText
             let tooltipText = ""
 
             switch (optionText) {
@@ -471,7 +472,7 @@ function setLMDLImpact() {
                     break;
             }
 
-            $(option).tooltip({
+            $(optionA).tooltip({
                 'title': tooltipText,
                 'placement': 'right'
             });
