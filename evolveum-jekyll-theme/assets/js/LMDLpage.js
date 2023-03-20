@@ -474,7 +474,8 @@ function setLMDLImpact() {
 
             $(optionA).tooltip({
                 'title': tooltipText,
-                'placement': 'right'
+                'placement': 'right',
+                'container': 'body'
             });
 
         });
