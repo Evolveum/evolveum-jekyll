@@ -331,18 +331,18 @@ $(document).ready(function() {
 
     OSrequest("POST", "https://opensearch.lab.evolveum.com/docs_commits/_search", request, true, setAuthors)
 
-    $(window).scroll(function() {
-        if ($(window).scrollTop() >= $(document).height() - $(window).height() - 10) {
-            if (shouldIgnoreScroll) {
-                return;
-            }
-            shouldIgnoreScroll = true;
-            setTimeout(() => {
-                shouldIgnoreScroll = false;
-            }, 1200);
-            searchLMDP(30)
-        }
-    });
+    // $(window).scroll(function() {
+    //     if ($(window).scrollTop() >= $(document).height() - $(window).height() - 10) {
+    //         if (shouldIgnoreScroll) {
+    //             return;
+    //         }
+    //         shouldIgnoreScroll = true;
+    //         setTimeout(() => {
+    //             shouldIgnoreScroll = false;
+    //         }, 1200);
+    //         searchLMDP(30)
+    //     }
+    // });
 
     $('.LMDLDatePickerButton').daterangepicker({
         "showDropdowns": true,
