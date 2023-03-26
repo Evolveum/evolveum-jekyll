@@ -286,7 +286,9 @@ function searchLMDP(beginningIndex = 0) {
         listbox.innerHTML = ""
     }
 
-    let scrollEvent = function() {
+    $(window).off('scroll');
+
+    scrollEvent = function() {
         if ($(window).scrollTop() >= $(document).height() - $(window).height() - 10) {
             if (shouldIgnoreScroll) {
                 return;
@@ -299,6 +301,7 @@ function searchLMDP(beginningIndex = 0) {
         }
     }
     $(window).scroll(scrollEvent); // TODO DO NOT REPEAT
+
 
 
     OSrequest("POST", "https://opensearch.lab.evolveum.com/docs_commits/_search", afterSearchQuery, true, updateList)
@@ -331,18 +334,18 @@ $(document).ready(function() {
 
     OSrequest("POST", "https://opensearch.lab.evolveum.com/docs_commits/_search", request, true, setAuthors)
 
-    // $(window).scroll(function() {
-    //     if ($(window).scrollTop() >= $(document).height() - $(window).height() - 10) {
-    //         if (shouldIgnoreScroll) {
-    //             return;
-    //         }
-    //         shouldIgnoreScroll = true;
-    //         setTimeout(() => {
-    //             shouldIgnoreScroll = false;
-    //         }, 1200);
-    //         searchLMDP(30)
-    //     }
-    // });
+    $(window).scroll(function() {
+        if ($(window).scrollTop() >= $(document).height() - $(window).height() - 10) {
+            if (shouldIgnoreScroll) {
+                return;
+            }
+            shouldIgnoreScroll = true;
+            setTimeout(() => {
+                shouldIgnoreScroll = false;
+            }, 1200);
+            searchLMDP(30)
+        }
+    });
 
     $('.LMDLDatePickerButton').daterangepicker({
         "showDropdowns": true,
