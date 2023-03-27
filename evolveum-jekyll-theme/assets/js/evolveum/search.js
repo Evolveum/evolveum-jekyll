@@ -23,7 +23,7 @@
     var typingTimer = null;
 
     $(document).on('keydown', function(e) {
-        if (e.key.length == 1 && !e.ctrlKey) {
+        if (String.fromCharCode(e.key).match(/(\w|\s)/g)) {
             if (!$("#search-modal").hasClass('show')) {
                 $("#search-modal").modal()
                 typingTimer = setTimeout(searchForPhrase, 200)
