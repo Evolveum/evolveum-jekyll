@@ -223,7 +223,7 @@
                 //changedContext = data.hits.hits[i]._source.changedContext
 
             listitems.push(`<tr>
-        <th scope="row"><a href="${data.hits.hits[i]._source.url}">${title}</a>&nbsp;<a href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i]._source.gitUrl}"github history><i class="far fa-external-link"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
+        <th scope="row"><a href="${data.hits.hits[i]._source.url}">${title}</a>&nbsp;<a href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i]._source.gitUrl}">github history<i class="fas fa-exclamation-triangle"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
         <td class="LMDLcategory${contentType} LMDLcategory">${contentType.toUpperCase()}</td>
         <td class="tableCentered LMDLimpact${impactOfChange} LMDLimpact">${impactOfChange.toUpperCase()}</td>
         <td class="tableCentered">${author}</td>
