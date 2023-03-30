@@ -44,7 +44,7 @@
 
     function OSrequest(method, url, query, async, callback) {
         if (method == "GET" && query != undefined) {
-            url = url + "?source_content_type=application/json&source=" + encodeURIComponent(JSON.stringify(query).replace(/\n/g, '').replaceAll("\\n", ""))
+            url = url + "?source_content_type=application/json&source=" + encodeURIComponent(JSON.stringify(query).replace(/\s/g, "").replace(/\n/g, ""))
             query = undefined
         }
         $.ajax({
@@ -52,7 +52,7 @@
             url: url,
             crossDomain: true,
             async: async,
-            data: JSON.stringify(query).replace(/\s/g, "").replace(/\n/g, ""),
+            data: JSON.stringify(query),
             dataType: 'json',
             contentType: 'application/json',
         }).done(function(data) {
