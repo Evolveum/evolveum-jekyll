@@ -52,7 +52,7 @@
             url: url,
             crossDomain: true,
             async: async,
-            data: JSON.stringify(query),
+            data: JSON.stringify(query).replace(/\s/g, "").replace(/\n/g, ""),
             dataType: 'json',
             contentType: 'application/json',
         }).done(function(data) {
