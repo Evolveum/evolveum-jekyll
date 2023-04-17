@@ -224,7 +224,7 @@
             author = author.replace(/<.*>/, "")
 
             listitems.push(`<tr>
-        <th scope="row"><a href="${data.hits.hits[i]._source.url}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='<span>Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}">${unknownStatus}</span>'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i]._source.gitUrl}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
+        <th scope="row"><a href="${data.hits.hits[i]._source.url}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='<span>Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></i>${unknownStatus}</span>'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i]._source.gitUrl}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
         <td class="LMDLcategory${contentType} LMDLcategory">${contentType.toUpperCase()}</td>
         <td class="tableCentered LMDLimpact${impactOfChange} LMDLimpact">${impactOfChange.toUpperCase()}</td>
         <td class="tableCentered">${author}</td>
