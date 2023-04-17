@@ -207,7 +207,7 @@
             });
 
             if (contentStatus != "") {
-                contentTriangleClass = "fas fa-exclamation-triangle conditionTriangle"
+                contentTriangleClass = "fas fa-exclamation-triangle conditionTriangle LMDLelementTooltip"
             }
 
             let contentType = data.hits.hits[i]._source.contentType;
@@ -223,16 +223,16 @@
                 //changedContext = data.hits.hits[i]._source.changedContext
 
             listitems.push(`<tr>
-        <th scope="row"><a href="${data.hits.hits[i]._source.url}">${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i]._source.gitUrl}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
+        <th scope="row"><a href="${data.hits.hits[i]._source.url}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}">'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i]._source.gitUrl}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
         <td class="LMDLcategory${contentType} LMDLcategory">${contentType.toUpperCase()}</td>
         <td class="tableCentered LMDLimpact${impactOfChange} LMDLimpact">${impactOfChange.toUpperCase()}</td>
         <td class="tableCentered">${author}</td>
         <td class="tableCentered">${date.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</td>
-        <td class="tableCentered">${upkeepStatus}&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></td>
         <td>${commitMessage}</td>
         </tr>`);
         }
         listbox.innerHTML += listitems.join("")
+        $(".LMDLelementTooltip").tooltip();
     }
 
     function searchLMDP(beginningIndex = 0) {
