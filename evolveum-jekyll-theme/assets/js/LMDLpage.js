@@ -164,6 +164,7 @@
         console.log(data)
         for (let i = 0; i < data.hits.hits.length && i < data.hits.total.value; i++) { // TODO
             let commitMessage = data.hits.hits[i]._source.commitMessage;
+            let unknownStatus = "";
             // if (commitMessage == undefined) {
             //     commitMessage = data.hits.hits[i]._source.commitMessage
             // }
@@ -191,6 +192,7 @@
             let upkeepStatus = data.hits.hits[i]._source["upkeep-status"]
             if (typeof upkeepStatus == 'undefined' || !upkeepStatus) {
                 upkeepStatus = "unknown"
+                unknownStatus = "&nbsp;unknown"
             }
 
             contentTriangleClass = ""
@@ -223,7 +225,7 @@
                 //changedContext = data.hits.hits[i]._source.changedContext
 
             listitems.push(`<tr>
-        <th scope="row"><a href="${data.hits.hits[i]._source.url}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}">'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i]._source.gitUrl}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
+        <th scope="row"><a href="${data.hits.hits[i]._source.url}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}">${unknownStatus}'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i]._source.gitUrl}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
         <td class="LMDLcategory${contentType} LMDLcategory">${contentType.toUpperCase()}</td>
         <td class="tableCentered LMDLimpact${impactOfChange} LMDLimpact">${impactOfChange.toUpperCase()}</td>
         <td class="tableCentered">${author}</td>
