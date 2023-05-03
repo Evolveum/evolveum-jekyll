@@ -10,46 +10,6 @@
     let allAuthors = []
     var shouldIgnoreScroll = false;
 
-    // $('.ovalChange').click(function() {
-    //     $(this).toggleClass('on');
-    //     let name = this.id.replace('oval', '')
-    //     if (this.classList.contains('on')) {
-    //         document.getElementById("check" + name).className = 'fas fa-check'
-    //         this.innerHTML = this.innerHTML.replace(name.toUpperCase(), "&nbsp;" + name.toUpperCase())
-    //         console.log(this.innerHTML)
-    //         importance.add(name)
-    //     } else {
-    //         document.getElementById("check" + name).className = ''
-    //         this.innerHTML = this.innerHTML.replace("&nbsp;" + name.toUpperCase(), name.toUpperCase())
-    //         console.log(this.innerHTML + name.toUpperCase())
-    //         importance.delete(name)
-    //     }
-    //     afterSearchQuery.query.bool.must[0].bool.filter[0].terms["importance.keyword"] = Array.from(importance)
-    //     searchLMDP()
-    // });
-
-    // $('.ovalSearchIn').click(function() {
-    //     $(this).toggleClass('on');
-    //     let name = ""
-    //     if (this.id == "ovalText") {
-    //         searchText = !searchText
-    //         name = "text"
-    //     } else {
-    //         searchTitle = !searchTitle
-    //         name = "title"
-    //     }
-    //     if (this.classList.contains('on')) {
-    //         document.getElementById("check" + name).className = 'fas fa-check'
-    //         this.innerHTML = this.innerHTML.replace(name.toUpperCase(), "&nbsp;" + name.toUpperCase())
-    //         console.log(this.innerHTML)
-    //     } else {
-    //         document.getElementById("check" + name).className = ''
-    //         this.innerHTML = this.innerHTML.replace("&nbsp;" + name.toUpperCase(), name.toUpperCase())
-    //         console.log(this.innerHTML + name.toUpperCase())
-    //     }
-    //     searchLMDP()
-    // });
-
     let initialSearchQuery = {
         query: {
             match_all: {}
@@ -99,52 +59,11 @@
         }]
     }
 
-    // let commitsFilterQuery = {
-    //     query: {
-    //         bool: {
-    //             filter: [{
-    //                 terms: {
-    //                     "importance.keyword": Array.from(importance)
-    //                 }
-    //             },{
-    //                 terms: {
-    //                     "author.keyword": Array.from(authors)
-    //                 }
-    //             }]
-    //         }
-    //     },
-    //     size: 0,
-    //     aggs: {
-    //         id: {
-    //             terms: {
-    //                 field: "docsID.keyword",
-    //                 size: 100000,
-    //                 order: {
-    //                     first_event_occur: "desc"
-    //                 }
-    //             },
-    //             aggs: {
-    //                 first_event_occur: {
-    //                     min: {
-    //                         field: "date"
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-
     function OSrequest(method, url, query, async, callback) {
         $.ajax({
             method: method,
             url: url,
             crossDomain: true,
-            // xhrFields: {
-            //     withCredentials: true
-            // },
-            // headers: {
-            //     "Authorization": "Basic " + btoa(username + ":" + password)
-            // },
             async: async,
             data: JSON.stringify(query),
             dataType: 'json',
@@ -165,9 +84,6 @@
         for (let i = 0; i < data.hits.hits.length && i < data.hits.total.value; i++) { // TODO
             let commitMessage = data.hits.hits[i]._source.commitMessage;
             let unknownStatus = "";
-            // if (commitMessage == undefined) {
-            //     commitMessage = data.hits.hits[i]._source.commitMessage
-            // }
 
             if (commitMessage != undefined && commitMessage) {
                 commitMessage = commitMessage.replaceAll("<", "&lt;")
@@ -183,9 +99,6 @@
             }
 
             let rawDate = data.hits.hits[i]._source.date
-                // if (rawDate == undefined) {
-                //     rawDate = data.hits.hits[i]._source.lastModificationDate
-                // }
             const parsedDate = Date.parse(rawDate)
             const date = new Date(parsedDate)
 
@@ -213,9 +126,6 @@
             }
 
             let contentType = data.hits.hits[i]._source.contentType;
-            // if (contentType == undefined) {
-            //     contentType = data.hits.hits[i]._source.type
-            // }
 
             impactOfChange = data.hits.hits[i]._source.importance
 
@@ -314,6 +224,8 @@
         setLMDLSearchIn()
         setLMDLCategory()
         setLMDLImpact()
+
+        $("#LMDLsearchButton").click(searchLMDP);
 
         $(".LMDLtooltipTh").tooltip()
 
@@ -492,24 +404,6 @@
         });
     }
 
-    // $('.ovalCategory').click(function() {
-    //     $(this).toggleClass('on');
-    //     let name = this.id.replace('ovalLMDL', '')
-    //     if (this.classList.contains('on')) {
-    //         document.getElementById("check" + name).className = 'fas fa-check'
-    //         this.innerHTML = this.innerHTML.replace(name.toUpperCase(), "&nbsp;" + name.toUpperCase())
-    //         console.log(this.innerHTML)
-    //         searchCategory.add(name)
-    //     } else {
-    //         document.getElementById("check" + name).className = ''
-    //         this.innerHTML = this.innerHTML.replace("&nbsp;" + name.toUpperCase(), name.toUpperCase())
-    //         console.log(this.innerHTML + name.toUpperCase())
-    //         searchCategory.delete(name)
-    //     }
-    //     afterSearchQuery.query.bool.must[0].bool.filter[2].terms["contentType.keyword"] = Array.from(searchCategory)
-    //     searchLMDP()
-    // });
-
     function setAuthors(data) {
         let authorsArray = data.aggregations.authors.buckets
         let authorsList = []
@@ -549,18 +443,5 @@
             });
         });
     }
-
-    // function firstFilter(beginningIndex = 0) {
-    //     afterSearchQuery.from = beginningIndex
-    //     if (authors.size == allAuthors.length && importance.size == 3) {
-    //         searchLMDP()
-    //     }
-    //     OSrequest("POST", "https://search.evolveum.com/docs_commits/_search", commitsFilterQuery, "search", "YvHY6hR8Zets+fGQ", true, filterByIds)
-    // }
-
-    // function filterByIds(data) {
-    //     let idArrays = data.aggregations.id.buckets
-
-    // }
 
 })();
