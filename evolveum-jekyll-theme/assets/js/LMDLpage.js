@@ -225,7 +225,9 @@
         setLMDLCategory()
         setLMDLImpact()
 
-        $("#LMDLsearchButton").click(searchLMDP);
+        $("#LMDLsearchButton").click(function() {
+            searchLMDP();
+        });
 
         $(".LMDLtooltipTh").tooltip()
 
