@@ -217,7 +217,7 @@
 
 
 
-        OSrequest("POST", "https://search.evolveum.com/docs_commits/_search", afterSearchQuery, true, updateList)
+        OSrequest("POST", "https://opensearch-test.lab.evolveum.com/docs_commits/_search", afterSearchQuery, true, updateList)
     }
 
     $(document).ready(function() {
@@ -231,7 +231,7 @@
 
         $(".LMDLtooltipTh").tooltip()
 
-        OSrequest("POST", "https://search.evolveum.com/docs_commits/_search", initialSearchQuery, true, updateList)
+        OSrequest("POST", "https://opensearch-test.lab.evolveum.com/docs_commits/_search", initialSearchQuery, true, updateList)
 
         let request = {
             "aggs": {
@@ -249,7 +249,7 @@
             "size": 0
         }
 
-        OSrequest("POST", "https://search.evolveum.com/docs_commits/_search", request, true, setAuthors)
+        OSrequest("POST", "https://opensearch-test.lab.evolveum.com/docs_commits/_search", request, true, setAuthors)
 
         $(window).scroll(function() {
             if ($(window).scrollTop() >= $(document).height() - $(window).height() - 10) {
