@@ -401,7 +401,7 @@
                 let queryClick = {
                     "title": title,
                     "doc_id": id,
-                    "timestamp": date.toISOString(),
+                    "@timestamp": date.toISOString(),
                     "query": document.getElementById('searchbar').value.toLowerCase()
                 }
 
