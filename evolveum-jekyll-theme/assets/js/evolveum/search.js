@@ -402,7 +402,7 @@
                     "title": title,
                     "doc_id": id,
                     "@timestamp": date.toISOString(),
-                    "query": document.getElementById('searchbar').value.toLowerCase()
+                    "clickquery": document.getElementById('searchbar').value.toLowerCase()
                 }
 
                 ev.button == 0 ? OSrequest("POST", "https://searchtest.evolveum.com/click_logs/_doc/", queryClick, false) : OSrequest("POST", "https://searchtest.evolveum.com/click_logs/_doc/", queryClick, true);
