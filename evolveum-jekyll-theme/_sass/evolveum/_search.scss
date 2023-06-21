@@ -119,12 +119,12 @@
 
 @media (max-width:500px) {
     .oval {
-        border: 2px solid;
-        margin: 2%;
-        padding: 2.5px 7px;
+        border: 1px solid;
+        margin: 1%;
+        padding: 3px 3.5px 2.5px 3.5px;
         font-size: 0.63rem;
         font-weight: bold;
-        border-radius: 40px;
+        border-radius: 20px;
         justify-content: center;
         align-items: center;
         transition: all .1s linear, color 0s;
