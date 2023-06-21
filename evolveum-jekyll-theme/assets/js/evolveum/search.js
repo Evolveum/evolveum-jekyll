@@ -286,7 +286,7 @@
                         contentTriangleClass = ""
                     }
 
-                    showItems.push(`<div><span class="trigger-details" style="display: inline-block;width: 430px" data-toggle="tooltip" data-placement="left" 
+                    showItems.push(`<div><span class="trigger-details searchResult" data-toggle="tooltip" data-toggle="tooltip" data-placement="left" 
                     data-html="true" title='<span class="tooltip-preview"><p>Last modification date: ${date.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</p>
                     <p>Upkeep status: ${upkeepStatus} <i id="upkeep${upkeepStatus}" class="fa fa-circle"></i>
                     </p><p>Likes: ${upvotes}</p><p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${data.hits.hits[i]._source.url}" 
