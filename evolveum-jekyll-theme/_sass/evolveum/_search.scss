@@ -24,16 +24,12 @@
 }
 
 .searchResultTitle {
-    width: calc(100% - 100px);
+    max-width: calc(100% - 100px) !important;
 }
 
 #docssearchbutton {
     margin-top: 0px !important;
     margin-bottom: 0px !important;
-}
-
-.searchResultTitle {
-    width: calc(100% - 100px);
 }
 
 .searchResult {
