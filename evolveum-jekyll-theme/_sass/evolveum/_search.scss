@@ -23,6 +23,10 @@
     margin-top: 0rem !important;
 }
 
+.searchResultTitle {
+    width: calc(100% - 100px);
+}
+
 #docssearchbutton {
     margin-top: 0px !important;
     margin-bottom: 0px !important;
@@ -87,8 +91,10 @@
     color: $gray-600;
 }
 
-.modal-dialog {
-    margin-right: 25px;
+@media (min-width:500px) {
+    .modal-dialog {
+        margin-right: 25px;
+    }
 }
 
 .vote {
