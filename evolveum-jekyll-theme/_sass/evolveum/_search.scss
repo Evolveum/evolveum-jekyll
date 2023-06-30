@@ -18,11 +18,24 @@
     transform: scale(1);
 }
 
+.searchbarform {
+    width: 85%;
+    margin-top: 0rem !important;
+}
+
+.searchResultTitle {
+    max-width: calc(100% - 100px) !important;
+}
+
+#docssearchbutton {
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}
+
 .searchResult {
-    border: 2px solid $black;
-    border-radius: 5px;
-    padding: 5px;
-    margin: 10px;
+    display: inline-block;
+    max-width: 430px;
+    width: 80vw;
 }
 
 .font1 {
@@ -74,8 +87,10 @@
     color: $gray-600;
 }
 
-.modal-dialog {
-    margin-right: 25px;
+@media (min-width:500px) {
+    .modal-dialog {
+        margin-right: 25px;
+    }
 }
 
 .vote {
@@ -104,21 +119,42 @@
     white-space: nowrap;
 }
 
-.oval {
-    border: 2px solid;
-    margin: 10px;
-    padding: 2.5px 7px;
-    font-size: 12px;
-    font-weight: bold;
-    border-radius: 40px;
-    justify-content: center;
-    align-items: center;
-    transition: all .1s linear, color 0s;
-    -webkit-transition: all .1s linear, color 0s;
-    -moz-transition: all .1s linear, color 0s;
-    -o-transition: all .1s linear, color 0s;
-    max-width: 200px;
-    cursor: default;
+@media (max-width:500px) {
+    .oval {
+        border: 1px solid;
+        margin: 1%;
+        padding: 3px 3.5px 2.5px 3.5px;
+        font-size: 0.63rem;
+        font-weight: bold;
+        border-radius: 20px;
+        justify-content: center;
+        align-items: center;
+        transition: all .1s linear, color 0s;
+        -webkit-transition: all .1s linear, color 0s;
+        -moz-transition: all .1s linear, color 0s;
+        -o-transition: all .1s linear, color 0s;
+        max-width: 200px;
+        cursor: default;
+    }
+}
+
+@media (min-width:501px) {
+    .oval {
+        border: 2px solid;
+        margin: 2%;
+        padding: 2.5px 7px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        border-radius: 40px;
+        justify-content: center;
+        align-items: center;
+        transition: all .1s linear, color 0s;
+        -webkit-transition: all .1s linear, color 0s;
+        -moz-transition: all .1s linear, color 0s;
+        -o-transition: all .1s linear, color 0s;
+        max-width: 200px;
+        cursor: default;
+    }
 }
 
 .LMDLcategory {
@@ -314,7 +350,8 @@
 }
 
 #searchbar {
-    width: 360px;
+    width: 100%;
+    margin-right: 0.5rem !important;
 }
 
 .typeLabel {
@@ -381,8 +418,6 @@
     vertical-align: middle;
 }
 
-
-/*
 .pageEval {
     text-align: center;
     font-size: 1.4rem;
@@ -403,7 +438,6 @@
     color: green;
     margin-right: 5px;
 }
-*/
 
 .highlightSearch:focus {
     border: none;
