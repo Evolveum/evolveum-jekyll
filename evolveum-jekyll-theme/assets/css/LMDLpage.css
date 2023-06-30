@@ -116,7 +116,15 @@
     white-space: nowrap;
 }
 
+.LMDLupkeepunknown {
+    display: none;
+}
+
 @media (max-width:500px) {
+    #LMDLtitleHeader {
+        width: 25% !important;
+        font-size: 0.85rem;
+    }
     #LMDLcategoryHeader {
         width: 0% !important;
         display: none !important;
@@ -129,6 +137,17 @@
         width: 0% !important;
         display: none !important;
     }
+    #LMDLdateHeader {
+        width: 25% !important;
+        font-size: 0.85rem;
+    }
+    #LMDLmessageHeader {
+        width: 50% !important;
+        font-size: 0.85rem;
+    }
+    .LMDLtitle {
+        font-size: 0.75rem;
+    }
     .LMDLcategory {
         display: none !important;
     }
@@ -137,5 +156,23 @@
     }
     .LMDLauthor {
         display: none !important;
+    }
+    .LMDLdate {
+        font-size: 0.75rem;
+    }
+    .LMDLmessage {
+        font-size: 0.75rem;
+    }
+    #selectpickercategory {
+        display: none;
+    }
+    #selectpickerimpact {
+        display: none;
+    }
+    #selectpickerauthor {
+        display: none;
+    }
+    .LMDLfiltersearch {
+        display: none;
     }
 }
