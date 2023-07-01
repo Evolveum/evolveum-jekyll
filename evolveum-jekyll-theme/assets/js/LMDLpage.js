@@ -346,7 +346,7 @@
             }
             searchLMDP()
         }).on('loaded.bs.select', function(e) {
-            let parent = $('#selectpickercategory').parentElement
+            let parent = $('#selectpickercategory')[0].parentElement
             parent.id = "LMDLcategoryPicker"
         });
     }
@@ -406,7 +406,7 @@
 
             });
 
-            let parent = $('#selectpickerimpact').parentElement
+            let parent = $('#selectpickerimpact')[0].parentElement
             parent.id = "LMDLimpactPicker"
 
         });
@@ -438,7 +438,7 @@
 
             searchLMDP()
         }).on('loaded.bs.select', function(e) {
-            let parent = $('#selectpickerauthor').parentElement
+            let parent = $('#selectpickerauthor')[0].parentElement
             parent.id = "LMDLauthorPicker"
         });
         $("#selectpickerauthor").on("shown.bs.select", function() {
