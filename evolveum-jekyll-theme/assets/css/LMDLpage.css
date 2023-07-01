@@ -122,7 +122,7 @@
 
 @media (max-width:500px) {
     #LMDLtitleHeader {
-        width: 25% !important;
+        width: 37.5% !important;
         font-size: 0.85rem;
     }
     #LMDLcategoryHeader {
@@ -142,7 +142,7 @@
         font-size: 0.85rem;
     }
     #LMDLmessageHeader {
-        width: 50% !important;
+        width: 37.5% !important;
         font-size: 0.85rem;
     }
     .LMDLtitle {
@@ -163,13 +163,13 @@
     .LMDLmessage {
         font-size: 0.75rem;
     }
-    #selectpickercategory {
+    #LMDLcategoryPicker {
         display: none;
     }
-    #selectpickerimpact {
-        display: none;
+    #LMDLimpactPicker {
+        display: none !important;
     }
-    #selectpickerauthor {
+    #LMDLauthorPicker {
         display: none;
     }
     .LMDLfiltersearch {

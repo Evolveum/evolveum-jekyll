@@ -345,6 +345,9 @@
                 afterSearchQuery.query.bool.must[0].bool.filter[2].terms["contentType.keyword"] = Array.from(searchCategory)
             }
             searchLMDP()
+        }).on('loaded.bs.select', function(e) {
+            let parent = $('#selectpickercategory').parentElement
+            parent.id = "LMDLcategoryPicker"
         });
     }
 
@@ -403,6 +406,9 @@
 
             });
 
+            let parent = $('#selectpickerimpact').parentElement
+            parent.id = "LMDLimpactPicker"
+
         });
     }
 
@@ -431,6 +437,9 @@
             }
 
             searchLMDP()
+        }).on('loaded.bs.select', function(e) {
+            let parent = $('#selectpickerauthor').parentElement
+            parent.id = "LMDLauthorPicker"
         });
         $("#selectpickerauthor").on("shown.bs.select", function() {
             $(document).off('keydown')
