@@ -455,4 +455,13 @@
         });
     }
 
+    $('#LMDLmoreFiltersButton').click(function() {
+        $('#LMDLcategoryPicker')[0].style.display = "initial"
+        $('#LMDLimpactPicker')[0].style.display = "initial"
+        $('#LMDLauthorPicker')[0].style.display = "initial"
+        $('.LMDLfiltersearch')[0].style.display = "initial"
+        $('.LMDLfilters')[0].style['justify-content'] = "space-between"
+        $('.LMDLfilters')[0].style['align-items'] = "normal"
+    });
+
 })();
