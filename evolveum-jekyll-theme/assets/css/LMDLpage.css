@@ -147,6 +147,7 @@
     }
     .LMDLtitle {
         font-size: 0.75rem;
+        padding-bottom: 5px;
     }
     .LMDLcategory {
         display: none !important;
@@ -159,9 +160,11 @@
     }
     .LMDLdate {
         font-size: 0.75rem;
+        padding-bottom: 5px;
     }
     .LMDLmessage {
         font-size: 0.75rem;
+        padding-bottom: 5px;
     }
     #LMDLcategoryPicker {
         display: none;
@@ -182,11 +185,26 @@
     }
     #LMDLmoreFiltersButton {
         height: 100%;
-        display: flex;
-        align-items: center;
+        display: flex !important;
+        /*align-items: center; Maybe needed?*/
     }
 }
 
 #LMDLmoreFiltersButton {
     display: none;
+}
+
+.LMDLexpandedDetail {
+    display: none;
+    font-size: 0.75rem;
+    border: none !important;
+}
+
+.LMDLexpandedHeader {
+    display: none;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-align: center;
+    border: none !important;
+    text-rendering: geometricprecision;
 }
