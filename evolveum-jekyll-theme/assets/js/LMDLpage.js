@@ -475,6 +475,7 @@
     function setMoreDetailsOnClick(id) {
         $(`#${id}`).click(function() {
             let element = $(this)[0].childNodes[0]
+            console.log(element)
             if (element.prop("classList").contains('on')) {
                 element.innerHTML = `Show more&nbsp;<i class=\"fas fa-angle-down LMDLmoreSmallDetailsI\"></i>`
                 element.classList.remove("on");
