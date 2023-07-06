@@ -206,18 +206,24 @@
 }
 
 .LMDLexpandedDetail {
-    display: none;
     font-size: 0.75rem;
     border: none !important;
 }
 
-.LMDLexpandedHeader {
+.LMDLexpandedDetailRow {
     display: none;
+}
+
+.LMDLexpandedHeader {
     font-size: 0.75rem;
     font-weight: bold;
     text-align: center;
     border: none !important;
     text-rendering: geometricprecision;
+}
+
+.LMDLexpandedHeaderRow {
+    display: none;
 }
 
 .LMDLmoreSmallDetails {
