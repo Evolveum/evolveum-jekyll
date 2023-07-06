@@ -133,7 +133,7 @@
 
             author = author.replace(/<.*>/, "")
 
-            let parsedTitle = title.replace(/\n/g, "")
+            let parsedTitle = title.replace(/[\W_]+/g, "")
 
             listitems.push(`<tr>
         <th class="LMDLtitle" scope="row"><a href="${data.hits.hits[i]._source.url}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='<span>Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></i>${unknownStatus}</span>'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i]._source.gitUrl}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
