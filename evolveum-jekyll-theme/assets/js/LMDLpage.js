@@ -148,7 +148,7 @@
         <td class="tableCentered LMDLimpactMinor LMDLimpact">MINOR</td>
         <td class="tableCentered LMDLauthor LMDLexpandedDetail">Jan Mederly</td></tr>
         <tr id="${data.hits.hits[i]._source.id}" class='LMDLmoreSmallDetails'><td colspan="3" class="notShown LMDLmoreSmallDetailsTd">Show more&nbsp;<i class="fas fa-angle-down LMDLmoreSmallDetailsI"></i></td></tr>`);
-            setTimeout(setMoreDetailsOnClick(data.hits.hits[i]._source.id), 70);
+            setTimeout(setMoreDetailsOnClick(data.hits.hits[i]._source.id.toString()), 70);
         }
         listbox.innerHTML += listitems.join("")
         $(".LMDLelementTooltip").tooltip();
@@ -475,7 +475,7 @@
     function setMoreDetailsOnClick(id) {
         $(`#${id}`).click(function() {
             let element = $(this)[0].childNodes[0]
-            console.log(element)
+            console.log(element + "somtu")
             if (element.prop("classList").contains('on')) {
                 element.innerHTML = `Show more&nbsp;<i class=\"fas fa-angle-down LMDLmoreSmallDetailsI\"></i>`
                 element.classList.remove("on");
