@@ -146,8 +146,8 @@
         <td scope="row" class="tableCentered LMDLtooltipTh LMDLexpandedHeader LMDLexpandedImpactHeader" data-toggle="tooltip" data-html="true" 
         title="<div><span>Extend to which the page had been modified</span><br><span><span class=&quot;LMDLimpactMajor&quot;>Major</span> - more than 30% of lines were edited</span><br><span><span class=&quot;LMDLimpactSignificant&quot;>Significant</span> - more than 10% and less than 30% of lines were edited</span><br><span><span class=&quot;LMDLimpactMinor&quot;>Minor</span> - less than 10% of lines were edited</span></div>">Impact of change&nbsp;<i style="font-size: 0.8rem;" class="fas fa-question-circle"></i></td>
         <td scope="row" class="tableCentered LMDLexpandedHeader LMDLexpandedAuthor">Author</td></tr>
-        <tr id="${data.hits.hits[i]._source.id}${parsedTitle}detail" class="LMDLexpandedDetailRow"><td scope="row" class="LMDLcategoryGuide LMDLcategory LMDLexpandedCategoryCell">GUIDE</td>
-        <td class="tableCentered LMDLimpactMinor LMDLimpact LMDLexpandedImpactCell">MINOR</td>
+        <tr id="${data.hits.hits[i]._source.id}${parsedTitle}detail" class="LMDLexpandedDetailRow"><td scope="row" class="LMDLcategoryGuide LMDLcategory LMDLexpandedDetail LMDLexpandedCategoryCell">GUIDE</td>
+        <td class="tableCentered LMDLimpactMinor LMDLimpact LMDLexpandedDetail LMDLexpandedImpactCell">MINOR</td>
         <td class="tableCentered LMDLauthor LMDLexpandedDetail LMDLexpandedAuthorCell">Jan Mederly</td></tr>
         <tr id="${data.hits.hits[i]._source.id}${parsedTitle}" class='LMDLmoreSmallDetails'><td colspan="3" class="notShown LMDLmoreSmallDetailsTd">Show more&nbsp;<i class="fas fa-angle-down LMDLmoreSmallDetailsI"></i></td></tr>`);
             setTimeout(setMoreDetailsOnClick.bind(null, `${data.hits.hits[i]._source.id}${parsedTitle}`), 100);
@@ -487,7 +487,6 @@
             $(this)[0].classList.add("on")
             $(this)[0].innerHTML = `<div class="notShown" id="LMDLmoreFiltersButton">Less filters&nbsp;<i class="fas fa-caret-up" style="color: #555753;"></i></div>`
         }
-        
     });
 
     function setMoreDetailsOnClick(id) {
