@@ -133,6 +133,8 @@
 
             author = author.replace(/<.*>/, "")
 
+            let parsedTitle = title.replace(/\n/g, "")
+
             listitems.push(`<tr>
         <th class="LMDLtitle" scope="row"><a href="${data.hits.hits[i]._source.url}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='<span>Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></i>${unknownStatus}</span>'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i]._source.gitUrl}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
         <td class="LMDLcategory${contentType} LMDLcategory">${contentType.toUpperCase()}</td>
@@ -140,15 +142,15 @@
         <td class="tableCentered LMDLauthor">${author}</td>
         <td class="tableCentered LMDLdate">${date.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</td>
         <td class="LMDLmessage">${commitMessage}</td></tr>
-        <tr id="${data.hits.hits[i]._source.id}header" class="LMDLexpandedHeader"><td scope="row" class="tableCentered LMDLexpandedHeader LMDLexpandedCategory">Category</td>
+        <tr id="${data.hits.hits[i]._source.id}${parsedTitle}header" class="LMDLexpandedHeader"><td scope="row" class="tableCentered LMDLexpandedHeader LMDLexpandedCategory">Category</td>
         <td scope="row" class="tableCentered LMDLtooltipTh LMDLexpandedHeader LMDLexpandedImpactHeader" data-toggle="tooltip" data-html="true" 
         title="<div><span>Extend to which the page had been modified</span><br><span><span class=&quot;LMDLimpactMajor&quot;>Major</span> - more than 30% of lines were edited</span><br><span><span class=&quot;LMDLimpactSignificant&quot;>Significant</span> - more than 10% and less than 30% of lines were edited</span><br><span><span class=&quot;LMDLimpactMinor&quot;>Minor</span> - less than 10% of lines were edited</span></div>">Impact of change&nbsp;<i style="font-size: 0.8rem;" class="fas fa-question-circle"></i></td>
         <td scope="row" class="tableCentered LMDLexpandedHeader LMDLexpandedAuthor">Author</td></tr>
-        <tr id="${data.hits.hits[i]._source.id}detail" class="LMDLexpandedDetail"><td scope="row" class="LMDLcategoryGuide LMDLcategory">GUIDE</td>
+        <tr id="${data.hits.hits[i]._source.id}${parsedTitle}detail" class="LMDLexpandedDetail"><td scope="row" class="LMDLcategoryGuide LMDLcategory">GUIDE</td>
         <td class="tableCentered LMDLimpactMinor LMDLimpact">MINOR</td>
         <td class="tableCentered LMDLauthor LMDLexpandedDetail">Jan Mederly</td></tr>
-        <tr id="${data.hits.hits[i]._source.id}" class='LMDLmoreSmallDetails'><td colspan="3" class="notShown LMDLmoreSmallDetailsTd">Show more&nbsp;<i class="fas fa-angle-down LMDLmoreSmallDetailsI"></i></td></tr>`);
-            setTimeout(setMoreDetailsOnClick.bind(null, data.hits.hits[i]._source.id.toString()), 100);
+        <tr id="${data.hits.hits[i]._source.id}${parsedTitle}" class='LMDLmoreSmallDetails'><td colspan="3" class="notShown LMDLmoreSmallDetailsTd">Show more&nbsp;<i class="fas fa-angle-down LMDLmoreSmallDetailsI"></i></td></tr>`);
+            setTimeout(setMoreDetailsOnClick.bind(null, `${data.hits.hits[i]._source.id}${parsedTitle}`), 100);
             console.log("calling" + data.hits.hits[i]._source.id.toString())
         }
         listbox.innerHTML += listitems.join("")
