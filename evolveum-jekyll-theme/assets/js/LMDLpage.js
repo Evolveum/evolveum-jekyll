@@ -473,8 +473,9 @@
             $('.LMDLfiltersearch')[0].style.display = "none"
             $('.LMDLfilters')[0].style['justify-content'] = "space-around"
             $('.LMDLfilters')[0].style['align-items'] = "center"
-            $(this)[0].classList.add("off")
+            $(this)[0].classList.remove("on")
             $(this)[0].innerHTML = `<div class="notShown" id="LMDLmoreFiltersButton">More filters&nbsp;<i class="fas fa-caret-down" style="color: #555753;"></i></div>`
+            $('.LMDLfilters')[0].style['flex-wrap'] = "initial"
         } else {
             $('#LMDLcategoryPicker')[0].style.display = "flex"
             $('#LMDLimpactPicker')[0].style.display = "flex"
@@ -482,6 +483,7 @@
             $('.LMDLfiltersearch')[0].style.display = "flex"
             $('.LMDLfilters')[0].style['justify-content'] = "space-between"
             $('.LMDLfilters')[0].style['align-items'] = "normal"
+            $('.LMDLfilters')[0].style['flex-wrap'] = "wrap"
             $(this)[0].classList.add("on")
             $(this)[0].innerHTML = `<div class="notShown" id="LMDLmoreFiltersButton">Less filters&nbsp;<i class="fas fa-caret-up" style="color: #555753;"></i></div>`
         }
