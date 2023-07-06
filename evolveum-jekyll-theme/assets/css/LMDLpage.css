@@ -194,7 +194,7 @@
     .LMDLmoreSmallDetailsTd {
         border: none !important;
         font-size: 0.68rem;
-        padding: 2px;
+        padding: 2px !important;
     }
     .LMDLmoreSmallDetailsI {
         color: #555753;

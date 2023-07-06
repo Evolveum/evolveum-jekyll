@@ -148,6 +148,7 @@
         <td class="tableCentered LMDLimpactMinor LMDLimpact">MINOR</td>
         <td class="tableCentered LMDLauthor LMDLexpandedDetail">Jan Mederly</td></tr>
         <tr id="${data.hits.hits[i]._source.id}" class='LMDLmoreSmallDetails'><td colspan="3" class="notShown LMDLmoreSmallDetailsTd">Show more&nbsp;<i class="fas fa-angle-down LMDLmoreSmallDetailsI"></i></td></tr>`);
+            setTimeout(setMoreDetailsOnClick(data.hits.hits[i]._source.id), 70);
         }
         listbox.innerHTML += listitems.join("")
         $(".LMDLelementTooltip").tooltip();
