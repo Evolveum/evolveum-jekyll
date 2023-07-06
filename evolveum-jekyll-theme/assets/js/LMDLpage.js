@@ -479,7 +479,7 @@
         console.log("called" + id)
         $(`#${id}`).click(function() {
             let element = $(this)[0].childNodes[0]
-            console.log(element + "somtu")
+            console.log(element + "somtu" + id)
             if (element.classList.contains('on')) {
                 element.innerHTML = `Show more&nbsp;<i class=\"fas fa-angle-down LMDLmoreSmallDetailsI\"></i>`
                 element.classList.remove("on");
