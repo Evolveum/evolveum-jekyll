@@ -471,4 +471,21 @@
         $('.LMDLfilters')[0].style['align-items'] = "normal"
     });
 
+    function setMoreDetailsOnClick(id) {
+        $(`#${id}`).click(function() {
+            let element = $(this)[0].childNodes[0]
+            if (element.prop("classList").contains('on')) {
+                element.innerHTML = `Show more&nbsp;<i class=\"fas fa-angle-down LMDLmoreSmallDetailsI\"></i>`
+                element.classList.remove("on");
+                $(`#${id}header`)[0].style.display = "none"
+                $(`#${id}detail`)[0].style.display = "none"
+            } else {
+                element.innerHTML = `Show less&nbsp;<i class=\"fas fa-angle-up LMDLmoreSmallDetailsI\"></i>`
+                element.classList.add("on");
+                $(`#${id}header`)[0].style.display = "table-row !important"
+                $(`#${id}detail`)[0].style.display = "table-row !important"
+            }
+        });
+    }
+
 })();
