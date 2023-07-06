@@ -488,8 +488,8 @@
             } else {
                 element.innerHTML = `Show less&nbsp;<i class=\"fas fa-angle-up LMDLmoreSmallDetailsI\"></i>`
                 element.classList.add("on");
-                $(`#${id}header`)[0].style.display = "table-row !important"
-                $(`#${id}detail`)[0].style.display = "table-row !important"
+                $(`#${id}header`)[0].style.display = "table-row"
+                $(`#${id}detail`)[0].style.display = "table-row"
             }
         });
     }
