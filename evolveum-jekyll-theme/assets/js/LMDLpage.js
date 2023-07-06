@@ -480,7 +480,7 @@
         $(`#${id}`).click(function() {
             let element = $(this)[0].childNodes[0]
             console.log(element + "somtu")
-            if (element.prop("classList").contains('on')) {
+            if (element.classList.contains('on')) {
                 element.innerHTML = `Show more&nbsp;<i class=\"fas fa-angle-down LMDLmoreSmallDetailsI\"></i>`
                 element.classList.remove("on");
                 $(`#${id}header`)[0].style.display = "none"
