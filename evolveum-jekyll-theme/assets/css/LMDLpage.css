@@ -188,6 +188,17 @@
         display: flex !important;
         /*align-items: center; Maybe needed?*/
     }
+    .LMDLmoreSmallDetails {
+        display: table-row;
+    }
+    .LMDLmoreSmallDetailsTd {
+        border: none;
+        font-size: 0.68rem;
+        padding: 2px;
+    }
+    .LMDLmoreSmallDetailsI {
+        color: #555753;
+    }
 }
 
 #LMDLmoreFiltersButton {
@@ -207,4 +218,8 @@
     text-align: center;
     border: none !important;
     text-rendering: geometricprecision;
+}
+
+.LMDLmoreSmallDetails {
+    display: none;
 }
