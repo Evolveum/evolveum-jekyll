@@ -193,10 +193,6 @@
         display: flex !important;
         /*align-items: center; Maybe needed?*/
     }
-    #LMDmoreFiltersButton.on {
-        width: 100%;
-        justify-content: center;
-    }
     .LMDLmoreSmallDetails {
         display: table-row !important;
     }
@@ -249,4 +245,9 @@
 
 .LMDLmoreSmallDetails {
     display: none;
+}
+
+#LMDmoreFiltersButton.on {
+    width: 100%;
+    justify-content: center;
 }
