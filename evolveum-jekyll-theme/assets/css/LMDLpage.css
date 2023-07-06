@@ -178,15 +178,24 @@
     }
     .LMDLfiltersearch {
         display: none;
+        justify-content: center;
     }
     .LMDLfilters {
         justify-content: space-around;
         align-items: center;
+        flex-wrap: wrap;
+    }
+    .LMDLtypefilters {
+        justify-content: center;
     }
     #LMDLmoreFiltersButton {
         height: 100%;
         display: flex !important;
         /*align-items: center; Maybe needed?*/
+    }
+    #LMDmoreFiltersButton.on {
+        width: 100%;
+        justify-content: center;
     }
     .LMDLmoreSmallDetails {
         display: table-row !important;
@@ -207,6 +216,9 @@
     }
     .LMDLexpandedAuthorCell {
         display: table-cell !important;
+    }
+    .LMDLsearchform {
+        gap: 10px;
     }
 }
 

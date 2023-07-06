@@ -151,7 +151,6 @@
         <td class="tableCentered LMDLauthor LMDLexpandedDetail LMDLexpandedAuthorCell">Jan Mederly</td></tr>
         <tr id="${data.hits.hits[i]._source.id}${parsedTitle}" class='LMDLmoreSmallDetails'><td colspan="3" class="notShown LMDLmoreSmallDetailsTd">Show more&nbsp;<i class="fas fa-angle-down LMDLmoreSmallDetailsI"></i></td></tr>`);
             setTimeout(setMoreDetailsOnClick.bind(null, `${data.hits.hits[i]._source.id}${parsedTitle}`), 100);
-            console.log("calling" + data.hits.hits[i]._source.id.toString())
         }
         listbox.innerHTML += listitems.join("")
         $(".LMDLelementTooltip").tooltip();
@@ -467,19 +466,31 @@
     }
 
     $('#LMDLmoreFiltersButton').click(function() {
-        $('#LMDLcategoryPicker')[0].style.display = "initial"
-        $('#LMDLimpactPicker')[0].style.display = "initial"
-        $('#LMDLauthorPicker')[0].style.display = "initial"
-        $('.LMDLfiltersearch')[0].style.display = "initial"
-        $('.LMDLfilters')[0].style['justify-content'] = "space-between"
-        $('.LMDLfilters')[0].style['align-items'] = "normal"
+        if ($(this)[0].classList.contains('on')) {
+            $('#LMDLcategoryPicker')[0].style.display = "none"
+            $('#LMDLimpactPicker')[0].style.display = "none"
+            $('#LMDLauthorPicker')[0].style.display = "none"
+            $('.LMDLfiltersearch')[0].style.display = "none"
+            $('.LMDLfilters')[0].style['justify-content'] = "space-around"
+            $('.LMDLfilters')[0].style['align-items'] = "center"
+            $(this)[0].classList.add("off")
+            $(this)[0].innerHTML = `<div class="notShown" id="LMDLmoreFiltersButton">More filters&nbsp;<i class="fas fa-caret-down" style="color: #555753;"></i></div>`
+        } else {
+            $('#LMDLcategoryPicker')[0].style.display = "flex"
+            $('#LMDLimpactPicker')[0].style.display = "flex"
+            $('#LMDLauthorPicker')[0].style.display = "flex"
+            $('.LMDLfiltersearch')[0].style.display = "flex"
+            $('.LMDLfilters')[0].style['justify-content'] = "space-between"
+            $('.LMDLfilters')[0].style['align-items'] = "normal"
+            $(this)[0].classList.add("on")
+            $(this)[0].innerHTML = `<div class="notShown" id="LMDLmoreFiltersButton">Less filters&nbsp;<i class="fas fa-caret-up" style="color: #555753;"></i></div>`
+        }
+        
     });
 
     function setMoreDetailsOnClick(id) {
-        console.log("called" + id)
         $(`#${id}`).click(function() {
             let element = $(this)[0].childNodes[0]
-            console.log(element + "somtu" + id)
             if (element.classList.contains('on')) {
                 element.innerHTML = `Show more&nbsp;<i class=\"fas fa-angle-down LMDLmoreSmallDetailsI\"></i>`
                 element.classList.remove("on");
