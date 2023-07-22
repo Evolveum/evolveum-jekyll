@@ -402,6 +402,7 @@
                     "title": title,
                     "doc_id": id,
                     "@timestamp": date.toISOString(),
+                    "querylength": document.getElementById('searchbar').value.toLowerCase().length,
                     "clickquery": document.getElementById('searchbar').value.toLowerCase()
                 }
 
