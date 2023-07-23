@@ -76,10 +76,6 @@
     color: white;
 }
 
-.LMDLupkeepunknown {
-    display: none;
-}
-
 .notShown {
     font-size: 0.78rem;
     font-style: italic;
@@ -157,73 +153,6 @@
     }
 }
 
-.LMDLcategory {
-    font-size: 0.856rem;
-    font-weight: bold;
-    text-align: center;
-    text-rendering: geometricprecision;
-}
-
-.LMDLcategoryGuide {
-    color: #020929;
-}
-
-.LMDLcategoryReference {
-    color: #071145;
-}
-
-.LMDLcategoryDeveloper {
-    color: #273376;
-}
-
-.LMDLcategoryOther {
-    color: #3F4B8C;
-}
-
-#ovalLMDLGuide {
-    outline-color: #020929;
-    color: #020929;
-}
-
-#ovalLMDLGuide.on {
-    color: white;
-    background-color: #020929;
-    border-color: #020929;
-}
-
-#ovalLMDLReference {
-    outline-color: #071145;
-    color: #071145;
-}
-
-#ovalLMDLReference.on {
-    color: white;
-    background-color: #071145;
-    border-color: #071145;
-}
-
-#ovalLMDLDeveloper {
-    outline-color: #273376;
-    color: #273376;
-}
-
-#ovalLMDLDeveloper.on {
-    color: white;
-    background-color: #273376;
-    border-color: #273376;
-}
-
-#ovalLMDLOther {
-    outline-color: #3F4B8C;
-    color: #3F4B8C;
-}
-
-#ovalLMDLOther.on {
-    color: white;
-    background-color: #3F4B8C;
-    border-color: #3F4B8C;
-}
-
 #ovalGuide {
     outline-color: #DAA06D;
     color: #DAA06D;
@@ -266,61 +195,6 @@
     color: white;
     background-color: #FFC0CB;
     border-color: #FFC0CB;
-}
-
-#ovalText.on {
-    color: white;
-    background-color: #555;
-    border-color: #555;
-}
-
-#ovalText {
-    color: #555;
-    outline-color: #555;
-}
-
-#ovalTitle.on {
-    color: white;
-    background-color: #202020;
-    border-color: #202020;
-}
-
-#ovalTitle {
-    color: #202020;
-    outline-color: #202020;
-}
-
-.ovalMajor.on {
-    color: white;
-    background-color: #74481a;
-    border-color: #74481a;
-}
-
-.ovalMajor {
-    color: #74481a;
-    outline-color: #74481a;
-}
-
-.ovalSignificant.on {
-    color: white;
-    background-color: #AC6D29;
-    border-color: #AC6D29;
-}
-
-.ovalSignificant {
-    color: #AC6D29;
-    outline-color: #AC6D29;
-}
-
-.ovalMinor.on {
-    color: white;
-    background-color: #CC8F4C;
-    border-color: #CC8F4C;
-}
-
-.ovalMinor {
-    color: #CC8F4C;
-    outline-color: #CC8F4C;
 }
 
 .modal-h-frow {
@@ -418,8 +292,6 @@
     vertical-align: middle;
 }
 
-
-/*
 .pageEval {
     text-align: center;
     font-size: 1.4rem;
@@ -440,7 +312,6 @@
     color: green;
     margin-right: 5px;
 }
-*/
 
 .highlightSearch:focus {
     border: none;
@@ -462,83 +333,7 @@
     cursor: default;
 }
 
-.LMDLimpactMajor {
-    color: #74481a;
-}
-
-.LMDLimpactSignificant {
-    color: #AC6D29;
-}
-
-.LMDLimpactMinor {
-    color: #CC8F4C;
-}
-
-.LMDLimpact {
-    font-size: 0.856rem;
-    font-weight: bold;
-    text-align: center;
-    text-rendering: geometricprecision;
-}
-
 .btn-light {
     background-color: #FFF;
     color: #000;
-}
-
-.btnLMDLsearch {
-    color: #000;
-    border-color: #000;
-}
-
-.btnLMDLsearch:hover {
-    color: #212529;
-    background-color: #A3CCDC;
-    border-color: #A3CCDC;
-}
-
-.LMDLDatePickerButton {
-    border-color: #6f6f6f;
-    border-style: solid;
-    border-width: 0.5px;
-    border-radius: 6px;
-    color: #909090;
-}
-
-#LMDLPickedDate {
-    color: #999;
-}
-
-.LMDLDatePickerIcon {
-    margin-right: 10px;
-    color: #303030;
-}
-
-.LMDLfilters {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 10px;
-    justify-content: space-between;
-}
-
-.LMDLupkeepunknown {
-    display: none !important;
-}
-
-.LMDLtypefilters {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.LMDLfiltersearch {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.LMDLtitleGithubLink {
-    color: gray;
-    font-size: 0.7rem;
-    white-space: nowrap;
 }

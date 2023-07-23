@@ -133,14 +133,24 @@
 
             author = author.replace(/<.*>/, "")
 
+            let parsedTitle = title.replace(/[\W_]+/g, "")
+
             listitems.push(`<tr>
-        <th scope="row"><a href="${data.hits.hits[i]._source.url}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='<span>Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></i>${unknownStatus}</span>'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i]._source.gitUrl}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
+        <th class="LMDLtitle" scope="row"><a href="${data.hits.hits[i]._source.url}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='<span>Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></i>${unknownStatus}</span>'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i]._source.gitUrl}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
         <td class="LMDLcategory${contentType} LMDLcategory">${contentType.toUpperCase()}</td>
         <td class="tableCentered LMDLimpact${impactOfChange} LMDLimpact">${impactOfChange.toUpperCase()}</td>
-        <td class="tableCentered">${author}</td>
-        <td class="tableCentered">${date.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</td>
-        <td>${commitMessage}</td>
-        </tr>`);
+        <td class="tableCentered LMDLauthor">${author}</td>
+        <td class="tableCentered LMDLdate">${date.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</td>
+        <td class="LMDLmessage">${commitMessage}</td></tr>
+        <tr id="${data.hits.hits[i]._source.id}${parsedTitle}header" class="LMDLexpandedHeaderRow"><td scope="row" class="tableCentered LMDLexpandedHeader LMDLexpandedCategory">Category</td>
+        <td scope="row" class="tableCentered LMDLtooltipTh LMDLexpandedHeader LMDLexpandedImpactHeader" data-toggle="tooltip" data-html="true" 
+        title="<div><span>Extend to which the page had been modified</span><br><span><span class=&quot;LMDLimpactMajor&quot;>Major</span> - more than 30% of lines were edited</span><br><span><span class=&quot;LMDLimpactSignificant&quot;>Significant</span> - more than 10% and less than 30% of lines were edited</span><br><span><span class=&quot;LMDLimpactMinor&quot;>Minor</span> - less than 10% of lines were edited</span></div>">Impact of change&nbsp;<i style="font-size: 0.8rem;" class="fas fa-question-circle"></i></td>
+        <td scope="row" class="tableCentered LMDLexpandedHeader LMDLexpandedAuthor">Author</td></tr>
+        <tr id="${data.hits.hits[i]._source.id}${parsedTitle}detail" class="LMDLexpandedDetailRow"><td scope="row" class="LMDLcategoryGuide LMDLcategory LMDLexpandedDetail LMDLexpandedCategoryCell">GUIDE</td>
+        <td class="tableCentered LMDLimpactMinor LMDLimpact LMDLexpandedDetail LMDLexpandedImpactCell">MINOR</td>
+        <td class="tableCentered LMDLauthor LMDLexpandedDetail LMDLexpandedAuthorCell">Jan Mederly</td></tr>
+        <tr id="${data.hits.hits[i]._source.id}${parsedTitle}" class='LMDLmoreSmallDetails'><td colspan="3" class="notShown LMDLmoreSmallDetailsTd">Show more&nbsp;<i class="fas fa-angle-down LMDLmoreSmallDetailsI"></i></td></tr>`);
+            setTimeout(setMoreDetailsOnClick.bind(null, `${data.hits.hits[i]._source.id}${parsedTitle}`), 100);
         }
         listbox.innerHTML += listitems.join("")
         $(".LMDLelementTooltip").tooltip();
@@ -345,6 +355,9 @@
                 afterSearchQuery.query.bool.must[0].bool.filter[2].terms["contentType.keyword"] = Array.from(searchCategory)
             }
             searchLMDP()
+        }).on('loaded.bs.select', function(e) {
+            let parent = $('#selectpickercategory')[0].parentElement
+            parent.id = "LMDLcategoryPicker"
         });
     }
 
@@ -403,6 +416,9 @@
 
             });
 
+            let parent = $('#selectpickerimpact')[0].parentElement
+            parent.id = "LMDLimpactPicker"
+
         });
     }
 
@@ -431,6 +447,9 @@
             }
 
             searchLMDP()
+        }).on('loaded.bs.select', function(e) {
+            let parent = $('#selectpickerauthor')[0].parentElement
+            parent.id = "LMDLauthorPicker"
         });
         $("#selectpickerauthor").on("shown.bs.select", function() {
             $(document).off('keydown')
@@ -443,6 +462,47 @@
                     }
                 }
             });
+        });
+    }
+
+    $('#LMDLmoreFiltersButton').click(function() {
+        if ($(this)[0].classList.contains('on')) {
+            $('#LMDLcategoryPicker')[0].style.display = "none"
+            $('#LMDLimpactPicker')[0].style.display = "none"
+            $('#LMDLauthorPicker')[0].style.display = "none"
+            $('.LMDLfiltersearch')[0].style.display = "none"
+            $('.LMDLfilters')[0].style['justify-content'] = "space-around"
+            $('.LMDLfilters')[0].style['align-items'] = "center"
+            $(this)[0].classList.remove("on")
+            $(this)[0].innerHTML = `<div class="notShown" id="LMDLmoreFiltersButton">More filters&nbsp;<i class="fas fa-caret-down" style="color: #555753;"></i></div>`
+            $('.LMDLfilters')[0].style['flex-wrap'] = "initial"
+        } else {
+            $('#LMDLcategoryPicker')[0].style.display = "flex"
+            $('#LMDLimpactPicker')[0].style.display = "flex"
+            $('#LMDLauthorPicker')[0].style.display = "flex"
+            $('.LMDLfiltersearch')[0].style.display = "flex"
+            $('.LMDLfilters')[0].style['justify-content'] = "space-between"
+            $('.LMDLfilters')[0].style['align-items'] = "normal"
+            $('.LMDLfilters')[0].style['flex-wrap'] = "wrap"
+            $(this)[0].classList.add("on")
+            $(this)[0].innerHTML = `<div class="notShown" id="LMDLmoreFiltersButton">Less filters&nbsp;<i class="fas fa-caret-up" style="color: #555753;"></i></div>`
+        }
+    });
+
+    function setMoreDetailsOnClick(id) {
+        $(`#${id}`).click(function() {
+            let element = $(this)[0].childNodes[0]
+            if (element.classList.contains('on')) {
+                element.innerHTML = `Show more&nbsp;<i class=\"fas fa-angle-down LMDLmoreSmallDetailsI\"></i>`
+                element.classList.remove("on");
+                $(`#${id}header`)[0].style.display = "none"
+                $(`#${id}detail`)[0].style.display = "none"
+            } else {
+                element.innerHTML = `Show less&nbsp;<i class=\"fas fa-angle-up LMDLmoreSmallDetailsI\"></i>`
+                element.classList.add("on");
+                $(`#${id}header`)[0].style.display = "table-row"
+                $(`#${id}detail`)[0].style.display = "table-row"
+            }
         });
     }
 
