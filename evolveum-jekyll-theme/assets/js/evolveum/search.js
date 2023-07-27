@@ -372,6 +372,7 @@
     }
 
     function setSearchItemOnclick(id, title) {
+        console.log(id + "test" + title)
 
         $("#" + id + "up").click(function() {
             let modify = "+"
