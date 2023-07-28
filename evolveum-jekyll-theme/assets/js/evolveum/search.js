@@ -245,7 +245,7 @@
                         title = data.hits.hits[i]._source.title
                     }
 
-                    setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id, data.hits.hits[i]._source.title), 130);
+                    setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id, data.hits.hits[i]._source.title), 230);
 
                     const parsedDate = Date.parse(data.hits.hits[i]._source.lastModificationDate)
                     const date = new Date(parsedDate)
