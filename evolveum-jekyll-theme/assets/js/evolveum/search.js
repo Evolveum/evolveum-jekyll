@@ -376,7 +376,7 @@
 
         let up = document.getElementById(id + "up")
         console.log(up)
-        up.click(function() {
+        up.onclick = function() {
             let modify = "+"
 
             if ($(this).prop("classList").contains('on')) {
@@ -392,12 +392,13 @@
             OSrequest("POST", "https://searchtest.evolveum.com/docs/_update/" + id + "?refresh", queryUpvote, true)
 
             $(this).toggleClass('on');
-        });
+        };
 
         // TODO for now, we suppose that cases in which the user did not select "open in a new tab" or just triggered the "mousedown" event and did not click are statistically insignificant
         let site = document.getElementById(id + "site")
         console.log(site)
         site.addEventListener("mousedown", (event) => {
+            console.log(event.button)
             if (event.button == 0 || event.button == 2) {
                 console.log("mousedown" + ev.button);
 
