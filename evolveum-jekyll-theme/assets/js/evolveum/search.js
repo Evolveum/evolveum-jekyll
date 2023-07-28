@@ -398,9 +398,8 @@
         let site = document.getElementById(id + "site")
         console.log(site)
         site.addEventListener("mousedown", (event) => {
-            console.log(event.button)
             if (event.button == 0 || event.button == 2) {
-                console.log("mousedown" + ev.button);
+                console.log("mousedown" + event.button);
 
                 const date = new Date();
 
