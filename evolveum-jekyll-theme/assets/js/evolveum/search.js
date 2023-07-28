@@ -374,7 +374,9 @@
     function setSearchItemOnclick(id, title) {
         console.log(id + "test" + title)
 
-        document.getElementById(id + "up").click(function() {
+        let up = document.getElementById(id + "up")
+        console.log(up)
+        up.click(function() {
             let modify = "+"
 
             if ($(this).prop("classList").contains('on')) {
@@ -393,7 +395,9 @@
         });
 
         // TODO for now, we suppose that cases in which the user did not select "open in a new tab" or just triggered the "mousedown" event and did not click are statistically insignificant
-        document.getElementById(id + "up").on('mousedown', function(ev) {
+        let site = document.getElementById(id + "site")
+        console.log(site)
+        site.on('mousedown', function(ev) {
             if (ev.button == 0 || ev.button == 2) {
                 console.log("mousedown" + ev.button);
 
