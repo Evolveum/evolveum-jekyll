@@ -397,8 +397,8 @@
         // TODO for now, we suppose that cases in which the user did not select "open in a new tab" or just triggered the "mousedown" event and did not click are statistically insignificant
         let site = document.getElementById(id + "site")
         console.log(site)
-        site.on('mousedown', function(ev) {
-            if (ev.button == 0 || ev.button == 2) {
+        siteaddEventListener("mousedown", (event) => {
+            if (event.button == 0 || event.button == 2) {
                 console.log("mousedown" + ev.button);
 
                 const date = new Date();
