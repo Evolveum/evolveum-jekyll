@@ -373,7 +373,8 @@
 
     function setSearchItemOnclick(id, title) {
 
-        $("#" + id + "up").click(function() {
+        let up = document.getElementById(id + "up")
+        up.onclick = function() {
             let modify = "+"
 
             if ($(this).prop("classList").contains('on')) {
@@ -389,12 +390,13 @@
             OSrequest("POST", "https://search.evolveum.com/docs/_update/" + id + "?refresh", queryUpvote, true)
 
             $(this).toggleClass('on');
-        });
+        };
 
         // TODO for now, we suppose that cases in which the user did not select "open in a new tab" or just triggered the "mousedown" event and did not click are statistically insignificant
-        $("#" + id + "site").on('mousedown', function(ev) {
-            if (ev.button == 0 || ev.button == 2) {
-                console.log("mousedown" + ev.button);
+        let site = document.getElementById(id + "site")
+        site.addEventListener("mousedown", (event) => {
+            if (event.button == 0 || event.button == 2) {
+                console.log("mousedown" + event.button);
 
                 const date = new Date();
 
@@ -406,7 +408,7 @@
                     "clickquery": document.getElementById('searchbar').value.toLowerCase()
                 }
 
-                ev.button == 0 ? OSrequest("POST", "https://search.evolveum.com/click_logs/_doc/", queryClick, false) : OSrequest("POST", "https://search.evolveum.com/click_logs/_doc/", queryClick, true);
+                event.button == 0 ? OSrequest("POST", "https://search.evolveum.com/click_logs/_doc/", queryClick, false) : OSrequest("POST", "https://search.evolveum.com/click_logs/_doc/", queryClick, true);
             }
         });
     }
