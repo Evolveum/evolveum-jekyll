@@ -490,7 +490,8 @@
     });
 
     function setMoreDetailsOnClick(id) {
-        $(`#${id}`).click(function() {
+        let moreButton = document.getElementById(id)
+        moreButton.onclick = function() {
             let element = $(this)[0].childNodes[0]
             if (element.classList.contains('on')) {
                 element.innerHTML = `Show more&nbsp;<i class=\"fas fa-angle-down LMDLmoreSmallDetailsI\"></i>`
@@ -503,7 +504,7 @@
                 $(`#${id}header`)[0].style.display = "table-row"
                 $(`#${id}detail`)[0].style.display = "table-row"
             }
-        });
+        };
     }
 
 })();
