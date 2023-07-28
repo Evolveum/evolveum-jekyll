@@ -245,7 +245,7 @@
                         title = data.hits.hits[i]._source.title
                     }
 
-                    setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id, data.hits.hits[i]._source.title), 230);
+                    setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id, data.hits.hits[i]._source.title), 130);
 
                     const parsedDate = Date.parse(data.hits.hits[i]._source.lastModificationDate)
                     const date = new Date(parsedDate)
@@ -374,7 +374,7 @@
     function setSearchItemOnclick(id, title) {
         console.log(id + "test" + title)
 
-        document.getElementById("#" + id + "up").click(function() {
+        document.getElementById(id + "up").click(function() {
             let modify = "+"
 
             if ($(this).prop("classList").contains('on')) {
@@ -393,7 +393,7 @@
         });
 
         // TODO for now, we suppose that cases in which the user did not select "open in a new tab" or just triggered the "mousedown" event and did not click are statistically insignificant
-        document.getElementById("#" + id + "up").on('mousedown', function(ev) {
+        document.getElementById(id + "up").on('mousedown', function(ev) {
             if (ev.button == 0 || ev.button == 2) {
                 console.log("mousedown" + ev.button);
 
