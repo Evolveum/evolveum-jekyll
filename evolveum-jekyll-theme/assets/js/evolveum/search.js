@@ -166,7 +166,8 @@
                 "deprecated",
                 "experimental",
                 "planned",
-                "outdated"
+                "outdated",
+                "wiki-metadata-create-user"
             ],
             _source: false,
             highlight: {
@@ -240,7 +241,7 @@
                             }
                         }
                     } else {
-                        preview = data.hits.hits[i]._source.alternative_text
+                        preview = data.hits.hits[i].fields.alternative_text[0]
                     }
 
                     if (preview != undefined && preview) {
@@ -253,34 +254,40 @@
                     }
 
                     if (title == undefined || !title) {
-                        title = data.hits.hits[i]._source.title
+                        title = data.hits.hits[i].fields.title[0]
                     }
 
-                    setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id, data.hits.hits[i]._source.title), 130);
+                    setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id, data.hits.hits[i].fields.title[0]), 130);
 
-                    const parsedDate = Date.parse(data.hits.hits[i]._source.lastModificationDate)
+                    const parsedDate = Date.parse(data.hits.hits[i].fields.lastModificationDate[0])
                     const date = new Date(parsedDate)
 
-                    let author = data.hits.hits[i]._source.author
-                    if (typeof author == 'undefined' || !author) {
-                        author = data.hits.hits[i]._source["wiki-metadata-create-user"]
-                        if (typeof author == 'undefined' || !author) {
-                            author = "unknown"
+                    let authorRaw = data.hits.hits[i].fields.author
+                    let author = ""
+                    if (typeof authorRaw == 'undefined' || !authorRaw) {
+                        authorRaw = data.hits.hits[i].fields["wiki-metadata-create-user"]
+                        author = "unknown"
+                        if (typeof authorRaw != 'undefined' && authorRaw) {
+                            author = authorRaw[0]
                         }
+                    } else {
+                        author = authorRaw[0]
                     }
 
-                    let upvotes = data.hits.hits[i]._source.upvotes
-                    if (typeof upvotes == 'undefined' || !upvotes) {
-                        upvotes = 0
+                    let upvotesRaw = data.hits.hits[i].fields.upvotes
+                    let upvotes = 0
+                    if (typeof upvotesRaw != 'undefined' && upvotesRaw) {
+                        upvotes = upvotesRaw[0]
                     }
 
-                    let upkeepStatus = data.hits.hits[i]._source["upkeep-status"]
-                    if (typeof upkeepStatus == 'undefined' || !upkeepStatus) {
-                        upkeepStatus = "unknown"
+                    let upkeepStatusRaw = data.hits.hits[i].fields["upkeep-status"]
+                    let upkeepStatus = "unknown"
+                    if (typeof upkeepStatusRaw != 'undefined' && upkeepStatusRaw) {
+                        upkeepStatus = upkeepStatusRaw[0]
                     }
 
                     contentTriangleClass = "fas fa-exclamation-triangle conditionTriangle"
-                    contentStatusArray = [data.hits.hits[i]._source.obsolete, data.hits.hits[i]._source.deprecated, data.hits.hits[i]._source.experimental, data.hits.hits[i]._source.planned, data.hits.hits[i]._source.outdated]
+                    contentStatusArray = [data.hits.hits[i].fields.obsolete, data.hits.hits[i].fields.deprecated, data.hits.hits[i].fields.experimental, data.hits.hits[i].fields.planned, data.hits.hits[i].fields.outdated]
                     contentStatusValuesArray = ["obsolete", "deprecated", "experimental", "planned", "outdated"]
                     contentStatus = "" // TODO as array
                     filtredArray = contentStatusArray.filter(function(element, index) {
