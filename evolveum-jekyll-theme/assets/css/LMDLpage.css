@@ -137,6 +137,15 @@
         margin-bottom: 10px !important;
         justify-content: space-between !important;
     }
+    #LMDLcategoryPicker {
+        display: flex !important;
+    }
+    #LMDLimpactPicker {
+        display: flex !important;
+    }
+    #LMDLauthorPicker {
+        display: flex !important;
+    }
 }
 
 @media (max-width:500px) {
