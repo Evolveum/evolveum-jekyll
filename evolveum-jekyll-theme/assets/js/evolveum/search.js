@@ -155,6 +155,20 @@
                     }]
                 }
             },
+            fields: [
+                "alternative_text",
+                "title",
+                "lastModificationDate",
+                "author",
+                "upvotes",
+                "upkeep-status",
+                "obsolete",
+                "deprecated",
+                "experimental",
+                "planned",
+                "outdated"
+            ],
+            _source: false,
             highlight: {
                 pre_tags: [
                     "<strong>"
@@ -226,10 +240,7 @@
                             }
                         }
                     } else {
-                        preview = data.hits.hits[i]._source.text.substring(0, 115)
-                        if (preview == undefined || !preview) {
-                            preview = data.hits.hits[i]._source.alternative_text
-                        }
+                        preview = data.hits.hits[i]._source.alternative_text
                     }
 
                     if (preview != undefined && preview) {
