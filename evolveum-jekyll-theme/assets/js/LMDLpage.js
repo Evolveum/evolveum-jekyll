@@ -14,6 +14,24 @@
         query: {
             match_all: {}
         },
+        fields: [
+            "commitMessage",
+            "title",
+            "date",
+            "upkeep-status",
+            "obsolete",
+            "deprecated",
+            "experimental",
+            "planned",
+            "outdated",
+            "contentType",
+            "importance",
+            "author",
+            "url",
+            "id",
+            "gitUrl"
+        ],
+        _source: false,
         size: 30,
         sort: [{
             date: {
@@ -50,6 +68,24 @@
                 ]
             }
         },
+        fields: [
+            "commitMessage",
+            "title",
+            "date",
+            "upkeep-status",
+            "obsolete",
+            "deprecated",
+            "experimental",
+            "planned",
+            "outdated",
+            "contentType",
+            "importance",
+            "author",
+            "url",
+            "id",
+            "gitUrl"
+        ],
+        _source: false,
         size: 30,
         from: 0,
         sort: [{
@@ -82,7 +118,11 @@
         let listitems = []
         console.log(data)
         for (let i = 0; i < data.hits.hits.length && i < data.hits.total.value; i++) { // TODO
-            let commitMessage = data.hits.hits[i]._source.commitMessage;
+            let commitMessageRaw = data.hits.hits[i].fields.commitMessage;
+            let commitMessage = ""
+            if (commitMessageRaw != undefined && commitMessageRaw) {
+                commitMessage = commitMessageRaw[0]
+            }
             let unknownStatus = "";
 
             if (commitMessage != undefined && commitMessage) {
@@ -91,25 +131,30 @@
             }
 
             let title = ""
+            let titleRaw = data.hits.hits[i].fields.title
 
             if (data.hits.hits[i].highlight == undefined) {
-                title = data.hits.hits[i]._source.title
+                if (titleRaw != undefined && titleRaw) {
+                    title = titleRaw[0]
+                }
             } else {
                 title = data.hits.hits[i].highlight.title
             }
 
-            let rawDate = data.hits.hits[i]._source.date
+            let rawDate = data.hits.hits[i].fields.date[0]
             const parsedDate = Date.parse(rawDate)
             const date = new Date(parsedDate)
 
-            let upkeepStatus = data.hits.hits[i]._source["upkeep-status"]
-            if (typeof upkeepStatus == 'undefined' || !upkeepStatus) {
-                upkeepStatus = "unknown"
+            let upkeepStatusRaw = data.hits.hits[i].fields["upkeep-status"]
+            let upkeepStatus = "unknown"
+            if (typeof upkeepStatusRaw == 'undefined' || !upkeepStatusRaw) {
                 unknownStatus = "&nbsp;unknown"
+            } else {
+                upkeepStatus = upkeepStatusRaw[0]
             }
 
             contentTriangleClass = ""
-            contentStatusArray = [data.hits.hits[i]._source.obsolete, data.hits.hits[i]._source.deprecated, data.hits.hits[i]._source.experimental, data.hits.hits[i]._source.planned, data.hits.hits[i]._source.outdated]
+            contentStatusArray = [data.hits.hits[i].fields.obsolete, data.hits.hits[i].fields.deprecated, data.hits.hits[i].fields.experimental, data.hits.hits[i].fields.planned, data.hits.hits[i].fields.outdated]
             contentStatusValuesArray = ["obsolete", "deprecated", "experimental", "planned", "outdated"]
             contentStatus = "" // TODO as array
             filtredArray = contentStatusArray.filter(function(element, index) {
@@ -125,32 +170,44 @@
                 contentTriangleClass = "fas fa-exclamation-triangle conditionTriangle LMDLelementTooltip"
             }
 
-            let contentType = data.hits.hits[i]._source.contentType;
+            let contentTypeRaw = data.hits.hits[i].fields.contentType;
+            let contentType = ""
+            if (typeof contentTypeRaw != 'undefined' && contentTypeRaw) {
+                contentType = contentTypeRaw[0]
+            }
 
-            impactOfChange = data.hits.hits[i]._source.importance
+            let impactOfChangeRaw = data.hits.hits[i].fields.importance
+            let impactOfChange = ""
+            if (typeof impactOfChangeRaw != 'undefined' && impactOfChangeRaw) {
+                impactOfChange = impactOfChangeRaw[0]
+            }
 
-            let author = data.hits.hits[i]._source.author
+            let authorRaw = data.hits.hits[i].fields.author
+            let author = ""
+            if (typeof authorRaw != 'undefined' && authorRaw) {
+                author = authorRaw[0]
+            }
 
             author = author.replace(/<.*>/, "")
 
             let parsedTitle = title.replace(/[\W_]+/g, "")
 
             listitems.push(`<tr>
-        <th class="LMDLtitle" scope="row"><a href="${data.hits.hits[i]._source.url}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='<span>Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></i>${unknownStatus}</span>'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i]._source.gitUrl}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
+        <th class="LMDLtitle" scope="row"><a href="${data.hits.hits[i].fields.url[0]}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='<span>Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></i>${unknownStatus}</span>'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i].fields.gitUrl[0]}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
         <td class="LMDLcategory${contentType} LMDLcategory">${contentType.toUpperCase()}</td>
         <td class="tableCentered LMDLimpact${impactOfChange} LMDLimpact">${impactOfChange.toUpperCase()}</td>
         <td class="tableCentered LMDLauthor">${author}</td>
         <td class="tableCentered LMDLdate">${date.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</td>
         <td class="LMDLmessage">${commitMessage}</td></tr>
-        <tr id="${data.hits.hits[i]._source.id}${parsedTitle}header" class="LMDLexpandedHeaderRow"><td scope="row" class="tableCentered LMDLexpandedHeader LMDLexpandedCategory">Category</td>
+        <tr id="${data.hits.hits[i].fields.id[0]}${parsedTitle}header" class="LMDLexpandedHeaderRow"><td scope="row" class="tableCentered LMDLexpandedHeader LMDLexpandedCategory">Category</td>
         <td scope="row" class="tableCentered LMDLtooltipTh LMDLexpandedHeader LMDLexpandedImpactHeader" data-toggle="tooltip" data-html="true" 
         title="<div><span>Extend to which the page had been modified</span><br><span><span class=&quot;LMDLimpactMajor&quot;>Major</span> - more than 30% of lines were edited</span><br><span><span class=&quot;LMDLimpactSignificant&quot;>Significant</span> - more than 10% and less than 30% of lines were edited</span><br><span><span class=&quot;LMDLimpactMinor&quot;>Minor</span> - less than 10% of lines were edited</span></div>">Impact of change&nbsp;<i style="font-size: 0.8rem;" class="fas fa-question-circle"></i></td>
         <td scope="row" class="tableCentered LMDLexpandedHeader LMDLexpandedAuthor">Author</td></tr>
-        <tr id="${data.hits.hits[i]._source.id}${parsedTitle}detail" class="LMDLexpandedDetailRow"><td scope="row" class="LMDLcategoryGuide LMDLcategory LMDLexpandedDetail LMDLexpandedCategoryCell">GUIDE</td>
+        <tr id="${data.hits.hits[i].fields.id[0]}${parsedTitle}detail" class="LMDLexpandedDetailRow"><td scope="row" class="LMDLcategoryGuide LMDLcategory LMDLexpandedDetail LMDLexpandedCategoryCell">GUIDE</td>
         <td class="tableCentered LMDLimpactMinor LMDLimpact LMDLexpandedDetail LMDLexpandedImpactCell">MINOR</td>
         <td class="tableCentered LMDLauthor LMDLexpandedDetail LMDLexpandedAuthorCell">Jan Mederly</td></tr>
-        <tr id="${data.hits.hits[i]._source.id}${parsedTitle}" class='LMDLmoreSmallDetails'><td colspan="3" class="notShown LMDLmoreSmallDetailsTd">Show more&nbsp;<i class="fas fa-angle-down LMDLmoreSmallDetailsI"></i></td></tr>`);
-            setTimeout(setMoreDetailsOnClick.bind(null, `${data.hits.hits[i]._source.id}${parsedTitle}`), 100);
+        <tr id="${data.hits.hits[i].fields.id[0]}${parsedTitle}" class='LMDLmoreSmallDetails'><td colspan="3" class="notShown LMDLmoreSmallDetailsTd">Show more&nbsp;<i class="fas fa-angle-down LMDLmoreSmallDetailsI"></i></td></tr>`);
+            setTimeout(setMoreDetailsOnClick.bind(null, `${data.hits.hits[i].fields.id[0]}${parsedTitle}`), 100);
         }
         listbox.innerHTML += listitems.join("")
         $(".LMDLelementTooltip").tooltip();
