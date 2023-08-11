@@ -409,13 +409,14 @@
     }
 
     function sendSearchLog(id, title) {
+        logScheduled = false
+        const date = new Date();
         let logPayload = {
             "@timestamp": date.toISOString(),
             "querylength": document.getElementById('searchbar').value.toLowerCase().length,
             "query": document.getElementById('searchbar').value.toLowerCase()
         }
         OSrequest("POST", "https://searchtest.evolveum.com/usefulsearchlogs/_doc/", logPayload, true)
-        logScheduled = false
     }
 
     function setSearchItemOnclick(id, title) {
@@ -444,6 +445,8 @@
         site.addEventListener("mousedown", (event) => {
             if (event.button == 0 || event.button == 2) {
 
+                const date = new Date();
+
                 if (logScheduled) {
                     clearTimeout(logTimer);
                     logTimer = null;
@@ -458,8 +461,6 @@
                 }
 
                 console.log("mousedown" + event.button);
-
-                const date = new Date();
 
                 let queryClick = {
                     "title": title,
