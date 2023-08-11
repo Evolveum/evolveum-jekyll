@@ -21,12 +21,16 @@
     });
 
     var typingTimer = null;
+    let logTimer = null;
+    let logScheduled = false
 
     $(document).on('keydown', function(e) {
         if (/^[a-zA-Z0-9-_ ]$/.test(e.key) && !e.altKey && !e.ctrlKey && !e.metaKey && e.which !== 32) {
             if (!$("#search-modal").hasClass('show')) {
                 $("#search-modal").modal()
                 typingTimer = setTimeout(searchForPhrase, 200)
+                logTimer = setTimeout(sendSearchLog, 2000)
+                logScheduled = true
             }
         }
     });
@@ -195,9 +199,16 @@
                 typingTimer = null;
                 console.log("timer removed")
             }
+            if (logTimer) {
+                clearTimeout(logTimer);
+                logTimer = null;
+                console.log("logtimer removed")
+            }
             if ($('#searchbar').val()) {
                 typingTimer = setTimeout(searchForPhrase, 200);
-                console.log("timer added")
+                logTimer = setTimeout(sendSearchLog, 2000)
+                console.log("timer and logtimer added")
+                logScheduled = true
             }
         }
     });
@@ -397,6 +408,16 @@
         });
     }
 
+    function sendSearchLog(id, title) {
+        let logPayload = {
+            "@timestamp": date.toISOString(),
+            "querylength": document.getElementById('searchbar').value.toLowerCase().length,
+            "query": document.getElementById('searchbar').value.toLowerCase()
+        }
+        OSrequest("POST", "https://searchtest.evolveum.com/usefulsearchlogs/_doc/", logPayload, true)
+        logScheduled = false
+    }
+
     function setSearchItemOnclick(id, title) {
 
         let up = document.getElementById(id + "up")
@@ -422,6 +443,20 @@
         let site = document.getElementById(id + "site")
         site.addEventListener("mousedown", (event) => {
             if (event.button == 0 || event.button == 2) {
+
+                if (logScheduled) {
+                    clearTimeout(logTimer);
+                    logTimer = null;
+                    let logPayload = {
+                        "@timestamp": date.toISOString(),
+                        "querylength": document.getElementById('searchbar').value.toLowerCase().length,
+                        "query": document.getElementById('searchbar').value.toLowerCase()
+                    }
+                    OSrequest("POST", "https://searchtest.evolveum.com/usefulsearchlogs/_doc/", logPayload, true)
+                    logScheduled = false
+                    console.log("logtimer removed")
+                }
+
                 console.log("mousedown" + event.button);
 
                 const date = new Date();
