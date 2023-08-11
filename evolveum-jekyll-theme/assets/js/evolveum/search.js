@@ -416,7 +416,7 @@
             "querylength": document.getElementById('searchbar').value.toLowerCase().length,
             "query": document.getElementById('searchbar').value.toLowerCase()
         }
-        OSrequest("POST", "https://searchtest.evolveum.com/usefulsearchlogs/_doc/", logPayload, true)
+        OSrequest("POST", "https://searchtest.evolveum.com/finalsearchlogs/_doc/", logPayload, true)
     }
 
     function setSearchItemOnclick(id, title) {
@@ -455,7 +455,7 @@
                         "querylength": document.getElementById('searchbar').value.toLowerCase().length,
                         "query": document.getElementById('searchbar').value.toLowerCase()
                     }
-                    OSrequest("POST", "https://searchtest.evolveum.com/usefulsearchlogs/_doc/", logPayload, true)
+                    OSrequest("POST", "https://searchtest.evolveum.com/finalsearchlogs/_doc/", logPayload, true)
                     logScheduled = false
                     console.log("logtimer removed")
                 }
