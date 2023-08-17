@@ -43,6 +43,15 @@
         $('#reportSearchProblemPopover').popover()
     })
 
+    $('#reportSearchProblemPopoverClose').click(function() {
+        $('#reportSearchProblemPopover').popover('hide');
+    });
+
+    $('#reportSearchProblemPopoverSend').click(function() {
+        $('#reportSearchProblemPopover').popover('hide');
+        console.log("hidden")
+    });
+
     $("#search-modal").on('hidden.bs.modal', function() {
         document.getElementById("autocombox").innerHTML = "";
         document.getElementById("autocombox").style.display = "none";
