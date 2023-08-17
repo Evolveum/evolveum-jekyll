@@ -39,6 +39,10 @@
         $('#searchbar').trigger('focus')
     });
 
+    $(function() {
+        $('#reportSearchProblemPopover').popover()
+    })
+
     $("#search-modal").on('hidden.bs.modal', function() {
         document.getElementById("autocombox").innerHTML = "";
         document.getElementById("autocombox").style.display = "none";
