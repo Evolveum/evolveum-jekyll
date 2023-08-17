@@ -587,6 +587,10 @@ module Evolveum
                 processAllVisibleNavsLevel(subnav, &block)
             end
         end
+
+        def to_s()
+            return "Nav(#{@url})"
+        end
     end
 
 end
