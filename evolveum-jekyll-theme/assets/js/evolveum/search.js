@@ -41,7 +41,17 @@
 
     $(function() {
         $('#reportSearchProblemPopover').popover({
-            title: `<div><span><h1>TEST</h1></span><span><p>test text</p><button type="button" class="btn btn-secondary" id="reportSearchProblemPopoverClose">Close</button><button type="button" class="btn btn-primary" id="reportSearchProblemPopoverSend">Send message</button></span></div>`
+            content: `<div>
+                        <span>
+                            <h1>TEST</h1>
+                        </span>
+                        <span>
+                            <p>test text</p>
+                            <button type="button" class="btn btn-secondary" id="reportSearchProblemPopoverClose">Close</button>
+                            <button type="button" class="btn btn-primary" id="reportSearchProblemPopoverSend">Send message</button>
+                            <button id="testbuttonpopoverreport" class="btn btn-outline-secondary btn-sm my-2 my-sm-0">TESTBUTTON</button>
+                        </span>
+                    </div>`
         });
     })
 
