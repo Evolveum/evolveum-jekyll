@@ -37,9 +37,10 @@
 
     $("#search-modal").on('shown.bs.modal', async function() {
         $('#searchbar').trigger('focus')
+        searchReportPopoverSetup()
     });
 
-    $(function() {
+    function searchReportPopoverSetup() {
         $('#reportSearchProblemPopover').popover({
             html: true,
             sanitize: false,
@@ -63,18 +64,18 @@
                         </span>
                     </div>`
         });
-    })
 
-    $('#reportSearchProblemPopover').on('inserted.bs.popover', function() {
-        $('#reportSearchProblemPopoverClose').click(function() {
-            $('#reportSearchProblemPopover').popover('hide');
-        });
+        $('#reportSearchProblemPopover').on('inserted.bs.popover', function() {
+            $('#reportSearchProblemPopoverClose').click(function() {
+                $('#reportSearchProblemPopover').popover('hide');
+            });
 
-        $('#reportSearchProblemPopoverSend').click(function() {
-            $('#reportSearchProblemPopover').popover('hide');
-            console.log("hidden")
-        });
-    })
+            $('#reportSearchProblemPopoverSend').click(function() {
+                $('#reportSearchProblemPopover').popover('hide');
+                console.log("hidden")
+            });
+        })
+    }
 
     $("#search-modal").on('hidden.bs.modal', function() {
         document.getElementById("autocombox").innerHTML = "";
