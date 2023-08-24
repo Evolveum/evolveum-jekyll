@@ -41,6 +41,8 @@
 
     $(function() {
         $('#reportSearchProblemPopover').popover({
+            html: true,
+            sanitize: false,
             content: `<div>
                         <span>
                             <h1>TEST</h1>
