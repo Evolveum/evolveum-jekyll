@@ -43,15 +43,23 @@
         $('#reportSearchProblemPopover').popover({
             html: true,
             sanitize: false,
+            title: "Report a problem",
             content: `<div>
+                        <div class="form-group">
+                            <label for="searchproblemselect">Select the type of problem</label>
+                            <select class="form-control" id="searchproblemselect">
+                                <option>Visual bug</option>
+                                <option>Functional bug</option>
+                                <option>Problem with results</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleFormControlTextarea1">Details of the problem</label>
+                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="5"></textarea>
+                        </div>
                         <span>
-                            <h1>TEST</h1>
-                        </span>
-                        <span>
-                            <p>test text</p>
-                            <button type="button" class="btn btn-secondary" id="reportSearchProblemPopoverClose">Close</button>
+                            <button type="button" class="btn btn-primary" id="reportSearchProblemPopoverClose">Close</button>
                             <button type="button" class="btn btn-primary" id="reportSearchProblemPopoverSend">Send message</button>
-                            <button id="testbuttonpopoverreport" class="btn btn-outline-secondary btn-sm my-2 my-sm-0">TESTBUTTON</button>
                         </span>
                     </div>`
         });
