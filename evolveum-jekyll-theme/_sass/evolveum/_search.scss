@@ -366,3 +366,7 @@
 #reportSearchProblemPopover:hover {
     color: $gray-600;
 }
+
+#searchReportAProblemSelect option[selected] {
+    background-color: lightskyblue !important;
+}
