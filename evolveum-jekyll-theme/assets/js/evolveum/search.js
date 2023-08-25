@@ -71,6 +71,8 @@
                 $('#reportSearchProblemPopover').popover('hide');
             });
 
+            $('#searchReportAProblemSelect').selectpicker();
+
             $('#reportSearchProblemPopoverSend').click(function() {
                 $('#reportSearchProblemPopover').popover('hide');
                 console.log("hidden")
