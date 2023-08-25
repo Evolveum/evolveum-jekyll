@@ -44,6 +44,7 @@
         $('#reportSearchProblemPopover').popover({
             html: true,
             sanitize: false,
+            container: '#search-modal',
             title: "Report a problem",
             content: `<div>
                         <div class="form-group">
