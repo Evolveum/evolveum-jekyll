@@ -358,3 +358,11 @@
     color: #2f81d4;
     background-color: white;
 }
+
+#reportSearchProblemPopover {
+    cursor: pointer;
+}
+
+#reportSearchProblemPopover:hover {
+    color: $gray-600;
+}
