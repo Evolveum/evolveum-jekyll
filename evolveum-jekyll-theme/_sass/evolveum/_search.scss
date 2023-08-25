@@ -337,3 +337,24 @@
     background-color: #FFF;
     color: #000;
 }
+
+.btnSearchSelectReport:hover {
+    background-color: lightskyblue !important;
+    border-color: lightskyblue !important;
+    color: black !important;
+}
+
+.btnSearchSelectReport {
+    background-color: white !important;
+    color: black !important;
+}
+
+.btnSearchSelectReport:active {
+    background-color: white;
+    color: black;
+}
+
+#reportSearchProblemPopoverClose {
+    color: #2f81d4;
+    background-color: white;
+}

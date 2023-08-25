@@ -49,7 +49,7 @@
             content: `<div>
                         <div class="form-group">
                             <label for="searchReportAProblemSelect">Select the type of problem</label>
-                            <select id="searchReportAProblemSelect" data-style="btn-light btn-sm" data-width="auto">
+                            <select id="searchReportAProblemSelect" data-style="btn-light btn-sm btnSearchSelectReport" data-width="auto">
                                 <option class="input-sm">Visual bug</option>
                                 <option class="input-sm">Functional bug</option>
                                 <option class="input-sm">Problem with results</option>
