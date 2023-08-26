@@ -367,6 +367,6 @@
     color: $gray-600;
 }
 
-#searchReportAProblemSelect option[selected] {
+.searchReportAProblemOption.selected {
     background-color: lightskyblue !important;
 }
