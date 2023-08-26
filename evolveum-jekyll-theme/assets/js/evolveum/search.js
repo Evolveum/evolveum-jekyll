@@ -56,8 +56,8 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="exampleFormControlTextarea1">Details of the problem</label>
-                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="5"></textarea>
+                            <label for="searchReportTextArea">Details of the problem</label>
+                            <textarea class="form-control" id="searchReportTextArea" rows="5"></textarea>
                         </div>
                         <span>
                             <button type="button" class="btn btn-primary" id="reportSearchProblemPopoverClose">Close</button>
@@ -74,8 +74,21 @@
             $('#searchReportAProblemSelect').selectpicker();
 
             $('#reportSearchProblemPopoverSend').click(function() {
+                let searchProblemSelected = $(".searchReportAProblemOption.selected")
+                let searchProblemCategory = "Not defined"
+                if (searchProblemSelected[0] != undefined) {
+                    searchProblemCategory = searchProblemSelected[0].childNodes[0].textContent
+                }
+
+                let reportSearchQuery = {
+                    category: searchProblemCategory,
+                    details: $("#searchReportTextArea").val(),
+                    query: document.getElementById('searchbar').value,
+                    width: $(document).width(),
+                    height: $(document).height()
+                }
+                OSrequest("POST", "docstest.evolveum.com/webhooks/searchreport", reportSearchQuery, true)
                 $('#reportSearchProblemPopover').popover('hide');
-                console.log("hidden")
             });
         })
     }
