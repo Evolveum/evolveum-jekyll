@@ -18,6 +18,8 @@
 
 module Evolveum
 
+    $stdout.reopen("/var/log/jekyll", "w")
+
     ##
     # Page generator.
     # Generates stub pages for URLs that do not have their own pages.
