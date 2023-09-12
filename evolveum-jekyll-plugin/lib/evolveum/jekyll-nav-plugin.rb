@@ -495,8 +495,8 @@ module Evolveum
 
         # NOTE: this may not work well until we have all labels generated correctly
         def presentableSubnodes(params = {})
-            puts(subnodes)
-            puts(subnodes.select{ |node| node.presentable?(params) })
+            puts("test" + subnodes)
+            puts("test2" + subnodes.select{ |node| node.presentable?(params) })
             subnodes.select{ |node| node.presentable?(params) }.sort{ |a,b| sortCompare(a,b) }
         end
 
