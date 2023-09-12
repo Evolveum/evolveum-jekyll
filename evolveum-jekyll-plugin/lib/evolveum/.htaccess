@@ -1,3 +1,4 @@
 {% for redirect in page.redirects %}
 RewriteRule   "{{ redirect.pattern }}" "{{ redirect.substitution }}" [R]
 {% endfor %}
+RewriteRule   "^midpoint/reference(?!v[0-9].*)(/|$)(.*)" "/midpoint/reference/latest/$3" [R]
