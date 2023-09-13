@@ -504,7 +504,7 @@ module Evolveum
                 subnodes.select{ |node| node.presentable?(params) }.sort{ |a,b| sortCompare(a,b) }
             rescue ArgumentError
                 text = ""
-                for i in subnodes do
+                for i in subnodes.select{ |node| node.presentable?(params) } do
                     text = text + "#{i.url}"
                 end
                 raise ArgumentError, "FAILED AGAIN: #{text}"
