@@ -499,6 +499,7 @@ module Evolveum
         def presentableSubnodes(params = {})
             puts("test  #{subnodes.join(', ')} ")
             puts("test2 #{subnodes.select{ |node| node.presentable?(params) }.join(', ')}")
+            puts("test3 #{subnodes[0].display_order}")
             subnodes.select{ |node| node.presentable?(params) }.sort{ |a,b| sortCompare(a,b) }
         end
 
