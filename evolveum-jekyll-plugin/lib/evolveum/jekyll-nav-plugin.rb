@@ -499,7 +499,7 @@ module Evolveum
         def presentableSubnodes(params = {})
             puts("test  #{subnodes.join(', ')} ")
             puts("test2 #{subnodes.select{ |node| node.presentable?(params) }.join(', ')}")
-            puts("test3 #{subnodes[0].display_order} #{subnodes[0].url}")
+            #puts("test3 #{subnodes[0].display_order} #{subnodes[0].url}")
             begin
                 subnodes.select{ |node| node.presentable?(params) }.sort{ |a,b| sortCompare(a,b) }
             rescue ArgumentError
@@ -513,7 +513,7 @@ module Evolveum
         end
 
         def sortCompare(a,b)
-            puts("I am here #{a.url} #{b.url}")
+            puts("I am here #{a.url} #{a.label} #{b.url} #{b.label}")
             sortBy = self&.page&.data&.[]('sub-sort-by')
             sortStrategy = self&.page&.data&.[]('sub-sort-strategy')
             sortDirection = self&.page&.data&.[]('sub-sort-direction')
