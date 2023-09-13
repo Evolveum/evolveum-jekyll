@@ -3,7 +3,14 @@
     let url = window.location.href
     if (!url.includes("/midpoint/reference")) {
         $("#select-version").style.display = "none";
+    } else if (url.includes("/latest/")) { //todo switch with extracted tags
+        $('.selectpicker').selectpicker('val', 'latest');
+    } else {
+        $('.selectpicker').selectpicker('val', 'v2');
     }
+
+
+
 
     $('#select-version-picker').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         switch (clickedIndex) {
