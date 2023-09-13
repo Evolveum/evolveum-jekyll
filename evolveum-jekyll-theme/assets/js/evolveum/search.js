@@ -5,6 +5,10 @@
         $("#select-version").style.display = "none";
     }
 
+    $('#select-version-picker').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
+        console.log(isSelected)
+    });
+
     let letters = new Set(["Guide", "Reference", "Developer", "Other"]);
 
     $('.ovalSearch').click(function() {
