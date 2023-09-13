@@ -513,6 +513,7 @@ module Evolveum
         end
 
         def sortCompare(a,b)
+            puts("I am here #{a.url} #{b.url}")
             sortBy = self&.page&.data&.[]('sub-sort-by')
             sortStrategy = self&.page&.data&.[]('sub-sort-strategy')
             sortDirection = self&.page&.data&.[]('sub-sort-direction')
