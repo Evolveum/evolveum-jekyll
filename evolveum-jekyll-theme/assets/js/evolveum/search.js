@@ -1,5 +1,10 @@
 (function() {
 
+    let url = window.location.href
+    if (!url.includes("/midpoint/reference")) {
+        $("#select-version").style.display = "none";
+    }
+
     let letters = new Set(["Guide", "Reference", "Developer", "Other"]);
 
     $('.ovalSearch').click(function() {

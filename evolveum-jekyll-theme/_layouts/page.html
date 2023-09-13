@@ -15,6 +15,10 @@ layout: default
         <div class="logo-title"><img src="{{page.logo-title}}" alt="{{ page.title }}" /></div>{% else %}
         <h1>{{ page.title }}</h1>{% endif %} {% if page.author %}<address class="author" rel="author">{{ page.author }}</address>{% endif %} {% if page.lastModificationDate %}
         <div class="page-meta">Last modified {{ page.lastModificationDate | date: "%d %b %Y %H:%M %Z" }}</div>{% endif %} {% include page-warnings.html %} {% if page.toc %}
+        <div id="select-version"><select class="selectpicker">
+  <option>latest</option>
+  <option>v2</option>
+</select></div>
         <div class="toc-{{page.toc}}">
             <title>Table of Contents</title>
             {{ page.document | tocify_asciidoc }}
