@@ -6,7 +6,15 @@
     }
 
     $('#select-version-picker').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
-        console.log(isSelected)
+        switch (clickedIndex) {
+            case 0:
+                window.location = url.replace('v2', 'latest')
+                break;
+            case 1:
+                window.location = url.replace('latest', 'v2')
+                break;
+        }
+
     });
 
     let letters = new Set(["Guide", "Reference", "Developer", "Other"]);
