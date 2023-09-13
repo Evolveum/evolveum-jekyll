@@ -4,9 +4,9 @@
     if (!url.includes("/midpoint/reference")) {
         $("#select-version").style.display = "none";
     } else if (url.includes("/latest/")) { //todo switch with extracted tags
-        $('.selectpicker').selectpicker('val', 'latest');
+        $('#select-version-picker').selectpicker('val', 'latest');
     } else {
-        $('.selectpicker').selectpicker('val', 'v2');
+        $('#select-version-picker').selectpicker('val', 'v2');
     }
 
 
