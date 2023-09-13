@@ -505,7 +505,7 @@ module Evolveum
             rescue ArgumentError
                 text = ""
                 for i in subnodes.select{ |node| node.presentable?(params) } do
-                    text = text + "#{i.url}"
+                    text = text + "#{i.url} #{i.label}"
                 end
                 raise ArgumentError, "FAILED AGAIN: #{text}"
             end
@@ -526,8 +526,10 @@ module Evolveum
             end
             order = sortCompareValue(a.display_order, b.display_order)
             if order != 0
+                puts("It was this")
                 return adjustSortOrder(order, sortDirection)
             end
+            puts("No it is this #{a.label.downcase} #{b.label.downcase}")
             return adjustSortOrder(sortCompareValue(a.label.downcase, b.label.downcase), sortDirection)
         end
 
