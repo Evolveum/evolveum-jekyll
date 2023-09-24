@@ -14,7 +14,7 @@ def generateSwitchContent()
  #generates content for version select
 end
 
-def filterVersions()
+def filterVersions(context)
   @versions = context['site']['data']['midpoint-versions']
   filteredVersions = []
   @versions.each do |ver|
@@ -28,5 +28,5 @@ end
 
 Jekyll::Hooks.register :site, :post_read do |site|
   puts "=========[ EVOLVEUM VERSIONNING ]============== post_read"
-  filterVersions()
+  filterVersions(site)
 end
