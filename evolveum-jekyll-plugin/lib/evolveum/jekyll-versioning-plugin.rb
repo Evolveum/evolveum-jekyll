@@ -17,7 +17,7 @@ def generateSwitchContent()
 end
 
 def filterVersions(context)
-  @versions = context['data']['midpoint-versions']
+  @versions = context.data['midpoint-versions']
   filteredVersions = []
   @versions.each do |ver|
       if ver['docsBranch'] != nil
