@@ -28,5 +28,5 @@ end
 
 Jekyll::Hooks.register :site, :post_read do |site|
   puts "=========[ EVOLVEUM VERSIONNING ]============== post_read"
-  filteredVersions()
+  filterVersions()
 end
