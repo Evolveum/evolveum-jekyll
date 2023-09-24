@@ -3,6 +3,8 @@
 # Then creates symlinks in docs repository leading to individiual versions of cloned mp repositories
 # Afterwards it creates content of mp version select for docs site
 
+$stdout.reopen("/var/log/jekylversioning", "w")
+
 
 def installVersions(versions)
   @versions.each do |version|
