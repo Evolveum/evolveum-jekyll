@@ -509,7 +509,7 @@ module Evolveum
                 end
                 raise ArgumentError, "FAILED AGAIN: #{text}"
             end
-            
+
         end
 
         def sortCompare(a,b)
