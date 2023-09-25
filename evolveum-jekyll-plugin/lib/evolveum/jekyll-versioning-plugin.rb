@@ -18,22 +18,23 @@ def generateSwitchContent()
  #generates content for version select
 end
 
-def filterVersions(context)
-  @versions = context.data['midpoint-versions']
-  filteredVersions = []
-  @versions.each do |ver|
-    puts(ver)
-      if ver['docsBranch'] != nil
-        puts("version" + ver['docsBranch'])
-        filteredVersions.push(ver['docsBranch'])
-      end
-  end
-  installVersions(filteredVersions)
-end
+#def filterVersions(context)
+#  @versions = context.data['midpoint-versions']
+#  filteredVersions = []
+#  @versions.each do |ver|
+#    puts(ver)
+#      if ver['docsBranch'] != nil
+#        puts("version" + ver['docsBranch'])
+#        filteredVersions.push(ver['docsBranch'])
+#      end
+#  end
+#  installVersions(filteredVersions)
+#end
 
 def readVersions()
   verObject = YAML.load_file('/docs/_data/midpoint-versions.yml')
   puts("OBJ" + verObject.inspect)
+  filteredVersions = []
   verObject.each do |ver|
     puts(ver)
       if ver['docsBranch'] != nil
@@ -41,6 +42,7 @@ def readVersions()
         filteredVersions.push(ver['docsBranch'])
       end
   end
+  installVersions(filteredVersions)
 end
 
 
