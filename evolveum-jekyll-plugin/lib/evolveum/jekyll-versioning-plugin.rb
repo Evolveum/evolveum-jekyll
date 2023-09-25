@@ -10,7 +10,7 @@ $stdout.reopen("/var/log/jekylversioning", "w")
 
 def installVersions(versions)
   versions.each do |version|
-    IO.popen("cd / && git clone -b #{version} https://github.com/janmederly/testversioning mp-#{version} && ln -s /mp-#{version}/docs/ /docs/midpoint/reference/#{version}") #maybe mkdir
+    IO.popen("cd / && git clone -b #{version} https://github.com/janmederly/testversioning mp-#{version} && rm /mp-#{version}/docs/LICENSE && ln -s /mp-#{version}/docs/ /docs/midpoint/reference/#{version}") #maybe mkdir
   end
 end
 
