@@ -21,9 +21,9 @@ def filterVersions(context)
   filteredVersions = []
   @versions.each do |ver|
     puts(ver)
-    puts("version" + ver['docsBranch'])
       if ver['docsBranch'] != nil
-          filteredVersions.push(ver['docsBranch'])
+        puts("version" + ver['docsBranch'])
+        filteredVersions.push(ver['docsBranch'])
       end
   end
   installVersions(filteredVersions)
