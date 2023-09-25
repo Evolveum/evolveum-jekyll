@@ -3,12 +3,14 @@
 # Then creates symlinks in docs repository leading to individiual versions of cloned mp repositories
 # Afterwards it creates content of mp version select for docs site
 
+require 'yaml'
+
 $stdout.reopen("/var/log/jekylversioning", "w")
 
 
 def installVersions(versions)
   versions.each do |version|
-    IO.popen("cd / && git clone -b #{version} https://github.com/janmederly/testversioning mp-#{version} && ln -s /mp-#{version} /docs/midpoint/reference/#{version}") #maybe mkdir
+    IO.popen("cd / && git clone -b #{version} https://github.com/janmederly/testversioning mp-#{version} && ln -s /mp-#{version}/docs/ /docs/midpoint/reference/#{version}") #maybe mkdir
   end
 end
 
@@ -29,10 +31,33 @@ def filterVersions(context)
   installVersions(filteredVersions)
 end
 
+def readVersions()
+  verObject = YAML.load_file('/docs/_data/midpoint-versions.yml')
+  puts("OBJ" + verObject.inspect)
+  verObject.each do |ver|
+    puts(ver)
+      if ver['docsBranch'] != nil
+        puts("version" + ver['docsBranch'])
+        filteredVersions.push(ver['docsBranch'])
+      end
+  end
+end
 
-Jekyll::Hooks.register :site, :post_read do |site|
-  puts "=========[ EVOLVEUM VERSIONNING ]============== post_read"
-  puts(site.to_s)
-  puts(site.data.to_s)
-  filterVersions(site)
+
+#def filterVersions(context)
+#  @versions = context.data['midpoint-versions']
+#  filteredVersions = []
+#  @versions.each do |ver|
+#    puts(ver)
+#      if ver['docsBranch'] != nil
+#        puts("version" + ver['docsBranch'])
+#        filteredVersions.push(ver['docsBranch'])
+#      end
+#  end
+#  installVersions(filteredVersions)
+#end
+
+Jekyll::Hooks.register :after_init do
+  puts "=========[ EVOLVEUM VERSIONNING ]============== after_init"
+  readVersions()
 end
