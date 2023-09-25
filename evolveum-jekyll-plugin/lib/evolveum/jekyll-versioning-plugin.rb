@@ -57,7 +57,7 @@ end
 #  installVersions(filteredVersions)
 #end
 
-Jekyll::Hooks.register :after_init do
+Jekyll::Hooks.register :site, :after_init do |site|
   puts "=========[ EVOLVEUM VERSIONNING ]============== after_init"
   readVersions()
 end
