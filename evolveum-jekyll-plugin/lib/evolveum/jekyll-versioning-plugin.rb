@@ -24,7 +24,7 @@ def filterVersions(context)
           filteredVersions.push(ver['docsBranch'])
       end
   end
-  installVersions(filterVersions)
+  installVersions(filteredVersions)
 end
 
 
