@@ -20,6 +20,8 @@ def filterVersions(context)
   @versions = context.data['midpoint-versions']
   filteredVersions = []
   @versions.each do |ver|
+    puts(ver)
+    puts("version" + ver['docsBranch'])
       if ver['docsBranch'] != nil
           filteredVersions.push(ver['docsBranch'])
       end
