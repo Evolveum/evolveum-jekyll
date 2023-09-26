@@ -9,6 +9,7 @@ $stdout.reopen("/var/log/jekylversioning", "w")
 
 
 def installVersions(versions)
+  IO.popen("rm -rf /docs/midpoint/reference/*")
   versions.each do |version|
     IO.popen("cd / && git clone -b #{version} https://github.com/janmederly/testversioning mp-#{version} && rm /mp-#{version}/docs/LICENSE && ln -s /mp-#{version}/docs/ /docs/midpoint/reference/#{version}") #maybe mkdir
   end
@@ -62,4 +63,9 @@ end
 Jekyll::Hooks.register :site, :after_init do |site|
   puts "=========[ EVOLVEUM VERSIONNING ]============== after_init"
   readVersions()
+end
+
+Jekyll::Hooks.register :site, :post_read do |site|
+  puts "=========[ EVOLVEUM VERSIONNING ]============== post_read"
+  generateSwitchContent()
 end
