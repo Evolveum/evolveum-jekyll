@@ -10,13 +10,13 @@ $stdout.reopen("/var/log/jekylversioning", "w")
 
 def installVersions(versions)
   if Dir["/mp-#{versions[0]}"].empty?
-    IO.popen("rm -rf /docs/midpoint/reference/*")
-    IO.popen("cd /docs && grep -rl midpoint/reference . | xargs sed -i '/\/master/! s/midpoint\/reference/midpoint\/reference\/master/'")
+    `rm -rf /docs/midpoint/reference/*`
+    `cd /docs && grep -rl midpoint/reference . | xargs sed -i '/\/master/! s/midpoint\/reference/midpoint\/reference\/master/'`
   end
 
   versions.each do |version|
     if Dir["/mp-#{version}"].empty?
-      IO.popen("cd / && git clone -b #{version} https://github.com/janmederly/testversioning mp-#{version} && rm /mp-#{version}/docs/LICENSE && ln -s /mp-#{version}/docs/ /docs/midpoint/reference/#{version}") #maybe
+      `cd / && git clone -b #{version} https://github.com/janmederly/testversioning mp-#{version} && rm /mp-#{version}/docs/LICENSE && ln -s /mp-#{version}/docs/ /docs/midpoint/reference/#{version}` #maybe
     end
   end
 end
