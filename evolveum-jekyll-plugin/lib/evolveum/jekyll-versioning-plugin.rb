@@ -11,7 +11,7 @@ $stdout.reopen("/var/log/jekylversioning", "w")
 def installVersions(versions)
   if Dir["/mp-#{versions[0]}"].empty?
     `rm -rf /docs/midpoint/reference/*`
-    `cd /docs && grep -rl midpoint/reference . | xargs sed -i '/\/master/! s/midpoint\/reference/midpoint\/reference\/master/'`
+    system("cd /docs && grep -rl midpoint/reference . | xargs sed -i '/reference\/master/! s|midpoint/reference|midpoint/reference/master|'")
   end
 
   versions.each do |version|
