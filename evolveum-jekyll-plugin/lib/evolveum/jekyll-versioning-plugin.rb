@@ -7,16 +7,16 @@ require 'yaml'
 
 $stdout.reopen("/var/log/jekylversioning", "w")
 
-
 def installVersions(versions)
   if Dir["/mp-#{versions[0]}"].empty?
+    `mv /docs/midpoint/reference/index.adoc /`
     `rm -rf /docs/midpoint/reference/*`
     system("cd /docs && grep -rl midpoint/reference . | xargs sed -i '/reference\\/master/!s/midpoint\\/reference/midpoint\\/reference\\/master/'")
   end
 
   versions.each do |version|
     if Dir["/mp-#{version}"].empty?
-      `cd / && git clone -b #{version} https://github.com/janmederly/testversioning mp-#{version} && rm /mp-#{version}/docs/LICENSE && ln -s /mp-#{version}/docs/ /docs/midpoint/reference/#{version}` #maybe
+      `cd / && git clone -b #{version} https://github.com/janmederly/testversioning mp-#{version} && rm /mp-#{version}/docs/LICENSE && ln -s /mp-#{version}/docs/ /docs/midpoint/reference/#{version} && cp /index.adoc /mp-#{version}/docs/` #maybe
     end
   end
 end
@@ -51,7 +51,6 @@ def readVersions()
   end
   installVersions(filteredVersions)
 end
-
 
 #def filterVersions(context)
 #  @versions = context.data['midpoint-versions']
