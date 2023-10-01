@@ -17,6 +17,9 @@ def installVersions(versions)
   versions.each do |version|
     if Dir["/mp-#{version}"].empty?
       `cd / && git clone -b #{version} https://github.com/janmederly/testversioning mp-#{version} && rm /mp-#{version}/docs/LICENSE && ln -s /mp-#{version}/docs/ /docs/midpoint/reference/#{version} && cp /index.adoc /mp-#{version}/docs/` #maybe
+      if version != "master"
+        `grep -rl :page-alias: /mp-#{version} | xargs sed -i '/:page-alias:/d'`
+      end
     end
   end
 end
