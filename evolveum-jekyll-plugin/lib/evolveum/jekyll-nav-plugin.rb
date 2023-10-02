@@ -528,7 +528,7 @@ module Evolveum
             end
             order = sortCompareValue(a.display_order, b.display_order)
             if order != 0
-                puts("It was this")
+                puts("It was this" + order.to_s + "  " + sortDirection.to_s)
                 return adjustSortOrder(order, sortDirection)
             end
             puts("No it is this #{a.label.downcase} #{b.label.downcase}")
