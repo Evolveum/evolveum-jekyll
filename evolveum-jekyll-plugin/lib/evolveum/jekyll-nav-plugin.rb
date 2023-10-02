@@ -487,8 +487,10 @@ module Evolveum
         end
 
         def <=> other
+            puts("special first" + self.to_s + " other " + other.to_s)
             order = self.display_order <=> other.display_order
             if (order == 0)
+                puts("special secend" + self.label.downcase + " other " + other.label.downcase)
                 self.label.downcase <=> other.label.downcase
             else
                 order
