@@ -11,3 +11,6 @@ cd evolveum-jekyll-theme
 gem build evolveum-jekyll-theme.gemspec
 gem install evolveum-jekyll-theme-$VERSION.gem
 cd ..
+
+#TODO not ideal place for this script
+ruby testversioning.rb
