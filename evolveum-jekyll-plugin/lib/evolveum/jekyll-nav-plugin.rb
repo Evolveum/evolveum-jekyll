@@ -544,6 +544,7 @@ module Evolveum
         end
 
         def sortCompareValue(a, b, sortStrategy=nil)
+            puts("COMPARISON #{a} #{b}")
             if sortStrategy == nil
                 return a <=> b
             end
