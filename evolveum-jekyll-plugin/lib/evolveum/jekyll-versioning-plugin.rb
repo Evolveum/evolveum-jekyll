@@ -8,12 +8,12 @@ require 'yaml'
 $stdout.reopen("/var/log/jekylversioning", "w")
 
 def installVersions(versions)
-  #if Dir["/mp-#{versions[0]}"].empty?
-  #  `mv /docs/midpoint/reference/index.adoc /`
-  #  `rm -rf /docs/midpoint/reference/*`
-  #  `cp /mnt/index.html /docs/midpoint/reference/`
-  #  system("cd /docs && grep -rl midpoint/reference . | xargs sed -i '/reference\\/master/!s/midpoint\\/reference/midpoint\\/reference\\/master/'")
-  #end
+  if Dir["/mp-#{versions[0]}"].empty?
+    `mv /docs/midpoint/reference/index.adoc /`
+    `rm -rf /docs/midpoint/reference/*`
+    `cp /mnt/index.html /docs/midpoint/reference/`
+    system("cd /docs && grep -rl midpoint/reference . | xargs sed -i '/reference\\/master/!s/midpoint\\/reference/midpoint\\/reference\\/master/'")
+  end
 
   versions.each do |version|
     if Dir["/mp-#{version}"].empty?
@@ -71,7 +71,7 @@ end
 
 Jekyll::Hooks.register :site, :after_init do |site|
   puts "=========[ EVOLVEUM VERSIONNING ]============== after_init"
-  #readVersions()
+  readVersions()
 end
 
 Jekyll::Hooks.register :site, :post_read do |site|
