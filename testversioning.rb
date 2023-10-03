@@ -1,3 +1,5 @@
+require 'yaml'
+
 def installVersions(versions)
   if Dir["/mp-#{versions[0]}"].empty?
     `mv /docs/midpoint/reference/index.adoc /`
