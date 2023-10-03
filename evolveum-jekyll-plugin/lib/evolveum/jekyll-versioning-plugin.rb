@@ -71,7 +71,7 @@ end
 
 Jekyll::Hooks.register :site, :after_init do |site|
   puts "=========[ EVOLVEUM VERSIONNING ]============== after_init"
-  readVersions()
+  #readVersions()
 end
 
 Jekyll::Hooks.register :site, :post_read do |site|
