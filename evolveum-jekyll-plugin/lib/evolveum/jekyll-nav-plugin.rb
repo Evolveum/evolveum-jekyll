@@ -516,6 +516,7 @@ module Evolveum
 
         def sortCompare(a,b)
             puts("I am here #{a.url} #{a.label} #{b.url} #{b.label}")
+            log = system("cd /docs/midpoint/reference/ && ls")
             sortBy = self&.page&.data&.[]('sub-sort-by')
             sortStrategy = self&.page&.data&.[]('sub-sort-strategy')
             sortDirection = self&.page&.data&.[]('sub-sort-direction')
