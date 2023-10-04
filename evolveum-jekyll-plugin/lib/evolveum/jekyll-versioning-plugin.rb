@@ -21,6 +21,7 @@ def installVersions(versions)
       if version != "master"
         `grep -rl :page-alias: /docs/midpoint/reference/#{version}/ | xargs sed -i '/:page-alias:/d'`
       end
+      `cd /docs/midpoint/reference/#{version}/ && grep -rl midpoint/reference . | xargs sed -i '/reference\\/#{version}/!s/midpoint\\/reference/midpoint\\/reference\\/#{version}/'`
     end
   end
 end
