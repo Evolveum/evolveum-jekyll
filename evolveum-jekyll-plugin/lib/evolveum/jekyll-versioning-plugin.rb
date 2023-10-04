@@ -12,7 +12,7 @@ def installVersions(versions)
     `mv /docs/midpoint/reference/index.adoc /`
     `rm -rf /docs/midpoint/reference/*`
     `cp /mnt/index.html /docs/midpoint/reference/`
-    system("cd /docs && grep -rl /reference . | xargs sed -i '/reference\\/master/!s/midpoint\\/reference/midpoint\\/reference\\/master/'")
+    system("cd /docs && find . -type f -exec perl -pi -e 's/midpoint\/reference\/(?!master\b)/midpoint\/reference\/master\//g' {} \;")
   end
 
   versions.each do |version|
@@ -21,7 +21,7 @@ def installVersions(versions)
       if version != "master"
         `grep -rl :page-alias: /docs/midpoint/reference/#{version}/ | xargs sed -i '/:page-alias:/d'`
       end
-      `cd /docs/midpoint/reference/#{version}/ && grep -rl midpoint/reference . | xargs sed -i '/reference\\/#{version}/!s/midpoint\\/reference/midpoint\\/reference\\/#{version}/'`
+      `cd /docs/midpoint/reference/#{version}/ && find . -type f -exec perl -pi -e 's/midpoint\/reference\/(?!#{version}\b)/midpoint\/reference\/#{version}\//g' {} \;`
     end
   end
 end
