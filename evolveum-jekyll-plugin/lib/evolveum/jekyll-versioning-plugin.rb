@@ -12,7 +12,7 @@ def installVersions(versions)
     `mv /docs/midpoint/reference/index.adoc /`
     `rm -rf /docs/midpoint/reference/*`
     `cp /mnt/index.html /docs/midpoint/reference/`
-    system("cd /docs && grep -rl midpoint/reference . | xargs sed -i '/reference\\/master/!s/midpoint\\/reference/midpoint\\/reference\\/master/'")
+    system("cd /docs && grep -rl /reference . | xargs sed -i '/reference\\/master/!s/midpoint\\/reference/midpoint\\/reference\\/master/'")
   end
 
   versions.each do |version|
