@@ -15,6 +15,8 @@ window.addEventListener('load', function () {
     $('#select-version-picker').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
         console.log(newVersion)
-        window.location = url.replace(version, newVersion)
+        let versionEdited = version.charAt(0).toLowerCase() + urlSubstrings[5].slice(1)
+        let newVersionEdited = newVersion.charAt(0).toLowerCase() + urlSubstrings[5].slice(1)
+        window.location = url.replace(versionEdited, newVersionEdited)
     });
 });
