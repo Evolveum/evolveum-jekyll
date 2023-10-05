@@ -1,29 +1,5 @@
 (function() {
 
-    let url = window.location.href
-    if (!url.includes("/midpoint/reference")) {
-        $("#select-version").style.display = "none";
-    } else if (url.includes("/latest/")) { //todo switch with extracted tags
-        $('#select-version-picker').selectpicker('val', 'latest');
-    } else {
-        $('#select-version-picker').selectpicker('val', 'v2');
-    }
-
-
-
-
-    $('#select-version-picker').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
-        switch (clickedIndex) {
-            case 0:
-                window.location = url.replace('v2', 'latest')
-                break;
-            case 1:
-                window.location = url.replace('latest', 'v2')
-                break;
-        }
-
-    });
-
     let letters = new Set(["Guide", "Reference", "Developer", "Other"]);
 
     $('.ovalSearch').click(function() {
