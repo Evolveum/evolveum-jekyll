@@ -1,7 +1,6 @@
 # This plugin is used to download and prepare versioning environment.
 # It downloads multiple branches of midpoint repository based on docsBranch property of mp versions described in midpoint-versions.yaml file.
 # Then creates symlinks in docs repository leading to individiual versions of cloned mp repositories
-# Afterwards it creates content of mp version select for docs site
 
 require 'yaml'
 
@@ -25,10 +24,6 @@ def installVersions(versions)
       system("find /docs/midpoint/reference/#{version} -type f -exec perl -pi -e 's/midpoint\\/reference\\/(?!#{version}\\b)/midpoint\\/reference\\/#{version}\\//g' {} \\;")
     end
   end
-end
-
-def generateSwitchContent()
- #generates content for version select
 end
 
 #def filterVersions(context)
@@ -74,9 +69,4 @@ end
 Jekyll::Hooks.register :site, :after_init do |site|
   puts "=========[ EVOLVEUM VERSIONNING ]============== after_init"
   readVersions()
-end
-
-Jekyll::Hooks.register :site, :post_read do |site|
-  #puts "=========[ EVOLVEUM VERSIONNING ]============== post_read"
-  #generateSwitchContent()
 end

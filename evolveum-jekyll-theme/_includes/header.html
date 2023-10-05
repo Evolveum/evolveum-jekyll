@@ -10,10 +10,16 @@
                 <a class="nav-link" href="{{ nav.url }}">{{ nav.label | escape }}</a>
             </li>
             {% endfor %}
-	     <li id="select-version"><select class="selectpicker" id="select-version-picker">
-  <option>latest</option>
-  <option>v2</option>
-</select></li>
+            <li id="select-version">
+                <select class="selectpicker" id="select-version-picker">
+                    {% assign versions = site.data.midpoint-versions | reverse %}
+                    {% for v in versions %}
+                        {% if v.docsBranch != null %}
+                            <option>{{ v.docsBranch | capitalize }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </li>
         </ul>
 
         <div class="modal fade2" id="search-modal" tabindex="-1" role="dialog" aria-hidden="true">
