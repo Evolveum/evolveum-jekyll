@@ -76,6 +76,6 @@ Jekyll::Hooks.register :site, :after_init do |site|
 end
 
 Jekyll::Hooks.register :site, :post_read do |site|
-  puts "=========[ EVOLVEUM VERSIONNING ]============== post_read"
-  generateSwitchContent()
+  #puts "=========[ EVOLVEUM VERSIONNING ]============== post_read"
+  #generateSwitchContent()
 end
