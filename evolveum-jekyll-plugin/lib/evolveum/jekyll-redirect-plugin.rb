@@ -36,6 +36,7 @@ module Evolveum
                     end
                 end
             end
+            redirects << { "pattern" => "^midpoint/reference(?!/master)(?!/v[0-9])(/|$)(.*)", "substitution" => "/midpoint/reference/master/$4"}
             return redirects
         end
 
