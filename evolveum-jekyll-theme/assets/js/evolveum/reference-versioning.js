@@ -1,4 +1,4 @@
-window.addEventListener('load', function () {
+window.addEventListener('load', function() {
     let url = window.location.href
     let urlSubstrings = url.split("/")
     let version = ""
@@ -7,16 +7,19 @@ window.addEventListener('load', function () {
     }
 
     if (!url.includes("/midpoint/reference")) {
-        $("#select-version").css("display","none");
+        $("#select-version").css("display", "none");
     } else {
         $('#select-version-picker').selectpicker('val', version);
     }
 
     $('#select-version-picker').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
-        //console.log(newVersion)
+        console.log(newVersion)
         let versionEdited = version.charAt(0).toLowerCase() + urlSubstrings[5].slice(1)
+        console.log(versionEdited)
         let newVersionEdited = newVersion.charAt(0).toLowerCase() + urlSubstrings[5].slice(1)
+        console.log(newVersionEdited)
+        console.log(url)
         window.location = url.replace(versionEdited, newVersionEdited)
     });
 });
