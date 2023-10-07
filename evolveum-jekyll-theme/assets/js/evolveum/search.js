@@ -1,6 +1,7 @@
 (function() {
 
     let letters = new Set(["Guide", "Reference", "Developer", "Other"]);
+    let branches = new Set(["notBranched", "master"])
 
     $('.ovalSearch').click(function() {
         $(this).toggleClass('on');
@@ -134,6 +135,9 @@
                     filter: [{
                         terms: {
                             "type.keyword": Array.from(letters)
+                        },
+                        terms: {
+                            "branch.keyword": Array.from(branches)
                         }
                     }],
                     must: [{
@@ -227,7 +231,8 @@
                 "outdated",
                 "wiki-metadata-create-user",
                 "url",
-                "type"
+                "type",
+                "branch"
             ],
             _source: false,
             highlight: {
