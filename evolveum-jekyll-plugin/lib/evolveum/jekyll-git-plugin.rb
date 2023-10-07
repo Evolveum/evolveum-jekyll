@@ -32,7 +32,7 @@ module Evolveum
                     branch = urlSplitted[2]
                     puts(urlSplitted)
                     puts(urlSplitted.drop(3).join("/"))
-                    dateString = git("log -1 --pretty='format:%ci' '/docs/#{urlSplitted.drop(3).join("/")}'", branch)
+                    dateString = git("log -1 --pretty='format:%ci' 'docs/#{urlSplitted.drop(3).join("/")}'", branch)
                     puts(dateString)
                 elsif 
                     dateString = git("log -1 --pretty='format:%ci' '#{page.path}'", nil)
