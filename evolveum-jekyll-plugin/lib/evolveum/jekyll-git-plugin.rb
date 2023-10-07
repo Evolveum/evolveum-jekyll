@@ -30,7 +30,10 @@ module Evolveum
                 if page.path != "/midpoint/reference/" && page.path["\/midpoint\/reference\/"]
                     urlSplitted = page.path.split("/")
                     branch = urlSplitted[2]
+                    puts(urlSplitted)
+                    puts(urlSplitted.drop(3).join("/"))
                     dateString = git("log -1 --pretty='format:%ci' '/docs/#{urlSplitted.drop(3).join("/")}'", branch)
+                    puts(dateString)
                 elsif 
                     dateString = git("log -1 --pretty='format:%ci' '#{page.path}'", nil)
                 end
