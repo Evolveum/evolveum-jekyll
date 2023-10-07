@@ -27,7 +27,7 @@ module Evolveum
             if page.path != nil && File.exists?(page.path)
                 puts(page.path)
                 # todo add somewhere index.html
-                if page.path != "/midpoint/reference/" && page.path["\/midpoint\/reference\/"]
+                if page.path != "midpoint/reference/" && page.path.include?("midpoint/reference/")
                     urlSplitted = page.path.split("/")
                     branch = urlSplitted[2]
                     puts(urlSplitted)
