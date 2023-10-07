@@ -4,7 +4,7 @@
 
 require 'yaml'
 
-$stdout.reopen("/var/log/jekylversioning", "w")
+#$stdout.reopen("/var/log/jekylversioning", "w")
 
 def installVersions(versions)
   if Dir["/mp-#{versions[0]}"].empty?
