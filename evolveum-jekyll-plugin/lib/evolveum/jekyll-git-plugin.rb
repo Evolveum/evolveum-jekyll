@@ -25,7 +25,7 @@ module Evolveum
         def self.update(page)
             lastModDate = nil
             if page.path != nil && File.exists?(page.path)
-
+                puts(page.path)
                 # todo add somewhere index.html
                 if page.path != "/midpoint/reference/" && page.path["\/midpoint\/reference\/"]
                     urlSplitted = page.path.split("/")
@@ -45,7 +45,7 @@ module Evolveum
                     page.data['lastModificationDate'] = lastModDate
                 end
             end
-            #puts("  [U] #{page.path}: #{lastModDate}")
+            puts("  [U] #{page.path}: #{lastModDate}")
         end
 
         def self.git(argString, branch)
