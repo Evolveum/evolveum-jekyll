@@ -14,6 +14,8 @@ module Evolveum
 
     class Git
 
+        $stdout.reopen("/var/log/gitplugin", "w")
+
         def self.post_read(site)
             site.pages.each do |page|
                 update(page)
@@ -23,7 +25,16 @@ module Evolveum
         def self.update(page)
             lastModDate = nil
             if page.path != nil && File.exists?(page.path)
-                dateString = git("log -1 --pretty='format:%ci' '#{page.path}'")
+
+                # todo add somewhere index.html
+                if page.path != "/midpoint/reference/" && page.path["\/midpoint\/reference\/"]
+                    urlSplitted = page.path.split("/")
+                    branch = urlSplitted[2]
+                    dateString = git("log -1 --pretty='format:%ci' '/docs/#{urlSplitted.drop(3).join("/")}'", branch)
+                elsif 
+                    dateString = git("log -1 --pretty='format:%ci' '#{page.path}'")
+                end
+
                 if dateString != nil && !dateString.empty?
                     begin
                         lastModDate = DateTime.parse(dateString)
@@ -37,8 +48,13 @@ module Evolveum
             #puts("  [U] #{page.path}: #{lastModDate}")
         end
 
-        def self.git(argString)
-            out = `git #{argString}`
+        def self.git(argString, branch)
+            if branch == nil
+                out = `git #{argString}`
+            else
+                out = `cd /mp-#{branch}/ && git #{argString}`
+            end
+            
             if !$?.success?
                 puts("ERROR executing git: $?")
                 return nil

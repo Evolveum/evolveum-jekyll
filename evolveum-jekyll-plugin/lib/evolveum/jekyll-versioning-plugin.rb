@@ -8,7 +8,7 @@ $stdout.reopen("/var/log/jekylversioning", "w")
 
 def installVersions(versions)
   if Dir["/mp-#{versions[0]}"].empty?
-    `mv /docs/midpoint/reference/index.adoc /`
+    #`mv /docs/midpoint/reference/index.adoc /`
     `rm -rf /docs/midpoint/reference/*`
     `cp /mnt/index.html /docs/midpoint/reference/`
     system("find /docs -mindepth 1 -type f -exec perl -pi -e 's/midpoint\\/reference\\/(?!master\\b)/midpoint\\/reference\\/master\\//g' {} \\;")
@@ -20,7 +20,7 @@ def installVersions(versions)
       if version != "master"
         `grep -rl :page-alias: /mp-#{version}/docs/ | xargs sed -i '/:page-alias:/d'`
       end
-      system("cp /index.adoc /mp-#{version}/docs/ && sed -i 's/:page-nav-title: Configuration Reference/:page-nav-title: #{version.capitalize}/g' /mp-#{version}/docs/index.adoc")
+      system("sed -i 's/:page-nav-title: Configuration Reference/:page-nav-title: #{version.capitalize}/g' /mp-#{version}/docs/index.adoc")
       system("find /mp-#{version}/docs -type f -exec perl -pi -e 's/midpoint\\/reference\\/(?!#{version}\\b)/midpoint\\/reference\\/#{version}\\//g' {} \\;")
     end
   end
