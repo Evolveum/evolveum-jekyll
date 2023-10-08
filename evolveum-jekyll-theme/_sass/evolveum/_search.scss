@@ -372,8 +372,17 @@
 
 .versioningButton {
     padding: 0.275rem 0.7rem;
-    font-size: 0.92rem;
+    font-size: 0.875rem;
     text-align: center;
     max-width: 175px;
     align-content: center;
+    height: calc(1.5em + 0.5rem + 2px);
+}
+
+#select-version {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 175px;
+    margin-right: 3rem;
 }
