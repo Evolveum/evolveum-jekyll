@@ -4,17 +4,17 @@ layout: default
 
 <div class="row">
     <div class="d-none d-md-block col-md-3 navtree-column">
+        <div id="select-version">
+            <select class="selectpicker" id="select-version-picker" data-style="versioningButton btn-light">
+                {% assign versions = site.data.midpoint-versions | reverse %}
+                {% for v in versions %}
+                    {% if v.docsBranch != null %}
+                        <option>{{ v.docsBranch | capitalize }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
         <div class="navtree">
-            <div id="select-version">
-                <select class="selectpicker" id="select-version-picker" data-style="versioningButton btn-light">
-                    {% assign versions = site.data.midpoint-versions | reverse %}
-                    {% for v in versions %}
-                        {% if v.docsBranch != null %}
-                            <option>{{ v.docsBranch | capitalize }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-            </div>
             {% navtree %}
         </div>
     </div>
