@@ -385,5 +385,10 @@
     justify-content: flex-start;
     align-items: center;
     margin-bottom: 1.2rem;
+    padding-left: 0.5rem;
     width: 100%;
+}
+
+#select-version .dropdown-item {
+    padding: 0.25rem 0.85rem;
 }
