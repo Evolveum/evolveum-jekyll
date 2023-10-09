@@ -22,6 +22,16 @@
                                 <input autocomplete="off" onkeypress="return event.keyCode!=13" class="form-control form-control-sm mr-sm-2" id="searchbar" type="search" placeholder="Type to search" name="q" aria-label="Search">
 
                             </form>
+                            <div id="version-search-select">
+                                <select class="selectpicker" id="select-version-picker-search" data-style="versioningButton btn-light">
+                                    {% assign versions = site.data.midpoint-versions | reverse %}
+                                    {% for v in versions %}
+                                        {% if v.docsBranch != null %}
+                                            <option>{{ v.docsBranch | capitalize }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
                             <button id="docssearchbutton" class="btn btn-outline-secondary btn-sm my-2 my-sm-0">Search</button>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>

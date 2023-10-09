@@ -3,6 +3,12 @@
     let letters = new Set(["Guide", "Reference", "Developer", "Other"]);
     let branches = new Set(["notBranched", "master"])
 
+    $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
+        let newVersion = $(this).find('option').eq(clickedIndex).text();
+        let newVersionEdited = newVersion.charAt(0).toLowerCase() + newVersion.slice(1)
+        console.log(newVersionEdited)
+    });
+
     $('.ovalSearch').click(function() {
         $(this).toggleClass('on');
         let name = this.id.replace('oval', '')

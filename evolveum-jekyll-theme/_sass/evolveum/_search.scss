@@ -393,3 +393,12 @@
     padding: 0.25rem 0.85rem;
     font-size: 0.875rem;
 }
+
+#version-search-select {
+    max-width: 25%;
+    margin-right: 0.5rem;
+}
+
+#version-search-select .dropdown.bootstrap-select {
+    max-width: 100%;
+}
