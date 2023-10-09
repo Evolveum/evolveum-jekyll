@@ -23,7 +23,7 @@
 
                             </form>
                             <div id="version-search-select">
-                                <select class="selectpicker" id="select-version-picker-search" data-style="versioningButton btn-light">
+                                <select class="selectpicker" id="select-version-picker-search" data-style="versioningButton btn-light" multiple title="Branches">
                                     {% assign versions = site.data.midpoint-versions | reverse %}
                                     {% for v in versions %}
                                         {% if v.docsBranch != null %}
