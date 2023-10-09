@@ -27,11 +27,11 @@ module Evolveum
             if page.path != nil && File.exists?(page.path)
                 #puts(page.path)
                 # todo add somewhere index.html
-                if page.path != "midpoint/reference/" && page.path.include?("midpoint/reference/")
+                if page.path != "midpoint/reference/index.html" && page.path.include?("midpoint/reference/")
                     urlSplitted = page.path.split("/")
                     branch = urlSplitted[2]
                     dateString = git("log -1 --pretty='format:%ci' 'docs/#{urlSplitted.drop(3).join("/")}'", branch)
-                elsif 
+                elsif
                     dateString = git("log -1 --pretty='format:%ci' '#{page.path}'", nil)
                 end
 
@@ -54,7 +54,7 @@ module Evolveum
             else
                 out = `cd /mp-#{branch}/ && git #{argString}`
             end
-            
+
             if !$?.success?
                 puts("ERROR executing git: $?")
                 return nil
