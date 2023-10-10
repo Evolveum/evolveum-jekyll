@@ -14,6 +14,8 @@
             branches.add(newVersionEdited)
             if (queryArr[queryLen - 6].includes("branch")) {
                 console.log(queryArr)
+                console.log(queryArr[ queryLen - 6])
+                console.log(queryLen)
                 searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0,queryLen - 6).push(queryArr[queryLen-1]).join("\n")
                 searchQuery.query.bool.filter.push({ terms: { "branch.keyword": Array.from(branches) }})
             } else {
@@ -23,9 +25,13 @@
             branches.delete(newVersionEdited)
             console.log(branches)
             if (branches.size == 1) {
-                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0, queryLen - 1).join("\n") + `if (doc.containsKey('branch') && doc.branch.size()!=0) { \n if (doc.branch.value != "master") {
-         totalScore = totalScore*${data._source.multipliers.notMasterBranch}; \n\t\t } \n\t }
-                return totalScore;`
+                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0, queryLen - 1).join("\n") + `if (doc.containsKey('branch.keyword') && doc.branch.keyword.size()!=0) {
+                    if (doc.branch.keyword.value != "master" && doc.branch.keyword.value != "notBranched") {
+                        totalScore = totalScore*${data._source.multipliers.notMasterBranch};
+                    }
+                }
+                return totalScore;
+                `
             } else {
                 searchQuery.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
             }
@@ -224,8 +230,8 @@
                                                 totalScore = totalScore*${data._source.multipliers.obsolete};
                                             }
                                         }
-                                        if (doc.containsKey('branch') && doc.branch.size()!=0) {
-                                            if (doc.branch.value != "master" && doc.branch.value != "notBranched") {
+                                        if (doc.containsKey('branch.keyword') && doc.branch.keyword.size()!=0) {
+                                            if (doc.branch.keyword.value != "master" && doc.branch.keyword.value != "notBranched") {
                                                 totalScore = totalScore*${data._source.multipliers.notMasterBranch};
                                             }
                                         }
