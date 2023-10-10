@@ -2,6 +2,7 @@
 
     let letters = new Set(["Guide", "Reference", "Developer", "Other"]);
     let branches = new Set(["notBranched"])
+    let notMasterBranchMult = 0
 
     $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
@@ -27,7 +28,7 @@
             if (branches.size == 1) {
                 searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0, queryLen - 1).join("\n") + "\n" + `if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
                     if (doc['branch.keyword'].value != "master" && doc['branch.keyword'].value != "notBranched") {
-                        totalScore = totalScore*${data._source.multipliers.notMasterBranch};
+                        totalScore = totalScore*${notMasterBranchMult};
                     }
                 }
                 return totalScore;
@@ -78,6 +79,7 @@
     });
 
     function searchReportPopoverSetup() {
+        notMasterBranchMult = data._source.multipliers.notMasterBranch
         $('#reportSearchProblemPopover').popover({
             html: true,
             sanitize: false,
