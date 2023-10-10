@@ -79,7 +79,6 @@
     });
 
     function searchReportPopoverSetup() {
-        notMasterBranchMult = data._source.multipliers.notMasterBranch
         $('#reportSearchProblemPopover').popover({
             html: true,
             sanitize: false,
@@ -167,6 +166,7 @@
     OSrequest("GET", "https://searchtest.evolveum.com/search_settings/_doc/1", undefined, true, setSearchQuery)
 
     function setSearchQuery(data) {
+        notMasterBranchMult = data._source.multipliers.notMasterBranch
         searchQuery = {
             query: {
                 bool: {
