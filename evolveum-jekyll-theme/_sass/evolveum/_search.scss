@@ -23,10 +23,6 @@
     margin-top: 0rem !important;
 }
 
-.searchResultTitle {
-    max-width: calc(100% - 100px) !important;
-}
-
 #docssearchbutton {
     margin-top: 0px !important;
     margin-bottom: 0px !important;
@@ -34,8 +30,8 @@
 
 .searchResult {
     display: inline-block;
-    max-width: 430px;
-    width: 80vw;
+    max-width: 465px;
+    width: 100vw;
 }
 
 .font1 {
@@ -405,4 +401,20 @@
 
 #version-search-select .versioningButton.versioningButtonSearch {
     border-color: #B1B1B1;
+}
+
+@media (min-width: 576px) {
+    #search-modal .modal-dialog {
+      max-width: 535px;
+      margin: 1.75rem auto;
+      margin-right: auto;
+    }
+}
+
+.searchResultBranched {
+    max-width: calc(100% - 155px) !important;
+}
+
+.searchResultNotBranched {
+    max-width: calc(100% - 100px) !important;
 }

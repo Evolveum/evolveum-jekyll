@@ -340,6 +340,13 @@
                 for (let i = 0; i < pagesShown && i < numberOfItems; i++) {
                     let text = undefined
                     let title = undefined
+                    let branch = data.hits.hits[i].fields.branch
+                    let branchClass = "searchResultNotBranched"
+
+                    if (branch !== "notBranched") {
+                        branchClass = "searchResultBranched"
+                    }
+
                     if (data.hits.hits[i].highlight != undefined) {
                         text = data.hits.hits[i].highlight.text
                         title = data.hits.hits[i].highlight.title
@@ -430,7 +437,7 @@
                     <p>Upkeep status: ${upkeepStatus} <i id="upkeep${upkeepStatus}" class="fa fa-circle"></i>
                     </p><p>Likes: ${upvotes}</p><p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${data.hits.hits[i].fields.url[0]}" 
                     id="${data.hits.hits[i]._id}site"><li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i>
-                    <span class="font1 searchResultTitle">&nbsp;${title}</span><span id="label${type}" class="typeLabel">${type.toUpperCase()}</span><i class="${contentTriangleClass}"></i><br><span class="font2">${preview}</span></li></a></span>
+                    <span class="font1 searchResultTitle ${branchClass}">&nbsp;${title}</span><span id="label${type}" class="typeLabel">${type.toUpperCase()}</span><i class="${contentTriangleClass}"></i><br><span class="font2">${preview}</span></li></a></span>
                     <span class="vote" id="${data.hits.hits[i]._id}up"><i class="fas fa-thumbs-up"></i></span></div>`);
                 }
 
