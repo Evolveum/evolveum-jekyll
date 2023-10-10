@@ -33,6 +33,7 @@
                 }
                 return totalScore;
                 `
+                searchQuery.query.bool.filter.pop()
             } else {
                 searchQuery.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
             }
