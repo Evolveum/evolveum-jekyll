@@ -16,7 +16,7 @@
                 console.log(queryArr)
                 console.log(queryArr[ queryLen - 6])
                 console.log(queryLen)
-                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0,queryLen - 6).push(queryArr[queryLen-1]).join("\n")
+                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0,queryLen - 6).join("\n") +  "\n" + queryArr[queryLen-2]
                 searchQuery.query.bool.filter.push({ terms: { "branch.keyword": Array.from(branches) }})
             } else {
                 searchQuery.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
@@ -25,7 +25,7 @@
             branches.delete(newVersionEdited)
             console.log(branches)
             if (branches.size == 1) {
-                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0, queryLen - 1).join("\n") + `if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
+                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0, queryLen - 1).join("\n") + "\n" + `if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
                     if (doc['branch.keyword'].value != "master" && doc['branch.keyword'].value != "notBranched") {
                         totalScore = totalScore*${data._source.multipliers.notMasterBranch};
                     }
@@ -36,6 +36,7 @@
                 searchQuery.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
             }
         }
+        searchForPhrase()
     });
 
     $('.ovalSearch').click(function() {
