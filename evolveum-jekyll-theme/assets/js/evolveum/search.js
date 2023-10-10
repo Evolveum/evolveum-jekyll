@@ -225,7 +225,7 @@
                                             }
                                         }
                                         if (doc.containsKey('branch') && doc.branch.size()!=0) {
-                                            if (doc.branch.value != "master") {
+                                            if (doc.branch.value != "master" && doc.branch.value != "notBranched") {
                                                 totalScore = totalScore*${data._source.multipliers.notMasterBranch};
                                             }
                                         }
