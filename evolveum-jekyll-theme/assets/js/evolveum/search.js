@@ -1,12 +1,35 @@
 (function() {
 
     let letters = new Set(["Guide", "Reference", "Developer", "Other"]);
-    let branches = new Set(["notBranched", "master"])
+    let branches = new Set(["notBranched"])
 
     $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
         let newVersionEdited = newVersion.charAt(0).toLowerCase() + newVersion.slice(1)
         console.log(newVersionEdited)
+        let queryArr = searchQuery.query.bool.must[0].function_score.script_score.script.source.split("\n")
+        let queryLen = queryArr.length
+        console.log(clickedIndex + " " + isSelected)
+        if (isSelected) {
+            branches.add(newVersionEdited)
+            if (queryArr[queryLen - 6].includes("branch")) {
+                console.log(queryArr)
+                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0,queryLen - 6).push(queryArr[queryLen-1]).join("\n")
+                searchQuery.query.bool.filter.push({ terms: { "branch.keyword": Array.from(branches) }})
+            } else {
+                searchQuery.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
+            }
+        } else {
+            branches.delete(newVersionEdited)
+            console.log(branches)
+            if (branches.size == 1) {
+                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0, queryLen - 1).join("\n") + `if (doc.containsKey('branch') && doc.branch.size()!=0) { \n if (doc.branch.value != "master") {
+         totalScore = totalScore*${data._source.multipliers.notMasterBranch}; \n\t\t } \n\t }
+                return totalScore;`
+            } else {
+                searchQuery.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
+            }
+        }
     });
 
     $('.ovalSearch').click(function() {
@@ -138,14 +161,13 @@
         searchQuery = {
             query: {
                 bool: {
-                    filter: [{
-                        terms: {
-                            "type.keyword": Array.from(letters)
-                        },
-                        terms: {
-                            "branch.keyword": Array.from(branches)
+                    filter: [
+                        {
+                            terms: {
+                                "type.keyword": Array.from(letters)
+                            }
                         }
-                    }],
+                    ],
                     must: [{
                         function_score: {
                             script_score: {
@@ -200,6 +222,11 @@
                                         if (doc.containsKey('obsolete') && doc.obsolete.size()!=0) {
                                             if (doc.obsolete.value == true) {
                                                 totalScore = totalScore*${data._source.multipliers.obsolete};
+                                            }
+                                        }
+                                        if (doc.containsKey('branch') && doc.branch.size()!=0) {
+                                            if (doc.branch.value != "master") {
+                                                totalScore = totalScore*${data._source.multipliers.notMasterBranch};
                                             }
                                         }
                                         return totalScore;
