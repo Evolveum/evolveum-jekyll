@@ -16,7 +16,7 @@
                 console.log(queryArr)
                 console.log(queryArr[ queryLen - 6])
                 console.log(queryLen)
-                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0,queryLen - 6).join("\n") +  "\n" + queryArr[queryLen-2]
+                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0,queryLen - 7).join("\n") +  "\n" + queryArr[queryLen-2]
                 searchQuery.query.bool.filter.push({ terms: { "branch.keyword": Array.from(branches) }})
             } else {
                 searchQuery.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
