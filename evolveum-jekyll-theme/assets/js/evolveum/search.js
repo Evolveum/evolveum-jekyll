@@ -346,7 +346,7 @@
 
                     if (branch !== "notBranched") {
                         branchClass = "searchResultBranched"
-                        branchLabel = `<span id="branch${branch}" class="typeLabel branchLabel">${branch.charAt(0).toUpperCase() + urlSubstrings[5].slice(1)}</span>`
+                        branchLabel = `<span id="branch${branch}" class="typeLabel branchLabel">${branch.toString().charAt(0).toUpperCase() + branch.toString().slice(1)}</span>`
                     }
 
                     if (data.hits.hits[i].highlight != undefined) {
