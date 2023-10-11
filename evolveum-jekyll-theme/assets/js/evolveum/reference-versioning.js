@@ -6,10 +6,12 @@ window.addEventListener('load', function() {
     console.log("opts" + options)
     let start = 40
     let end = 215
-    let step = (end - start) / options.size
+    console.log(options.length)
+    let step = (end - start) / options.length
     console.log("ADB" + options)
     for (o in options) {
         console.log(start + (o*step))
+        console.log(o)
         DOCSBRANCHESCOLORS.set(options[o].value, start + (o*step))
     }
     let url = window.location.href
