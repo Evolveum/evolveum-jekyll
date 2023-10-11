@@ -347,7 +347,7 @@
 
                     console.log(DOCSBRANCHESCOLORS)
 
-                    if (branch !== "notBranched") {
+                    if (branch != null && branch !== "notBranched") {
                         branchClass = "searchResultBranched"
                         let capitalBranch = branch.toString().charAt(0).toUpperCase() + branch.toString().slice(1)
                         console.log("CB" + capitalBranch)
