@@ -1,6 +1,7 @@
 var DOCSBRANCHESCOLORS = new Map();
 
 window.addEventListener('load', function() {
+    console.log($("#select-version-picker"))
     let options = document.getElementById('select-version-picker').options
     console.log("opts" + options)
     let start = 40
