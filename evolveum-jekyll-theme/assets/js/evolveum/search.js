@@ -4,17 +4,15 @@
     let branches = new Set(["notBranched"])
     let notMasterBranchMult = 0
     let branchColors = new Map();
-    
-    (function() {
-        let start = 40
-        let end = 215
-        let step = (end - start) / ALLDOCSBRANCHES.size
-        console.log("ADB" + ALLDOCSBRANCHES)
-        for (br in ALLDOCSBRANCHES) {
-            console.log(start + (br*step))
-            branchColors.set(ALLDOCSBRANCHES[br], start + (br*step))
-        }
-    })
+
+    let start = 40
+    let end = 215
+    let step = (end - start) / ALLDOCSBRANCHES.size
+    console.log("ADB" + ALLDOCSBRANCHES)
+    for (br in ALLDOCSBRANCHES) {
+        console.log(start + (br*step))
+        branchColors.set(ALLDOCSBRANCHES[br], start + (br*step))
+    }
 
     $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
