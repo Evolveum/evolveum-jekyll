@@ -4,11 +4,12 @@
     let branches = new Set(["notBranched"])
     let notMasterBranchMult = 0
     let branchColors = new Map();
-
-    window.addEventListener('load', function() {
+    
+    (function() {
         let start = 40
         let end = 215
         let step = (end - start) / ALLDOCSBRANCHES.size
+        console.log("ADB" + ALLDOCSBRANCHES)
         for (br in ALLDOCSBRANCHES) {
             console.log(start + (br*step))
             branchColors.set(ALLDOCSBRANCHES[br], start + (br*step))
