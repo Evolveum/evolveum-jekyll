@@ -10,6 +10,7 @@
         let end = 215
         let step = (end - start) / ALLDOCSBRANCHES.size
         for (br in ALLDOCSBRANCHES) {
+            console.log(start + (br*step))
             branchColors.set(ALLDOCSBRANCHES[br], start + (br*step))
         }
     })
@@ -354,9 +355,12 @@
                     let branchClass = "searchResultNotBranched"
                     let branchLabel = ""
 
+                    console.log(branchColors)
+
                     if (branch !== "notBranched") {
                         branchClass = "searchResultBranched"
                         let capitalBranch = branch.toString().charAt(0).toUpperCase() + branch.toString().slice(1)
+                        console.log("CB" + capitalBranch)
                         let colorString = "#" + branchColors.get(capitalBranch).toString(16) + branchColors.get(capitalBranch).toString(16) + branchColors.get(capitalBranch).toString(16)
                         branchLabel = `<span id="branch${branch}" class="typeLabel branchLabel" style="color: ${colorString}; border-color: ${colorString};>${capitalBranch}</span>`
                     }
