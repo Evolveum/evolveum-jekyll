@@ -1,4 +1,4 @@
-var ALLDOCSBRANCHES = []
+var ALLDOCSBRANCHES = [];
 (function() {
     let options = document.getElementById('select-version-picker').options
     for (o in options) {
