@@ -4,16 +4,6 @@ layout: default
 
 <div class="row">
     <div class="d-none d-md-block col-md-3 navtree-column">
-        <div id="select-version">
-            <select class="selectpicker" id="select-version-picker" data-style="versioningButton btn-light">
-                {% assign versions = site.data.midpoint-versions | reverse %}
-                {% for v in versions %}
-                    {% if v.docsBranch != null %}
-                        <option>{{ v.docsBranch | capitalize }}</option>
-                    {% endif %}
-                {% endfor %}
-            </select>
-        </div>
         <div class="navtree">
             {% navtree %}
         </div>
@@ -22,8 +12,26 @@ layout: default
         <nav aria-label="breadcrumb">{% breadcrumbs %}</nav>
 
         {% if page.logo-title %}
-        <div class="logo-title"><img src="{{page.logo-title}}" alt="{{ page.title }}" /></div>{% else %}
-        <h1>{{ page.title }}</h1>{% endif %} {% if page.author %}<address class="author" rel="author">{{ page.author }}</address>{% endif %} {% if page.lastModificationDate %}
+        <div><span class="logo-title"><img src="{{page.logo-title}}" alt="{{ page.title }}" /></span><span id="select-version">
+            <select class="selectpicker" id="select-version-picker" data-style="versioningButton btn-light">
+                {% assign versions = site.data.midpoint-versions | reverse %}
+                {% for v in versions %}
+                    {% if v.docsBranch != null %}
+                        <option>{{ v.docsBranch | capitalize }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </span></div>{% else %}
+        <div><span><h1>{{ page.title }}</h1></span><span id="select-version">
+            <select class="selectpicker" id="select-version-picker" data-style="versioningButton btn-light">
+                {% assign versions = site.data.midpoint-versions | reverse %}
+                {% for v in versions %}
+                    {% if v.docsBranch != null %}
+                        <option>{{ v.docsBranch | capitalize }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </span></div>{% endif %} {% if page.author %}<address class="author" rel="author">{{ page.author }}</address>{% endif %} {% if page.lastModificationDate %}
         <div class="page-meta">Last modified {{ page.lastModificationDate | date: "%d %b %Y %H:%M %Z" }}</div>{% endif %} {% include page-warnings.html %} {% if page.toc %}
         <div class="toc-{{page.toc}}">
             <title>Table of Contents</title>
