@@ -1,3 +1,10 @@
+var ALLDOCSBRANCHES = []
+(function() {
+    let options = document.getElementById('select-version-picker').options
+    for (o in options) {
+        ALLDOCSBRANCHES.push(options[o].value)
+    }
+})
 window.addEventListener('load', function() {
     let url = window.location.href
     let urlSubstrings = url.split("/")

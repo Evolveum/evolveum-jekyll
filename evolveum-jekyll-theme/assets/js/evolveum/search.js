@@ -3,6 +3,16 @@
     let letters = new Set(["Guide", "Reference", "Developer", "Other"]);
     let branches = new Set(["notBranched"])
     let notMasterBranchMult = 0
+    let branchColors = new Map();
+
+    window.addEventListener('load', function() {
+        let start = 40
+        let end = 215
+        let step = (end - start) / ALLDOCSBRANCHES.size
+        for (br in ALLDOCSBRANCHES) {
+            branchColors.set(ALLDOCSBRANCHES[br], start + (br*step))
+        }
+    })
 
     $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
@@ -346,7 +356,9 @@
 
                     if (branch !== "notBranched") {
                         branchClass = "searchResultBranched"
-                        branchLabel = `<span id="branch${branch}" class="typeLabel branchLabel">${branch.toString().charAt(0).toUpperCase() + branch.toString().slice(1)}</span>`
+                        let capitalBranch = branch.toString().charAt(0).toUpperCase() + branch.toString().slice(1)
+                        let colorString = "#" + branchColors.get(capitalBranch).toString(16) + branchColors.get(capitalBranch).toString(16) + branchColors.get(capitalBranch).toString(16)
+                        branchLabel = `<span id="branch${branch}" class="typeLabel branchLabel" style="color: ${colorString}; border-color: ${colorString};>${capitalBranch}</span>`
                     }
 
                     if (data.hits.hits[i].highlight != undefined) {
@@ -439,7 +451,7 @@
                     <p>Upkeep status: ${upkeepStatus} <i id="upkeep${upkeepStatus}" class="fa fa-circle"></i>
                     </p><p>Likes: ${upvotes}</p><p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${data.hits.hits[i].fields.url[0]}" 
                     id="${data.hits.hits[i]._id}site"><li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i>
-                    <span class="font1 searchResultTitle ${branchClass}">&nbsp;${title}</span><span id="label${type}" class="typeLabel">${type.toUpperCase()}</span><i class="${contentTriangleClass}"></i><br><span class="font2">${preview}</span></li></a></span>
+                    <span class="font1 searchResultTitle ${branchClass}">&nbsp;${title}</span><span id="label${type}" class="typeLabel">${type.toUpperCase()}</span>${branchLabel}<i class="${contentTriangleClass}"></i><br><span class="font2">${preview}</span></li></a></span>
                     <span class="vote" id="${data.hits.hits[i]._id}up"><i class="fas fa-thumbs-up"></i></span></div>`);
                 }
 
