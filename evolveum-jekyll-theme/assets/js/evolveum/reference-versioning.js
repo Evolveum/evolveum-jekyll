@@ -1,8 +1,15 @@
-var ALLDOCSBRANCHES = [];
+var DOCSBRANCHESCOLORS = new Map();
+
 (function() {
     let options = document.getElementById('select-version-picker').options
+    console.log("opts" + options)
+    let start = 40
+    let end = 215
+    let step = (end - start) / options.size
+    console.log("ADB" + options)
     for (o in options) {
-        ALLDOCSBRANCHES.push(options[o].value)
+        console.log(start + (o*step))
+        DOCSBRANCHESCOLORS.set(options[o].value, start + (o*step))
     }
 })
 window.addEventListener('load', function() {
