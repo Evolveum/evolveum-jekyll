@@ -1,6 +1,6 @@
 var DOCSBRANCHESCOLORS = new Map();
 
-(function() {
+window.addEventListener('load', function() {
     let options = document.getElementById('select-version-picker').options
     console.log("opts" + options)
     let start = 40
@@ -11,8 +11,6 @@ var DOCSBRANCHESCOLORS = new Map();
         console.log(start + (o*step))
         DOCSBRANCHESCOLORS.set(options[o].value, start + (o*step))
     }
-})
-window.addEventListener('load', function() {
     let url = window.location.href
     let urlSubstrings = url.split("/")
     let version = ""

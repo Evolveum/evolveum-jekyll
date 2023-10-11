@@ -345,7 +345,7 @@
                     let branchClass = "searchResultNotBranched"
                     let branchLabel = ""
 
-                    console.log(branchColors)
+                    console.log(DOCSBRANCHESCOLORS)
 
                     if (branch !== "notBranched") {
                         branchClass = "searchResultBranched"
