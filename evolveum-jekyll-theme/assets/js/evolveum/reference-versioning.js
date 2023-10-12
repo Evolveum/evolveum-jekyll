@@ -9,7 +9,7 @@ window.addEventListener('load', function() {
     console.log(options.length)
     let step = (end - start) / options.length
     console.log("ADB" + options)
-    for (let o = 0; o < options.length - 1; o++) {
+    for (let o = 0; o < options.length; o++) {
         console.log(start + (o*step))
         console.log(o)
         DOCSBRANCHESCOLORS.set(options[o].value, start + (o*step))
