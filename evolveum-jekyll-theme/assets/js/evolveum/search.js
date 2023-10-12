@@ -352,7 +352,7 @@
                         let capitalBranch = branch.toString().charAt(0).toUpperCase() + branch.toString().slice(1)
                         console.log("CB" + capitalBranch)
                         let colorString = "#" + DOCSBRANCHESCOLORS.get(capitalBranch).toString(16) + DOCSBRANCHESCOLORS.get(capitalBranch).toString(16) + DOCSBRANCHESCOLORS.get(capitalBranch).toString(16)
-                        branchLabel = `<span id="branch${branch}" class="typeLabel branchLabel" style="color: ${colorString}; border-color: ${colorString};>${capitalBranch}</span>`
+                        branchLabel = `<span id="branch${branch}" class="typeLabel branchLabel" style="color: ${colorString}; border-color: ${colorString};">${capitalBranch}</span>`
                     }
 
                     if (data.hits.hits[i].highlight != undefined) {
