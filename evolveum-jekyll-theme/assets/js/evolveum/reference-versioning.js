@@ -20,7 +20,7 @@ window.addEventListener('load', function() {
     console.log($("#select-version-picker-search"))
     let options = document.getElementById('select-version-picker-search').options
     console.log("opts" + options)
-    let start = 60
+    let start = 75
     let end = 210
     console.log(options.length)
     let step = Math.round((end - start) / options.length)
@@ -28,7 +28,7 @@ window.addEventListener('load', function() {
     for (let o = 0; o < options.length; o++) {
         console.log(start + (o*step))
         console.log(o)
-        DOCSBRANCHESCOLORS.set(options[o].value, rgbToHex(start + (o*step),start + (o*step),start + (o*step) + 20))
+        DOCSBRANCHESCOLORS.set(options[o].value, rgbToHex(start + (o*step),start + (o*step),start + (o*step) + 25))
     }
     let url = window.location.href
     let urlSubstrings = url.split("/")
