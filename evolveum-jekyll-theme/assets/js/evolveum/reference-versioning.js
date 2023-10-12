@@ -23,7 +23,7 @@ window.addEventListener('load', function() {
     let start = 60
     let end = 210
     console.log(options.length)
-    let step = (end - start) / options.length
+    let step = Math.round((end - start) / options.length)
     console.log("ADB" + options)
     for (let o = 0; o < options.length; o++) {
         console.log(start + (o*step))
