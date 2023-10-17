@@ -11,7 +11,7 @@ def installVersions(versions)
     #`mv /docs/midpoint/reference/index.adoc /`
     `rm -rf /docs/midpoint/reference/*`
     `cp /mnt/index.html /docs/midpoint/reference/`
-    system("find /docs -mindepth 1 -type f -exec perl -pi -e 's/midpoint\\/reference\\/(?!master\\b)/midpoint\\/reference\\/master\\//g' {} \\;")
+    system("find /docs -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/midpoint\\/reference\\/(?!master\\b)/midpoint\\/reference\\/master\\//g' {} \\;")
   end
 
   versions.each do |version|
