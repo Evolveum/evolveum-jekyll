@@ -42,7 +42,7 @@ window.addEventListener('load', function() {
     let urlSubstrings = url.split("/")
     let version = ""
     if (urlSubstrings.length > 6) {
-        version = DOCSBRANCHDISPLAYNAMES[urlSubstrings[5]] //Maybe problem when number is first?
+        version = DOCSBRANCHDISPLAYNAMES[urlSubstrings[5]]
     }
 
     if (!url.includes("/midpoint/reference")) {
@@ -56,6 +56,6 @@ window.addEventListener('load', function() {
         let newVersionEdited = DOCSBRANCHDISPLAYNAMES[newVersion]
         console.log(newVersionEdited)
         console.log(url)
-        window.location = url.replace(version, newVersionEdited)
+        window.location = url.replace(urlSubstrings[5], newVersionEdited)
     });
 });
