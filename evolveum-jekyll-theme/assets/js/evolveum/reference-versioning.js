@@ -58,10 +58,10 @@ window.addEventListener('load', function() {
         console.log(newVersionEdited)
         console.log(url)
         console.log(urlSubstrings[5])
-        redirectToAnotherVersion(urlSubstrings[5], newVersionEdited)
+        redirectToAnotherVersion(urlSubstrings[5], newVersionEdited, url)
     });
 });
 
-function redirectToAnotherVersion(first, second) {
+function redirectToAnotherVersion(first, second, url) {
     window.location = url.replace(first, second)
 }
