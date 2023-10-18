@@ -66,5 +66,5 @@ window.addEventListener('load', function() {
 
 function redirectToAnotherVersion(first, second, url) {
     console.log(first, second, url)
-    window.location = url.replace(first, second)
+    window.location.href = url.replace(first, second)
 }
