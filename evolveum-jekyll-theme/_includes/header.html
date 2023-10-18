@@ -24,12 +24,14 @@
                             </form>
                             <div id="version-search-select">
                                 <select class="selectpicker" id="select-version-picker-search" data-style="versioningButton versioningButtonSearch btn-light" multiple title="Branches">
+                                    <option data-tokens="master">Development</option>
                                     {% assign versions = site.data.midpoint-versions | reverse %}
                                     {% for v in versions %}
-                                        {% if v.docsBranch != null %}
-                                            <option>{{ v.docsBranch | capitalize }}</option>
+                                        {% if v.docsDisplayBranch != null %}
+                                            <option data-tokens="{{ v.docsBranch }}">{{ v.docsDisplayBranch}}</option>
                                         {% endif %}
                                     {% endfor %}
+                                    <option data-tokens="docsFWDSbefore-4.8" >4.7 and earlier</option>
                                 </select>
                             </div>
                             <button id="docssearchbutton" class="btn btn-outline-secondary btn-sm my-2 my-sm-0">Search</button>
