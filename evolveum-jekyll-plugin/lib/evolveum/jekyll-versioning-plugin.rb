@@ -16,7 +16,7 @@ def installVersions(versions, displayVersions)
 
   versions.each_with_index do |version, index|
     if Dir["/mp-#{version}"].empty?
-      `cd / && git clone -b #{version.gsub("\\/","/")} https://github.com/evolveum/midpoint mp-#{version} && rm /mp-#{version}/docs/LICENSE && ln -s /mp-#{version}/docs/ /docs/midpoint/reference/#{version}` #maybe
+      `cd / && git clone -b #{version.gsub("FVDS","/")} https://github.com/evolveum/midpoint mp-#{version} && rm /mp-#{version}/docs/LICENSE && ln -s /mp-#{version}/docs/ /docs/midpoint/reference/#{version}` #maybe
       if version != "master"
         `grep -rl :page-alias: /mp-#{version}/docs/ | xargs sed -i '/:page-alias:/d'`
       end
@@ -52,7 +52,7 @@ def readVersions()
         filteredDisplayVersions.push(ver['docsDisplayBranch'])
       end
   end
-  filteredVersions.push("docs\/before-4.8")
+  filteredVersions.push("docsFWDSbefore-4.8")
   filteredDisplayVersions.push("4.7 and earlier")
   filteredVersions.push("master")
   filteredDisplayVersions.push("Development")
