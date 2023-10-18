@@ -14,22 +14,26 @@ layout: default
         {% if page.logo-title %}
         <div id="titleAndSelectVerDiv"><span class="logo-title"><img src="{{page.logo-title}}" alt="{{ page.title }}" /></span><span id="select-version">
             <select class="selectpicker" id="select-version-picker" data-style="versioningButton btn-light">
+                <option>Development</option>
                 {% assign versions = site.data.midpoint-versions | reverse %}
                 {% for v in versions %}
-                    {% if v.docsBranch != null %}
-                        <option>{{ v.docsBranch | capitalize }}</option>
+                    {% if v.docsDisplayBranch != null %}
+                        <option>{{ v.docsDisplayBranch}}</option>
                     {% endif %}
                 {% endfor %}
+                <option>4.7 and earlier</option>
             </select>
         </span></div>{% else %}
         <div id="titleAndSelectVerDiv"><span><h1>{{ page.title }}</h1></span><span id="select-version">
             <select class="selectpicker" id="select-version-picker" data-style="versioningButton btn-light">
+                <option>Development</option>
                 {% assign versions = site.data.midpoint-versions | reverse %}
                 {% for v in versions %}
-                    {% if v.docsBranch != null %}
-                        <option>{{ v.docsBranch | capitalize }}</option>
+                    {% if v.docsDisplayBranch != null %}
+                        <option>{{ v.docsDisplayBranch}}</option>
                     {% endif %}
                 {% endfor %}
+                <option>4.7 and earlier</option>
             </select>
         </span></div>{% endif %} {% if page.author %}<address class="author" rel="author">{{ page.author }}</address>{% endif %} {% if page.lastModificationDate %}
         <div class="page-meta">Last modified {{ page.lastModificationDate | date: "%d %b %Y %H:%M %Z" }}</div>{% endif %} {% include page-warnings.html %} {% if page.toc %}

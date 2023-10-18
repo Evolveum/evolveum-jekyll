@@ -7,7 +7,7 @@
 
     $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
-        let newVersionEdited = newVersion.charAt(0).toLowerCase() + newVersion.slice(1)
+        let newVersionEdited = DOCSBRANCHDISPLAYNAMES[newVersion]
         console.log(newVersionEdited)
         let queryArr = searchQuery.query.bool.must[0].function_score.script_score.script.source.split("\n")
         let queryLen = queryArr.length

@@ -16,7 +16,7 @@ def installVersions(versions)
 
   versions.each do |version|
     if Dir["/mp-#{version}"].empty?
-      `cd / && git clone -b #{version} https://github.com/janmederly/testversioning mp-#{version} && rm /mp-#{version}/docs/LICENSE && ln -s /mp-#{version}/docs/ /docs/midpoint/reference/#{version}` #maybe
+      `cd / && git clone -b #{version} https://github.com/evolveum/midpoint mp-#{version} && rm /mp-#{version}/docs/LICENSE && ln -s /mp-#{version}/docs/ /docs/midpoint/reference/#{version}` #maybe
       if version != "master"
         `grep -rl :page-alias: /mp-#{version}/docs/ | xargs sed -i '/:page-alias:/d'`
       end
@@ -50,6 +50,8 @@ def readVersions()
         filteredVersions.push(ver['docsBranch'])
       end
   end
+  filteredVersions.push("docs/before-4.8")
+  filteredVersions.push("master")
   installVersions(filteredVersions)
 end
 
