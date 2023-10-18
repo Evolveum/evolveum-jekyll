@@ -13,7 +13,7 @@ layout: default
 
         {% if page.logo-title %}
         <div id="titleAndSelectVerDiv"><span class="logo-title"><img src="{{page.logo-title}}" alt="{{ page.title }}" /></span><span id="select-version">
-            <select class="selectpicker" id="select-version-picker" data-style="versioningButton btn-light">
+            <select id="select-version-picker" data-style="versioningButton btn-light">
                 <option data-branch="master">Development</option>
                 {% assign versions = site.data.midpoint-versions | reverse %}
                 {% for v in versions %}
@@ -25,7 +25,7 @@ layout: default
             </select>
         </span></div>{% else %}
         <div id="titleAndSelectVerDiv"><span><h1>{{ page.title }}</h1></span><span id="select-version">
-            <select class="selectpicker" id="select-version-picker" data-style="versioningButton btn-light">
+            <select id="select-version-picker" data-style="versioningButton btn-light">
                 <option data-branch="master">Development</option>
                 {% assign versions = site.data.midpoint-versions | reverse %}
                 {% for v in versions %}

@@ -52,7 +52,7 @@ window.addEventListener('load', function() {
     if (!url.includes("/midpoint/reference")) {
         $("#select-version").css("display", "none");
     } else {
-        $('#select-version-picker').selectpicker('val', versionDisplay);
+        //$('#select-version-picker').selectpicker('val', versionDisplay);
     }
 
     $('#select-version-picker').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
