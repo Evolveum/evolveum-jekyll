@@ -349,10 +349,10 @@
 
                     if (branch != null && branch != "notBranched") {
                         branchClass = "searchResultBranched"
-                        let capitalBranch = branch.toString().charAt(0).toUpperCase() + branch.toString().slice(1)
+                        let displayBranch = DOCSBRANCHDISPLAYNAMES[branch]
                         console.log("CB" + capitalBranch)
-                        let colorString = DOCSBRANCHESCOLORS.get(capitalBranch)
-                        branchLabel = `<span id="branch${branch}" class="typeLabel branchLabel" style="color: ${colorString}; border-color: ${colorString};">${capitalBranch}</span>`
+                        let colorString = DOCSBRANCHESCOLORS.get(displayBranch)
+                        branchLabel = `<span id="branch${branch}" class="typeLabel branchLabel" style="color: ${colorString}; border-color: ${colorString};">${displayBranch}</span>`
                     }
 
                     if (data.hits.hits[i].highlight != undefined) {
