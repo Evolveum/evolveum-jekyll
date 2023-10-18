@@ -42,27 +42,29 @@ window.addEventListener('load', function() {
     let url = window.location.href
     let urlSubstrings = url.split("/")
     let version = ""
+    let versionDisplay = ""
     if (urlSubstrings.length > 6) {
-        version = DOCSBRANCHDISPLAYNAMES[urlSubstrings[5].toString()]
+        version = urlSubstrings[5].toString()
+        versionDisplay = DOCSBRANCHDISPLAYNAMES[version]
     }
 
     if (!url.includes("/midpoint/reference")) {
         $("#select-version").css("display", "none");
     } else {
-        $('#select-version-picker').selectpicker('val', version);
+        $('#select-version-picker').selectpicker('val', versionDisplay);
     }
 
     $('#select-version-picker').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
-        let newVersion = $(this).find('option').eq(clickedIndex).text();
+        let newVersion = $(this).find('option').eq(clickedIndex).text().toString();
         let newVersionEdited = DOCSBRANCHDISPLAYNAMES[newVersion].toString()
         console.log(newVersionEdited)
         console.log(url)
-        console.log(urlSubstrings[5])
-        redirectToAnotherVersion(urlSubstrings[5], newVersionEdited, url)
+        console.log(version)
+        redirectToAnotherVersion(version, newVersionEdited, url)
     });
 });
 
 function redirectToAnotherVersion(first, second, url) {
-    //window.location = url.replace(first, second)
     console.log(first, second, url)
+    window.location = url.replace(first, second)
 }
