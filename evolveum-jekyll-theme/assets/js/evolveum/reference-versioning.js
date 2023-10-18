@@ -1,7 +1,7 @@
 var DOCSBRANCHESCOLORS = new Map();
 var DOCSBRANCHDISPLAYNAMES = {
-    master: "Development",
-    Development: "master",
+    "master": "Development",
+    "Development": "master",
     "docs/before-4.8": "4.7 and earlier",
     "4.7 and earlier": "docs/before-4.8",
     "support-4.8": "4.8",
@@ -63,5 +63,6 @@ window.addEventListener('load', function() {
 });
 
 function redirectToAnotherVersion(first, second, url) {
-    window.location = url.replace(first, second)
+    //window.location = url.replace(first, second)
+    console.log(first, second, url)
 }
