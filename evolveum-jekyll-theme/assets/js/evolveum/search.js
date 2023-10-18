@@ -350,7 +350,7 @@
                     if (branch != null && branch != "notBranched") {
                         branchClass = "searchResultBranched"
                         let displayBranch = DOCSBRANCHDISPLAYNAMES[branch]
-                        console.log("CB" + capitalBranch)
+                        console.log("CB" + displayBranch)
                         let colorString = DOCSBRANCHESCOLORS.get(displayBranch)
                         branchLabel = `<span id="branch${branch}" class="typeLabel branchLabel" style="color: ${colorString}; border-color: ${colorString};">${displayBranch}</span>`
                     }
