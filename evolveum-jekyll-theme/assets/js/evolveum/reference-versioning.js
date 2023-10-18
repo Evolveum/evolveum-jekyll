@@ -3,7 +3,7 @@ var DOCSBRANCHDISPLAYNAMES = {
     "master": "Development",
     "Development": "master",
     "docsFWDSbefore-4.8": "4.7 and earlier",
-    "4.7 and earlier": "docs/before-4.8",
+    "4.7 and earlier": "docsFWDSbefore-4.8",
     "support-4.8": "4.8",
     "4.8": "support-4.8"
 }
