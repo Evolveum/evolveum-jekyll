@@ -43,7 +43,7 @@ window.addEventListener('load', function() {
     let urlSubstrings = url.split("/")
     let version = ""
     if (urlSubstrings.length > 6) {
-        version = DOCSBRANCHDISPLAYNAMES[urlSubstrings[5]]
+        version = DOCSBRANCHDISPLAYNAMES[urlSubstrings[5].toString()]
     }
 
     if (!url.includes("/midpoint/reference")) {
@@ -54,7 +54,7 @@ window.addEventListener('load', function() {
 
     $('#select-version-picker').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
-        let newVersionEdited = DOCSBRANCHDISPLAYNAMES[newVersion]
+        let newVersionEdited = DOCSBRANCHDISPLAYNAMES[newVersion].toString()
         console.log(newVersionEdited)
         console.log(url)
         console.log(urlSubstrings[5])
