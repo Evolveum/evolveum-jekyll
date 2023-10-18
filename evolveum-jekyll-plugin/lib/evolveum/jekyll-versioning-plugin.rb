@@ -43,6 +43,7 @@ def readVersions()
   verObject = YAML.load_file('/docs/_data/midpoint-versions.yml')
   puts("OBJ" + verObject.inspect)
   filteredVersions = []
+  filteredDisplayVersions = []
   verObject.each do |ver|
     puts(ver)
       if ver['docsBranch'] != nil && ver['docsDisplayBranch']
