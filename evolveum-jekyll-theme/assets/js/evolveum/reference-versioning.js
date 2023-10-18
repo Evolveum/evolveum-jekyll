@@ -36,6 +36,7 @@ window.addEventListener('load', function() {
     for (let o = 0; o < options.length; o++) {
         console.log(start + (o*step))
         console.log(o)
+        console.log(options[o].tokens)
         DOCSBRANCHESCOLORS.set(options[o].value, rgbToHex(start + (o*step),start + (o*step),start + (o*step) + 35))
     }
     let url = window.location.href
@@ -56,6 +57,11 @@ window.addEventListener('load', function() {
         let newVersionEdited = DOCSBRANCHDISPLAYNAMES[newVersion]
         console.log(newVersionEdited)
         console.log(url)
-        window.location = url.replace(urlSubstrings[5], newVersionEdited)
+        console.log(urlSubstrings[5])
+        redirectToAnotherVersion(urlSubstrings[5], newVersionEdited)
     });
 });
+
+function redirectToAnotherVersion(first, second) {
+    window.location = url.replace(first, second)
+}
