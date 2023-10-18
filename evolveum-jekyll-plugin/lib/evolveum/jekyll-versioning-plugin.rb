@@ -20,7 +20,7 @@ def installVersions(versions, displayVersions)
       if version != "master"
         `grep -rl :page-alias: /mp-#{version}/docs/ | xargs sed -i '/:page-alias:/d'`
       end
-      system("sed -i 's/:page-nav-title: Configuration Reference/:page-nav-title: #{displayVersions[index]}/g' /mp-#{version}/docs/index.adoc")
+      system("sed -i 's/:page-nav-title: Configuration Reference/:page-nav-title: \"#{displayVersions[index]}\"/g' /mp-#{version}/docs/index.adoc")
       system("find /mp-#{version}/docs -type f -exec perl -pi -e 's/midpoint\\/reference\\/(?!#{version}\\b)/midpoint\\/reference\\/#{version}\\//g' {} \\;")
     end
   end
