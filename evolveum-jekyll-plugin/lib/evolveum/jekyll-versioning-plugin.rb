@@ -6,7 +6,7 @@ require 'yaml'
 
 #$stdout.reopen("/var/log/jekylversioning", "w")
 
-def installVersions(versions)
+def installVersions(versions, displayVersions)
   if Dir["/mp-#{versions[0]}"].empty?
     #`mv /docs/midpoint/reference/index.adoc /`
     `rm -rf /docs/midpoint/reference/*`
@@ -14,13 +14,13 @@ def installVersions(versions)
     system("find /docs -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/midpoint\\/reference\\/(?!master\\b)/midpoint\\/reference\\/master\\//g' {} \\;")
   end
 
-  versions.each do |version|
+  versions.each_with_index do |version, index|
     if Dir["/mp-#{version}"].empty?
-      `cd / && git clone -b #{version} https://github.com/evolveum/midpoint mp-#{version} && rm /mp-#{version}/docs/LICENSE && ln -s /mp-#{version}/docs/ /docs/midpoint/reference/#{version}` #maybe
+      `cd / && git clone -b #{version.gsub("\\/","/")} https://github.com/evolveum/midpoint mp-#{version} && rm /mp-#{version}/docs/LICENSE && ln -s /mp-#{version}/docs/ /docs/midpoint/reference/#{version}` #maybe
       if version != "master"
         `grep -rl :page-alias: /mp-#{version}/docs/ | xargs sed -i '/:page-alias:/d'`
       end
-      system("sed -i 's/:page-nav-title: Configuration Reference/:page-nav-title: #{version.capitalize}/g' /mp-#{version}/docs/index.adoc")
+      system("sed -i 's/:page-nav-title: Configuration Reference/:page-nav-title: #{displayVersions[index]}/g' /mp-#{version}/docs/index.adoc")
       system("find /mp-#{version}/docs -type f -exec perl -pi -e 's/midpoint\\/reference\\/(?!#{version}\\b)/midpoint\\/reference\\/#{version}\\//g' {} \\;")
     end
   end
@@ -45,14 +45,17 @@ def readVersions()
   filteredVersions = []
   verObject.each do |ver|
     puts(ver)
-      if ver['docsBranch'] != nil
+      if ver['docsBranch'] != nil && ver['docsDisplayBranch']
         puts("version" + ver['docsBranch'])
         filteredVersions.push(ver['docsBranch'])
+        filteredDisplayVersions.push(ver['docsDisplayBranch'])
       end
   end
-  filteredVersions.push("docs/before-4.8")
+  filteredVersions.push("docs\/before-4.8")
+  filteredDisplayVersions.push("4.7 and earlier")
   filteredVersions.push("master")
-  installVersions(filteredVersions)
+  filteredDisplayVersions.push("Development")
+  installVersions(filteredVersions, filteredDisplayVersions)
 end
 
 #def filterVersions(context)
