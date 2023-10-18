@@ -37,6 +37,7 @@ window.addEventListener('load', function() {
         console.log(start + (o*step))
         console.log(o)
         console.log(options[o]['data-tokens'])
+        console.log(options[o])
         DOCSBRANCHESCOLORS.set(options[o].value, rgbToHex(start + (o*step),start + (o*step),start + (o*step) + 35))
     }
     let url = window.location.href
