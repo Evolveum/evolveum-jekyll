@@ -60,11 +60,6 @@ window.addEventListener('load', function() {
         console.log(newVersionEdited)
         console.log(url)
         console.log(version)
-        redirectToAnotherVersion(version, newVersionEdited, url)
+        window.location.href = url.replace(version, newVersionEdited)
     });
 });
-
-function redirectToAnotherVersion(first, second, url) {
-    console.log(first, second, url)
-    window.location.href = url.replace(first, second)
-}

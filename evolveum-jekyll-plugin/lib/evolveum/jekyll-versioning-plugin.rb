@@ -48,6 +48,7 @@ def readVersions()
     puts(ver)
       if ver['docsBranch'] != nil && ver['docsDisplayBranch']
         puts("version" + ver['docsBranch'])
+        upVer = ver['docsBranch'].gsub("/", "FWDS")
         filteredVersions.push(ver['docsBranch'])
         filteredDisplayVersions.push(ver['docsDisplayBranch'])
       end
