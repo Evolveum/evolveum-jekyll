@@ -21,7 +21,7 @@ layout: default
                         <option>{{ v.docsDisplayBranch}}</option>
                     {% endif %}
                 {% endfor %}
-                <option>4.7 and earlier</option>
+                <option>V4.7 and earlier</option>
             </select>
         </span></div>{% else %}
         <div id="titleAndSelectVerDiv"><span><h1>{{ page.title }}</h1></span><span id="select-version">
@@ -33,7 +33,7 @@ layout: default
                         <option>{{ v.docsDisplayBranch}}</option>
                     {% endif %}
                 {% endfor %}
-                <option>4.7 and earlier</option>
+                <option>V4.7 and earlier</option>
             </select>
         </span></div>{% endif %} {% if page.author %}<address class="author" rel="author">{{ page.author }}</address>{% endif %} {% if page.lastModificationDate %}
         <div class="page-meta">Last modified {{ page.lastModificationDate | date: "%d %b %Y %H:%M %Z" }}</div>{% endif %} {% include page-warnings.html %} {% if page.toc %}
