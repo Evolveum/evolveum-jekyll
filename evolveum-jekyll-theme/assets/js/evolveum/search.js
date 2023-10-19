@@ -1,6 +1,46 @@
 (function() {
 
     let letters = new Set(["Guide", "Reference", "Developer", "Other"]);
+    let branches = new Set(["notBranched"])
+    let notMasterBranchMult = 0
+    
+
+    $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
+        let newVersion = $(this).find('option').eq(clickedIndex).text();
+        let newVersionEdited = DOCSBRANCHDISPLAYNAMES[newVersion]
+        console.log(newVersionEdited)
+        let queryArr = searchQuery.query.bool.must[0].function_score.script_score.script.source.split("\n")
+        let queryLen = queryArr.length
+        console.log(clickedIndex + " " + isSelected)
+        if (isSelected) {
+            branches.add(newVersionEdited)
+            if (queryArr[queryLen - 6].includes("branch")) {
+                console.log(queryArr)
+                console.log(queryArr[ queryLen - 6])
+                console.log(queryLen)
+                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0,queryLen - 7).join("\n") +  "\n" + queryArr[queryLen-2]
+                searchQuery.query.bool.filter.push({ terms: { "branch.keyword": Array.from(branches) }})
+            } else {
+                searchQuery.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
+            }
+        } else {
+            branches.delete(newVersionEdited)
+            console.log(branches)
+            if (branches.size == 1) {
+                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0, queryLen - 1).join("\n") + "\n" + `if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
+                    if (doc['branch.keyword'].value != "master" && doc['branch.keyword'].value != "notBranched") {
+                        totalScore = totalScore*${notMasterBranchMult};
+                    }
+                }
+                return totalScore;
+                `
+                searchQuery.query.bool.filter.pop()
+            } else {
+                searchQuery.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
+            }
+        }
+        searchForPhrase()
+    });
 
     $('.ovalSearch').click(function() {
         $(this).toggleClass('on');
@@ -21,19 +61,77 @@
     });
 
     var typingTimer = null;
+    let logTimer = null;
+    let logScheduled = false
 
     $(document).on('keydown', function(e) {
         if (/^[a-zA-Z0-9-_ ]$/.test(e.key) && !e.altKey && !e.ctrlKey && !e.metaKey && e.which !== 32) {
             if (!$("#search-modal").hasClass('show')) {
                 $("#search-modal").modal()
                 typingTimer = setTimeout(searchForPhrase, 200)
+                logTimer = setTimeout(sendSearchLog, 2000)
+                logScheduled = true
             }
         }
     });
 
     $("#search-modal").on('shown.bs.modal', async function() {
         $('#searchbar').trigger('focus')
+        searchReportPopoverSetup()
     });
+
+    function searchReportPopoverSetup() {
+        $('#reportSearchProblemPopover').popover({
+            html: true,
+            sanitize: false,
+            container: '#search-modal',
+            title: "Report a problem",
+            content: `<div>
+                        <div class="form-group">
+                            <label for="searchReportAProblemSelect">Select the type of problem</label>
+                            <select id="searchReportAProblemSelect" data-style="btn-light btn-sm btnSearchSelectReport" title="Type of a problem" data-width="auto">
+                                <option class="input-sm searchReportAProblemOption">Visual bug</option>
+                                <option class="input-sm searchReportAProblemOption">Functional bug</option>
+                                <option class="input-sm searchReportAProblemOption">Problem with results</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="searchReportTextArea">Details of the problem</label>
+                            <textarea class="form-control" id="searchReportTextArea" rows="5"></textarea>
+                        </div>
+                        <span>
+                            <button type="button" class="btn btn-primary" id="reportSearchProblemPopoverClose">Close</button>
+                            <button type="button" class="btn btn-primary" id="reportSearchProblemPopoverSend">Send message</button>
+                        </span>
+                    </div>`
+        });
+
+        $('#reportSearchProblemPopover').on('inserted.bs.popover', function() {
+            $('#reportSearchProblemPopoverClose').click(function() {
+                $('#reportSearchProblemPopover').popover('hide');
+            });
+
+            $('#searchReportAProblemSelect').selectpicker();
+
+            $('#reportSearchProblemPopoverSend').click(function() {
+                let searchProblemSelected = $(".searchReportAProblemOption.selected")
+                let searchProblemCategory = "Not defined"
+                if (searchProblemSelected[0] != undefined) {
+                    searchProblemCategory = searchProblemSelected[0].childNodes[0].textContent
+                }
+
+                let reportSearchQuery = {
+                    category: searchProblemCategory,
+                    details: $("#searchReportTextArea").val(),
+                    query: document.getElementById('searchbar').value,
+                    width: $(document).width(),
+                    height: $(document).height()
+                }
+                OSrequest("POST", "https://docs.evolveum.com/webhooks/searchreport", reportSearchQuery, true)
+                $('#reportSearchProblemPopover').popover('hide');
+            });
+        })
+    }
 
     $("#search-modal").on('hidden.bs.modal', function() {
         document.getElementById("autocombox").innerHTML = "";
@@ -70,14 +168,17 @@
     OSrequest("GET", "https://search.evolveum.com/search_settings/_doc/1", undefined, true, setSearchQuery)
 
     function setSearchQuery(data) {
+        notMasterBranchMult = data._source.multipliers.notMasterBranch
         searchQuery = {
             query: {
                 bool: {
-                    filter: [{
-                        terms: {
-                            "type.keyword": Array.from(letters)
+                    filter: [
+                        {
+                            terms: {
+                                "type.keyword": Array.from(letters)
+                            }
                         }
-                    }],
+                    ],
                     must: [{
                         function_score: {
                             script_score: {
@@ -134,6 +235,11 @@
                                                 totalScore = totalScore*${data._source.multipliers.obsolete};
                                             }
                                         }
+                                        if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
+                                            if (doc['branch.keyword'].value != "master" && doc['branch.keyword'].value != "notBranched") {
+                                                totalScore = totalScore*${data._source.multipliers.notMasterBranch};
+                                            }
+                                        }
                                         return totalScore;
                                     `
                                 }
@@ -155,6 +261,24 @@
                     }]
                 }
             },
+            fields: [
+                "alternative_text",
+                "title",
+                "lastModificationDate",
+                "author",
+                "upvotes",
+                "upkeep-status",
+                "obsolete",
+                "deprecated",
+                "experimental",
+                "planned",
+                "outdated",
+                "wiki-metadata-create-user",
+                "url",
+                "type",
+                "branch"
+            ],
+            _source: false,
             highlight: {
                 pre_tags: [
                     "<strong>"
@@ -178,9 +302,16 @@
                 typingTimer = null;
                 console.log("timer removed")
             }
+            if (logTimer) {
+                clearTimeout(logTimer);
+                logTimer = null;
+                console.log("logtimer removed")
+            }
             if ($('#searchbar').val()) {
                 typingTimer = setTimeout(searchForPhrase, 200);
-                console.log("timer added")
+                logTimer = setTimeout(sendSearchLog, 2000)
+                console.log("timer and logtimer added")
+                logScheduled = true
             }
         }
     });
@@ -210,6 +341,20 @@
                 for (let i = 0; i < pagesShown && i < numberOfItems; i++) {
                     let text = undefined
                     let title = undefined
+                    let branch = data.hits.hits[i].fields.branch
+                    let branchClass = "searchResultNotBranched"
+                    let branchLabel = ""
+
+                    console.log(DOCSBRANCHESCOLORS)
+
+                    if (branch != null && branch != "notBranched") {
+                        branchClass = "searchResultBranched"
+                        let displayBranch = DOCSBRANCHDISPLAYNAMES[branch]
+                        console.log("CB" + displayBranch)
+                        let colorString = DOCSBRANCHESCOLORS.get(displayBranch)
+                        branchLabel = `<span id="branch${branch}" class="typeLabel branchLabel" style="color: ${colorString}; border-color: ${colorString};">${displayBranch}</span>`
+                    }
+
                     if (data.hits.hits[i].highlight != undefined) {
                         text = data.hits.hits[i].highlight.text
                         title = data.hits.hits[i].highlight.title
@@ -226,10 +371,7 @@
                             }
                         }
                     } else {
-                        preview = data.hits.hits[i]._source.text.substring(0, 115)
-                        if (preview == undefined || !preview) {
-                            preview = data.hits.hits[i]._source.alternative_text
-                        }
+                        preview = data.hits.hits[i].fields.alternative_text[0]
                     }
 
                     if (preview != undefined && preview) {
@@ -242,34 +384,40 @@
                     }
 
                     if (title == undefined || !title) {
-                        title = data.hits.hits[i]._source.title
+                        title = data.hits.hits[i].fields.title[0]
                     }
 
-                    setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id, data.hits.hits[i]._source.title), 30);
+                    setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id, data.hits.hits[i].fields.title[0]), 130);
 
-                    const parsedDate = Date.parse(data.hits.hits[i]._source.lastModificationDate)
+                    const parsedDate = Date.parse(data.hits.hits[i].fields.lastModificationDate[0])
                     const date = new Date(parsedDate)
 
-                    let author = data.hits.hits[i]._source.author
-                    if (typeof author == 'undefined' || !author) {
-                        author = data.hits.hits[i]._source["wiki-metadata-create-user"]
-                        if (typeof author == 'undefined' || !author) {
-                            author = "unknown"
+                    let authorRaw = data.hits.hits[i].fields.author
+                    let author = ""
+                    if (typeof authorRaw == 'undefined' || !authorRaw) {
+                        authorRaw = data.hits.hits[i].fields["wiki-metadata-create-user"]
+                        author = "unknown"
+                        if (typeof authorRaw != 'undefined' && authorRaw) {
+                            author = authorRaw[0]
                         }
+                    } else {
+                        author = authorRaw[0]
                     }
 
-                    let upvotes = data.hits.hits[i]._source.upvotes
-                    if (typeof upvotes == 'undefined' || !upvotes) {
-                        upvotes = 0
+                    let upvotesRaw = data.hits.hits[i].fields.upvotes
+                    let upvotes = 0
+                    if (typeof upvotesRaw != 'undefined' && upvotesRaw) {
+                        upvotes = upvotesRaw[0]
                     }
 
-                    let upkeepStatus = data.hits.hits[i]._source["upkeep-status"]
-                    if (typeof upkeepStatus == 'undefined' || !upkeepStatus) {
-                        upkeepStatus = "unknown"
+                    let upkeepStatusRaw = data.hits.hits[i].fields["upkeep-status"]
+                    let upkeepStatus = "unknown"
+                    if (typeof upkeepStatusRaw != 'undefined' && upkeepStatusRaw) {
+                        upkeepStatus = upkeepStatusRaw[0]
                     }
 
                     contentTriangleClass = "fas fa-exclamation-triangle conditionTriangle"
-                    contentStatusArray = [data.hits.hits[i]._source.obsolete, data.hits.hits[i]._source.deprecated, data.hits.hits[i]._source.experimental, data.hits.hits[i]._source.planned, data.hits.hits[i]._source.outdated]
+                    contentStatusArray = [data.hits.hits[i].fields.obsolete, data.hits.hits[i].fields.deprecated, data.hits.hits[i].fields.experimental, data.hits.hits[i].fields.planned, data.hits.hits[i].fields.outdated]
                     contentStatusValuesArray = ["obsolete", "deprecated", "experimental", "planned", "outdated"]
                     contentStatus = "" // TODO as array
                     filtredArray = contentStatusArray.filter(function(element, index) {
@@ -286,12 +434,18 @@
                         contentTriangleClass = ""
                     }
 
+                    let typeRaw = data.hits.hits[i].fields.type
+                    let type = "other"
+                    if (typeRaw != undefined && typeRaw) {
+                        type = typeRaw[0]
+                    }
+
                     showItems.push(`<div><span class="trigger-details searchResult" data-toggle="tooltip" data-toggle="tooltip" data-placement="left" 
                     data-html="true" title='<span class="tooltip-preview"><p>Last modification date: ${date.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</p>
                     <p>Upkeep status: ${upkeepStatus} <i id="upkeep${upkeepStatus}" class="fa fa-circle"></i>
-                    </p><p>Likes: ${upvotes}</p><p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${data.hits.hits[i]._source.url}" 
+                    </p><p>Likes: ${upvotes}</p><p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${data.hits.hits[i].fields.url[0]}" 
                     id="${data.hits.hits[i]._id}site"><li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i>
-                    <span class="font1 searchResultTitle">&nbsp;${title}</span><span id="label${data.hits.hits[i]._source.type}" class="typeLabel">${data.hits.hits[i]._source.type.toUpperCase()}</span><i class="${contentTriangleClass}"></i><br><span class="font2">${preview}</span></li></a></span>
+                    <span class="font1 searchResultTitle ${branchClass}">&nbsp;${title}</span><span id="label${type}" class="typeLabel">${type.toUpperCase()}</span>${branchLabel}<i class="${contentTriangleClass}"></i><br><span class="font2">${preview}</span></li></a></span>
                     <span class="vote" id="${data.hits.hits[i]._id}up"><i class="fas fa-thumbs-up"></i></span></div>`);
                 }
 
@@ -371,6 +525,17 @@
         });
     }
 
+    function sendSearchLog(id, title) {
+        logScheduled = false
+        const date = new Date();
+        let logPayload = {
+            "@timestamp": date.toISOString(),
+            "querylength": document.getElementById('searchbar').value.toLowerCase().length,
+            "query": document.getElementById('searchbar').value.toLowerCase()
+        }
+        OSrequest("POST", "https://search.evolveum.com/finalsearchlogs/_doc/", logPayload, true)
+    }
+
     function setSearchItemOnclick(id, title) {
 
         let up = document.getElementById(id + "up")
@@ -396,9 +561,23 @@
         let site = document.getElementById(id + "site")
         site.addEventListener("mousedown", (event) => {
             if (event.button == 0 || event.button == 2) {
-                console.log("mousedown" + event.button);
 
                 const date = new Date();
+
+                if (logScheduled) {
+                    clearTimeout(logTimer);
+                    logTimer = null;
+                    let logPayload = {
+                        "@timestamp": date.toISOString(),
+                        "querylength": document.getElementById('searchbar').value.toLowerCase().length,
+                        "query": document.getElementById('searchbar').value.toLowerCase()
+                    }
+                    OSrequest("POST", "https://search.evolveum.com/finalsearchlogs/_doc/", logPayload, true)
+                    logScheduled = false
+                    console.log("logtimer removed")
+                }
+
+                console.log("mousedown" + event.button);
 
                 let queryClick = {
                     "title": title,

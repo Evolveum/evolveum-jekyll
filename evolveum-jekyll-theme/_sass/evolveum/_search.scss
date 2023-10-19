@@ -23,10 +23,6 @@
     margin-top: 0rem !important;
 }
 
-.searchResultTitle {
-    max-width: calc(100% - 100px) !important;
-}
-
 #docssearchbutton {
     margin-top: 0px !important;
     margin-bottom: 0px !important;
@@ -34,8 +30,8 @@
 
 .searchResult {
     display: inline-block;
-    max-width: 430px;
-    width: 80vw;
+    max-width: 470px;
+    width: 100vw;
 }
 
 .font1 {
@@ -336,4 +332,94 @@
 .btn-light {
     background-color: #FFF;
     color: #000;
+}
+
+.btnSearchSelectReport:hover {
+    background-color: lightskyblue !important;
+    border-color: lightskyblue !important;
+    color: black !important;
+}
+
+.btnSearchSelectReport {
+    background-color: white !important;
+    color: black !important;
+}
+
+.btnSearchSelectReport:active {
+    background-color: white;
+}
+
+#reportSearchProblemPopoverClose {
+    color: #2f81d4;
+    background-color: white;
+}
+
+#reportSearchProblemPopover {
+    cursor: pointer;
+}
+
+#reportSearchProblemPopover:hover {
+    color: $gray-600;
+}
+
+.searchReportAProblemOption.selected {
+    background-color: lightskyblue !important;
+}
+
+.versioningButton {
+    padding: 0.275rem 0.7rem;
+    font-size: 0.875rem;
+    text-align: center;
+    align-content: center;
+    height: calc(1.5em + 0.5rem + 2px);
+    border-color: #707070;
+    color: #454545;
+}
+
+#select-version {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding-left: 0.5rem;
+    height: 100%;
+    margin-bottom: calc(1.125rem - 0.75em - 1px);
+    margin-top: calc(1.125rem - 0.75em - 1px);
+    margin-right: 6rem;
+}
+
+#titleAndSelectVerDiv {
+    display: flex;
+    justify-content: space-between;
+}
+
+#select-version .dropdown-item {
+    padding: 0.25rem 0.85rem;
+    font-size: 0.875rem;
+}
+
+#version-search-select {
+    max-width: 25%;
+    margin-right: 0.5rem;
+}
+
+#version-search-select .dropdown.bootstrap-select {
+    max-width: 100%;
+}
+
+#version-search-select .versioningButton.versioningButtonSearch {
+    border-color: #B1B1B1;
+}
+
+@media (min-width: 576px) {
+    #search-modal .modal-dialog {
+      max-width: 540px;
+    }
+}
+
+.searchResultBranched {
+    max-width: calc(100% - 155px) !important;
+}
+
+.searchResultNotBranched {
+    max-width: calc(100% - 100px) !important;
 }
