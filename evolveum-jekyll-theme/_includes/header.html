@@ -28,10 +28,10 @@
                                     {% assign versions = site.data.midpoint-versions | reverse %}
                                     {% for v in versions %}
                                         {% if v.docsDisplayBranch != null %}
-                                            <option data-tokens="{{ v.docsBranch }}">{{ v.docsDisplayBranch}}</option>
+                                            <option data-tokens="{{ v.docsBranch | replace: "docs/", "" }}">{{ v.docsDisplayBranch}}</option>
                                         {% endif %}
                                     {% endfor %}
-                                    <option data-tokens="docsFWDSbefore-4.8" >4.7 and earlier</option>
+                                    <option data-tokens="before-4.8" >4.7 and earlier</option>
                                 </select>
                             </div>
                             <button id="docssearchbutton" class="btn btn-outline-secondary btn-sm my-2 my-sm-0">Search</button>

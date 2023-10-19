@@ -16,12 +16,13 @@ def installVersions(versions, displayVersions)
 
   versions.each_with_index do |version, index|
     if Dir["/mp-#{version}"].empty?
-      `cd / && git clone -b #{version.gsub("FWDS","/")} https://github.com/evolveum/midpoint mp-#{version} && rm /mp-#{version}/docs/LICENSE && ln -s /mp-#{version}/docs/ /docs/midpoint/reference/#{version}` #maybe
+      versionWithoutDocs = version.gsub("docs/","")
+      `cd / && git clone -b #{version} https://github.com/evolveum/midpoint mp-#{versionWithoutDocs} && rm /mp-#{versionWithoutDocs}/docs/LICENSE && ln -s /mp-#{versionWithoutDocs}/docs/ /docs/midpoint/reference/#{versionWithoutDocs}` #maybe
       if version != "master"
-        `grep -rl :page-alias: /mp-#{version}/docs/ | xargs sed -i '/:page-alias:/d'`
+        `grep -rl :page-alias: /mp-#{versionWithoutDocs}/docs/ | xargs sed -i '/:page-alias:/d'`
       end
-      system("sed -i 's/:page-nav-title: Configuration Reference/:page-nav-title: \"#{displayVersions[index]}\"/g' /mp-#{version}/docs/index.adoc")
-      system("find /mp-#{version}/docs -type f -exec perl -pi -e 's/midpoint\\/reference\\/(?!#{version}\\b)/midpoint\\/reference\\/#{version}\\//g' {} \\;")
+      system("sed -i 's/:page-nav-title: Configuration Reference/:page-nav-title: \"#{displayVersions[index]}\"/g' /mp-#{versionWithoutDocs}/docs/index.adoc")
+      system("find /mp-#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/midpoint\\/reference\\/(?!#{versionWithoutDocs}\\b)/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} \\;")
     end
   end
 end
@@ -53,7 +54,7 @@ def readVersions()
         filteredDisplayVersions.push(ver['docsDisplayBranch'])
       end
   end
-  filteredVersions.push("docsFWDSbefore-4.8")
+  filteredVersions.push("docs/before-4.8")
   filteredDisplayVersions.push("4.7 and earlier")
   filteredVersions.push("master")
   filteredDisplayVersions.push("Development")
