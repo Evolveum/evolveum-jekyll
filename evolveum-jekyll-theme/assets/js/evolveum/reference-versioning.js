@@ -29,10 +29,10 @@ window.addEventListener('load', function() {
     for (let o = 0; o < options.length; o++) {
         console.log(start + (o*step))
         console.log(o)
-        console.log(options[o]['data-tokens'])
+        console.log(options[o].dataset['data-tokens'])
         console.log(options[o])
-        DOCSBRANCHDISPLAYNAMES[options[o].value] = options[o]['data-tokens']
-        DOCSBRANCHDISPLAYNAMES[options[o]['data-tokens']] = options[o].value
+        DOCSBRANCHDISPLAYNAMES[options[o].value] = options[o].dataset['data-tokens']
+        DOCSBRANCHDISPLAYNAMES[options[o].dataset['data-tokens']] = options[o].value
         DOCSBRANCHESCOLORS.set(options[o].value, rgbToHex(start + (o*step),start + (o*step),start + (o*step) + 35))
     }
     let url = window.location.href
