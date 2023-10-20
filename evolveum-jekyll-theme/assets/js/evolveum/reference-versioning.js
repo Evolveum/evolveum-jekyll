@@ -31,8 +31,8 @@ window.addEventListener('load', function() {
         console.log(o)
         console.log(options[o]['data-tokens'])
         console.log(options[o])
-        DOCSBRANCHDISPLAYNAMES.set(options[o].value, options[o]['data-tokens'])
-        DOCSBRANCHDISPLAYNAMES.set(options[o]['data-tokens'], options[o].value)
+        DOCSBRANCHDISPLAYNAMES[options[o].value] = options[o]['data-tokens']
+        DOCSBRANCHDISPLAYNAMES[options[o]['data-tokens']] = options[o].value
         DOCSBRANCHESCOLORS.set(options[o].value, rgbToHex(start + (o*step),start + (o*step),start + (o*step) + 35))
     }
     let url = window.location.href
