@@ -17,7 +17,7 @@ def installVersions(versions, displayVersions)
   versions.each_with_index do |version, index|
     versionWithoutDocs = version.gsub("docs/","")
     if Dir["/mp-#{versionWithoutDocs}"].empty?
-      `cd / && git clone -b #{version} https://github.com/evolveum/midpoint mp-#{versionWithoutDocs} && rm /mp-#{versionWithoutDocs}/docs/LICENSE && ln -s /mp-#{versionWithoutDocs}/docs/ /docs/midpoint/reference/#{versionWithoutDocs}` #maybe
+      `cd / && git clone -b #{version} https://github.com/janmederly/testversioning mp-#{versionWithoutDocs} && rm /mp-#{versionWithoutDocs}/docs/LICENSE && ln -s /mp-#{versionWithoutDocs}/docs/ /docs/midpoint/reference/#{versionWithoutDocs}` #maybe
       if version != "master"
         `grep -rl :page-alias: /mp-#{versionWithoutDocs}/docs/ | xargs sed -i '/:page-alias:/d'`
       end
