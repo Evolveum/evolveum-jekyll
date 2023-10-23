@@ -10,10 +10,10 @@ def installVersions(versions, displayVersions)
     #`mv /docs/midpoint/reference/index.adoc /`
   `rm -rf /docs/midpoint/reference/*`
   `cp /mnt/index.html /docs/midpoint/reference/`
-  negativeAssert = ""
+  negativeAssert = "?!"
   versions.each do |version|
     versionWithoutDocs = version.gsub("docs/","")
-    negativeAssert << "?!#{versionWithoutDocs}\\\\b|"
+    negativeAssert << "#{versionWithoutDocs}\\\\b|"
     puts("?!#{versionWithoutDocs}\\\\b|")
   end
   negativeAssert.chop!
