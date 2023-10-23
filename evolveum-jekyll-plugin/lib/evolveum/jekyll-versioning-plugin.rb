@@ -7,12 +7,18 @@ require 'yaml'
 #$stdout.reopen("/var/log/jekylversioning", "w")
 
 def installVersions(versions, displayVersions)
-  if Dir["/mp-#{versions[0]}"].empty?
     #`mv /docs/midpoint/reference/index.adoc /`
-    `rm -rf /docs/midpoint/reference/*`
-    `cp /mnt/index.html /docs/midpoint/reference/`
-    system("find /docs -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/midpoint\\/reference\\/(?!master\\b)/midpoint\\/reference\\/master\\//g' {} \\;")
+  `rm -rf /docs/midpoint/reference/*`
+  `cp /mnt/index.html /docs/midpoint/reference/`
+  negativeAssert = ""
+  versions.each do |version|
+    versionWithoutDocs = version.gsub("docs/","")
+    negativeAssert << "?!#{versionWithoutDocs}\\b|"
+    puts("?!#{versionWithoutDocs}\\b|")
   end
+  negativeAssert.chop!
+  puts(negativeAssert)
+  system("find /docs -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/master\\//g' {} \\;")
 
   versions.each_with_index do |version, index|
     versionWithoutDocs = version.gsub("docs/","")
@@ -22,7 +28,7 @@ def installVersions(versions, displayVersions)
         `grep -rl :page-alias: /mp-#{versionWithoutDocs}/docs/ | xargs sed -i '/:page-alias:/d'`
       end
       system("sed -i 's/:page-nav-title: Configuration Reference/:page-nav-title: \"#{displayVersions[index]}\"/g' /mp-#{versionWithoutDocs}/docs/index.adoc")
-      system("find /mp-#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/midpoint\\/reference\\/(?!#{versionWithoutDocs}\\b)/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} \\;")
+      system("find /mp-#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} \\;")
     end
   end
 end
