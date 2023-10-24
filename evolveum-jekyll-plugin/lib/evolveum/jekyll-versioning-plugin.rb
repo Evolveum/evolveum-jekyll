@@ -13,8 +13,8 @@ def installVersions(versions, displayVersions)
   negativeAssert = "?!"
   versions.each do |version|
     versionWithoutDocs = version.gsub("docs/","")
-    negativeAssert << "#{versionWithoutDocs}\\\\b|"
-    puts("?!#{versionWithoutDocs}\\\\b|")
+    negativeAssert << "#{versionWithoutDocs}|"
+    puts("?!#{versionWithoutDocs}|")
   end
   negativeAssert.chop!
   puts(negativeAssert)
