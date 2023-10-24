@@ -10,13 +10,14 @@ def installVersions(versions, displayVersions)
     #`mv /docs/midpoint/reference/index.adoc /`
   `rm -rf /docs/midpoint/reference/*`
   `cp /mnt/index.html /docs/midpoint/reference/`
-  negativeAssert = "?!"
+  negativeAssert = "?!(?:"
   versions.each do |version|
     versionWithoutDocs = version.gsub("docs/","")
     negativeAssert << "#{versionWithoutDocs}|"
     puts("?!#{versionWithoutDocs}|")
   end
   negativeAssert.chop!
+  negativeAssert << ")"
   puts(negativeAssert)
   system("find /docs -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/master\\//g' {} \\;")
 
