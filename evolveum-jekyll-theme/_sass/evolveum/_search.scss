@@ -1,9 +1,9 @@
 #autocombox {
     list-style-type: none;
     width: 100%;
-    text-overflow: ellipsis;
+    /*text-overflow: ellipsis;
     overflow: hidden;
-    white-space: nowrap;
+    white-space: nowrap;*/
 }
 
 .fade2 {
@@ -147,7 +147,7 @@
     }
     
     .searchResultNotBranched {
-        max-width: calc(75% - 100px) !important;
+        max-width: calc(75% - 70px) !important;
     }
     .searchResult {
         max-width: 75%;
