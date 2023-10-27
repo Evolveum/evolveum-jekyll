@@ -143,11 +143,11 @@
         flex-wrap: wrap-reverse;
     }
     .searchResultBranched {
-        max-width: calc(100% - 130px) !important;
+        max-width: calc(100% - 175px) !important;
     }
     
     .searchResultNotBranched {
-        max-width: calc(100% - 80px) !important;
+        max-width: calc(100% - 105px) !important;
     }
     .searchResult {
         max-width: calc(100% - 35px);
@@ -197,6 +197,10 @@
     
     .searchResultNotBranched {
         max-width: calc(100% - 100px) !important;
+    }
+
+    .typeLabel {
+        margin-left: 5px;
     }
 }
 
