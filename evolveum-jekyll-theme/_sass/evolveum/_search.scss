@@ -155,7 +155,10 @@
     #autocombox {
         display: flex !important;
     }
-
+    
+    .typeLabel {
+        margin-left: 5px;
+    }
 }
 
 @media (min-width:501px) {
@@ -197,10 +200,6 @@
     
     .searchResultNotBranched {
         max-width: calc(100% - 100px) !important;
-    }
-
-    .typeLabel {
-        margin-left: 5px;
     }
 }
 
