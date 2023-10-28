@@ -136,7 +136,6 @@
         margin-bottom: 1rem;
         margin-top: calc(1.125rem - 0.75em - 1px);
     }
-    
     #titleAndSelectVerDiv {
         display: flex;
         justify-content: space-between;
@@ -145,7 +144,6 @@
     .searchResultBranched {
         max-width: calc(100% - 175px) !important;
     }
-    
     .searchResultNotBranched {
         max-width: calc(100% - 105px) !important;
     }
@@ -155,7 +153,6 @@
     #autocombox {
         display: flex !important;
     }
-    
     .typeLabel {
         margin-left: 5px;
     }
@@ -188,16 +185,13 @@
         margin-top: calc(1.125rem - 0.75em - 1px);
         margin-right: 6rem;
     }
-    
     #titleAndSelectVerDiv {
         display: flex;
         justify-content: space-between;
     }
-
     .searchResultBranched {
         max-width: calc(100% - 155px) !important;
     }
-    
     .searchResultNotBranched {
         max-width: calc(100% - 100px) !important;
     }
@@ -349,20 +343,6 @@
     font-weight: 600;
 }
 
-.thumbs {
-    margin-top: 10px;
-    font-size: 1rem;
-    font-weight: normal;
-}
-
-.yes.thumb {
-    border: 2px solid green;
-    padding: 2px 2px 2px 6px;
-    border-radius: 20px;
-    color: green;
-    margin-right: 5px;
-}
-
 .highlightSearch:focus {
     border: none;
     outline: none;
@@ -430,6 +410,7 @@
     color: #454545;
 }
 
+
 /*#select-version {
     display: flex;
     justify-content: flex-start;
@@ -466,6 +447,35 @@
 
 @media (min-width: 576px) {
     #search-modal .modal-dialog {
-      max-width: 540px;
+        max-width: 540px;
     }
+}
+
+.siteReviewThumbs {
+    margin-top: 10px;
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+.siteReviewThumb {
+    border: 1.3px solid;
+    padding: 2px 2px 2px 6px;
+    border-radius: 20px;
+    margin-right: 5px;
+    font-size: 13px;
+}
+
+#yesSiteReviewThumb {
+    border-color: green;
+    color: green;
+}
+
+#noSiteReviewThumb {
+    border-color: green;
+    color: green;
+}
+
+#helpfullPageText {
+    font-size: 17px;
+    font-weight: 700;
 }
