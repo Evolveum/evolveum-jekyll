@@ -1,7 +1,7 @@
-$(".siteReviewThumb").on("click", function() {
-    $(this).toggleClass('on');
-    $(".thanksFeedback").toggleClass('on');
-});
+// $(".siteReviewThumb").on("click", function() {
+//     $(this).toggleClass('on');
+//     $(".thanksFeedback").toggleClass('on');
+// });
 
 $('#noSiteReviewThumb').popover({
     html: true,
