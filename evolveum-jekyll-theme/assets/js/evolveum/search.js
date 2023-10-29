@@ -127,7 +127,7 @@
                     width: $(document).width(),
                     height: $(document).height()
                 }
-                OSrequest("POST", "https://docstest.evolveum.com/webhooks/searchreport", reportSearchQuery, true)
+                OSrequest("POST", "https://docstest.evolveum.com/webhooks/report/search", reportSearchQuery, true)
                 $('#reportSearchProblemPopover').popover('hide');
             });
         })

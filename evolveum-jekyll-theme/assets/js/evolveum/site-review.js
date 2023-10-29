@@ -7,19 +7,19 @@ $('#noSiteReviewThumb').popover({
     html: true,
     sanitize: false,
     container: '#pageEval',
-    title: "Report a problem",
+    title: "Please tell us more about what you don't like",
     content: `<div>
                 <div class="form-group">
-                    <label for="docsReportAProblemSelect">Please tell us more about what you don't like</label>
-                    <select id="docsReportAProblemSelect" data-style="btn-light btn-sm btnSearchSelectReport" title="Type of a problem" data-width="auto">
-                        <option class="input-sm searchReportAProblemOption">Visual bug</option>
-                        <option class="input-sm searchReportAProblemOption">Functional bug</option>
-                        <option class="input-sm searchReportAProblemOption">Problem with results</option>
+                    <label for="docsReportAProblemSelect">Type of a problem</label>
+                    <select id="docsReportAProblemSelect" data-style="btn-light btn-sm btndocsSelectReport" title="Type of a problem" data-width="auto">
+                        <option class="input-sm docsReportAProblemOption">Visual bug</option>
+                        <option class="input-sm docsReportAProblemOption">Functional bug</option>
+                        <option class="input-sm docsReportAProblemOption">Problem with content</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="searchReportTextArea">Details of the problem</label>
-                    <textarea class="form-control" id="searchReportTextArea" rows="5"></textarea>
+                    <label for="docsReportTextArea">Details of the problem</label>
+                    <textarea class="form-control" id="docsReportTextArea" rows="5"></textarea>
                 </div>
                 <span>
                     <button type="button" class="btn btn-primary" id="reportDocsProblemPopoverClose">Close</button>
@@ -30,26 +30,36 @@ $('#noSiteReviewThumb').popover({
 
 $('#noSiteReviewThumb').on('inserted.bs.popover', function() {
     $('#reportDocsProblemPopoverClose').click(function() {
-        $('#reportDocsProblemPopover').popover('hide');
+        $('#noSiteReviewThumb').popover('hide');
     });
 
     $('#docsReportAProblemSelect').selectpicker();
 
-    // $('#reportSearchProblemPopoverSend').click(function() {
-    //     let searchProblemSelected = $(".searchReportAProblemOption.selected")
-    //     let searchProblemCategory = "Not defined"
-    //     if (searchProblemSelected[0] != undefined) {
-    //         searchProblemCategory = searchProblemSelected[0].childNodes[0].textContent
-    //     }
+    $('#docsdocsProblemPopoverSend').click(function() {
+        let docsProblemSelected = $(".docsReportAProblemOption.selected")
+        let docsProblemCategory = "Not defined"
+        if (docsProblemSelected[0] != undefined) {
+            docsProblemCategory = docsProblemSelected[0].childNodes[0].textContent
+        }
 
-    //     let reportSearchQuery = {
-    //         category: searchProblemCategory,
-    //         details: $("#searchReportTextArea").val(),
-    //         query: document.getElementById('searchbar').value,
-    //         width: $(document).width(),
-    //         height: $(document).height()
-    //     }
-    //     OSrequest("POST", "https://docstest.evolveum.com/webhooks/docsreport", reportSearchQuery, true)
-    //     $('#reportSearchProblemPopover').popover('hide');
-    // });
+        let reportdocsQuery = {
+            category: docsProblemCategory,
+            details: $("#docsReportTextArea").val(),
+            query: document.getElementById('docsbar').value,
+            width: $(document).width(),
+            height: $(document).height()
+        }
+        $.ajax({
+            method: "POST",
+            url: "https://docstest.evolveum.com/webhooks/report/docs",
+            crossDomain: true,
+            async: true,
+            data: JSON.stringify(reportdocsQuery),
+            dataType: 'json',
+            contentType: 'application/json',
+        }).fail(function(data) {
+            console.log(data);
+        });
+        $('#reportdocsProblemPopover').popover('hide');
+    });
 })
