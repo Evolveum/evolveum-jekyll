@@ -470,9 +470,19 @@
     color: green;
 }
 
+#yesSiteReviewThumb.on {
+    color: white;
+    background-color: green;
+}
+
+#noSiteReviewThumb.on {
+    color: white;
+    background-color: darkred;
+}
+
 #noSiteReviewThumb {
-    border-color: green;
-    color: green;
+    border-color: darkred;
+    color: darkred;
 }
 
 #helpfullPageText {
