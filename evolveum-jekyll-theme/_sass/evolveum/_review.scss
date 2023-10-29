@@ -1,0 +1,46 @@
+.siteReviewThumbs {
+    margin-top: 10px;
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+.siteReviewThumb {
+    border: 1.3px solid;
+    padding: 2px 2px 2px 6px;
+    border-radius: 20px;
+    margin-right: 5px;
+    font-size: 13px;
+}
+
+#yesSiteReviewThumb {
+    border-color: green;
+    color: green;
+}
+
+#yesSiteReviewThumb.on {
+    color: white;
+    background-color: green;
+}
+
+#noSiteReviewThumb.on {
+    color: white;
+    background-color: darkred;
+}
+
+#noSiteReviewThumb {
+    border-color: darkred;
+    color: darkred;
+}
+
+#helpfullPageText {
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.thankFeedback {
+    display: none;
+}
+
+.thanksFeedback.on {
+    display: inherit;
+}
