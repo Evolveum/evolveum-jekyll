@@ -1,7 +1,7 @@
-// $(".siteReviewThumb").on("click", function() {
-//     $(this).toggleClass('on');
-//     $(".thanksFeedback").toggleClass('on');
-// });
+$(".siteReviewThumb").on("click", function() {
+    $(this).toggleClass('on');
+    $(".thanksFeedback").toggleClass('on');
+});
 
 $('#noSiteReviewThumb').popover({
     html: true,
@@ -10,8 +10,8 @@ $('#noSiteReviewThumb').popover({
     title: "Report a problem",
     content: `<div>
                 <div class="form-group">
-                    <label for="searchReportAProblemSelect">Select the type of problem</label>
-                    <select id="searchReportAProblemSelect" data-style="btn-light btn-sm btnSearchSelectReport" title="Type of a problem" data-width="auto">
+                    <label for="docsReportAProblemSelect">Please tell us more about what you don't like</label>
+                    <select id="docsReportAProblemSelect" data-style="btn-light btn-sm btnSearchSelectReport" title="Type of a problem" data-width="auto">
                         <option class="input-sm searchReportAProblemOption">Visual bug</option>
                         <option class="input-sm searchReportAProblemOption">Functional bug</option>
                         <option class="input-sm searchReportAProblemOption">Problem with results</option>
@@ -33,7 +33,7 @@ $('#noSiteReviewThumb').on('inserted.bs.popover', function() {
         $('#reportDocsProblemPopover').popover('hide');
     });
 
-    //$('#searchReportAProblemSelect').selectpicker();
+    $('#docsReportAProblemSelect').selectpicker();
 
     // $('#reportSearchProblemPopoverSend').click(function() {
     //     let searchProblemSelected = $(".searchReportAProblemOption.selected")
