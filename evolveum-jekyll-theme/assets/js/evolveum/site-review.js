@@ -48,7 +48,7 @@ $('#noSiteReviewThumb').on('inserted.bs.popover', function() {
         $(document).off('keydown');
     });
 
-    $('#docsProblemPopoverSend').click(function() {
+    $('#reportDocsProblemPopoverSend').click(function() {
         let docsProblemSelected = $(".docsReportAProblemOption.selected")
         let docsProblemCategory = "Not defined"
         if (docsProblemSelected[0] != undefined) {
