@@ -1,4 +1,13 @@
-$(".siteReviewThumb").on("click", function() {
+$("#yesSiteReviewThumb").on("click", function() {
+    $(this).toggleClass('on');
+    if ($("#noSiteReviewThumb").classList.contains(on)) {
+        $("#noSiteReviewThumb").toggleClass('on');
+    } else {
+        $(".thanksFeedback").toggleClass('on');
+    }
+});
+
+$("#noSiteReviewThumb").on("click", function() {
     $(this).toggleClass('on');
     $(".thanksFeedback").toggleClass('on');
 });
