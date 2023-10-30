@@ -1,6 +1,6 @@
 (function() {
     function sendLike(modify) {
-                let url = window.location.href
+        let url = window.location.href
         let id = url.replace("https://docstest.evolveum.com", "").replace("/", "") + "title"
 
         let queryDocsLikes = {
@@ -20,7 +20,7 @@
         }).fail(function(data) {
             console.log(data);
         });
-        OSrequest("POST", "https://searchtest.evolveum.com/docs/_update/" + id + "?refresh", queryUpvote, true)
+        //OSrequest("POST", "https://searchtest.evolveum.com/docs/_update/" + id + "?refresh", queryUpvote, true)
     }
     
     $("#yesSiteReviewThumb").on("click", function() {
