@@ -1,6 +1,6 @@
 $("#yesSiteReviewThumb").on("click", function() {
     $(this).toggleClass('on');
-    if ($("#noSiteReviewThumb")[0].classList.contains(on)) {
+    if ($("#noSiteReviewThumb")[0].classList.contains("on")) {
         $("#noSiteReviewThumb").toggleClass('on');
     } else {
         $(".thanksFeedback").toggleClass('on');
@@ -9,7 +9,11 @@ $("#yesSiteReviewThumb").on("click", function() {
 
 $("#noSiteReviewThumb").on("click", function() {
     $(this).toggleClass('on');
-    $(".thanksFeedback").toggleClass('on');
+    if ($("#yesSiteReviewThumb")[0].classList.contains("on")) {
+        $("#yesSiteReviewThumb").toggleClass('on');
+    } else {
+        $(".thanksFeedback").toggleClass('on');
+    }
 });
 
 $('#noSiteReviewThumb').popover({
