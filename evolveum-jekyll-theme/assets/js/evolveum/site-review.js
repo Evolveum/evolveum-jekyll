@@ -58,7 +58,6 @@ $('#noSiteReviewThumb').on('inserted.bs.popover', function() {
         let reportdocsQuery = {
             category: docsProblemCategory,
             details: $("#docsReportTextArea").val(),
-            query: document.getElementById('docsbar').value,
             width: $(document).width(),
             height: $(document).height()
         }
