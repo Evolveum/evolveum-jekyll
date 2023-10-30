@@ -1,6 +1,6 @@
 $("#yesSiteReviewThumb").on("click", function() {
     $(this).toggleClass('on');
-    if ($("#noSiteReviewThumb").classList.contains(on)) {
+    if ($("#noSiteReviewThumb")[0].classList.contains(on)) {
         $("#noSiteReviewThumb").toggleClass('on');
     } else {
         $(".thanksFeedback").toggleClass('on');
