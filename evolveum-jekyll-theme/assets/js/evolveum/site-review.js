@@ -72,6 +72,6 @@ $('#noSiteReviewThumb').on('inserted.bs.popover', function() {
         }).fail(function(data) {
             console.log(data);
         });
-        $('#reportdocsProblemPopover').popover('hide');
+        $('#noSiteReviewThumb').popover('hide');
     });
 })
