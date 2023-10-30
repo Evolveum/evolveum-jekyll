@@ -1,7 +1,7 @@
 (function() {
     function sendLike(modify) {
         let url = window.location.href
-        let id = url.replace("https://docstest.evolveum.com", "").replace("/", "") + "title"
+        let id = url.replace("https://docstest.evolveum.com", "").replace(/\//g, "") + "title"
 
         let queryDocsLikes = {
             script: {
