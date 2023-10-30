@@ -35,7 +35,11 @@ $('#noSiteReviewThumb').on('inserted.bs.popover', function() {
 
     $('#docsReportAProblemSelect').selectpicker();
 
-    $('#docsdocsProblemPopoverSend').click(function() {
+    $('#docsReportTextArea').on('focus', function() {
+        $(document).off('keydown');
+    });
+
+    $('#docsProblemPopoverSend').click(function() {
         let docsProblemSelected = $(".docsReportAProblemOption.selected")
         let docsProblemCategory = "Not defined"
         if (docsProblemSelected[0] != undefined) {
