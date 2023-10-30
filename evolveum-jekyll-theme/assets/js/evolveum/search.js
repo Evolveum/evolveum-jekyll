@@ -188,6 +188,9 @@
                                         if (doc.upvotes.size()!=0) {
                                             totalScore = totalScore*(1+${data._source.multipliers.upvotes}*doc.upvotes.value/100);
                                         }
+                                        if (doc.upvotes.size()!=0) {
+                                            totalScore = totalScore*(1+${data._source.multipliers.docslikes}*doc.upvotes.value/100);
+                                        }
                                         if (doc['_index'].value == "mpbook") {
                                             totalScore = totalScore*${data._source.multipliers.book};
                                         }
