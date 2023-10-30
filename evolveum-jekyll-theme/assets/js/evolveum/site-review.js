@@ -116,4 +116,4 @@
             $('#noSiteReviewThumb').popover('hide');
         });
     })
-});
+})();
