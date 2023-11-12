@@ -1,9 +1,9 @@
 (function() {
 
-    let letters = new Set(["Guide", "Reference", "Developer", "Other"]);
+    let letters = new Set(["Guide", "Reference", "Other"]);
     let branches = new Set(["notBranched"])
     let notMasterBranchMult = 0
-    
+
 
     $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
@@ -16,10 +16,10 @@
             branches.add(newVersionEdited)
             if (queryArr[queryLen - 6].includes("branch")) {
                 console.log(queryArr)
-                console.log(queryArr[ queryLen - 6])
+                console.log(queryArr[queryLen - 6])
                 console.log(queryLen)
-                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0,queryLen - 7).join("\n") +  "\n" + queryArr[queryLen-2]
-                searchQuery.query.bool.filter.push({ terms: { "branch.keyword": Array.from(branches) }})
+                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0, queryLen - 7).join("\n") + "\n" + queryArr[queryLen - 2]
+                searchQuery.query.bool.filter.push({ terms: { "branch.keyword": Array.from(branches) } })
             } else {
                 searchQuery.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
             }
@@ -172,13 +172,11 @@
         searchQuery = {
             query: {
                 bool: {
-                    filter: [
-                        {
-                            terms: {
-                                "type.keyword": Array.from(letters)
-                            }
+                    filter: [{
+                        terms: {
+                            "type.keyword": Array.from(letters)
                         }
-                    ],
+                    }],
                     must: [{
                         function_score: {
                             script_score: {
