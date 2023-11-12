@@ -241,6 +241,11 @@
                                                 totalScore = totalScore*${data._source.multipliers.notMasterBranch};
                                             }
                                         }
+                                        if (doc.containsKey('type.keyword') && doc['type.keyword'].size()!=0) {
+                                            if (doc['type.keyword'].value == "Other") {
+                                                totalScore = totalScore*${data._source.multipliers.other};
+                                            }
+                                        }
                                         return totalScore;
                                     `
                                 }
@@ -251,7 +256,7 @@
                                     analyzer: "standard",
                                     fields: [
                                         "text",
-                                        "title^2",
+                                        "title^1.5",
                                         "alternative_text^0.5" // TODO
                                     ],
                                     fuzziness: "AUTO",
