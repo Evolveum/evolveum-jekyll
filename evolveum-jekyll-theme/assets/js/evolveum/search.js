@@ -256,7 +256,7 @@
                                     analyzer: "standard",
                                     fields: [
                                         "text",
-                                        "title^1.5",
+                                        `title^${data._source.multipliers.title}`,
                                         "alternative_text^0.5" // TODO
                                     ],
                                     fuzziness: "AUTO",
