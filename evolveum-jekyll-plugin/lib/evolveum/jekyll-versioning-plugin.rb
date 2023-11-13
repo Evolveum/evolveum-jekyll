@@ -59,7 +59,7 @@ def readVersions()
   puts("OBJ" + verObject.inspect)
   filteredVersions = []
   filteredDisplayVersions = []
-  defaultBranch
+  defaultBranch = ""
   verObject.each do |ver|
     puts(ver)
       if ver['docsBranch'] != nil && ver['docsDisplayBranch']
