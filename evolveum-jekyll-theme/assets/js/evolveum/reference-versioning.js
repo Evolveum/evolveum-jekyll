@@ -32,14 +32,12 @@ window.addEventListener('load', function() {
         console.log(o)
         console.log(options[o].dataset['tokens'])
         console.log(options[o])
-        let branch = options[o].dataset['tokens']
-        if (options[0].dataset['tokens'].includes(" default")) {
-            console.log(options[0].dataset['tokens'])
-            branch = options[o].dataset['tokens'].replace(" default", "")
+        if (options[0].dataset['default'] != undefined && options[0].dataset['default'] == "default") {
+            console.log(options[0].dataset['default'])
             DEFAULTDOCSBRANCH = options[o].dataset['tokens']
         }
-        DOCSBRANCHDISPLAYNAMES[options[o].value] = branch
-        DOCSBRANCHDISPLAYNAMES[branch] = options[o].value
+        DOCSBRANCHDISPLAYNAMES[options[o].value] = options[o].dataset['tokens']
+        DOCSBRANCHDISPLAYNAMES[options[o].dataset['tokens']] = options[o].value
         DOCSBRANCHESCOLORS.set(options[o].value, rgbToHex(start + (o*step),start + (o*step),start + (o*step) + 35))
     }
     let url = window.location.href
