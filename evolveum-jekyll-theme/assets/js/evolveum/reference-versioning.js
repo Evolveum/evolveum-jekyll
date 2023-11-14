@@ -1,5 +1,6 @@
 var DOCSBRANCHESCOLORS = new Map();
 var DOCSBRANCHDISPLAYNAMES = {}
+var DEFAULTDOCSBRANCH = "master"
 
 function decToHex(dec) {
     return dec.toString(16);
@@ -31,6 +32,9 @@ window.addEventListener('load', function() {
         console.log(o)
         console.log(options[o].dataset['tokens'])
         console.log(options[o])
+        if (options[0].dataset['default'] != undefined && options[0].dataset['default'] == "default") {
+            DEFAULTDOCSBRANCH = options[o].value.replace("docs/", "")
+        }
         DOCSBRANCHDISPLAYNAMES[options[o].value] = options[o].dataset['tokens']
         DOCSBRANCHDISPLAYNAMES[options[o].dataset['tokens']] = options[o].value
         DOCSBRANCHESCOLORS.set(options[o].value, rgbToHex(start + (o*step),start + (o*step),start + (o*step) + 35))
