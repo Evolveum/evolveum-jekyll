@@ -66,9 +66,9 @@ def readVersions()
         puts("version" + ver['docsBranch'])
         filteredVersions.push(ver['docsBranch'])
         filteredDisplayVersions.push(ver['docsDisplayBranch'])
-        console.log(ver['defaultBranch'])
+        puts ver['defaultBranch']
         if ver['defaultBranch'] != nil && ver['defaultBranch'] == true
-          console.log("somtu")
+          puts "somtu"
           defaultBranch = ver['docsBranch']
         end
       end
