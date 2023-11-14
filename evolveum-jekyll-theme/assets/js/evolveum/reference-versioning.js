@@ -31,6 +31,7 @@ window.addEventListener('load', function() {
         console.log(start + (o*step))
         console.log(o)
         console.log(options[o].dataset['tokens'])
+        console.log(options[o].dataset['default'])
         console.log(options[o])
         if (options[0].dataset['default'] != undefined && options[0].dataset['default'] == "default") {
             console.log(options[0].dataset['default'])
