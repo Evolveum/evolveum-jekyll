@@ -168,6 +168,7 @@
     OSrequest("GET", "https://searchtest.evolveum.com/search_settings/_doc/1", undefined, true, setSearchQuery)
 
     function setSearchQuery(data) {
+        console.log("DEFAULT: " + DEFAULTDOCSBRANCH)
         notMasterBranchMult = data._source.multipliers.notMasterBranch
         searchQuery = {
             query: {
