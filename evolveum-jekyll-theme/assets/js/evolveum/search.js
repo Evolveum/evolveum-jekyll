@@ -165,7 +165,9 @@
 
     let searchQuery = {}
 
-    OSrequest("GET", "https://searchtest.evolveum.com/search_settings/_doc/1", undefined, true, setSearchQuery)
+    window.addEventListener('load', function() {
+        OSrequest("GET", "https://searchtest.evolveum.com/search_settings/_doc/1", undefined, true, setSearchQuery)
+    });
 
     function setSearchQuery(data) {
         console.log("DEFAULT: " + DEFAULTDOCSBRANCH)
