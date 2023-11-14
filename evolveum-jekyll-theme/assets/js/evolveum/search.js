@@ -350,16 +350,19 @@
                     let branch = data.hits.hits[i].fields.branch
                     let branchClass = "searchResultNotBranched"
                     let branchLabel = ""
+                    let displayBranch = ""
+                    let tooltipVer = "not versioned"
 
                     console.log(DOCSBRANCHESCOLORS)
 
                     if (branch != null && branch != "notBranched") {
                         branchClass = "searchResultBranched"
-                        let displayBranch = DOCSBRANCHDISPLAYNAMES[branch]
+                        displayBranch = DOCSBRANCHDISPLAYNAMES[branch]
+                        tooltipVer = displayBranch
                         console.log("CB" + displayBranch)
                         let colorString = DOCSBRANCHESCOLORS.get(displayBranch)
                         branchLabel = `<span id="branch${branch}" class="typeLabel branchLabel" style="color: ${colorString}; border-color: ${colorString};">${displayBranch}</span>`
-                    } else if (branch == null) {
+                    } else {
                         branch = "notBranched"
                     }
 
@@ -457,7 +460,7 @@
                     showItems.push(`<div><span class="trigger-details searchResult" data-toggle="tooltip" data-toggle="tooltip" data-placement="left" 
                     data-html="true" title='<span class="tooltip-preview"><p>Last modification date: ${date.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</p>
                     <p>Upkeep status: ${upkeepStatus} <i id="upkeep${upkeepStatus}" class="fa fa-circle"></i>
-                    </p><p>Search likes: ${searchUpvotes}</p><p>Docs likes: ${docsUpvotes}</p><p>Branch: ${branch}</p><p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${data.hits.hits[i].fields.url[0]}" 
+                    </p><p>Search likes: ${searchUpvotes}</p><p>Docs likes: ${docsUpvotes}</p><p>Version: ${tooltipVer}</p><p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${data.hits.hits[i].fields.url[0]}" 
                     id="${data.hits.hits[i]._id}site"><li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i>
                     <span class="font1 searchResultTitle ${branchClass}">&nbsp;${title}</span><span id="label${type}" class="typeLabel">${type.toUpperCase()}</span>${branchLabel}<i class="${contentTriangleClass}"></i><br><span class="font2">${preview}</span></li></a></span>
                     <span class="vote" id="${data.hits.hits[i]._id}up"><i class="fas fa-thumbs-up"></i></span></div>`);
