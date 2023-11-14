@@ -34,7 +34,7 @@ window.addEventListener('load', function() {
         console.log(options[o].dataset['default'])
         console.log(options[o])
         if (options[o].dataset['default'] != undefined && options[o].dataset['default'] == "default") {
-            console.log(options[0].dataset['default'])
+            console.log(options[o].dataset['default'] + " " + options[o].dataset['tokens'])
             DEFAULTDOCSBRANCH = options[o].dataset['tokens']
         }
         DOCSBRANCHDISPLAYNAMES[options[o].value] = options[o].dataset['tokens']
