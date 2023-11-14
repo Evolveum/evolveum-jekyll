@@ -237,7 +237,7 @@
                                             }
                                         }
                                         if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
-                                            if (doc['branch.keyword'].value != "master" && doc['branch.keyword'].value != "notBranched") {
+                                            if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
                                                 totalScore = totalScore*${data._source.multipliers.notMasterBranch};
                                             }
                                         }

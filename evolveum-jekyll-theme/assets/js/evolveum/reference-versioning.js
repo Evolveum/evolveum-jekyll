@@ -33,7 +33,7 @@ window.addEventListener('load', function() {
         console.log(options[o].dataset['tokens'])
         console.log(options[o])
         if (options[0].dataset['default'] != undefined && options[0].dataset['default'] == "default") {
-            DEFAULTDOCSBRANCH = options[o].value.replace("docs/", "")
+            DEFAULTDOCSBRANCH = options[o].dataset['tokens']
         }
         DOCSBRANCHDISPLAYNAMES[options[o].value] = options[o].dataset['tokens']
         DOCSBRANCHDISPLAYNAMES[options[o].dataset['tokens']] = options[o].value

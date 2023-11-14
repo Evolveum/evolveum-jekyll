@@ -31,9 +31,9 @@ def installVersions(versions, displayVersions, defaultBranch)
     if version != defaultBranch
       `grep -rl :page-alias: /mp-#{versionWithoutDocs}/docs/ | xargs sed -i '/:page-alias:/d' 2> /dev/null || true`
     else
-      lines = File.readlines('/evolveum-jekyll/evolveum-jekyll-plugin/lib/evolveum/.htaccess')
+      lines = File.readlines('/docs/_site/.htaccess')
       lines[0] = 'RewriteRule   "^midpoint/reference(?!/master)(?!/before-.*)(?![0-9]\..*)(?!/support-.*)(/|$)(.*)" "/midpoint/reference/' + versionWithoutDocs + '/$2" [R]' << $/
-      File.open('/evolveum-jekyll/evolveum-jekyll-plugin/lib/evolveum/.htaccess', 'w') { |f| f.write(lines.join) }
+      File.open('/docs/_site/.htaccess', 'w') { |f| f.write(lines.join) }
     end
     `ln -s /mp-#{versionWithoutDocs}/docs/ /docs/midpoint/reference/#{versionWithoutDocs}`
     system("sed -i 's/:page-nav-title: Configuration Reference/:page-nav-title: \"#{displayVersions[index]}\"/g' /mp-#{versionWithoutDocs}/docs/index.adoc")
