@@ -271,6 +271,14 @@
                     }],
                     should: [
                         {
+                            term: {
+                                "title.keyword": {
+                                    value: "",
+                                    boost: `${data._source.multipliers.queryTitleExactMatch}`
+                                }
+                            }
+                        },
+                        {
                             multi_match: {
                                 query: "",
                                 analyzer: "simple",
@@ -280,7 +288,7 @@
                                     `title^${data._source.multipliers.title}`,
                                     "alternative_text^0.5" // TODO
                                 ],
-                                boost: `${data._source.multipliers.exactMatch}`
+                                boost: `${data._source.multipliers.wordExactMatch}`
                             }
                         }
                     ]
@@ -349,7 +357,8 @@
 
         searchQuery.size = pagesShown;
         searchQuery.query.bool.must[0].function_score.query.multi_match.query = document.getElementById('searchbar').value.toLowerCase();
-        searchQuery.query.bool.should[0].multi_match.query = document.getElementById('searchbar').value.toLowerCase();
+        searchQuery.query.bool.should[1].multi_match.query = document.getElementById('searchbar').value.toLowerCase();
+        searchQuery.query.bool.should[0].term['title.keyword'].value = document.getElementById('searchbar').value.toLowerCase();
 
         const showResults = function(data) {
             console.log(data)
