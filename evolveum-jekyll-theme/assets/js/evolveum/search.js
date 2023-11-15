@@ -312,16 +312,30 @@
                 "branch"
             ],
             _source: false,
-            highlight: {
-                pre_tags: [
-                    "<strong>"
-                ],
-                post_tags: [
-                    "</strong>"
-                ],
+            highlight:{
+                pre_tags: ["<strong>"],
+                post_tags: ["</strong>"],
                 fields: {
-                    title: {},
-                    text: {}
+                    title: {
+                        highlight_query: {
+                            match: {
+                                title: {
+                                    query: "reverse",
+                                    analyzer: "simple"
+                                }
+                            }
+                        }
+                    },
+                    text: {
+                        highlight_query: {
+                            match: {
+                                text: {
+                                    query: "reverse",
+                                    analyzer: "simple"
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
