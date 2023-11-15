@@ -370,9 +370,12 @@
         $('[data-toggle="tooltip"]').tooltip('hide')
 
         searchQuery.size = pagesShown;
-        searchQuery.query.bool.must[0].function_score.query.multi_match.query = document.getElementById('searchbar').value.toLowerCase();
-        searchQuery.query.bool.should[1].multi_match.query = document.getElementById('searchbar').value.toLowerCase();
-        searchQuery.query.bool.should[0].term['title.keyword'].value = document.getElementById('searchbar').value.toLowerCase();
+        const query = document.getElementById('searchbar').value.toLowerCase();
+        searchQuery.query.bool.must[0].function_score.query.multi_match.query = query
+        searchQuery.query.bool.should[1].multi_match.query = query
+        searchQuery.query.bool.should[0].term['title.keyword'].value = query
+        searchQuery.highlight.fields.title.query = query
+        searchQuery.highlight.fields.text.query  = query
 
         const showResults = function(data) {
             console.log(data)
