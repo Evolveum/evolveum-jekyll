@@ -257,6 +257,7 @@
                                 multi_match: {
                                     query: "",
                                     analyzer: "standard",
+                                    type: "most_fields",
                                     fields: [
                                         "text",
                                         `title^${data._source.multipliers.title}`,
@@ -267,7 +268,22 @@
                                 }
                             }
                         }
-                    }]
+                    }],
+                    should: [
+                        {
+                            multi_match: {
+                                query: "",
+                                analyzer: "standard",
+                                type: "most_fields",
+                                fields: [
+                                    "text",
+                                    `title^${data._source.multipliers.title}`,
+                                    "alternative_text^0.5" // TODO
+                                ],
+                                boost: `${data._source.multipliers.exactMatch}`
+                            }
+                        }
+                    ]
                 }
             },
             fields: [
@@ -333,6 +349,7 @@
 
         searchQuery.size = pagesShown;
         searchQuery.query.bool.must[0].function_score.query.multi_match.query = document.getElementById('searchbar').value.toLowerCase();
+        searchQuery.query.bool.should[0].multi_match.query = document.getElementById('searchbar').value.toLowerCase();
 
         const showResults = function(data) {
             console.log(data)
