@@ -273,7 +273,7 @@
                         {
                             multi_match: {
                                 query: "",
-                                analyzer: "standard",
+                                analyzer: "simple",
                                 type: "most_fields",
                                 fields: [
                                     "text",
