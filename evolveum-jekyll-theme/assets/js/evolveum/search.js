@@ -1,9 +1,9 @@
 (function() {
 
-    let letters = new Set(["Guide", "Reference", "Developer", "Other"]);
+    let letters = new Set(["Guide", "Reference", "Other"]);
     let branches = new Set(["notBranched"])
     let notMasterBranchMult = 0
-    
+
 
     $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
@@ -16,10 +16,10 @@
             branches.add(newVersionEdited)
             if (queryArr[queryLen - 6].includes("branch")) {
                 console.log(queryArr)
-                console.log(queryArr[ queryLen - 6])
+                console.log(queryArr[queryLen - 6])
                 console.log(queryLen)
-                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0,queryLen - 7).join("\n") +  "\n" + queryArr[queryLen-2]
-                searchQuery.query.bool.filter.push({ terms: { "branch.keyword": Array.from(branches) }})
+                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0, queryLen - 7).join("\n") + "\n" + queryArr[queryLen - 2]
+                searchQuery.query.bool.filter.push({ terms: { "branch.keyword": Array.from(branches) } })
             } else {
                 searchQuery.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
             }
@@ -127,7 +127,7 @@
                     width: $(document).width(),
                     height: $(document).height()
                 }
-                OSrequest("POST", "https://docs.evolveum.com/webhooks/searchreport", reportSearchQuery, true)
+                OSrequest("POST", "https://docs.evolveum.com/webhooks/report/search", reportSearchQuery, true)
                 $('#reportSearchProblemPopover').popover('hide');
             });
         })
@@ -165,20 +165,21 @@
 
     let searchQuery = {}
 
-    OSrequest("GET", "https://search.evolveum.com/search_settings/_doc/1", undefined, true, setSearchQuery)
+    window.addEventListener('load', function() {
+        OSrequest("GET", "https://search.evolveum.com/search_settings/_doc/1", undefined, true, setSearchQuery)
+    });
 
     function setSearchQuery(data) {
+        console.log("DEFAULT: " + DEFAULTDOCSBRANCH)
         notMasterBranchMult = data._source.multipliers.notMasterBranch
         searchQuery = {
             query: {
                 bool: {
-                    filter: [
-                        {
-                            terms: {
-                                "type.keyword": Array.from(letters)
-                            }
+                    filter: [{
+                        terms: {
+                            "type.keyword": Array.from(letters)
                         }
-                    ],
+                    }],
                     must: [{
                         function_score: {
                             script_score: {
@@ -187,6 +188,9 @@
                                         double totalScore = _score;
                                         if (doc.upvotes.size()!=0) {
                                             totalScore = totalScore*(1+${data._source.multipliers.upvotes}*doc.upvotes.value/100);
+                                        }
+                                        if (doc.upvotes.size()!=0) {
+                                            totalScore = totalScore*(1+${data._source.multipliers.docslikes}*doc.upvotes.value/100);
                                         }
                                         if (doc['_index'].value == "mpbook") {
                                             totalScore = totalScore*${data._source.multipliers.book};
@@ -236,8 +240,13 @@
                                             }
                                         }
                                         if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
-                                            if (doc['branch.keyword'].value != "master" && doc['branch.keyword'].value != "notBranched") {
+                                            if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
                                                 totalScore = totalScore*${data._source.multipliers.notMasterBranch};
+                                            }
+                                        }
+                                        if (doc.containsKey('type.keyword') && doc['type.keyword'].size()!=0) {
+                                            if (doc['type.keyword'].value == "Other") {
+                                                totalScore = totalScore*${data._source.multipliers.other};
                                             }
                                         }
                                         return totalScore;
@@ -248,17 +257,60 @@
                                 multi_match: {
                                     query: "",
                                     analyzer: "standard",
+                                    type: "most_fields",
                                     fields: [
                                         "text",
-                                        "title^2",
-                                        "alternative_text^0.5" // TODO
+                                        `title^${data._source.multipliers.title}`,
+                                        "alternative_text^0.5", // TODO
+                                        `keywords^${data._source.multipliers.keywords}`,
+                                        `search-alias^${data._source.multipliers.searchAlias}`
                                     ],
                                     fuzziness: "AUTO",
                                     prefix_length: 2,
                                 }
                             }
                         }
-                    }]
+                    }],
+                    should: [
+                        {
+                            term: {
+                                "title.keyword": {
+                                    value: "",
+                                    boost: `${data._source.multipliers.queryTitleExactMatch}`
+                                }
+                            }
+                        },
+                        {
+                            term: {
+                                "keywords.keyword": {
+                                    value: "",
+                                    boost: `${data._source.multipliers.queryKeywordExactMatch}`
+                                }
+                            }
+                        },
+                        {
+                            term: {
+                                "search-alias.keyword": {
+                                    value: "",
+                                    boost: `${data._source.multipliers.querySearchAliasExactMatch}`
+                                }
+                            }
+                        },
+                        {
+                            multi_match: {
+                                query: "",
+                                analyzer: "simple",
+                                type: "most_fields",
+                                fields: [
+                                    "text",
+                                    `title^${data._source.multipliers.title}`,
+                                    "alternative_text^0.5",
+                                    `search-alias^${data._source.multipliers.searchAlias}`
+                                ],
+                                boost: `${data._source.multipliers.wordExactMatch}`
+                            }
+                        }
+                    ]
                 }
             },
             fields: [
@@ -279,16 +331,30 @@
                 "branch"
             ],
             _source: false,
-            highlight: {
-                pre_tags: [
-                    "<strong>"
-                ],
-                post_tags: [
-                    "</strong>"
-                ],
+            highlight:{
+                pre_tags: ["<strong>"],
+                post_tags: ["</strong>"],
                 fields: {
-                    title: {},
-                    text: {}
+                    title: {
+                        highlight_query: {
+                            match: {
+                                title: {
+                                    query: "reverse",
+                                    analyzer: "simple"
+                                }
+                            }
+                        }
+                    },
+                    text: {
+                        highlight_query: {
+                            match: {
+                                text: {
+                                    query: "reverse",
+                                    analyzer: "simple"
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -323,7 +389,14 @@
         $('[data-toggle="tooltip"]').tooltip('hide')
 
         searchQuery.size = pagesShown;
-        searchQuery.query.bool.must[0].function_score.query.multi_match.query = document.getElementById('searchbar').value.toLowerCase();
+        const query = document.getElementById('searchbar').value.toLowerCase();
+        searchQuery.query.bool.must[0].function_score.query.multi_match.query = query
+        searchQuery.query.bool.should[3].multi_match.query = query
+        searchQuery.query.bool.should[2].term['search-alias.keyword'].value = query
+        searchQuery.query.bool.should[1].term['keywords.keyword'].value = query
+        searchQuery.query.bool.should[0].term['title.keyword'].value = query
+        searchQuery.highlight.fields.title.highlight_query.match.title.query = query
+        searchQuery.highlight.fields.text.highlight_query.match.text.query  = query
 
         const showResults = function(data) {
             console.log(data)
@@ -344,15 +417,20 @@
                     let branch = data.hits.hits[i].fields.branch
                     let branchClass = "searchResultNotBranched"
                     let branchLabel = ""
+                    let displayBranch = ""
+                    let tooltipVer = "not versioned"
 
                     console.log(DOCSBRANCHESCOLORS)
 
                     if (branch != null && branch != "notBranched") {
                         branchClass = "searchResultBranched"
-                        let displayBranch = DOCSBRANCHDISPLAYNAMES[branch]
+                        displayBranch = DOCSBRANCHDISPLAYNAMES[branch]
+                        tooltipVer = displayBranch
                         console.log("CB" + displayBranch)
                         let colorString = DOCSBRANCHESCOLORS.get(displayBranch)
                         branchLabel = `<span id="branch${branch}" class="typeLabel branchLabel" style="color: ${colorString}; border-color: ${colorString};">${displayBranch}</span>`
+                    } else {
+                        branch = "notBranched"
                     }
 
                     if (data.hits.hits[i].highlight != undefined) {
@@ -404,10 +482,16 @@
                         author = authorRaw[0]
                     }
 
-                    let upvotesRaw = data.hits.hits[i].fields.upvotes
-                    let upvotes = 0
-                    if (typeof upvotesRaw != 'undefined' && upvotesRaw) {
-                        upvotes = upvotesRaw[0]
+                    let searchUpvotesRaw = data.hits.hits[i].fields.upvotes
+                    let searchUpvotes = 0
+                    if (typeof searchUpvotesRaw != 'undefined' && searchUpvotesRaw) {
+                        searchUpvotes = searchUpvotesRaw[0]
+                    }
+
+                    let docsUpvotesRaw = data.hits.hits[i].fields.docslikes
+                    let docsUpvotes = 0
+                    if (typeof docsUpvotesRaw != 'undefined' && docsUpvotesRaw) {
+                        docsUpvotes = docsUpvotesRaw[0]
                     }
 
                     let upkeepStatusRaw = data.hits.hits[i].fields["upkeep-status"]
@@ -443,7 +527,7 @@
                     showItems.push(`<div><span class="trigger-details searchResult" data-toggle="tooltip" data-toggle="tooltip" data-placement="left" 
                     data-html="true" title='<span class="tooltip-preview"><p>Last modification date: ${date.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</p>
                     <p>Upkeep status: ${upkeepStatus} <i id="upkeep${upkeepStatus}" class="fa fa-circle"></i>
-                    </p><p>Likes: ${upvotes}</p><p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${data.hits.hits[i].fields.url[0]}" 
+                    </p><p>Search likes: ${searchUpvotes}</p><p>Docs likes: ${docsUpvotes}</p><p>Version: ${tooltipVer}</p><p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${data.hits.hits[i].fields.url[0]}" 
                     id="${data.hits.hits[i]._id}site"><li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i>
                     <span class="font1 searchResultTitle ${branchClass}">&nbsp;${title}</span><span id="label${type}" class="typeLabel">${type.toUpperCase()}</span>${branchLabel}<i class="${contentTriangleClass}"></i><br><span class="font2">${preview}</span></li></a></span>
                     <span class="vote" id="${data.hits.hits[i]._id}up"><i class="fas fa-thumbs-up"></i></span></div>`);
@@ -587,7 +671,7 @@
                     "clickquery": document.getElementById('searchbar').value.toLowerCase()
                 }
 
-                event.button == 0 ? OSrequest("POST", "https://search.evolveum.com/click_logs/_doc/", queryClick, false) : OSrequest("POST", "https://search.evolveum.com/click_logs/_doc/", queryClick, true);
+                event.button == 0 ? OSrequest("POST", "https://search.evolveum.com/click_logs/_doc/", queryClick, false) : OSrequest("POST", "https://searchd.evolveum.com/click_logs/_doc/", queryClick, true);test
             }
         });
     }

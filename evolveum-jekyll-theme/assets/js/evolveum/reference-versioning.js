@@ -1,5 +1,6 @@
 var DOCSBRANCHESCOLORS = new Map();
 var DOCSBRANCHDISPLAYNAMES = {}
+var DEFAULTDOCSBRANCH = "master"
 
 function decToHex(dec) {
     return dec.toString(16);
@@ -27,13 +28,18 @@ window.addEventListener('load', function() {
     let step = Math.round((end - start) / options.length)
     console.log("ADB" + options)
     for (let o = 0; o < options.length; o++) {
-        console.log(start + (o * step))
+        console.log(start + (o*step))
         console.log(o)
         console.log(options[o].dataset['tokens'])
+        console.log(options[o].dataset['default'])
         console.log(options[o])
+        if (options[o].dataset['default'] != undefined && options[o].dataset['default'] == "default") {
+            console.log(options[o].dataset['default'] + " " + options[o].dataset['tokens'])
+            DEFAULTDOCSBRANCH = options[o].dataset['tokens']
+        }
         DOCSBRANCHDISPLAYNAMES[options[o].value] = options[o].dataset['tokens']
         DOCSBRANCHDISPLAYNAMES[options[o].dataset['tokens']] = options[o].value
-        DOCSBRANCHESCOLORS.set(options[o].value, rgbToHex(start + (o * step), start + (o * step), start + (o * step) + 35))
+        DOCSBRANCHESCOLORS.set(options[o].value, rgbToHex(start + (o*step),start + (o*step),start + (o*step) + 35))
     }
     let url = window.location.href
     let urlSubstrings = url.split("/")

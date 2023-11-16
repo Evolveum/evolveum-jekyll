@@ -126,7 +126,7 @@
         -moz-transition: all .1s linear, color 0s;
         -o-transition: all .1s linear, color 0s;
         max-width: 200px;
-        cursor: default;
+        cursor: pointer;
     }
     #select-version {
         display: flex;
@@ -173,7 +173,7 @@
         -moz-transition: all .1s linear, color 0s;
         -o-transition: all .1s linear, color 0s;
         max-width: 200px;
-        cursor: default;
+        cursor: pointer;
     }
     #select-version {
         display: flex;
@@ -334,27 +334,6 @@
     margin-left: 10px;
     color: #FFD700 !important;
     vertical-align: middle;
-}
-
-.pageEval {
-    text-align: center;
-    font-size: 1.4rem;
-    margin-top: 20px;
-    font-weight: 600;
-}
-
-.thumbs {
-    margin-top: 10px;
-    font-size: 1rem;
-    font-weight: normal;
-}
-
-.yes.thumb {
-    border: 2px solid green;
-    padding: 2px 2px 2px 6px;
-    border-radius: 20px;
-    color: green;
-    margin-right: 5px;
 }
 
 .highlightSearch:focus {
