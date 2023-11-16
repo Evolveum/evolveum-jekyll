@@ -261,7 +261,9 @@
                                     fields: [
                                         "text",
                                         `title^${data._source.multipliers.title}`,
-                                        "alternative_text^0.5" // TODO
+                                        "alternative_text^0.5", // TODO
+                                        `keywords^${data._source.multipliers.keywords}`,
+                                        `search-alias^${data._source.multipliers.searchAlias}`
                                     ],
                                     fuzziness: "AUTO",
                                     prefix_length: 2,
@@ -279,6 +281,22 @@
                             }
                         },
                         {
+                            term: {
+                                "keywords.keyword": {
+                                    value: "",
+                                    boost: `${data._source.multipliers.queryKeywordExactMatch}`
+                                }
+                            }
+                        },
+                        {
+                            term: {
+                                "search-alias.keyword": {
+                                    value: "",
+                                    boost: `${data._source.multipliers.querySearchAliasExactMatch}`
+                                }
+                            }
+                        },
+                        {
                             multi_match: {
                                 query: "",
                                 analyzer: "simple",
@@ -286,7 +304,8 @@
                                 fields: [
                                     "text",
                                     `title^${data._source.multipliers.title}`,
-                                    "alternative_text^0.5" // TODO
+                                    "alternative_text^0.5",
+                                    `search-alias^${data._source.multipliers.searchAlias}`
                                 ],
                                 boost: `${data._source.multipliers.wordExactMatch}`
                             }
@@ -372,7 +391,9 @@
         searchQuery.size = pagesShown;
         const query = document.getElementById('searchbar').value.toLowerCase();
         searchQuery.query.bool.must[0].function_score.query.multi_match.query = query
-        searchQuery.query.bool.should[1].multi_match.query = query
+        searchQuery.query.bool.should[3].multi_match.query = query
+        searchQuery.query.bool.should[2].term['search-alias.keyword'].value = query
+        searchQuery.query.bool.should[1].term['keywords.keyword'].value = query
         searchQuery.query.bool.should[0].term['title.keyword'].value = query
         searchQuery.highlight.fields.title.highlight_query.match.title.query = query
         searchQuery.highlight.fields.text.highlight_query.match.text.query  = query
