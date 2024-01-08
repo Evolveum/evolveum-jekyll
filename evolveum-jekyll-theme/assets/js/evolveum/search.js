@@ -187,10 +187,10 @@
                                     source: `
                                         double totalScore = _score;
                                         if (doc.upvotes.size()!=0) {
-                                            totalScore = totalScore*(1+${data._source.multipliers.upvotes}*doc.upvotes.value/100);
+                                            totalScore = totalScore*(1.0+${data._source.multipliers.upvotes}*doc.upvotes.value);
                                         }
                                         if (doc.upvotes.size()!=0) {
-                                            totalScore = totalScore*(1+${data._source.multipliers.docslikes}*doc.upvotes.value/100);
+                                            totalScore = totalScore*(1.0+${data._source.multipliers.docslikes}*doc.upvotes.value);
                                         }
                                         if (doc['_index'].value == "mpbook") {
                                             totalScore = totalScore*${data._source.multipliers.book};
