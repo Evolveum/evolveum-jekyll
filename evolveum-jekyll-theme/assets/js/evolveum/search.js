@@ -239,18 +239,18 @@
                                                 totalScore = totalScore*${data._source.multipliers.obsolete};
                                             }
                                         }
-                                        if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
-                                            if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
-                                                totalScore = totalScore*${data._source.multipliers.notMasterBranch};
-                                            }
-                                        }
                                         if (doc.containsKey('type.keyword') && doc['type.keyword'].size()!=0) {
                                             if (doc['type.keyword'].value == "Other") {
                                                 totalScore = totalScore*${data._source.multipliers.other};
                                             }
                                         }
+                                        if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
+                                            if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
+                                                totalScore = totalScore*${data._source.multipliers.notMasterBranch};
+                                            }
+                                        }
                                         return totalScore;
-                                    `
+                                    `// ONLY ADD CODE AFTER BRANCH CLAUSE
                                 }
                             },
                             query: {
