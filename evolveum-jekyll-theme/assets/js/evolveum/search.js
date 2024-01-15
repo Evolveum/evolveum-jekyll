@@ -28,7 +28,7 @@
             console.log(branches)
             if (branches.size == 1) {
                 searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0, queryLen - 1).join("\n") + "\n" + `if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
-                    if (doc['branch.keyword'].value != "master" && doc['branch.keyword'].value != "notBranched") {
+                    if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
                         totalScore = totalScore*${notMasterBranchMult};
                     }
                 }
@@ -239,18 +239,18 @@
                                                 totalScore = totalScore*${data._source.multipliers.obsolete};
                                             }
                                         }
-                                        if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
-                                            if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
-                                                totalScore = totalScore*${data._source.multipliers.notMasterBranch};
-                                            }
-                                        }
                                         if (doc.containsKey('type.keyword') && doc['type.keyword'].size()!=0) {
                                             if (doc['type.keyword'].value == "Other") {
                                                 totalScore = totalScore*${data._source.multipliers.other};
                                             }
                                         }
+                                        if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
+                                            if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
+                                                totalScore = totalScore*${data._source.multipliers.notMasterBranch};
+                                            }
+                                        }
                                         return totalScore;
-                                    `
+                                    ` //ADD ONLY BEFORE BRANCH PART
                                 }
                             },
                             query: {
