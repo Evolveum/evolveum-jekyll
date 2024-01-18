@@ -127,7 +127,7 @@
                     width: $(document).width(),
                     height: $(document).height()
                 }
-                OSrequest("POST", "https://docs.evolveum.com/webhooks/report/search", reportSearchQuery, true)
+                OSrequest("POST", "https://docstestr.evolveum.com/webhooks/report/search", reportSearchQuery, true)
                 $('#reportSearchProblemPopover').popover('hide');
             });
         })
@@ -166,7 +166,7 @@
     let searchQuery = {}
 
     window.addEventListener('load', function() {
-        OSrequest("GET", "https://search.evolveum.com/search_settings/_doc/1", undefined, true, setSearchQuery)
+        OSrequest("GET", "https://searchtestr.evolveum.com/search_settings/_doc/1", undefined, true, setSearchQuery)
     });
 
     function setSearchQuery(data) {
@@ -559,7 +559,7 @@
 
         }
 
-        OSrequest("GET", "https://search.evolveum.com/docs,mpbook/_search", searchQuery, true, showResults)
+        OSrequest("GET", "https://searchtestr.evolveum.com/docs,mpbook/_search", searchQuery, true, showResults)
     }
 
     function setHighlighting() {
@@ -617,7 +617,7 @@
             "querylength": document.getElementById('searchbar').value.toLowerCase().length,
             "query": document.getElementById('searchbar').value.toLowerCase()
         }
-        OSrequest("POST", "https://search.evolveum.com/finalsearchlogs/_doc/", logPayload, true)
+        OSrequest("POST", "https://searchtestr.evolveum.com/finalsearchlogs/_doc/", logPayload, true)
     }
 
     function setSearchItemOnclick(id, title) {
@@ -636,7 +636,7 @@
                 }
             }
 
-            OSrequest("POST", "https://search.evolveum.com/docs/_update/" + id + "?refresh", queryUpvote, true)
+            OSrequest("POST", "https://searchtestr.evolveum.com/docs/_update/" + id + "?refresh", queryUpvote, true)
 
             $(this).toggleClass('on');
         };
@@ -656,7 +656,7 @@
                         "querylength": document.getElementById('searchbar').value.toLowerCase().length,
                         "query": document.getElementById('searchbar').value.toLowerCase()
                     }
-                    OSrequest("POST", "https://search.evolveum.com/finalsearchlogs/_doc/", logPayload, true)
+                    OSrequest("POST", "https://searchtestr.evolveum.com/finalsearchlogs/_doc/", logPayload, true)
                     logScheduled = false
                     console.log("logtimer removed")
                 }
@@ -671,7 +671,7 @@
                     "clickquery": document.getElementById('searchbar').value.toLowerCase()
                 }
 
-                event.button == 0 ? OSrequest("POST", "https://search.evolveum.com/click_logs/_doc/", queryClick, false) : OSrequest("POST", "https://searchd.evolveum.com/click_logs/_doc/", queryClick, true);test
+                event.button == 0 ? OSrequest("POST", "https://searchtestr.evolveum.com/click_logs/_doc/", queryClick, false) : OSrequest("POST", "https://searchd.evolveum.com/click_logs/_doc/", queryClick, true);test
             }
         });
     }
