@@ -220,7 +220,7 @@ module Evolveum
 
         # Checking if target includes specific midpoint versions
         verArr = readVersions()
-        version = verArr[0]
+        versions = verArr[0]
         versions.each do |version|
             versionWithoutDocs = version.gsub("docs/","")
             if target.include?("/" + versionWithoutDocs + "/")
