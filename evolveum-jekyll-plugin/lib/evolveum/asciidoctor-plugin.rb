@@ -10,6 +10,7 @@ require 'asciidoctor'
 require 'asciidoctor/extensions'
 require 'pathname'
 require 'pp'
+require_relative 'jekyll-versioning-plugin.rb' # We need readVersions method for checking if xfer path includes exact midpoint version
 
 module Evolveum
 
@@ -216,6 +217,17 @@ module Evolveum
 
         targetPage = findPageByTarget(parent.document, targetPath)
         #puts("DEBUG XREF #{targetPath} -> found page #{targetPage&.url} in #{sourceFile}")
+
+        # Checking if target includes specific midpoint versions
+        verArr = readVersions()
+        version = verArr[0]
+        versions.each do |version|
+            versionWithoutDocs = version.gsub("docs/","")
+            if target.include?("/" + versionWithoutDocs + "/")
+                Jekyll.logger.warning("Specific midpoint version included in link xref:#{target} in #{sourceFile}")
+                puts("Specific version included")
+            end
+        end
 
         if targetPage == nil
             # No page. But there still may be a plain file (e.g. a PDF file)

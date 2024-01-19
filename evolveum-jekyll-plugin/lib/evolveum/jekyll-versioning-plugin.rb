@@ -6,7 +6,11 @@ require 'yaml'
 
 #$stdout.reopen("/var/log/jekylversioning", "w")
 
-def installVersions(versions, displayVersions, defaultBranch)
+def installVersions()
+  let arr = readVersions()
+  versions = arr[0]
+  displayVersions = arr[1]
+  defaultBranch = arr[2]
     #`mv /docs/midpoint/reference/index.adoc /`
   `rm -rf /docs/midpoint/reference/*`
   `cp /mnt/index.html /docs/midpoint/reference/`
@@ -80,7 +84,7 @@ def readVersions()
   filteredDisplayVersions.push("4.7 and earlier")
   filteredVersions.push("master")
   filteredDisplayVersions.push("Development")
-  installVersions(filteredVersions, filteredDisplayVersions, defaultBranch)
+  return([filteredVersions, filteredDisplayVersions, defaultBranch])
 end
 
 #def filterVersions(context)
@@ -98,5 +102,5 @@ end
 
 Jekyll::Hooks.register :site, :after_init do |site|
   puts "=========[ EVOLVEUM VERSIONNING ]============== after_init"
-  readVersions()
+  installVersions()
 end
