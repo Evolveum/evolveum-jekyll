@@ -224,7 +224,7 @@ module Evolveum
         versions.each do |version|
             versionWithoutDocs = version.gsub("docs/","")
             if target.include?("/" + versionWithoutDocs + "/")
-                Jekyll.logger.warning("Specific midpoint version included in link xref:#{target} in #{sourceFile}")
+                Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{sourceFile}")
                 puts("Specific version included")
             end
         end
