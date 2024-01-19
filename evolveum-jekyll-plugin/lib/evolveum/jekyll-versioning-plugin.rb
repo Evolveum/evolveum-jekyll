@@ -7,7 +7,7 @@ require 'yaml'
 #$stdout.reopen("/var/log/jekylversioning", "w")
 
 def installVersions()
-  let arr = readVersions()
+  arr = readVersions()
   versions = arr[0]
   displayVersions = arr[1]
   defaultBranch = arr[2]
