@@ -23,8 +23,9 @@ def installVersions()
   negativeAssert.chop!
   negativeAssert << ")"
   puts(negativeAssert)
+  system("find /docs -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv\\/midpoint\\/reference\\/#{defaultBranch.gsub("docs/","")}\\//g' {} \\;")
   system("find /docs -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{defaultBranch.gsub("docs/","")}\\//g' {} \\;")
-
+  
   versions.each_with_index do |version, index|
     versionWithoutDocs = version.gsub("docs/","")
     if Dir["/mp-#{versionWithoutDocs}"].empty?
@@ -41,6 +42,7 @@ def installVersions()
     end
     `ln -s /mp-#{versionWithoutDocs}/docs/ /docs/midpoint/reference/#{versionWithoutDocs}`
     system("sed -i 's/:page-nav-title: Configuration Reference/:page-nav-title: \"#{displayVersions[index]}\"/g' /mp-#{versionWithoutDocs}/docs/index.adoc")
+    system("find /mp-#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv:\\/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} \\;")
     system("find /mp-#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} \\;")
   end
 end
@@ -72,7 +74,6 @@ def readVersions()
         filteredDisplayVersions.push(ver['docsDisplayBranch'])
         puts ver['defaultBranch']
         if ver['defaultBranch'] != nil && ver['defaultBranch'] == true
-          puts "somtu"
           defaultBranch = ver['docsBranch']
         end
       end
