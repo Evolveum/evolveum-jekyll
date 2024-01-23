@@ -202,25 +202,25 @@ module Evolveum
             end
             return ignoredPrefixes.any? { |prefix|  targetPath.start_with?(prefix) }
         end
-    
+
         def processXRefLink(parent, target, attrs)
         #    puts "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXREF -------> Processing #{parent} #{targetFile} #{attrs}"
-    
+
             targetPath, fragmentSuffix = parseFragment(target)
             sourceFile = parent.document.attributes["docfile"]
             # puts "targetPath=#{targetPath}, fragment=#{fragmentSuffix}"
-    
+
             if targetPath == nil
                 # document-local link, use as is
                 return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert
             end
-    
+
             targetPage = findPageByTarget(parent.document, targetPath)
             #puts("DEBUG XREF #{targetPath} -> found page #{targetPage&.url} in #{sourceFile}")
-    
+
             # Checking if target includes specific midpoint versions
-            
-    
+
+
             if targetPage == nil
                 # No page. But there still may be a plain file (e.g. a PDF file)
                 fileUrl = findFileByTarget(parent.document, targetPath)
@@ -239,7 +239,7 @@ module Evolveum
                 createLink(addFragmentSuffix(targetPage.url,fragmentSuffix), parent, attrs, targetPage.data['title'])
             end
         end
-    
+
 
     end
 
@@ -256,31 +256,31 @@ module Evolveum
       name_positional_attributes 'linktext'
 
       def process(parent, target, attrs)
-        verArr = readVersions()
-        versions = verArr[0]
-        versions.each do |version|
-            versionWithoutDocs = version.gsub("docs/","")
-            if target.include?("/" + versionWithoutDocs + "/")
-                Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{sourceFile}")
-                puts("Specific version included")
-            end
-        end
+        # verArr = readVersions()
+        # versions = verArr[0]
+        # versions.each do |version|
+        #     versionWithoutDocs = version.gsub("docs/","")
+        #     if target.include?("/" + versionWithoutDocs + "/")
+        #         Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{sourceFile}")
+        #         puts("Specific version included")
+        #     end
+        # end
         processXRefLink(parent, target, attrs)
       end
     end
 
     class XrefVInlineMacro < JekyllInlineMacro
         use_dsl
-  
+
         named :xrefv
         name_positional_attributes 'linktext'
-  
+
         def process(parent, target, attrs)
             processXRefLink(parent, target, attrs)
         end
     end
 
-    
+
     class WikiInlineMacro < JekyllInlineMacro
       use_dsl
 
