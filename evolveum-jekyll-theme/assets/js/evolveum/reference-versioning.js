@@ -1,6 +1,6 @@
 var DOCSBRANCHESCOLORS = new Map();
 var DOCSBRANCHDISPLAYNAMES = {}
-var DEFAULTDOCSBRANCH = "master"
+var DEFAULTDOCSBRANCH = "support-4.8"
 
 function decToHex(dec) {
     return dec.toString(16);
@@ -27,6 +27,7 @@ window.addEventListener('load', function() {
     console.log(options.length)
     let step = Math.round((end - start) / options.length)
     console.log("ADB" + options)
+    // options[o].values is display branch, options[o].dataset['tokens'] is branch without docs/
     for (let o = 0; o < options.length; o++) {
         console.log(start + (o*step))
         console.log(o)
