@@ -25,7 +25,7 @@ def installVersions()
   puts(negativeAssert)
   system("find /docs -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv\\/midpoint\\/reference\\/#{defaultBranch.gsub("docs/","")}\\//g' {} \\;")
   system("find /docs -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{defaultBranch.gsub("docs/","")}\\//g' {} \\;")
-  
+
   versions.each_with_index do |version, index|
     versionWithoutDocs = version.gsub("docs/","")
     if Dir["/mp-#{versionWithoutDocs}"].empty?
@@ -62,12 +62,12 @@ end
 
 def readVersions()
   verObject = YAML.load_file('/docs/_data/midpoint-versions.yml')
-  puts("OBJ" + verObject.inspect)
+  #puts("OBJ" + verObject.inspect)
   filteredVersions = []
   filteredDisplayVersions = []
   defaultBranch = ""
   verObject.each do |ver|
-    puts(ver)
+    #puts(ver)
       if ver['docsBranch'] != nil && ver['docsDisplayBranch']
         puts("version" + ver['docsBranch'])
         filteredVersions.push(ver['docsBranch'])

@@ -258,6 +258,7 @@ module Evolveum
       def process(parent, target, attrs)
         verArr = readVersions()
         versions = verArr[0]
+        sourceFile = parent.document.attributes["docfile"]
         versions.each do |version|
             versionWithoutDocs = version.gsub("docs/","")
             if target.include?("/" + versionWithoutDocs + "/")
