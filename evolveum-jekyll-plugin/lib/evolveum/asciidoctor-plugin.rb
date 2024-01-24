@@ -256,15 +256,15 @@ module Evolveum
       name_positional_attributes 'linktext'
 
       def process(parent, target, attrs)
-        # verArr = readVersions()
-        # versions = verArr[0]
-        # versions.each do |version|
-        #     versionWithoutDocs = version.gsub("docs/","")
-        #     if target.include?("/" + versionWithoutDocs + "/")
-        #         Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{sourceFile}")
-        #         puts("Specific version included")
-        #     end
-        # end
+        verArr = readVersions()
+        versions = verArr[0]
+        versions.each do |version|
+            versionWithoutDocs = version.gsub("docs/","")
+            if target.include?("/" + versionWithoutDocs + "/")
+                Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{sourceFile}")
+                puts("Specific version included")
+            end
+        end
         processXRefLink(parent, target, attrs)
       end
     end
