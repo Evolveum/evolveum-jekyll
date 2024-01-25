@@ -136,7 +136,7 @@
                 if (contentVersion != "Not versioned") {
                     let contentVersionWithoutDocs = contentVersion.replace("docs/", "")
                     contentDisplayVersion = DOCSBRANCHDISPLAYNAMES[contentVersionWithoutDocs]
-                    versionColor = DOCSBRANCHESCOLORS[contentDisplayVersion]
+                    versionColor = DOCSBRANCHESCOLORS.get(contentDisplayVersion)
                 }
             }
 
