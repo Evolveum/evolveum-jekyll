@@ -29,7 +29,8 @@
             "author",
             "url",
             "id",
-            "gitUrl"
+            "gitUrl",
+            "branch"
         ],
         _source: false,
         size: 30,
@@ -83,7 +84,8 @@
             "author",
             "url",
             "id",
-            "gitUrl"
+            "gitUrl",
+            "branch"
         ],
         _source: false,
         size: 30,
