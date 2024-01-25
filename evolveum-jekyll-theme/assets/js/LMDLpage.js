@@ -132,7 +132,7 @@
             if (data.hits.hits[i].fields.branch != undefined) {
                 contentVersion = data.hits.hits[i].fields.branch
                 if (contentVersion != "Not versioned") {
-                    contentVersionWithoutDocs = contentVersion.replace("docs/", "")
+                    let contentVersionWithoutDocs = contentVersion.replace("docs/", "")
                     contentDisplayVersion = DOCSBRANCHDISPLAYNAMES[contentVersionWithoutDocs]
                     versionColor = DOCSBRANCHESCOLORS[contentDisplayVersion]
                 }
