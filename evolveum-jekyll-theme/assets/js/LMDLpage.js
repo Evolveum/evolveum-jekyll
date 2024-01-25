@@ -132,7 +132,7 @@
             let versionColor = "#757575"
 
             if (data.hits.hits[i].fields.branch != undefined) {
-                contentVersion = data.hits.hits[i].fields.branch
+                contentVersion = data.hits.hits[i].fields.branch[0]
                 if (contentVersion != "Not versioned") {
                     let contentVersionWithoutDocs = contentVersion.replace("docs/", "")
                     contentDisplayVersion = DOCSBRANCHDISPLAYNAMES[contentVersionWithoutDocs]
@@ -208,7 +208,7 @@
             let parsedTitle = title.replace(/[\W_]+/g, "")
 
             listitems.push(`<tr>
-        <th class="LMDLtitle" scope="row"><a href="${data.hits.hits[i].fields.url[0]}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='<span>Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></i>${unknownStatus}</span>'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i].fields.gitUrl[0]}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
+        <th class="LMDLtitle" scope="row"><a href="${data.hits.hits[i].fields.url[0]}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='<span>Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></i>${unknownStatus}</span>'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="${data.hits.hits[i].fields.gitUrl[0]}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
         <td class="LMDLcategory${contentVersion} LMDLcategory" style="color:${versionColor};">${contentDisplayVersion}</td>
         <td class="LMDLcategory${contentType} LMDLcategory">${contentType.toUpperCase()}</td>
         <td class="tableCentered LMDLimpact${impactOfChange} LMDLimpact">${impactOfChange.toUpperCase()}</td>
