@@ -419,7 +419,7 @@
         for (let i = 0; i < DOCSBRANCHESDISPLAYNAMES.length; i++) {
             branchList.push("<option style=\"color: " + DOCSBRANCHESCOLORS[DOCSBRANCHESDISPLAYNAMES[i]] + ";\">" + DOCSBRANCHESDISPLAYNAMES[i] + "</option>")
         }
-        let selectObjects = document.getElementById("selectpickercategory")
+        let selectObjects = document.getElementById("selectpickerversion")
         selectObjects.innerHTML = branchList.join("")
         //afterSearchQuery.query.bool.must[0].bool.filter[1].terms["author.keyword"] = allAuthors
         $('#selectpickerversion').selectpicker();
