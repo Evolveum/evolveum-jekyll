@@ -7,7 +7,7 @@
 
     $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
-        let newVersionEdited = DOCSBRANCHDISPLAYNAMES[newVersion]
+        let newVersionEdited = DOCSBRANCHMAP[newVersion]
         console.log(newVersionEdited)
         let queryArr = searchQuery.query.bool.must[0].function_score.script_score.script.source.split("\n")
         let queryLen = queryArr.length
@@ -423,7 +423,7 @@
 
                     if (branch != null && branch != "notBranched") {
                         branchClass = "searchResultBranched"
-                        displayBranch = DOCSBRANCHDISPLAYNAMES[branch]
+                        displayBranch = DOCSBRANCHMAP[branch]
                         tooltipVer = displayBranch
                         console.log("CB" + displayBranch)
                         let colorString = DOCSBRANCHESCOLORS.get(displayBranch)

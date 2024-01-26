@@ -7,6 +7,7 @@
     let allSearchIn = ["Title", "Text", "Commit message"]
     let searchIn = new Set([])
     let authors = new Set([])
+    let filterBranches = new Set([])
     let allAuthors = []
     var shouldIgnoreScroll = false;
 
@@ -129,13 +130,13 @@
 
             let contentVersion = "Not versioned"
             let contentDisplayVersion = "Not versioned"
-            let versionColor = "#757575"
+            let versionColor = "#CACACA"
 
             if (data.hits.hits[i].fields.branch != undefined) {
                 contentVersion = data.hits.hits[i].fields.branch[0]
                 if (contentVersion != "Not versioned") {
                     let contentVersionWithoutDocs = contentVersion.replace("docs/", "")
-                    contentDisplayVersion = DOCSBRANCHDISPLAYNAMES[contentVersionWithoutDocs]
+                    contentDisplayVersion = DOCSBRANCHMAP[contentVersionWithoutDocs]
                     versionColor = DOCSBRANCHESCOLORS.get(contentDisplayVersion)
                 }
             }
@@ -305,6 +306,7 @@
 
     $(document).ready(function() {
         setLMDLSearchIn()
+        setLMDLVersion()
         setLMDLCategory()
         setLMDLImpact()
 
@@ -409,6 +411,39 @@
             } else {
                 searchIn.delete(allSearchIn[clickedIndex])
             }
+        });
+    }
+
+    function setLMDLVersion() {
+        let branchList = []
+        for (let i = 0; i < DOCSBRANCHESDISPLAYNAMES.length; i++) {
+            branchList.push("<option style=\"color: " + DOCSBRANCHESCOLORS[DOCSBRANCHESDISPLAYNAMES[i]] + ";\">" + DOCSBRANCHESDISPLAYNAMES[i] + "</option>")
+        }
+        let selectObjects = document.getElementById("selectpickercategory")
+        selectObjects.innerHTML = branchList.join("")
+        //afterSearchQuery.query.bool.must[0].bool.filter[1].terms["author.keyword"] = allAuthors
+        $('#selectpickerversion').selectpicker();
+        $('#selectpickerversion').selectpicker('deselectAll');
+        $('#selectpickerversion').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
+            if (isSelected) {
+                filterBranches.add(DOCSORIGINALBRANCHMAP[DOCSBRANCHMAP[DOCSBRANCHESDISPLAYNAMES[clickedIndex]]]) //TODO improve - not very pretty
+            } else {
+                filterBranches.delete(DOCSORIGINALBRANCHMAP[DOCSBRANCHMAP[DOCSBRANCHESDISPLAYNAMES[clickedIndex]]])
+            }
+
+            if (filterBranches.size == 0) {
+                afterSearchQuery.query.bool.must[0].bool.filter.pop()
+            } else {
+                afterSearchQuery.query.bool.must[0].bool.filter.push({
+                    terms: {
+                        "branch.keyword": Array.from(filterBranches)
+                    }
+                })
+            }
+            searchLMDP()
+        }).on('loaded.bs.select', function(e) {
+            let parent = $('#selectpickerversion')[0].parentElement
+            parent.id = "LMDLversionPicker"
         });
     }
 
