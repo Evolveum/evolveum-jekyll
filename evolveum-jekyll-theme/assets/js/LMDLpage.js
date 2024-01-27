@@ -417,8 +417,8 @@
     function setLMDLVersion() {
         let branchList = []
         for (let i = 0; i < DOCSBRANCHESDISPLAYNAMES.length; i++) {
-            branchList.push("<option class=\"color: " + DOCSBRANCHESCOLORS.get(DOCSBRANCHESDISPLAYNAMES[i]) + ";\">" + DOCSBRANCHESDISPLAYNAMES[i] + "</option>")
-            console.log("<option class=\"color: " + DOCSBRANCHESCOLORS.get(DOCSBRANCHESDISPLAYNAMES[i]) + ";\">" + DOCSBRANCHESDISPLAYNAMES[i] + "</option>")
+            branchList.push("<option style=\"color: " + DOCSBRANCHESCOLORS.get(DOCSBRANCHESDISPLAYNAMES[i]) + ";\">" + DOCSBRANCHESDISPLAYNAMES[i] + "</option>")
+            console.log("<option style=\"color: " + DOCSBRANCHESCOLORS.get(DOCSBRANCHESDISPLAYNAMES[i]) + ";\">" + DOCSBRANCHESDISPLAYNAMES[i] + "</option>")
         }
         let selectObjects = document.getElementById("selectpickerversion")
         selectObjects.innerHTML = branchList.join("")
