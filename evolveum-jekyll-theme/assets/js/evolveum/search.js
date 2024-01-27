@@ -1,6 +1,6 @@
 (function() {
 
-    let letters = new Set(["Guide", "Reference", "Other"]);
+    let letters = new Set(["Guide", "Book", "Reference", "Other"]);
     let branches = new Set(["notBranched"])
     let notMasterBranchMult = 0
 
