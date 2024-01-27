@@ -261,6 +261,10 @@
                                     fields: [
                                         "text",
                                         `title^${data._source.multipliers.title}`,
+                                        `second_titles^${data._source.multipliers.secondTitle}`,
+                                        `third_titles^${data._source.multipliers.thirdTitle}`,
+                                        `fourth_titles^${data._source.multipliers.fourthTitle}`,
+                                        `fifth_titles^${data._source.multipliers.fifthTitle}`,
                                         "alternative_text^0.5", // TODO
                                         `keywords^${data._source.multipliers.keywords}`,
                                         `search-alias^${data._source.multipliers.searchAlias}`

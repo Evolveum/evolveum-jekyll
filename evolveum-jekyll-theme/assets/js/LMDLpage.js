@@ -1,6 +1,6 @@
 (function() {
 
-    let allSearchCategory = ["Guide", "Reference", "Developer", "Other"]
+    let allSearchCategory = ["Guide", "Book", "Reference", "Developer", "Other"]
     let searchCategory = new Set([]);
     let allImportance = ["Major", "Significant", "Minor"]
     let importance = new Set([]);
