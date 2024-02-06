@@ -23,7 +23,7 @@ def installVersions()
   negativeAssert.chop!
   negativeAssert << ")"
   puts(negativeAssert)
-  system("find /docs -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv\\/midpoint\\/reference\\/#{defaultBranch.gsub("docs/","")}\\//g' {} \\;")
+  system("find /docs -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv:\\/midpoint\\/reference\\/#{defaultBranch.gsub("docs/","")}\\//g' {} \\;")
   system("find /docs -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{defaultBranch.gsub("docs/","")}\\//g' {} \\;")
 
   versions.each_with_index do |version, index|
