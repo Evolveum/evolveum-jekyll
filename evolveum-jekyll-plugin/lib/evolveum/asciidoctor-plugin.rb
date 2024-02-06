@@ -255,6 +255,7 @@ module Evolveum
       named :xref
       name_positional_attributes 'linktext'
 
+      # Check if there is an sprecific midpoint version included in link
       def process(parent, target, attrs)
         verArr = readVersions()
         versions = verArr[0]
