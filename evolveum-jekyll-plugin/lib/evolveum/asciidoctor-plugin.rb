@@ -428,6 +428,7 @@ end
 
 Asciidoctor::Extensions.register do
   inline_macro Evolveum::XrefInlineMacro
+  inline_macro Evolveum::XrefVInlineMacro
   inline_macro Evolveum::WikiInlineMacro
   inline_macro Evolveum::BugInlineMacro
   inline_macro Evolveum::GlossrefInlineMacro
