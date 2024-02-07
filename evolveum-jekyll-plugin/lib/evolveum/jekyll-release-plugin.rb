@@ -13,7 +13,11 @@ def readVersions()
   verObject = YAML.load_file('/docs/_data/midpoint-versions.yml')
   versionsNumbers = []
   verObject.each do |ver|
-    if (ver.version.gsub!(/\./, "").to_d >= 4.8 && ver.status != "planned" && ver.status != "development")
+    shorterVersion = ver
+    if (shorterVersion.length > 3)
+      shorterVersion.pop()
+    end
+    if (ver.version.gsub!(/\./, "").to_i >= 48 && ver.status != "planned" && ver.status != "development")
       versionsNumbers.push(ver.version.to_d)
     end
   end
