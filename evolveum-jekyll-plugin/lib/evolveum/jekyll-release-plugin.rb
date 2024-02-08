@@ -2,14 +2,14 @@
 require 'yaml'
 
 def installReleaseNotes()
-  versions = readVersions()
+  versions = readReleaseVersions()
   versions.each do |ver|
     `cd /docs/midpoint/release/ && mkdir #{ver} && cd #{ver} && wget https://raw.githubusercontent.com/Evolveum/midpoint/v#{ver}/release-notes.adoc
     && mv release-notes.adoc index.adoc && wget https://raw.githubusercontent.com/Evolveum/midpoint/v#{ver}/install-dist.adoc && mv install-dist.adoc install.adoc`
   end
 end
 
-def readVersions()
+def readReleaseVersions()
   verObject = YAML.load_file('/docs/_data/midpoint-versions.yml')
   versionsNumbers = []
   verObject.each do |ver|
