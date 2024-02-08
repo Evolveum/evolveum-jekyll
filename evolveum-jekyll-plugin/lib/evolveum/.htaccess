@@ -1,3 +1,5 @@
+RewriteRule   "^midpoint/reference(?!/master)(?!/before-.*)(?![0-9]\..*)(?!/support-.*)(/|$)(.*)" "/midpoint/reference/{{ page.defaultBranch }}/$2" [R]
 {% for redirect in page.redirects %}
 RewriteRule   "{{ redirect.pattern }}" "{{ redirect.substitution }}" [R]
 {% endfor %}
+

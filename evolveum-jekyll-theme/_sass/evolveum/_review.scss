@@ -1,0 +1,64 @@
+#pageEval {
+    text-align: center;
+    font-size: 1.4rem;
+    margin-top: 20px;
+    font-weight: 600;
+}
+
+.siteReviewThumbs {
+    margin-top: 10px;
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+.siteReviewThumb {
+    border: 1.3px solid;
+    padding: 2px 2px 2px 6px;
+    border-radius: 20px;
+    margin-right: 5px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+#yesSiteReviewThumb {
+    border-color: #273376;
+    color: #273376;
+}
+
+#yesSiteReviewThumb.on {
+    color: white;
+    background-color: #273376;
+}
+
+#noSiteReviewThumb.on {
+    color: white;
+    background-color: #3F4B8C;
+}
+
+#noSiteReviewThumb {
+    border-color: #3F4B8C;
+    color: #3F4B8C;
+}
+
+#helpfullPageText {
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.thanksFeedback {
+    display: none;
+}
+
+.thanksFeedback.on {
+    display: inherit;
+}
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
+  }

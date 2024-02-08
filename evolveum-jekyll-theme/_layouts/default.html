@@ -1,51 +1,40 @@
 <!DOCTYPE html>
-<html lang="{{ page.lang | default: site.lang | default: "en" }}" class="h-100">
+<html lang="{{ page.lang | default: site.lang | default: " en " }}" class="h-100">
 
 {%- include head.html -%}
 
 <body class="h-100">
 
-<div id="page-container" class="container-fluid pr-0 pl-0 h-100 d-flex flex-column">
+    <div id="page-container" class="container-fluid pr-0 pl-0 h-100 d-flex flex-column">
 
-{%- include header.html -%}
+        {%- include header.html -%}
 
-    <main role="main" class="container-fluid">
-{{ content }}
-    </main>
+        <main role="main" class="container-fluid">
+            {{ content }}
+        </main>
 
-{%- include footer.html -%}
+        {%- include footer.html -%}
 
-<script src="/assets/js/jquery-3.5.1.min.js"></script>
-<script src="/assets/js/popper.min.js"></script>
-<script src="/assets/js/bootstrap.min.js"></script>
-<script src="/assets/js/evolveum/multi-source.js"></script>
-<script src="/assets/js/evolveum/search.js"></script>
+        <script src="/assets/js/jquery-3.5.1.min.js"></script>
+        <script src="/assets/js/popper.min.js"></script>
+        <script src="/assets/js/bootstrap.min.js"></script>
+        <script src="/assets/js/bootstrap-select.min.js"></script>
+        <script src="/assets/js/evolveum/multi-source.js"></script>
+        <script src="/assets/js/evolveum/reference-versioning.js"></script>
+        <script src="/assets/js/evolveum/search.js"></script>
+        <script src="/assets/js/evolveum/site-review.js"></script>
 
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  messageStyle: "none",
-  tex2jax: {
-    inlineMath: [["\\(","\\)"]],
-    displayMath: [["\\[","\\]"]],
-    ignoreClass: "nostem|nolatexmath"
-  },
-  asciimath2jax: {
-    delimiters: [["\\$","\\$"]],
-    ignoreClass: "nostem|noasciimath"
-  },
-  TeX: {
-      equationNumbers: {
-        autoNumber: "AMS"
-      }
-    }
-});
-</script>
-<script src="/assets/js/mathjax/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({ messageStyle: "none", tex2jax: { inlineMath: [["\\(","\\)"]], displayMath: [["\\[","\\]"]], ignoreClass: "nostem|nolatexmath" }, asciimath2jax: { delimiters: [["\\$","\\$"]], ignoreClass: "nostem|noasciimath" }, TeX: { equationNumbers:
+            { autoNumber: "AMS" } } });
+        </script>
+        <script src="/assets/js/mathjax/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
 
-{% for script in page.scripts %}
-    <script src="/assets/scripts/{{ script }}"></script>
-{% endfor %}
+        {% for script in page.scripts %}
+        <script src="/assets/scripts/{{ script }}"></script>
+        {% endfor %}
 
-</div>
+    </div>
 </body>
+
 </html>

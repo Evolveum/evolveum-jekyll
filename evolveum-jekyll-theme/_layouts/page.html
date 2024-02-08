@@ -11,19 +11,52 @@ layout: default
     <div class="col-md-9 col-sm-12">
         <nav aria-label="breadcrumb">{% breadcrumbs %}</nav>
 
-        {% if page.logo-title %}<div class="logo-title"><img src="{{page.logo-title}}" alt="{{ page.title }}"/></div>{% else %}<h1>{{ page.title }}</h1>{% endif %}
-        {% if page.author %}<address class="author" rel="author">{{ page.author }}</address>{% endif %}
-        {% if page.lastModificationDate %}<div class="page-meta">Last modified {{ page.lastModificationDate | date: "%d %b %Y %H:%M %Z" }}</div>{% endif %}
-
-        {% include page-warnings.html %}
-
-        {% if page.toc %}
+        {% if page.logo-title %}
+        <div id="titleAndSelectVerDiv"><span class="logo-title"><img src="{{page.logo-title}}" alt="{{ page.title }}" /></span><span id="select-version">
+            <select class="selectpicker" id="select-version-picker" data-style="versioningButton btn-light">
+                <option data-tokens="master">Development</option>
+                {% assign versions = site.data.midpoint-versions | reverse %}
+                {% for v in versions %}
+                    {% if v.docsDisplayBranch != null %}
+                        <option data-tokens="{{ v.docsBranch | replace: "docs/", "" }}">{{ v.docsDisplayBranch}}</option>
+                    {% endif %}
+                {% endfor %}
+                <option data-tokens="before-4.8" >4.7 and earlier</option>
+            </select>
+        </span></div>{% else %}
+        <div id="titleAndSelectVerDiv"><span><h1>{{ page.title }}</h1></span><span id="select-version">
+            <select class="selectpicker" id="select-version-picker" data-style="versioningButton btn-light">
+                <option data-tokens="master">Development</option>
+                {% assign versions = site.data.midpoint-versions | reverse %}
+                {% for v in versions %}
+                    {% if v.docsDisplayBranch != null %}
+                        <option data-tokens="{{ v.docsBranch | replace: "docs/", "" }}">{{ v.docsDisplayBranch}}</option>
+                    {% endif %}
+                {% endfor %}
+                <option data-tokens="before-4.8" >4.7 and earlier</option>
+            </select>
+        </span></div>{% endif %} {% if page.author %}<address class="author" rel="author">{{ page.author }}</address>{% endif %} {% if page.lastModificationDate %}
+        <div class="page-meta">Last modified {{ page.lastModificationDate | date: "%d %b %Y %H:%M %Z" }}</div>{% endif %} {% include page-warnings.html %} {% if page.toc %}
         <div class="toc-{{page.toc}}">
             <title>Table of Contents</title>
             {{ page.document | tocify_asciidoc }}
         </div>
-        {% endif %}
-
-        {{ content }}
+        {% endif %} {{ content }}
+        <div id="pageEval" style="text-align: center;">
+            <div id="helpfullPageText">Was this page helpful?</div>
+            <div class="siteReviewThumbs">
+                <span id="yesSiteReviewThumb" class="siteReviewThumb noselect">
+              <i class="fas fa-thumbs-up"></i>
+                YES
+          </span>
+                <span id="noSiteReviewThumb" class="siteReviewThumb noselect" data-toggle="popover" data-html="true">
+              <i class="fas fa-thumbs-down"></i>
+               NO
+          </span>
+            </div>
+            <div class="thanksFeedback">
+                Thanks for your feedback
+            </div>
+        </div>
     </div>
 </div>

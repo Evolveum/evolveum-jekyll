@@ -4,4 +4,4 @@ source "https://ruby.evolveum.com"
 gemspec
 
 gem "evolveum-jekyll-plugin"
-gem "jekyll-asciidoc"
+gem "jekyll-asciidoc", "~> 2.0.2"
