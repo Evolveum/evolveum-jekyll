@@ -13,7 +13,7 @@ def readReleaseVersions()
   verObject = YAML.load_file('/docs/_data/midpoint-versions.yml')
   versionsNumbers = []
   verObject.each do |ver|
-    if (ver["legacy"] == null && ver["status"] != "planned" && ver["status"] != "development")
+    if (ver["legacy"] == nil && ver["status"] != "planned" && ver["status"] != "development")
       versionsNumbers.push(ver.version.to_d)
     end
   end
