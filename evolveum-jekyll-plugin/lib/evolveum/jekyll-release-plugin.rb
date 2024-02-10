@@ -14,7 +14,7 @@ def readReleaseVersions()
   versionsNumbers = []
   verObject.each do |ver|
     if (ver["legacy"] == nil && ver["status"] != "planned" && ver["status"] != "development")
-      versionsNumbers.push(ver["version"].to_d)
+      versionsNumbers.push(ver["version"].to_f)
     end
   end
   return(versionsNumbers)
