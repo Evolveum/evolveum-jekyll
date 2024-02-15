@@ -4,7 +4,7 @@ require 'yaml'
 def installReleaseNotes()
   versions = readReleaseVersions()
   versions.each do |ver|
-    `cd /docs/midpoint/release/ && mkdir #{ver} && cd #{ver} && wget https://raw.githubusercontent.com/Evolveum/midpoint/v#{ver}/release-notes.adoc && mv release-notes.adoc index.adoc && wget https://raw.githubusercontent.com/Evolveum/midpoint/v#{ver}/install-dist.adoc && mv install-dist.adoc install.adoc`
+    `rm -rf /docs/midpoint/release/#{ver} && cd /docs/midpoint/release/ && mkdir #{ver} && cd #{ver} && wget https://raw.githubusercontent.com/Evolveum/midpoint/v#{ver}/release-notes.adoc && mv release-notes.adoc index.adoc && wget https://raw.githubusercontent.com/Evolveum/midpoint/v#{ver}/install-dist.adoc && mv install-dist.adoc install.adoc`
   end
 end
 
