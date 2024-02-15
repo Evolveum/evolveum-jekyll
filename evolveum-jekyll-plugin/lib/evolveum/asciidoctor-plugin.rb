@@ -257,7 +257,7 @@ module Evolveum
 
       # Check if there is an sprecific midpoint version included in link
       def process(parent, target, attrs)
-        `cp /evolveum-jekyll/evolveum-jekyll-plugin/lib/evolveum/.htaccess /`
+        `cp /testMovedFrom /evolveum-jekyll/`
         verArr = readVersions()
         versions = verArr[0]
         sourceFile = parent.document.attributes["docfile"]
