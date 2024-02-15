@@ -228,7 +228,30 @@ module Evolveum
                     if ignoreLinkBreak?(parent, targetPath)
                         Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
                     else
-                        Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
+                        output = `grep -rl ":page-moved-from: #{target}" /docs/`
+                        if (output != nil && output != "")
+                            Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
+                        else
+                            output = `grep -rl "\nmoved-from: #{target}\n" /docs/`
+                            if (output != nil && output != "")
+                                Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
+                            else
+                                targetArr = target.split("/")
+                                matched = false
+                                targetArr.each_with_index do |version, index|
+                                    partTargetArr = targetArr[...i+1]
+                                    output = `grep -rl ":page-moved-from: /#{partTargetArr.join("/")}*" /docs/`
+                                    if (output != nil && output != "")
+                                        Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
+                                        matched = true
+                                        break
+                                    end
+                                end
+                                if (!matched)
+                                    Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
+                                end
+                            end
+                        end
                     end
                     # Leave the target of broken link untouched. Redirects may still be able to handle it.
                     return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert
