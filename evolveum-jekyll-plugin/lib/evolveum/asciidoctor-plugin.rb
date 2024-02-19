@@ -224,6 +224,7 @@ module Evolveum
             if targetPage == nil
                 # No page. But there still may be a plain file (e.g. a PDF file)
                 fileUrl = findFileByTarget(parent.document, targetPath)
+                output = ""
                 if fileUrl == nil
                     if ignoreLinkBreak?(parent, targetPath)
                         Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
@@ -233,7 +234,8 @@ module Evolveum
                             Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
                             Jekyll.logger.warn(output + " first")
                         else
-                            output = `grep -rl "\nmoved-from: #{target}\n" /docs/`
+                            escaped_target = Regexp.escape("\nmoved-from: #{target}\n")
+                            output = `grep -rl #{escaped_target} /docs/`
                             if (output != nil && output != "")
                                 Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
                                 Jekyll.logger.warn(output + " second")
