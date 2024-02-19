@@ -234,7 +234,8 @@ module Evolveum
                             Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
                             Jekyll.logger.warn(output + " first")
                         else
-                            escaped_target = Regexp.escape("\nmoved-from: #{target}\n")
+                            escaped_target = "\nmoved-from: #{target}\n"
+                            Jekyll.logger.warn(escaped_target)
                             output = `grep -rl #{escaped_target} /docs/`
                             if (output != nil && output != "")
                                 Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
