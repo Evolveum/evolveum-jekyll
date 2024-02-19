@@ -234,8 +234,7 @@ module Evolveum
                             Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
                             Jekyll.logger.warn(output + " first")
                         else
-                            escaped_target = "\nmoved-from: #{target}\n"
-                            Jekyll.logger.warn(escaped_target)
+                            escaped_target = Regexp.escape("\nmoved-from: #{target}\n")
                             output = `grep -rl #{escaped_target} /docs/`
                             if (output != nil && output != "")
                                 Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
@@ -244,7 +243,7 @@ module Evolveum
                                 targetArr = target.split("/")
                                 matched = false
                                 targetArr.each_with_index do |version, index|
-                                    partTargetArr = targetArr[...i+1]
+                                    partTargetArr = targetArr[...index+1]
                                     output = `grep -rl ":page-moved-from: /#{partTargetArr.join("/")}*" /docs/`
                                     if (output != nil && output != "")
                                         Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
