@@ -247,7 +247,19 @@ module Evolveum
                                     Jekyll.logger.warn(escaped_target)
                                     output = `grep -rl ":page-moved-from: #{escaped_target}" /docs/`
                                     if (output != nil && output != "")
-                                        Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
+                                        movedPart = `sed -n -e '/^:moved-from: /p' #{output.split("\n")[0]}`
+                                        movedPart.replace(":moved-from:", "")
+                                        movedPart.replace("*", "")
+                                        Jekyll.logger.warn("MOVED PART " + movedPart)
+                                        targetPath = movedPart + partTargetArr[index+1...]
+                                        Jekyll.logger.warn("targetPath " + targetPath)
+                                        targetPage = findPageByTarget(parent.document, targetPath)
+                                        if targetPage == nil
+                                            Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
+                                        else
+                                            Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
+                                        end
+
                                         Jekyll.logger.warn(output + " test " + partTargetArr.join("/"))
 
                                         matched = true
