@@ -243,7 +243,7 @@ module Evolveum
                                 Jekyll.logger.warn(targetArr)
                                 targetArr.each_with_index do |version, index|
                                     partTargetArr = targetArr[...index+2]
-                                    escaped_target = Regexp.escape("/#{partTargetArr.join("/")}*")
+                                    escaped_target = Regexp.escape("#{partTargetArr.join("/")}/\*\n")
                                     Jekyll.logger.warn(escaped_target)
                                     output = `grep -rl ":page-moved-from: " /docs/`
                                     if (output != nil && output != "")
