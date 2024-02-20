@@ -245,6 +245,8 @@ module Evolveum
                                     output = `grep -rl ":page-moved-from: /#{partTargetArr.join("/")}*" /docs/`
                                     if (output != nil && output != "")
                                         Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
+                                        Jekyll.logger.warn(output + " test " + partTargetArr.join("/"))
+
                                         matched = true
                                         break
                                     end
