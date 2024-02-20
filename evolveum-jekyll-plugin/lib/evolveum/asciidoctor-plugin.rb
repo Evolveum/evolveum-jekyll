@@ -242,7 +242,9 @@ module Evolveum
                                 matched = false
                                 targetArr.each_with_index do |version, index|
                                     partTargetArr = targetArr[...index+1]
-                                    output = `grep -rl ":page-moved-from: /#{partTargetArr.join("/")}*" /docs/`
+                                    escaped_target = Regexp.escape("/#{partTargetArr.join("/")}*")
+                                    Jekyll.logger.warn(escaped_target)
+                                    output = `grep -rl ":page-moved-from: " /docs/`
                                     if (output != nil && output != "")
                                         Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
                                         Jekyll.logger.warn(output + " test " + partTargetArr.join("/"))
