@@ -238,14 +238,14 @@ module Evolveum
                             if (output != nil && output != "")
                                 Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
                             else
-                                targetArr = target.split("/")
+                                targetArr = target.split("/").drop(1)
                                 matched = false
                                 Jekyll.logger.warn(targetArr)
                                 targetArr.each_with_index do |version, index|
-                                    partTargetArr = targetArr[...index+2]
+                                    partTargetArr = targetArr[...index+1]
                                     escaped_target = Regexp.escape("#{partTargetArr.join("/")}/\*\n")
                                     Jekyll.logger.warn(escaped_target)
-                                    output = `grep -rl ":page-moved-from: " /docs/`
+                                    output = `grep -rl ":page-moved-from: #{escaped_target}" /docs/`
                                     if (output != nil && output != "")
                                         Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
                                         Jekyll.logger.warn(output + " test " + partTargetArr.join("/"))
