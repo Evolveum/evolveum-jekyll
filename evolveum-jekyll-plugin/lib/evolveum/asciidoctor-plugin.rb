@@ -240,6 +240,7 @@ module Evolveum
                             else
                                 targetArr = target.split("/")
                                 matched = false
+                                Jekyll.logger.warn(targetArr)
                                 targetArr.each_with_index do |version, index|
                                     partTargetArr = targetArr[...index+2]
                                     escaped_target = Regexp.escape("/#{partTargetArr.join("/")}*")
