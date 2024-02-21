@@ -248,8 +248,8 @@ module Evolveum
                                     output = `grep -rl ":page-moved-from: /#{escaped_target}" /docs/`
                                     if (output != nil && output != "")
                                         movedPart = `sed -n -e '/^:moved-from: /p' #{output.split("\n")[0]}`
-                                        movedPart.replace(":moved-from:", "")
-                                        movedPart.replace("*", "")
+                                        movedPart.gsub(":moved-from:", "")
+                                        movedPart.gsub("*", "")
                                         Jekyll.logger.warn("MOVED PART " + movedPart)
                                         targetPath = movedPart + partTargetArr[index+1...]
                                         Jekyll.logger.warn("targetPath " + targetPath)
