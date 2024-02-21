@@ -251,7 +251,7 @@ module Evolveum
                                         movedPart.gsub(":moved-from:", "")
                                         movedPart.gsub("*", "")
                                         Jekyll.logger.warn("MOVED PART " + movedPart)
-                                        targetPath = movedPart + partTargetArr[index+1...]
+                                        targetPath = movedPart + partTargetArr[index+1...].join("/")
                                         Jekyll.logger.warn("targetPath " + targetPath)
                                         targetPage = findPageByTarget(parent.document, targetPath)
                                         if targetPage == nil
