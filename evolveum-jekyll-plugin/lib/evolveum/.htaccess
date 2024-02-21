@@ -2,4 +2,3 @@ RewriteRule   "^midpoint/reference(?!/master)(?!/before-.*)(?![0-9]\..*)(?!/supp
 {% for redirect in page.redirects %}
 RewriteRule   "{{ redirect.pattern }}" "{{ redirect.substitution }}" [R]
 {% endfor %}
-

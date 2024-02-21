@@ -28,7 +28,7 @@
                                     {% assign versions = site.data.midpoint-versions | reverse %}
                                     {% for v in versions %}
                                         {% if v.docsDisplayBranch != null %}
-                                            <option data-default="{% if v.defaultBranch == true %}default{% else %}not{% endif %}" data-tokens="{{ v.docsBranch | replace: "docs/", "" }}">{{ v.docsDisplayBranch}}</option>
+                                            <option data-default="{% if v.defaultBranch == true %}default{% else %}not{% endif %}" data-tokens="{{ v.docsBranch }}">{{ v.docsDisplayBranch}}</option>
                                         {% endif %}
                                     {% endfor %}
                                     <option data-tokens="before-4.8" >4.7 and earlier</option>
@@ -41,6 +41,7 @@
                         </div>
                         <div id="checkboxes">
                             <span id="ovalGuide" class="oval on ovalSearch"><i id="checkGuide" class="fas fa-check"></i>&nbsp;GUIDE</span>
+                            <span id="ovalBook" class="oval on ovalSearch"><i id="checkBook" class="fas fa-check"></i>&nbsp;BOOK</span>
                             <span id="ovalReference" class="oval on ovalSearch"><i id="checkReference" class="fas fa-check"></i>&nbsp;REFERENCE</span>
                             <span id="ovalOther" class="oval on ovalSearch"><i id="checkOther" class="fas fa-check"></i>&nbsp;OTHER</span>
                             <span id="ovalDeveloper" class="oval ovalSearch"><i id="checkDeveloper" class=""></i>&nbsp;DEVELOPER</span>

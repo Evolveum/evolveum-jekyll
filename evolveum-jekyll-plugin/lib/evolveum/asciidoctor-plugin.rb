@@ -10,6 +10,7 @@ require 'asciidoctor'
 require 'asciidoctor/extensions'
 require 'pathname'
 require 'pp'
+require_relative 'jekyll-versioning-plugin.rb' # We need readVersions method for checking if xfer path includes exact midpoint version
 
 module Evolveum
 
@@ -188,6 +189,94 @@ module Evolveum
             node.convert
         end
 
+        # methods used in xref and xrefv macros
+
+        def ignoreLinkBreak?(parent, targetPath)
+            pageIgnore = parent.document.attributes["ignore-broken-links"]
+            if pageIgnore != nil
+                return true
+            end
+            ignoredPrefixes = parent.document.attributes["xref-ignored-prefixes"]
+            if ignoredPrefixes == nil
+                return false
+            end
+            return ignoredPrefixes.any? { |prefix|  targetPath.start_with?(prefix) }
+        end
+
+        def processXRefLink(parent, target, attrs)
+        #    puts "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXREF -------> Processing #{parent} #{targetFile} #{attrs}"
+
+            targetPath, fragmentSuffix = parseFragment(target)
+            sourceFile = parent.document.attributes["docfile"]
+            # puts "targetPath=#{targetPath}, fragment=#{fragmentSuffix}"
+
+            if targetPath == nil
+                # document-local link, use as is
+                return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert
+            end
+
+            targetPage = findPageByTarget(parent.document, targetPath)
+            #puts("DEBUG XREF #{targetPath} -> found page #{targetPage&.url} in #{sourceFile}")
+
+            # Checking if target includes specific midpoint versions
+
+
+            if targetPage == nil
+                # No page. But there still may be a plain file (e.g. a PDF file)
+                fileUrl = findFileByTarget(parent.document, targetPath)
+                output = ""
+                if fileUrl == nil
+                    if ignoreLinkBreak?(parent, targetPath)
+                        Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
+                    else
+                        output = `grep -rl ":page-moved-from: #{target}" /docs/`
+                        if (output != nil && output != "")
+                            Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
+                        else
+                            escaped_target = Regexp.escape("\nmoved-from: #{target}\n")
+                            output = `grep -rl #{escaped_target} /docs/`
+                            if (output != nil && output != "")
+                                Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
+                            else
+                                targetArr = target.split("/").drop(1)
+                                matched = false
+                                targetArr.each_with_index do |version, index|
+                                    partTargetArr = targetArr[...index+1]
+                                    escaped_target = Regexp.escape("#{partTargetArr.join("/")}/\*")
+                                    output = `grep -rl ":page-moved-from: /#{escaped_target}" /docs/`
+                                    if (output != nil && output != "")
+                                        movedPart = `sed -n -e '/^:page-moved-from: /p' #{output.split("\n")[0]}`
+                                        movedPart = movedPart.gsub(":page-moved-from:", "")
+                                        movedPart = movedPart.gsub("*", "")
+                                        movedPart = movedPart.gsub(/\n/, "")
+                                        targetPath = movedPart + targetArr[index+1...].join("/") + "/"
+                                        targetPage = findPageByTarget(parent.document, targetPath)
+                                        if targetPage == nil
+                                            Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
+                                        else
+                                            Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
+                                        end
+                                        matched = true
+                                        break
+                                    end
+                                end
+                                if (!matched)
+                                    Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
+                                end
+                            end
+                        end
+                    end
+                    # Leave the target of broken link untouched. Redirects may still be able to handle it.
+                    return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert
+                else
+                    createLink(target, parent, attrs, fileUrl)
+                end
+            else
+                createLink(addFragmentSuffix(targetPage.url,fragmentSuffix), parent, attrs, targetPage.data['title'])
+            end
+        end
+
+
     end
 
     class JekyllBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
@@ -202,52 +291,31 @@ module Evolveum
       named :xref
       name_positional_attributes 'linktext'
 
+      # Check if there is an sprecific midpoint version included in link
       def process(parent, target, attrs)
-    #    puts "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXREF -------> Processing #{parent} #{targetFile} #{attrs}"
-
-        targetPath, fragmentSuffix = parseFragment(target)
+        verArr = readVersions()
+        versions = verArr[0]
         sourceFile = parent.document.attributes["docfile"]
-        # puts "targetPath=#{targetPath}, fragment=#{fragmentSuffix}"
-
-        if targetPath == nil
-            # document-local link, use as is
-            return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert
-        end
-
-        targetPage = findPageByTarget(parent.document, targetPath)
-        #puts("DEBUG XREF #{targetPath} -> found page #{targetPage&.url} in #{sourceFile}")
-
-        if targetPage == nil
-            # No page. But there still may be a plain file (e.g. a PDF file)
-            fileUrl = findFileByTarget(parent.document, targetPath)
-            if fileUrl == nil
-                if ignoreLinkBreak?(parent, targetPath)
-                    Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
-                else
-                    Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
-                end
-                # Leave the target of broken link untouched. Redirects may still be able to handle it.
-                return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert
-            else
-                createLink(target, parent, attrs, fileUrl)
+        versions.each do |version|
+            versionWithoutDocs = version.gsub("docs/","")
+            if target.include?("/" + versionWithoutDocs + "/")
+                Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{sourceFile}")
+                puts("Specific version included")
             end
-        else
-            createLink(addFragmentSuffix(targetPage.url,fragmentSuffix), parent, attrs, targetPage.data['title'])
         end
+        processXRefLink(parent, target, attrs)
       end
+    end
 
-      def ignoreLinkBreak?(parent, targetPath)
-        pageIgnore = parent.document.attributes["ignore-broken-links"]
-        if pageIgnore != nil
-            return true
-        end
-        ignoredPrefixes = parent.document.attributes["xref-ignored-prefixes"]
-        if ignoredPrefixes == nil
-            return false
-        end
-        return ignoredPrefixes.any? { |prefix|  targetPath.start_with?(prefix) }
-      end
+    class XrefVInlineMacro < JekyllInlineMacro
+        use_dsl
 
+        named :xrefv
+        name_positional_attributes 'linktext'
+
+        def process(parent, target, attrs)
+            processXRefLink(parent, target, attrs)
+        end
     end
 
 
@@ -396,6 +464,7 @@ end
 
 Asciidoctor::Extensions.register do
   inline_macro Evolveum::XrefInlineMacro
+  inline_macro Evolveum::XrefVInlineMacro
   inline_macro Evolveum::WikiInlineMacro
   inline_macro Evolveum::BugInlineMacro
   inline_macro Evolveum::GlossrefInlineMacro

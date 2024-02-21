@@ -1,12 +1,13 @@
 (function() {
 
-    let allSearchCategory = ["Guide", "Reference", "Developer", "Other"]
+    let allSearchCategory = ["Guide", "Book", "Reference", "Developer", "Other"]
     let searchCategory = new Set([]);
     let allImportance = ["Major", "Significant", "Minor"]
     let importance = new Set([]);
     let allSearchIn = ["Title", "Text", "Commit message"]
     let searchIn = new Set([])
     let authors = new Set([])
+    let filterBranches = new Set([])
     let allAuthors = []
     var shouldIgnoreScroll = false;
 
@@ -29,7 +30,8 @@
             "author",
             "url",
             "id",
-            "gitUrl"
+            "gitUrl",
+            "branch"
         ],
         _source: false,
         size: 30,
@@ -83,7 +85,8 @@
             "author",
             "url",
             "id",
-            "gitUrl"
+            "gitUrl",
+            "branch"
         ],
         _source: false,
         size: 30,
@@ -124,6 +127,19 @@
                 commitMessage = commitMessageRaw[0]
             }
             let unknownStatus = "";
+
+            let contentVersion = "Not versioned"
+            let contentDisplayVersion = "Not versioned"
+            let versionColor = "#CACACA"
+
+            if (data.hits.hits[i].fields.branch != undefined) {
+                contentVersion = data.hits.hits[i].fields.branch[0]
+                if (contentVersion != "Not versioned") {
+                    let contentVersionWithoutDocs = contentVersion.replace("docs/", "")
+                    contentDisplayVersion = DOCSBRANCHMAP[contentVersionWithoutDocs]
+                    versionColor = DOCSBRANCHESCOLORS.get(contentDisplayVersion)
+                }
+            }
 
             if (commitMessage != undefined && commitMessage) {
                 commitMessage = commitMessage.replaceAll("<", "&lt;")
@@ -193,7 +209,8 @@
             let parsedTitle = title.replace(/[\W_]+/g, "")
 
             listitems.push(`<tr>
-        <th class="LMDLtitle" scope="row"><a href="${data.hits.hits[i].fields.url[0]}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='<span>Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></i>${unknownStatus}</span>'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="https://github.com/Evolveum/docs/commits/master/${data.hits.hits[i].fields.gitUrl[0]}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
+        <th class="LMDLtitle" scope="row"><a href="${data.hits.hits[i].fields.url[0]}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='<span>Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></i>${unknownStatus}</span>'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="${data.hits.hits[i].fields.gitUrl[0]}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
+        <td class="LMDLcategory${contentVersion} LMDLcategory" style="color:${versionColor};">${contentDisplayVersion}</td>
         <td class="LMDLcategory${contentType} LMDLcategory">${contentType.toUpperCase()}</td>
         <td class="tableCentered LMDLimpact${impactOfChange} LMDLimpact">${impactOfChange.toUpperCase()}</td>
         <td class="tableCentered LMDLauthor">${author}</td>
@@ -289,6 +306,7 @@
 
     $(document).ready(function() {
         setLMDLSearchIn()
+        setLMDLVersion()
         setLMDLCategory()
         setLMDLImpact()
 
@@ -393,6 +411,40 @@
             } else {
                 searchIn.delete(allSearchIn[clickedIndex])
             }
+        });
+    }
+
+    function setLMDLVersion() {
+        let branchList = []
+        for (let i = 0; i < DOCSBRANCHESDISPLAYNAMES.length; i++) {
+            branchList.push("<option style=\"color: " + DOCSBRANCHESCOLORS.get(DOCSBRANCHESDISPLAYNAMES[i]) + ";\">" + DOCSBRANCHESDISPLAYNAMES[i] + "</option>")
+            console.log("<option style=\"color: " + DOCSBRANCHESCOLORS.get(DOCSBRANCHESDISPLAYNAMES[i]) + ";\">" + DOCSBRANCHESDISPLAYNAMES[i] + "</option>")
+        }
+        let selectObjects = document.getElementById("selectpickerversion")
+        selectObjects.innerHTML = branchList.join("")
+            //afterSearchQuery.query.bool.must[0].bool.filter[1].terms["author.keyword"] = allAuthors
+        $('#selectpickerversion').selectpicker();
+        $('#selectpickerversion').selectpicker('deselectAll');
+        $('#selectpickerversion').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
+            if (isSelected) {
+                filterBranches.add(DOCSORIGINALBRANCHMAP[DOCSBRANCHMAP[DOCSBRANCHESDISPLAYNAMES[clickedIndex]]]) //TODO improve - not very pretty
+            } else {
+                filterBranches.delete(DOCSORIGINALBRANCHMAP[DOCSBRANCHMAP[DOCSBRANCHESDISPLAYNAMES[clickedIndex]]])
+            }
+
+            if (filterBranches.size == 0) {
+                afterSearchQuery.query.bool.must[0].bool.filter.pop()
+            } else {
+                afterSearchQuery.query.bool.must[0].bool.filter.push({
+                    terms: {
+                        "branch.keyword": Array.from(filterBranches)
+                    }
+                })
+            }
+            searchLMDP()
+        }).on('loaded.bs.select', function(e) {
+            let parent = $('#selectpickerversion')[0].parentElement
+            parent.id = "LMDLversionPicker"
         });
     }
 

@@ -1,13 +1,13 @@
 (function() {
 
-    let letters = new Set(["Guide", "Reference", "Other"]);
+    let letters = new Set(["Guide", "Book", "Reference", "Other"]);
     let branches = new Set(["notBranched"])
     let notMasterBranchMult = 0
 
 
     $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
-        let newVersionEdited = DOCSBRANCHDISPLAYNAMES[newVersion]
+        let newVersionEdited = DOCSBRANCHMAP[newVersion]
         console.log(newVersionEdited)
         let queryArr = searchQuery.query.bool.must[0].function_score.script_score.script.source.split("\n")
         let queryLen = queryArr.length
@@ -250,7 +250,7 @@
                                             }
                                         }
                                         return totalScore;
-                                    `// ONLY ADD CODE AFTER BRANCH CLAUSE
+                                    ` //ADD ONLY BEFORE BRANCH PART
                                 }
                             },
                             query: {
@@ -261,6 +261,10 @@
                                     fields: [
                                         "text",
                                         `title^${data._source.multipliers.title}`,
+                                        `second_titles^${data._source.multipliers.secondTitle}`,
+                                        `third_titles^${data._source.multipliers.thirdTitle}`,
+                                        `fourth_titles^${data._source.multipliers.fourthTitle}`,
+                                        `fifth_titles^${data._source.multipliers.fifthTitle}`,
                                         "alternative_text^0.5", // TODO
                                         `keywords^${data._source.multipliers.keywords}`,
                                         `search-alias^${data._source.multipliers.searchAlias}`
@@ -271,8 +275,7 @@
                             }
                         }
                     }],
-                    should: [
-                        {
+                    should: [{
                             term: {
                                 "title.keyword": {
                                     value: "",
@@ -331,7 +334,7 @@
                 "branch"
             ],
             _source: false,
-            highlight:{
+            highlight: {
                 pre_tags: ["<strong>"],
                 post_tags: ["</strong>"],
                 fields: {
@@ -396,7 +399,7 @@
         searchQuery.query.bool.should[1].term['keywords.keyword'].value = query
         searchQuery.query.bool.should[0].term['title.keyword'].value = query
         searchQuery.highlight.fields.title.highlight_query.match.title.query = query
-        searchQuery.highlight.fields.text.highlight_query.match.text.query  = query
+        searchQuery.highlight.fields.text.highlight_query.match.text.query = query
 
         const showResults = function(data) {
             console.log(data)
@@ -424,7 +427,7 @@
 
                     if (branch != null && branch != "notBranched") {
                         branchClass = "searchResultBranched"
-                        displayBranch = DOCSBRANCHDISPLAYNAMES[branch]
+                        displayBranch = DOCSBRANCHMAP[branch]
                         tooltipVer = displayBranch
                         console.log("CB" + displayBranch)
                         let colorString = DOCSBRANCHESCOLORS.get(displayBranch)
@@ -671,7 +674,7 @@
                     "clickquery": document.getElementById('searchbar').value.toLowerCase()
                 }
 
-                event.button == 0 ? OSrequest("POST", "https://search.evolveum.com/click_logs/_doc/", queryClick, false) : OSrequest("POST", "https://searchd.evolveum.com/click_logs/_doc/", queryClick, true);test
+                event.button == 0 ? OSrequest("POST", "https://search.evolveum.com/click_logs/_doc/", queryClick, false) : OSrequest("POST", "https://search.evolveum.com/click_logs/_doc/", queryClick, true);
             }
         });
     }

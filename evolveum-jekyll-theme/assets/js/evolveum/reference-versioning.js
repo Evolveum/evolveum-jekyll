@@ -1,6 +1,8 @@
 var DOCSBRANCHESCOLORS = new Map();
-var DOCSBRANCHDISPLAYNAMES = {}
-var DEFAULTDOCSBRANCH = "master"
+var DOCSBRANCHMAP = {}
+var DOCSORIGINALBRANCHMAP = {}
+var DOCSBRANCHESDISPLAYNAMES = []
+var DEFAULTDOCSBRANCH = "support-4.8"
 
 function decToHex(dec) {
     return dec.toString(16);
@@ -35,10 +37,12 @@ window.addEventListener('load', function() {
         console.log(options[o])
         if (options[o].dataset['default'] != undefined && options[o].dataset['default'] == "default") {
             console.log(options[o].dataset['default'] + " " + options[o].dataset['tokens'])
-            DEFAULTDOCSBRANCH = options[o].dataset['tokens']
+            DEFAULTDOCSBRANCH = options[o].dataset['tokens'].replace("docs/")
         }
-        DOCSBRANCHDISPLAYNAMES[options[o].value] = options[o].dataset['tokens']
-        DOCSBRANCHDISPLAYNAMES[options[o].dataset['tokens']] = options[o].value
+        DOCSORIGINALBRANCHMAP[options[o].dataset['tokens'].replace("docs/", "")] = options[o].dataset['tokens']
+        DOCSBRANCHMAP[options[o].value] = options[o].dataset['tokens'].replace("docs/", "") // options[o].value is display name and [tokens] are branches
+        DOCSBRANCHESDISPLAYNAMES.push(options[o].value)
+        DOCSBRANCHMAP[options[o].dataset['tokens'].replace("docs/", "")] = options[o].value
         DOCSBRANCHESCOLORS.set(options[o].value, rgbToHex(start + (o*step),start + (o*step),start + (o*step) + 35))
     }
     let url = window.location.href
@@ -47,7 +51,7 @@ window.addEventListener('load', function() {
     let versionDisplay = ""
     if (urlSubstrings.length > 6) {
         version = urlSubstrings[5].toString()
-        versionDisplay = DOCSBRANCHDISPLAYNAMES[version]
+        versionDisplay = DOCSBRANCHMAP[version]
     }
 
     if (!url.includes("/midpoint/reference")) {
@@ -58,7 +62,7 @@ window.addEventListener('load', function() {
 
     $('#select-version-picker').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text().toString();
-        let newVersionEdited = DOCSBRANCHDISPLAYNAMES[newVersion].toString()
+        let newVersionEdited = DOCSBRANCHMAP[newVersion].toString()
         console.log(newVersionEdited)
         console.log(url)
         console.log(version)

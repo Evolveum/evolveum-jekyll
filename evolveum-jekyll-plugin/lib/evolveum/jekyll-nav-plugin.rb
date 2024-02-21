@@ -499,9 +499,6 @@ module Evolveum
 
         # NOTE: this may not work well until we have all labels generated correctly
         def presentableSubnodes(params = {})
-            #puts("test  #{subnodes.join(', ')} ")
-            #puts("test2 #{subnodes.select{ |node| node.presentable?(params) }.join(', ')}")
-            #puts("test3 #{subnodes[0].display_order} #{subnodes[0].url}")
             begin
                 subnodes.select{ |node| node.presentable?(params) }.sort{ |a,b| sortCompare(a,b) }
             rescue ArgumentError
@@ -609,10 +606,6 @@ module Evolveum
                 block.call(subnav)
                 processAllVisibleNavsLevel(subnav, &block)
             end
-        end
-
-        def to_s()
-            return "Nav(#{@url})"
         end
     end
 
