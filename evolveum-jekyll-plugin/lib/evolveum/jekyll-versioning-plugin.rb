@@ -45,10 +45,10 @@ def readVersions()
   defaultBranch = ""
   verObject.each do |ver|
       if ver['docsBranch'] != nil && ver['docsDisplayBranch']
-        puts("version" + ver['docsBranch'])
+        #puts("version" + ver['docsBranch'])
         filteredVersions.push(ver['docsBranch'])
         filteredDisplayVersions.push(ver['docsDisplayBranch'])
-        puts ver['defaultBranch']
+        #puts ver['defaultBranch']
         if ver['defaultBranch'] != nil && ver['defaultBranch'] == true
           defaultBranch = ver['docsBranch']
         end
