@@ -250,7 +250,7 @@ module Evolveum
                                         movedPart = `sed -n -e '/^:moved-from: /p' #{output.split("\n")[0]}`
                                         movedPart.gsub(":moved-from:", "")
                                         movedPart.gsub("*", "")
-                                        Jekyll.logger.warn("MOVED PART " + movedPart)
+                                        Jekyll.logger.warn("MOVED PART " + movedPart + " test " + output.split("\n")[0])
                                         targetPath = movedPart + targetArr[index+1...].join("/")
                                         Jekyll.logger.warn("targetPath " + targetPath)
                                         targetPage = findPageByTarget(parent.document, targetPath)
