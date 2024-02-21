@@ -208,6 +208,17 @@
     border-color: #DAA06D;
 }
 
+#ovalBook {
+    outline-color: #fddd5c;
+    color: #fddd5c;
+}
+
+#ovalBook.on {
+    color: white;
+    background-color: #fddd5c;
+    border-color: #fddd5c;
+}
+
 #ovalReference {
     outline-color: #87CEFA;
     color: #87CEFA;
@@ -301,6 +312,11 @@
 #labelGuide {
     outline-color: #DAA06D;
     color: #DAA06D;
+}
+
+#labelBook {
+    outline-color: #fddd5c;
+    color: #fddd5c;
 }
 
 #labelReference {
