@@ -34,7 +34,7 @@ def readReleaseVersions()
       end
     end
   end
-  return(versionsNumbers, versionBranches)
+  return versionsNumbers, versionBranches
 end
 
 Jekyll::Hooks.register :site, :after_init do |site|
