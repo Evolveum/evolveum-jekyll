@@ -11,11 +11,11 @@ def installReleaseNotes()
     end
 
     if (!File.exist?("/docs/midpoint/release/#{ver}/index.adoc"))
-      `cd /docs/midpoint/release/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/release-notes.adoc && mv release-notes.adoc index.adoc`
+      `cd /docs/midpoint/release/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/release-notes-#{ver}.adoc && mv release-notes-#{ver}.adoc index.adoc`
     end
 
     if (!File.exist?("/docs/midpoint/release/#{ver}/install.adoc"))
-      `cd /docs/midpoint/release/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/install-dist.adoc && mv install-dist.adoc install.adoc`
+      `cd /docs/midpoint/release/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/install-dist-#{ver}.adoc && mv install-dist-#{ver}.adoc install.adoc`
     end
   end
 end
