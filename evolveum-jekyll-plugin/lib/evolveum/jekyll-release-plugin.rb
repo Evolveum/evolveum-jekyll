@@ -31,7 +31,7 @@ def readReleaseVersions()
         versionBranches.push(ver["docsReleaseBranch"])
       else
         versionBranches.push("master")
-
+      end
     end
   end
   return(versionsNumbers, versionBranches)
