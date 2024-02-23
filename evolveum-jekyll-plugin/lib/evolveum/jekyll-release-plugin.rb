@@ -7,7 +7,7 @@ def installReleaseNotes()
   versionsReleaseBranches = returnedVerArr[1]
   docsBranches = returnedVerArr[2]
   versions.each_with_index do |ver, index|
-    puts("ver " + ver + " index " + index + " releaseBranch " + versionsReleaseBranches[index] + " docsBranches " + docsBranches)
+    puts("ver " + ver + " index " + index.to_s + " releaseBranch " + versionsReleaseBranches[index] + " docsBranches " + docsBranches)
     if Dir["/docs/midpoint/release/#{ver}"].empty?
       `cd /docs/midpoint/release/ && mkdir #{ver}`
     end
