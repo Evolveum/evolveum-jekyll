@@ -1,7 +1,7 @@
 
 require 'yaml'
 
-def installReleaseNotes()
+def installReleaseNotes(site)
   docsDir = site.config['docs']['docsPath'] + site.config['docs']['docsDirName']
   returnedVerArr = readReleaseVersions(docsDir)
   versions = returnedVerArr[0]
