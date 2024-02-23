@@ -12,7 +12,7 @@ def installReleaseNotes()
     end
 
     if (!File.exist?("/docs/midpoint/release/#{ver}/index.adoc"))
-      if (docsBranches._include?(versionsReleaseBranches[index]))
+      if (docsBranches.include?(versionsReleaseBranches[index]))
         `ln -s /mp-#{versionsReleaseBranches[index].gsub("docs/","")}/release-notes-#{ver}.adoc /docs/midpoint/release/#{ver}/index.adoc`
       else
         `cd /docs/midpoint/release/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/release-notes-#{ver}.adoc && mv release-notes-#{ver}.adoc index.adoc`
@@ -20,7 +20,7 @@ def installReleaseNotes()
     end
 
     if (!File.exist?("/docs/midpoint/release/#{ver}/install.adoc"))
-      if (docsBranches._include?(versionsReleaseBranches[index]))
+      if (docsBranches.include?(versionsReleaseBranches[index]))
         `ln -s /mp-#{versionsReleaseBranches[index].gsub("docs/","")}/install-dist-#{ver}.adoc /docs/midpoint/release/#{ver}/install.adoc`
       else
         `cd /docs/midpoint/release/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/install-dist-#{ver}.adoc && mv install-dist-#{ver}.adoc install.adoc`
@@ -47,6 +47,8 @@ def readReleaseVersions()
       end
     end
   end
+  docsBranches.push("docs/before-4.8")
+  docsBranches.push("master")
   return versionsNumbers, versionBranches, docsBranches
 end
 
