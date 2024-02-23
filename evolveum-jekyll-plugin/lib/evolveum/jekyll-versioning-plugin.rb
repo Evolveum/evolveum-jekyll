@@ -7,7 +7,7 @@ require 'yaml'
 def installVersions(site)
   docsDir = site.config['docs']['docsPath'] + site.config['docs']['docsDirName']
   mpPreDir = site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix']
-  arr = readVersions()
+  arr = readVersions(docsDir)
   versions = arr[0]
   displayVersions = arr[1]
   defaultBranch = arr[2]
