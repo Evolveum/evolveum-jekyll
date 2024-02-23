@@ -13,4 +13,11 @@ asciidoctor:
     icons: font
     source-highlighter: rouge
 
+docs:
+  docsPath: /
+  docsDirName: docs
+  midpointVersionsPath: /
+  midpointVersionsPrefix: mp-
+  midpointSamplesDir: /mp-samples
+
 highlighter: rouge

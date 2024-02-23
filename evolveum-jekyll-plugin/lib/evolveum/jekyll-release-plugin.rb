@@ -2,7 +2,8 @@
 require 'yaml'
 
 def installReleaseNotes()
-  returnedVerArr = readReleaseVersions()
+  docsDir = site.config['docs']['docsPath'] + site.config['docs']['docsDirName']
+  returnedVerArr = readReleaseVersions(docsDir)
   versions = returnedVerArr[0]
   versionsReleaseBranches = returnedVerArr[1]
   docsBranches = returnedVerArr[2]
@@ -30,8 +31,8 @@ def installReleaseNotes()
   end
 end
 
-def readReleaseVersions()
-  verObject = YAML.load_file('/docs/_data/midpoint-versions.yml')
+def readReleaseVersions(docsDir)
+  verObject = YAML.load_file("#{docsDir}/_data/midpoint-versions.yml")
   versionsNumbers = []
   versionBranches = []
   docsBranches = []
@@ -55,5 +56,5 @@ end
 
 Jekyll::Hooks.register :site, :after_init do |site|
   puts "=========[ EVOLVEUM RELEASE NOTES INSTALL ]============== after_init"
-  installReleaseNotes()
+  installReleaseNotes(site)
 end
