@@ -7,6 +7,7 @@ def installReleaseNotes()
   versionsReleaseBranches = returnedVerArr[1]
   docsBranches = returnedVerArr[2]
   versions.each_with_index do |ver, index|
+    puts("ver " + ver + " index " + index + " releaseBranch " + versionsReleaseBranches[index] + " docsBranches " + docsBranches)
     if Dir["/docs/midpoint/release/#{ver}"].empty?
       `cd /docs/midpoint/release/ && mkdir #{ver}`
     end
@@ -39,7 +40,7 @@ def readReleaseVersions()
       docsBranches.push(ver['docsBranch'])
     end
     if ((!ver.key?("legacyDocs") || ver["legacyDocs"] != true ))
-      versionsNumbers.push(ver["version"].to_f)
+      versionsNumbers.push(ver["version"])
       if (ver["docsReleaseBranch"] != nil)
         versionBranches.push(ver["docsReleaseBranch"])
       else
