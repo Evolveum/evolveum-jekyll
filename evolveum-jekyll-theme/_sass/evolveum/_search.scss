@@ -190,7 +190,7 @@
         justify-content: space-between;
     }
     .searchResultBranched {
-        max-width: calc(100% - 155px) !important;
+        max-width: calc(100% - 175px) !important;
     }
     .searchResultNotBranched {
         max-width: calc(100% - 100px) !important;
@@ -203,14 +203,14 @@
 }
 
 #ovalBook {
-    outline-color: #ffdd3c;
-    color: #ffdd3c;
+    outline-color: #fddd5c;
+    color: #fddd5c;
 }
 
 #ovalBook.on {
     color: white;
-    background-color: #ffdd3c;
-    border-color: #ffdd3c;
+    background-color: #fddd5c;
+    border-color: #fddd5c;
 }
 
 #ovalGuide.on {
@@ -315,8 +315,8 @@
 }
 
 #labelBook {
-    outline-color: #ffdd3c;
-    color: #ffdd3c;
+    outline-color: #fddd5c;
+    color: #fddd5c;
 }
 
 #labelReference {
