@@ -52,7 +52,7 @@ module Evolveum
             if branch == nil
                 out = `git #{argString}`
             else
-                out = `cd /mp-#{branch}/ && git #{argString}`
+                out = `cd #{site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix']}#{branch}/ && git #{argString}`
             end
 
             if !$?.success?

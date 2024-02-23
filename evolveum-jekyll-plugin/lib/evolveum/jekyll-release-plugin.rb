@@ -9,23 +9,23 @@ def installReleaseNotes(site)
   docsBranches = returnedVerArr[2]
   versions.each_with_index do |ver, index|
     puts("ver " + ver + " index " + index.to_s + " releaseBranch " + versionsReleaseBranches[index] + " docsBranches " + docsBranches.join(" "))
-    if Dir["/docs/midpoint/release/#{ver}"].empty?
-      `cd /docs/midpoint/release/ && mkdir #{ver}`
+    if Dir["#{docsDir}/midpoint/release/#{ver}"].empty?
+      `cd #{docsDir}/midpoint/release/ && mkdir #{ver}`
     end
 
-    if (!File.exist?("/docs/midpoint/release/#{ver}/index.adoc"))
+    if (!File.exist?("#{docsDir}/midpoint/release/#{ver}/index.adoc"))
       if (docsBranches.include?(versionsReleaseBranches[index]))
-        `ln -s /mp-#{versionsReleaseBranches[index].gsub("docs/","")}/release-notes-#{ver}.adoc /docs/midpoint/release/#{ver}/index.adoc`
+        `ln -s /mp-#{versionsReleaseBranches[index].gsub("docs/","")}/release-notes.adoc #{docsDir}/midpoint/release/#{ver}/index.adoc`
       else
-        `cd /docs/midpoint/release/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/release-notes-#{ver}.adoc && mv release-notes-#{ver}.adoc index.adoc`
+        `cd #{docsDir}/midpoint/release/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/release-notes.adoc && mv release-notes.adoc index.adoc`
       end
     end
 
-    if (!File.exist?("/docs/midpoint/release/#{ver}/install.adoc"))
+    if (!File.exist?("#{docsDir}/midpoint/release/#{ver}/install.adoc"))
       if (docsBranches.include?(versionsReleaseBranches[index]))
-        `ln -s /mp-#{versionsReleaseBranches[index].gsub("docs/","")}/install-dist-#{ver}.adoc /docs/midpoint/release/#{ver}/install.adoc`
+        `ln -s /mp-#{versionsReleaseBranches[index].gsub("docs/","")}/install-dist.adoc #{docsDir}/midpoint/release/#{ver}/install.adoc`
       else
-        `cd /docs/midpoint/release/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/install-dist-#{ver}.adoc && mv install-dist-#{ver}.adoc install.adoc`
+        `cd #{docsDir}/midpoint/release/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/install-dist.adoc && mv install-dist.adoc install.adoc`
       end
     end
   end

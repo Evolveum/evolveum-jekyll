@@ -20,6 +20,10 @@ module Evolveum
             return Jekyll.sites[0]
         end
 
+        def docsDir()
+            return (jekyllSite().config['docs']['docsPath'] + jekyllSite().config['docs']['docsDirName'])
+        end
+
         def jekyllData(dataName)
             return jekyllSite().data[dataName]
         end
@@ -229,12 +233,12 @@ module Evolveum
                     if ignoreLinkBreak?(parent, targetPath)
                         Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
                     else
-                        output = `grep -rl ":page-moved-from: #{target}" /docs/`
+                        output = `grep -rl ":page-moved-from: #{target}" #{docsDir()}/`
                         if (output != nil && output != "")
                             Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
                         else
                             escaped_target = Regexp.escape("\nmoved-from: #{target}\n")
-                            output = `grep -rl #{escaped_target} /docs/`
+                            output = `grep -rl #{escaped_target} #{docsDir()}/`
                             if (output != nil && output != "")
                                 Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
                             else
@@ -245,7 +249,7 @@ module Evolveum
                                     partTargetArr = targetArr[...index+1]
                                     escaped_target = Regexp.escape("#{partTargetArr.join("/")}/\*")
                                     Jekyll.logger.warn(escaped_target)
-                                    output = `grep -rl ":page-moved-from: /#{escaped_target}" /docs/`
+                                    output = `grep -rl ":page-moved-from: /#{escaped_target}" #{docsDir()}/`
                                     if (output != nil && output != "")
                                         movedPart = `sed -n -e '/^:page-moved-from: /p' #{output.split("\n")[0]}`
                                         movedPart = movedPart.gsub(":page-moved-from:", "")
@@ -300,8 +304,7 @@ module Evolveum
 
       # Check if there is an sprecific midpoint version included in link
       def process(parent, target, attrs)
-        `cp /testMovedFrom /evolveum-jekyll/`
-        verArr = readVersions()
+        verArr = readVersions(jekyllSite())
         versions = verArr[0]
         sourceFile = parent.document.attributes["docfile"]
         versions.each do |version|
