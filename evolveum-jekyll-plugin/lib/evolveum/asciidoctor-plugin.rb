@@ -396,8 +396,8 @@ module Evolveum
         #TEST
         #</div>
         #</div>)
-            if (target != nil && !File.exist?("#{samplesDir}#{target}"))
-                samplesHtml = `<div class="mpSample">#{File.read("#{samplesDir}#{target}")}</div>`
+            if (target != nil && File.exist?("#{samplesDir}/#{target}"))
+                samplesHtml = `<div class="mpSample">#{File.read("#{samplesDir}/#{target}")}</div>`
                 create_pass_block parent, samplesHtml, attrs, subs: nil
             end
     
