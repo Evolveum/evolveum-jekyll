@@ -380,22 +380,23 @@ module Evolveum
       end
     end
 
-    class SamplesInlineMacro < JekyllBlockMacro
+    class SamplesBlockMacro < JekyllBlockMacro
         use_dsl
 
         named :sampleRef
         #name_positional_attributes 'linktext'
   
         def process(parent, target, attrs)
-  
+
             #title_html = (attrs.has_key? 'title') ?
             #%(<div class="title">#{attrs['title']}</div>\n) : nil
-    
+
             #html = %(<div class="test">
         ##{title_html}<div class="content">
         #TEST
         #</div>
         #</div>)
+            Jekyll.warn("SAMPLES " + samplesDir + "/" + target)
             if (target != nil && File.exist?("#{samplesDir}/#{target}"))
                 samplesHtml = `<div class="mpSample">#{File.read("#{samplesDir}/#{target}")}</div>`
                 create_pass_block parent, samplesHtml, attrs, subs: nil
@@ -507,6 +508,6 @@ Asciidoctor::Extensions.register do
   inline_macro Evolveum::WikiInlineMacro
   inline_macro Evolveum::BugInlineMacro
   inline_macro Evolveum::GlossrefInlineMacro
-  block_macro Evolveum::SamplesInlineMacro
+  block_macro Evolveum::SamplesBlockMacro
   treeprocessor Evolveum::ImagePathTreeprocessor
 end
