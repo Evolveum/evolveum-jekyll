@@ -31,9 +31,9 @@ module Evolveum
                 if page.path != "midpoint/reference/index.html" && page.path.include?("midpoint/reference/")
                     urlSplitted = page.path.split("/")
                     branch = urlSplitted[2]
-                    dateString = git("log -1 --pretty='format:%ci' 'docs/#{urlSplitted.drop(3).join("/")}'", branch)
+                    dateString = git("log -1 --pretty='format:%ci' 'docs/#{urlSplitted.drop(3).join("/")}'", branch, mpDir)
                 elsif
-                    dateString = git("log -1 --pretty='format:%ci' '#{page.path}'", nil)
+                    dateString = git("log -1 --pretty='format:%ci' '#{page.path}'", nil, nil)
                 end
 
                 if dateString != nil && !dateString.empty?
