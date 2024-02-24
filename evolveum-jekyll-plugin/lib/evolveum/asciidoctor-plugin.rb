@@ -304,7 +304,7 @@ module Evolveum
 
       # Check if there is an sprecific midpoint version included in link
       def process(parent, target, attrs)
-        verArr = readVersions(jekyllSite())
+        verArr = readVersions(docsDir())
         versions = verArr[0]
         sourceFile = parent.document.attributes["docfile"]
         versions.each do |version|
