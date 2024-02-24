@@ -396,7 +396,7 @@ module Evolveum
         #TEST
         #</div>
         #</div>)
-            Jekyll.warn("SAMPLES " + samplesDir + "/" + target)
+            Jekyll.logger.warn("SAMPLES " + samplesDir + "/" + target)
             if (target != nil && File.exist?("#{samplesDir}/#{target}"))
                 samplesHtml = `<div class="mpSample">#{File.read("#{samplesDir}/#{target}")}</div>`
                 create_pass_block parent, samplesHtml, attrs, subs: nil
