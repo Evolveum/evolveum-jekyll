@@ -374,8 +374,29 @@ module Evolveum
 #        puts "BBBUG: #{target} -> #{targetUrl}"
         createLink(targetUrl, parent, attrs, target)
       end
-
     end
+
+    class SamplesInlineMacro < JekyllBlockMacro
+        use_dsl
+  
+        named :sampleRef
+        #name_positional_attributes 'linktext'
+  
+        def process(parent, target, attrs)
+  
+            title_html = (attrs.has_key? 'title') ?
+            %(<div class="title">#{attrs['title']}</div>\n) : nil
+    
+            html = %(<div class="test">
+        #{title_html}<div class="content">
+        TEST
+        </div>
+        </div>)
+    
+            create_pass_block parent, html, attrs, subs: nil
+        end
+  
+      end
 
     class GlossrefInlineMacro < JekyllInlineMacro
       use_dsl
@@ -479,5 +500,6 @@ Asciidoctor::Extensions.register do
   inline_macro Evolveum::WikiInlineMacro
   inline_macro Evolveum::BugInlineMacro
   inline_macro Evolveum::GlossrefInlineMacro
+  block_macro Evolveum::SamplesInlineMacro
   treeprocessor Evolveum::ImagePathTreeprocessor
 end

@@ -18,6 +18,8 @@ docs:
   docsDirName: docs
   midpointVersionsPath: /
   midpointVersionsPrefix: mp-
-  midpointSamplesDir: /mp-samples
+  midpointSamplesPath: /
+  midpointSamplesDirName: mp-samples
+
 
 highlighter: rouge
