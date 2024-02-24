@@ -24,6 +24,10 @@ module Evolveum
             return (jekyllSite().config['docs']['docsPath'] + jekyllSite().config['docs']['docsDirName'])
         end
 
+        def samplesDir()
+            return (jekyllSite().config['docs']['midpointSamplesPath'] + jekyllSite().config['docs']['midpointSamplesDirName'])
+        end
+
         def jekyllData(dataName)
             return jekyllSite().data[dataName]
         end
@@ -378,22 +382,25 @@ module Evolveum
 
     class SamplesInlineMacro < JekyllBlockMacro
         use_dsl
-  
+
         named :sampleRef
         #name_positional_attributes 'linktext'
   
         def process(parent, target, attrs)
   
-            title_html = (attrs.has_key? 'title') ?
-            %(<div class="title">#{attrs['title']}</div>\n) : nil
+            #title_html = (attrs.has_key? 'title') ?
+            #%(<div class="title">#{attrs['title']}</div>\n) : nil
     
-            html = %(<div class="test">
-        #{title_html}<div class="content">
-        TEST
-        </div>
-        </div>)
+            #html = %(<div class="test">
+        ##{title_html}<div class="content">
+        #TEST
+        #</div>
+        #</div>)
+            if (target != nil && !File.exist?("#{samplesDir}#{target}"))
+                samplesHtml = `<div class="mpSample">#{File.read("#{samplesDir}#{target}")}</div>`
+                create_pass_block parent, samplesHtml, attrs, subs: nil
+            end
     
-            create_pass_block parent, html, attrs, subs: nil
         end
   
       end
