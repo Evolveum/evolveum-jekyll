@@ -398,13 +398,14 @@ module Evolveum
         #</div>)
             Jekyll.logger.warn("SAMPLES " + samplesDir + "/" + target)
             if (target != nil && File.exist?("#{samplesDir}/#{target}"))
-                samplesHtml = `<div class="mpSample">#{File.read("#{samplesDir}/#{target}")}</div>`
+                samplesHtml = `[source,xml]\n----\n#{File.read("#{samplesDir}/#{target}")}----\n`
+                Jekyll.logger.warn("I AM INSIDE " + samplesHtml)
                 create_pass_block parent, samplesHtml, attrs, subs: nil
             end
     
         end
   
-      end
+    end
 
     class GlossrefInlineMacro < JekyllInlineMacro
       use_dsl
