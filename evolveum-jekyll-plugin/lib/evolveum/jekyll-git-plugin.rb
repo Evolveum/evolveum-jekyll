@@ -17,12 +17,13 @@ module Evolveum
         $stdout.reopen("/var/log/gitplugin", "w")
 
         def self.post_read(site)
+            mpDir = site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix']
             site.pages.each do |page|
-                update(page)
+                update(page, mpDir)
             end
         end
 
-        def self.update(page)
+        def self.update(page, mpDir)
             lastModDate = nil
             if page.path != nil && File.exists?(page.path)
                 #puts(page.path)
@@ -48,11 +49,11 @@ module Evolveum
             #puts("  [U] #{page.path}: #{lastModDate}")
         end
 
-        def self.git(argString, branch)
+        def self.git(argString, branch, mpDir)
             if branch == nil
                 out = `git #{argString}`
             else
-                out = `cd #{site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix']}#{branch}/ && git #{argString}`
+                out = `cd #{mpDir}#{branch}/ && git #{argString}`
             end
 
             if !$?.success?
