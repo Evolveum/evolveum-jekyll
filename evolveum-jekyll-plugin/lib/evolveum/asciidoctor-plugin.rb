@@ -385,7 +385,7 @@ module Evolveum
 
         named :sampleRef
         #name_positional_attributes 'linktext'
-  
+
         def process(parent, target, attrs)
 
             #title_html = (attrs.has_key? 'title') ?
@@ -399,13 +399,14 @@ module Evolveum
             Jekyll.logger.warn("SAMPLES " + samplesDir + "/" + target)
             if (target != nil && File.exist?("#{samplesDir}/#{target}"))
                 #samplesHtml = Asciidoctor.convert("[source,xml]\n----\n#{File.read("#{samplesDir}/#{target}")}\n----")
-                samplesHtml = Asciidoctor.convert("*This* is Asciidoctor.")
+                samplesDoc = Asciidoctor.load '*This* is Asciidoctor.'
+                samplesHtml = doc.convert
                 Jekyll.logger.warn("I AM INSIDE " + samplesHtml)
                 create_pass_block parent, samplesHtml, attrs, subs: nil
             end
-    
+
         end
-  
+
     end
 
     class GlossrefInlineMacro < JekyllInlineMacro
