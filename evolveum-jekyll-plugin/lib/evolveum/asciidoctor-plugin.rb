@@ -406,7 +406,7 @@ module Evolveum
                 #samplesHtml = samplesDoc.convert
                 fileExt = File.extname(target)[1..-1]
                 if (fileExt == "csv")
-                    samplesHtml = `echo <<EOF[%header,format=#{fileExt}]\n\\|===\n#{Shellwords.escape(File.read("#{samplesDir}/#{target}"))}\n\\|===EOF | asciidoctor -e -`
+                    samplesHtml = `asciidoctor -e - <<EOF[%header,format=#{fileExt}]\n\|===\n#{File.read("#{samplesDir}/#{target}")}\n\|===EOF` #Shellwords.escape(
                 else
                     samplesHtml = `echo '[source,#{fileExt}]\n----\n#{File.read("#{samplesDir}/#{target}")}\n----' | asciidoctor -e -`
                 end
