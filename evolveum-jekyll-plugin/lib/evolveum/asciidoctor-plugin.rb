@@ -400,7 +400,7 @@ module Evolveum
             if (target != nil && File.exist?("#{samplesDir}/#{target}"))
                 #samplesHtml = Asciidoctor.convert("[source,xml]\n----\n#{File.read("#{samplesDir}/#{target}")}\n----")
                 samplesDoc = Asciidoctor.load '*This* is Asciidoctor.'
-                samplesHtml = doc.convert
+                samplesHtml = samplesDoc.convert
                 Jekyll.logger.warn("I AM INSIDE " + samplesHtml)
                 create_pass_block parent, samplesHtml, attrs, subs: nil
             end
