@@ -400,9 +400,11 @@ module Evolveum
             Jekyll.logger.warn("SAMPLES " + samplesDir() + "/" + target)
             if (target != nil && File.exist?("#{samplesDir()}/#{target}"))
             #    #samplesHtml = Asciidoctor.convert("[source,xml]\n----\n#{File.read("#{samplesDir}/#{target}")}\n----")
+                Jekyll.logger.warn("STARTED")
                 samplesDoc = Asciidoctor.load '*This* is Asciidoctor.'
+                Jekyll.logger.warn("LOADED")
                 samplesHtml = samplesDoc.convert
-                Jekyll.logger.warn("I AM INSIDE " + samplesHtml)
+                Jekyll.logger.warn("CONVERTED " + samplesHtml)
                 create_pass_block parent, samplesHtml, attrs, subs: nil
             end
 
