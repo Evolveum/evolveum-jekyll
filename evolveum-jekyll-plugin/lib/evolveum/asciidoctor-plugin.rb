@@ -511,6 +511,6 @@ Asciidoctor::Extensions.register do
   inline_macro Evolveum::WikiInlineMacro
   inline_macro Evolveum::BugInlineMacro
   inline_macro Evolveum::GlossrefInlineMacro
-  block_macro Evolveum::SamplesBlockMacro
+  #block_macro Evolveum::SamplesBlockMacro
   treeprocessor Evolveum::ImagePathTreeprocessor
 end
