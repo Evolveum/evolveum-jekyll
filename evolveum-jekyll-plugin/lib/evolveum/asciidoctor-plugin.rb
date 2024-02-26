@@ -404,7 +404,7 @@ module Evolveum
                 #samplesDoc = Asciidoctor.load '*This* is Asciidoctor.'
                 #Jekyll.logger.warn("LOADED")
                 #samplesHtml = samplesDoc.convert
-                samplesHtml = `echo '[source,#{File.extname(target).gsub(".", "")[1..-1]}]\n----\n#{File.read("#{samplesDir}/#{target}")}\n----' | asciidoctor -e -`
+                samplesHtml = `echo '[source,#{File.extname(target)[1..-1]}]\n----\n#{File.read("#{samplesDir}/#{target}")}\n----' | asciidoctor -e -`
                 Jekyll.logger.warn("CONVERTED " + samplesHtml)
                 create_pass_block parent, samplesHtml, attrs, subs: nil
             end
