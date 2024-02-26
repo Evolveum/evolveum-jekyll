@@ -396,14 +396,15 @@ module Evolveum
         #TEST
         #</div>
         #</div>)
-            Jekyll.logger.warn("SAMPLES " + samplesDir + "/" + target)
-            #if (target != nil && File.exist?("#{samplesDir}/#{target}"))
+
+            Jekyll.logger.warn("SAMPLES " + samplesDir() + "/" + target)
+            if (target != nil && File.exist?("#{samplesDir()}/#{target}"))
             #    #samplesHtml = Asciidoctor.convert("[source,xml]\n----\n#{File.read("#{samplesDir}/#{target}")}\n----")
-            #    samplesDoc = Asciidoctor.load '*This* is Asciidoctor.'
-            #    samplesHtml = samplesDoc.convert
-            #    Jekyll.logger.warn("I AM INSIDE " + samplesHtml)
-            #    create_pass_block parent, samplesHtml, attrs, subs: nil
-            #end
+                samplesDoc = Asciidoctor.load '*This* is Asciidoctor.'
+                samplesHtml = samplesDoc.convert
+                Jekyll.logger.warn("I AM INSIDE " + samplesHtml)
+                create_pass_block parent, samplesHtml, attrs, subs: nil
+            end
 
         end
 
@@ -511,6 +512,6 @@ Asciidoctor::Extensions.register do
   inline_macro Evolveum::WikiInlineMacro
   inline_macro Evolveum::BugInlineMacro
   inline_macro Evolveum::GlossrefInlineMacro
-  #block_macro Evolveum::SamplesBlockMacro
+  block_macro Evolveum::SamplesBlockMacro
   treeprocessor Evolveum::ImagePathTreeprocessor
 end
