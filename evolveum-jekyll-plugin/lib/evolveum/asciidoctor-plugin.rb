@@ -214,7 +214,7 @@ module Evolveum
 
         def processXRefLink(parent, target, attrs)
         #    puts "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXREF -------> Processing #{parent} #{targetFile} #{attrs}"
-
+=begin
             targetPath, fragmentSuffix = parseFragment(target)
             sourceFile = parent.document.attributes["docfile"]
             # puts "targetPath=#{targetPath}, fragment=#{fragmentSuffix}"
@@ -284,6 +284,7 @@ module Evolveum
             else
                 createLink(addFragmentSuffix(targetPage.url,fragmentSuffix), parent, attrs, targetPage.data['title'])
             end
+=end
         end
 
 
