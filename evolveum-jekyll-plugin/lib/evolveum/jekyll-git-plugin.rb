@@ -14,8 +14,6 @@ module Evolveum
 
     class Git
 
-        $stdout.reopen("/var/log/gitplugin", "w")
-
         def self.post_read(site)
             mpDir = site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix']
             site.pages.each do |page|
