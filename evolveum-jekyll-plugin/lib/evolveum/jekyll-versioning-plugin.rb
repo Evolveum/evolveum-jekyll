@@ -34,12 +34,12 @@ def installVersions(site)
       `cd #{site.config['docs']['midpointVersionsPath']} && git clone -b #{version} https://github.com/Evolveum/midpoint #{site.config['docs']['midpointVersionsPrefix']}#{versionWithoutDocs} && rm #{mpPreDir}#{versionWithoutDocs}/docs/LICENSE` #maybe
     end
     if version != defaultBranch
-      `grep -rl :page-alias: #{mpPreDir}#{versionWithoutDocs}/docs/ | xargs sed -i '/:page-alias:/d' 2> /dev/null || true`
+      `grep -rl :page-alias: #{mpPreDir}#{versionWithoutDocs}/docs/ | xargs -P 4 sed -i '/:page-alias:/d' 2> /dev/null || true`
     end
     `ln -s #{mpPreDir}#{versionWithoutDocs}/docs/ #{docsDir}/midpoint/reference/#{versionWithoutDocs}`
     system("sed -i 's/:page-nav-title: Configuration Reference/:page-nav-title: \"#{displayVersions[index]}\"/g' #{mpPreDir}#{versionWithoutDocs}/docs/index.adoc")
-    system("find #{mpPreDir}#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv:\\/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} \\;")
-    system("find #{mpPreDir}#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} \\;")
+    system("find #{mpPreDir}#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv:\\/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} +")
+    system("find #{mpPreDir}#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} +")
   end
   puts("Total versioning time: " + (Process.clock_gettime(Process::CLOCK_MONOTONIC) - $startingTime).to_s)
 end
