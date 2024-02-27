@@ -50,12 +50,12 @@ then
 
 	if [ -z $INITIAL ]
 	then
-		sed -i "s/.*docsPath:.*/  docsPath: $DOCSPATH/" evolveum-jekyll-theme/_config.yml
-		sed -i "s/.*docsDirName:.*/  docsDirName: $DOCSDIR/" evolveum-jekyll-theme/_config.yml
-		sed -i "s/.*midpointVersionsPath:.*/  midpointVersionsPath: $MPPATH/" evolveum-jekyll-theme/_config.yml
-		sed -i "s/.*midpointVersionsPrefix:.*/  midpointVersionsPrefix: $MPPREFIX/" evolveum-jekyll-theme/_config.yml
-		sed -i "s/.*midpointSamplesPath:.*/  midpointSamplesPath: $SAMPLESPATH/" evolveum-jekyll-theme/_config.yml
-		sed -i "s/.*midpointSamplesDir:.*/  midpointSamplesDir: $SAMPLESDIR/" evolveum-jekyll-theme/_config.yml
+		sed -i "s#.*docsPath:.*#  docsPath: $DOCSPATH#" evolveum-jekyll-theme/_config.yml
+		sed -i "s#.*docsDirName:.*#  docsDirName: $DOCSDIR#" evolveum-jekyll-theme/_config.yml
+		sed -i "s#.*midpointVersionsPath:.*#  midpointVersionsPath: $MPPATH#" evolveum-jekyll-theme/_config.yml
+		sed -i "s#.*midpointVersionsPrefix:.*#  midpointVersionsPrefix: $MPPREFIX#" evolveum-jekyll-theme/_config.yml
+		sed -i "s#.*midpointSamplesPath:.*#  midpointSamplesPath: $SAMPLESPATH#" evolveum-jekyll-theme/_config.yml
+		sed -i "s#.*midpointSamplesDir:.*#  midpointSamplesDir: $SAMPLESDIR#" evolveum-jekyll-theme/_config.yml
 	fi
 
 	VERSION=0.1.0
