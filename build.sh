@@ -31,6 +31,7 @@ do
         f) SAMPLESDIR=${OPTARG};;
         n) INITIAL=true;;
         h | *)
+          HELP=true
           echo "script usage:"
           echo "$0 [-s value] [-n value]"
           echo "--docs-path     custom path to a docs directory. The default is the home directory of the current user."
@@ -44,25 +45,28 @@ do
     esac
 done
 
-
-if [ -z $INITIAL ]
+if [ -z $HELP ]
 then
-	sed -i "s/.*docsPath:.*/  docsPath: $DOCSPATH/" evolveum-jekyll-theme/_config.yaml
-	sed -i "s/.*docsDirName:.*/  docsDirName: $DOCSDIR/" evolveum-jekyll-theme/_config.yaml
-	sed -i "s/.*midpointVersionsPath:.*/  midpointVersionsPath: $MPPATH/" evolveum-jekyll-theme/_config.yaml
-	sed -i "s/.*midpointVersionsPrefix:.*/  midpointVersionsPrefix: $MPPREFIX/" evolveum-jekyll-theme/_config.yaml
-	sed -i "s/.*midpointSamplesPath:.*/  midpointSamplesPath: $SAMPLESPATH/" evolveum-jekyll-theme/_config.yaml
-	sed -i "s/.*midpointSamplesDir:.*/  midpointSamplesDir: $SAMPLESDIR/" evolveum-jekyll-theme/_config.yaml
+
+	if [ -z $INITIAL ]
+	then
+		sed -i "s/.*docsPath:.*/  docsPath: $DOCSPATH/" evolveum-jekyll-theme/_config.yml
+		sed -i "s/.*docsDirName:.*/  docsDirName: $DOCSDIR/" evolveum-jekyll-theme/_config.yml
+		sed -i "s/.*midpointVersionsPath:.*/  midpointVersionsPath: $MPPATH/" evolveum-jekyll-theme/_config.yml
+		sed -i "s/.*midpointVersionsPrefix:.*/  midpointVersionsPrefix: $MPPREFIX/" evolveum-jekyll-theme/_config.yml
+		sed -i "s/.*midpointSamplesPath:.*/  midpointSamplesPath: $SAMPLESPATH/" evolveum-jekyll-theme/_config.yml
+		sed -i "s/.*midpointSamplesDir:.*/  midpointSamplesDir: $SAMPLESDIR/" evolveum-jekyll-theme/_config.yml
+	fi
+
+	VERSION=0.1.0
+
+	cd evolveum-jekyll-plugin
+	gem build evolveum-jekyll-plugin.gemspec
+	gem install evolveum-jekyll-plugin-0.1.0.gem
+	cd ..
+
+	cd evolveum-jekyll-theme
+	gem build evolveum-jekyll-theme.gemspec
+	gem install evolveum-jekyll-theme-$VERSION.gem
+	cd ..
 fi
-
-VERSION=0.1.0
-
-cd evolveum-jekyll-plugin
-gem build evolveum-jekyll-plugin.gemspec
-gem install evolveum-jekyll-plugin-0.1.0.gem
-cd ..
-
-cd evolveum-jekyll-theme
-gem build evolveum-jekyll-theme.gemspec
-gem install evolveum-jekyll-theme-$VERSION.gem
-cd ..

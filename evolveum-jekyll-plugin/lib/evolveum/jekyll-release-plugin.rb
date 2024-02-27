@@ -41,11 +41,9 @@ def readReleaseVersions(docsDir)
       docsBranches.push(ver['docsBranch'])
     end
     if ((!ver.key?("legacyDocs") || ver["legacyDocs"] != true ))
-      versionsNumbers.push(ver["version"])
       if (ver["docsReleaseBranch"] != nil)
         versionBranches.push(ver["docsReleaseBranch"])
-      else
-        versionBranches.push("master")
+        versionsNumbers.push(ver["version"])
       end
     end
   end
