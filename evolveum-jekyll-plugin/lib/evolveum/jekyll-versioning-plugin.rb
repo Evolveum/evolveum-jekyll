@@ -10,7 +10,7 @@ def installVersions(site)
   docsDir = site.config['docs']['docsPath'] + site.config['docs']['docsDirName']
   mpPreDir = site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix']
   arr = readVersions(docsDir)
-  puts("readVersion time: " + (Process.clock_gettime(Process::CLOCK_MONOTONIC) - startingTime).to_s)
+  puts("readVersion time: " + (Process.clock_gettime(Process::CLOCK_MONOTONIC) - $startingTime).to_s)
   versions = arr[0]
   displayVersions = arr[1]
   defaultBranch = arr[2]
@@ -27,7 +27,7 @@ def installVersions(site)
   puts(negativeAssert)
   system("find #{docsDir} -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv:\\/midpoint\\/reference\\/#{defaultBranch.gsub("docs/","")}\\//g' {} \\;")
   system("find #{docsDir} -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{defaultBranch.gsub("docs/","")}\\//g' {} \\;")
-  puts("replaceVersion time: " + (Process.clock_gettime(Process::CLOCK_MONOTONIC) - startingTime).to_s)
+  puts("replaceVersion time: " + (Process.clock_gettime(Process::CLOCK_MONOTONIC) - $startingTime).to_s)
   versions.each_with_index do |version, index|
     versionWithoutDocs = version.gsub("docs/","")
     if Dir["#{mpPreDir}#{versionWithoutDocs}"].empty?
@@ -41,7 +41,7 @@ def installVersions(site)
     system("find #{mpPreDir}#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv:\\/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} \\;")
     system("find #{mpPreDir}#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} \\;")
   end
-  puts("Total versioning time: " + (Process.clock_gettime(Process::CLOCK_MONOTONIC) - startingTime).to_s)
+  puts("Total versioning time: " + (Process.clock_gettime(Process::CLOCK_MONOTONIC) - $startingTime).to_s)
 end
 
 def readVersions(docsDir)
