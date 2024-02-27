@@ -408,7 +408,7 @@ module Evolveum
                 if (fileExt == "csv")
                     samplesHtml = `asciidoctor -e - <<EOF[%header,format=#{fileExt}]\n|===\ninclude::#{samplesDir}/#{target}[]\n|===\nEOF` #maybe prevent eof prom appering in a file
                 else
-                    samplesHtml = `asciidoctor -e - <<EOF[source,#{fileExt}]\n----\n#{File.read("#{samplesDir}/#{target}")}\n----\nEOF`
+                    samplesHtml = `echo '[source,#{fileExt}]\n----\n#{Shellwords.escape(File.read("#{samplesDir}/#{target}"))}\n----' | asciidoctor -e - `
                 end
 
                 Jekyll.logger.warn("CONVERTED " + samplesHtml)
