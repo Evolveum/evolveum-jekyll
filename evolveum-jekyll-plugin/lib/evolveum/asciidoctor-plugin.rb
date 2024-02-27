@@ -406,7 +406,7 @@ module Evolveum
                 #samplesHtml = samplesDoc.convert
                 fileExt = File.extname(target)[1..-1]
                 if (fileExt == "csv")
-                    samplesHtml = `asciidoctor -e - <<EOF[%header,format=#{fileExt}]\n\|===\n#{File.read("#{samplesDir}/#{target}")}\n\|===EOF` #maybe prevent eof prom appering in a file
+                    samplesHtml = `asciidoctor -e - <<EOF[%header,format=#{fileExt}]\n\|===\n#{File.read("#{samplesDir}/#{target}")}\n|===` #maybe prevent eof prom appering in a file
                 else
                     samplesHtml = `asciidoctor -e - <<EOF[source,#{fileExt}]\n----\n#{File.read("#{samplesDir}/#{target}")}\n----EOF`
                 end
