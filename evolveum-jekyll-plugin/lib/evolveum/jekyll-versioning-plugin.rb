@@ -25,8 +25,8 @@ def installVersions(site)
   negativeAssert.chop!
   negativeAssert << ")"
   puts(negativeAssert)
-  system("find #{docsDir} -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv:\\/midpoint\\/reference\\/#{defaultBranch.gsub("docs/","")}\\//g' {} \\;")
-  system("find #{docsDir} -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{defaultBranch.gsub("docs/","")}\\//g' {} \\;")
+  system("find #{docsDir} -mindepth 1 -not -path '*/[@.]*' -type f | xargs -P 4 -I {} perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv:\\/midpoint\\/reference\\/#{defaultBranch.gsub("docs/","")}\\//g' {} \\;")
+  system("find #{docsDir} -mindepth 1 -not -path '*/[@.]*' -type f | xargs -P 4 -I {} perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{defaultBranch.gsub("docs/","")}\\//g' {} \\;")
   puts("replaceVersion time: " + (Process.clock_gettime(Process::CLOCK_MONOTONIC) - $startingTime).to_s)
   versions.each_with_index do |version, index|
     versionWithoutDocs = version.gsub("docs/","")
