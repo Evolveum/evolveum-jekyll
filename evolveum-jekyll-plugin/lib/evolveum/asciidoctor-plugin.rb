@@ -249,28 +249,22 @@ module Evolveum
                             else
                                 targetArr = target.split("/").drop(1)
                                 matched = false
-                                Jekyll.logger.warn(targetArr)
                                 targetArr.each_with_index do |version, index|
                                     partTargetArr = targetArr[...index+1]
                                     escaped_target = Regexp.escape("#{partTargetArr.join("/")}/\*")
-                                    Jekyll.logger.warn(escaped_target)
                                     output = `grep -rl ":page-moved-from: /#{escaped_target}" #{docsDir()}/`
                                     if (output != nil && output != "")
                                         movedPart = `sed -n -e '/^:page-moved-from: /p' #{output.split("\n")[0]}`
                                         movedPart = movedPart.gsub(":page-moved-from:", "")
                                         movedPart = movedPart.gsub("*", "")
                                         movedPart = movedPart.gsub(/\n/, "")
-                                        Jekyll.logger.warn("MOVED PART " + movedPart + " test " + output.split("\n")[0] + "/")
                                         targetPath = movedPart + targetArr[index+1...].join("/") + "/"
-                                        Jekyll.logger.warn("targetPath " + targetPath)
                                         targetPage = findPageByTarget(parent.document, targetPath)
                                         if targetPage == nil
                                             Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
                                         else
                                             Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
                                         end
-
-                                        Jekyll.logger.warn(output + " test " + partTargetArr.join("/"))
 
                                         matched = true
                                         break
@@ -424,7 +418,6 @@ module Evolveum
                     samplesHtml, _ = Open3.capture2("asciidoctor -e -", stdin_data: source_content)
                   end
 
-                Jekyll.logger.warn("CONVERTED " + samplesHtml)
                 create_pass_block parent, samplesHtml, attrs, subs: nil
             end
 

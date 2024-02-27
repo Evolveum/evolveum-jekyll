@@ -28,7 +28,7 @@ def installVersions(site)
   versions.each_with_index do |version, index|
     versionWithoutDocs = version.gsub("docs/","")
     if Dir["#{mpPreDir}#{versionWithoutDocs}"].empty?
-      `cd #{site.config['docs']['midpointVersionsPath']} && git clone -b #{version} https://github.com/janmederly/testversioning #{site.config['docs']['midpointVersionsPrefix']}#{versionWithoutDocs} && rm #{mpPreDir}#{versionWithoutDocs}/docs/LICENSE` #maybe
+      `cd #{site.config['docs']['midpointVersionsPath']} && git clone -b #{version} https://github.com/Evolveum/midpoint #{site.config['docs']['midpointVersionsPrefix']}#{versionWithoutDocs} && rm #{mpPreDir}#{versionWithoutDocs}/docs/LICENSE` #maybe
     end
     if version != defaultBranch
       `grep -rl :page-alias: #{mpPreDir}#{versionWithoutDocs}/docs/ | xargs sed -i '/:page-alias:/d' 2> /dev/null || true`
