@@ -10,6 +10,7 @@ require 'asciidoctor'
 require 'asciidoctor/extensions'
 require 'pathname'
 require 'pp'
+require 'open3'
 require_relative 'jekyll-versioning-plugin.rb' # We need readVersions method for checking if xfer path includes exact midpoint version
 
 module Evolveum
@@ -405,12 +406,23 @@ module Evolveum
                 #Jekyll.logger.warn("LOADED")
                 #samplesHtml = samplesDoc.convert
                 fileExt = File.extname(target)[1..-1]
-                if (fileExt == "csv")
-                    samplesHtml = `echo <<EOF[format="csv",options="header"]\n|===\ninclude::#{samplesDir}/#{target}[]\n|===\n
-EOF && asciidoctor -e - `
-                else
-                    samplesHtml = `echo '[source,#{fileExt}]\n----\n#{File.read("#{samplesDir}/#{target}")}\n----' | asciidoctor -e - `
-                end
+                if fileExt == "csv"
+                    csv_content = <<~CSV
+                      [format="csv",options="header"]
+                      |===
+                      include::#{samplesDir}/#{target}[]
+                      |===
+                    CSV
+                    samplesHtml, _ = Open3.capture2("asciidoctor -e -", stdin_data: csv_content)
+                  else
+                    source_content = <<~SOURCE
+                      [source,#{fileExt}]
+                      ----
+                      #{File.read("#{samplesDir}/#{target}")}
+                      ----
+                    SOURCE
+                    samplesHtml, _ = Open3.capture2("asciidoctor -e -", stdin_data: source_content)
+                  end
 
                 Jekyll.logger.warn("CONVERTED " + samplesHtml)
                 create_pass_block parent, samplesHtml, attrs, subs: nil
