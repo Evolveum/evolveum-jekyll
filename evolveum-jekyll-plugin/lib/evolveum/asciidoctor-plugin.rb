@@ -392,10 +392,8 @@ module Evolveum
         #</div>
         #</div>)
 
-            Jekyll.logger.warn("SAMPLES " + samplesDir() + "/" + target)
             if (target != nil && File.exist?("#{samplesDir()}/#{target}"))
             #    #samplesHtml = Asciidoctor.convert("[source,xml]\n----\n#{File.read("#{samplesDir}/#{target}")}\n----")
-                Jekyll.logger.warn("STARTED")
                 #samplesDoc = Asciidoctor.load '*This* is Asciidoctor.'
                 #Jekyll.logger.warn("LOADED")
                 #samplesHtml = samplesDoc.convert
@@ -418,7 +416,6 @@ module Evolveum
                     samplesHtml, _ = Open3.capture2("asciidoctor -e -", stdin_data: source_content)
                   end
 
-                Jekyll.logger.warn("CONVERTED " + samplesHtml)
                 create_pass_block parent, samplesHtml, attrs, subs: nil
             end
 
