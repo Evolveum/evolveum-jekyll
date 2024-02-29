@@ -14,11 +14,11 @@ asciidoctor:
     source-highlighter: rouge
 
 docs:
-  docsPath: ../
+  docsPath: /
   docsDirName: docs
-  midpointVersionsPath: ../
+  midpointVersionsPath: /
   midpointVersionsPrefix: mp-
-  midpointSamplesPath: ../
+  midpointSamplesPath: /
   midpointSamplesDirName: mp-samples
 
 
