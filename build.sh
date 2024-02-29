@@ -23,18 +23,12 @@ done
 while getopts a:b:c:d:e:f:n:h flag
 do
     case "${flag}" in
-        a) DOCSPATH=${OPTARG}
-           CHANGED=true;;
-        b) DOCSDIR=${OPTARG};;
-           CHANGED=true;;
-        c) MPPATH=${OPTARG};;
-           CHANGED=true;;
-        d) MPPREFIX=${OPTARG};;
-           CHANGED=true;;
-        e) SAMPLESPATH=${OPTARG};;
-           CHANGED=true;;
-        f) SAMPLESDIR=${OPTARG};;
-           CHANGED=true;;
+        a) DOCSPATH=${OPTARG}; CHANGED=true ;;
+        b) DOCSDIR=${OPTARG}; CHANGED=true ;;
+        c) MPPATH=${OPTARG}; CHANGED=true ;;
+        d) MPPREFIX=${OPTARG}; CHANGED=true ;;
+        e) SAMPLESPATH=${OPTARG}; CHANGED=true ;;
+        f) SAMPLESDIR=${OPTARG}; CHANGED=true ;;
         h | *)
           HELP=true
           echo "script usage:"
