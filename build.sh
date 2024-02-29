@@ -1,10 +1,10 @@
 #!/bin/bash
 
-DOCSPATH="$HOME"
+DOCSPATH="$HOME/"
 DOCSDIR="docs"
-MPPATH="$HOME"
+MPPATH="$HOME/"
 MPPREFIX="mp-"
-SAMPLESPATH="$HOME"
+SAMPLESPATH="$HOME/"
 SAMPLESDIR="mp-samples"
 
 for arg in "$@"; do
@@ -16,12 +16,12 @@ for arg in "$@"; do
     '--mp-prefix')     set -- "$@" '-d'   ;;
     '--samples-path')     set -- "$@" '-e'   ;;
     '--samples-dir')     set -- "$@" '-f'   ;;
-    '--local')     set -- "$@" '-l'   ;;
+    '--local')     set -- '-l'   ;;
     *)          set -- "$@" "$arg" ;;
   esac
 done
 
-while getopts a:b:c:d:e:f:n:l:h flag
+while getopts a:b:c:d:e:f:n:lh flag
 do
     case "${flag}" in
         a) DOCSPATH=${OPTARG}; CHANGED=true ;;
