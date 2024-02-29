@@ -3,7 +3,7 @@
 (function() {
     function sendLike(modify) {
         let url = window.location.href
-        let id = url.replace("https://docs.evolveum.com", "").replace(/\//g, "") + "title"
+        let id = url.replace("https://{{ site.environment.docsUrl }}", "").replace(/\//g, "") + "title"
 
         let queryDocsLikes = {
             script: {
@@ -13,7 +13,7 @@
     
         $.ajax({
             method: "POST",
-            url: "https://search.evolveum.com/docs/_update/" + id + "?refresh",
+            url: "https://{{ site.environment.searchUrl }}/docs/_update/" + id + "?refresh",
             crossDomain: true,
             async: true,
             data: JSON.stringify(queryDocsLikes),
@@ -106,7 +106,7 @@
             }
             $.ajax({
                 method: "POST",
-                url: "https://docs.evolveum.com/webhooks/report/docs",
+                url: "https://{{ site.environment.docsUrl }}/webhooks/report/docs",
                 crossDomain: true,
                 async: true,
                 data: JSON.stringify(reportdocsQuery),
