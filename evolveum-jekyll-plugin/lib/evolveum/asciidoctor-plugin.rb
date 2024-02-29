@@ -10,6 +10,7 @@ require 'asciidoctor'
 require 'asciidoctor/extensions'
 require 'pathname'
 require 'pp'
+require 'open3'
 require_relative 'jekyll-versioning-plugin.rb' # We need readVersions method for checking if xfer path includes exact midpoint version
 
 module Evolveum
@@ -18,6 +19,14 @@ module Evolveum
 
         def jekyllSite()
             return Jekyll.sites[0]
+        end
+
+        def docsDir()
+            return (jekyllSite().config['docs']['docsPath'] + jekyllSite().config['docs']['docsDirName'])
+        end
+
+        def samplesDir()
+            return (jekyllSite().config['docs']['midpointSamplesPath'] + jekyllSite().config['docs']['midpointSamplesDirName'])
         end
 
         def jekyllData(dataName)
@@ -229,33 +238,40 @@ module Evolveum
                     if ignoreLinkBreak?(parent, targetPath)
                         Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
                     else
-                        output = `grep -rl ":page-moved-from: #{target}" /docs/`
+                        output = `grep -rl ":page-moved-from: #{target}" #{docsDir()}/`
                         if (output != nil && output != "")
                             Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
                         else
                             escaped_target = Regexp.escape("\nmoved-from: #{target}\n")
-                            output = `grep -rl #{escaped_target} /docs/`
+                            output = `grep -rl #{escaped_target} #{docsDir()}/`
                             if (output != nil && output != "")
                                 Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
                             else
                                 targetArr = target.split("/").drop(1)
                                 matched = false
+                                Jekyll.logger.warn(targetArr)
                                 targetArr.each_with_index do |version, index|
                                     partTargetArr = targetArr[...index+1]
                                     escaped_target = Regexp.escape("#{partTargetArr.join("/")}/\*")
-                                    output = `grep -rl ":page-moved-from: /#{escaped_target}" /docs/`
+                                    Jekyll.logger.warn(escaped_target)
+                                    output = `grep -rl ":page-moved-from: /#{escaped_target}" #{docsDir()}/`
                                     if (output != nil && output != "")
                                         movedPart = `sed -n -e '/^:page-moved-from: /p' #{output.split("\n")[0]}`
                                         movedPart = movedPart.gsub(":page-moved-from:", "")
                                         movedPart = movedPart.gsub("*", "")
                                         movedPart = movedPart.gsub(/\n/, "")
+                                        Jekyll.logger.warn("MOVED PART " + movedPart + " test " + output.split("\n")[0] + "/")
                                         targetPath = movedPart + targetArr[index+1...].join("/") + "/"
+                                        Jekyll.logger.warn("targetPath " + targetPath)
                                         targetPage = findPageByTarget(parent.document, targetPath)
                                         if targetPage == nil
                                             Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
                                         else
                                             Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
                                         end
+
+                                        Jekyll.logger.warn(output + " test " + partTargetArr.join("/"))
+
                                         matched = true
                                         break
                                     end
@@ -293,7 +309,7 @@ module Evolveum
 
       # Check if there is an sprecific midpoint version included in link
       def process(parent, target, attrs)
-        verArr = readVersions()
+        verArr = readVersions(docsDir()) #???????????????????????
         versions = verArr[0]
         sourceFile = parent.document.attributes["docfile"]
         versions.each do |version|
@@ -363,6 +379,56 @@ module Evolveum
 #        puts "BBBUG: #{target} -> #{targetUrl}"
         createLink(targetUrl, parent, attrs, target)
       end
+    end
+
+    class SamplesBlockMacro < JekyllBlockMacro
+        use_dsl
+
+        named :sampleRef
+        #name_positional_attributes 'linktext'
+
+        def process(parent, target, attrs)
+
+            #title_html = (attrs.has_key? 'title') ?
+            #%(<div class="title">#{attrs['title']}</div>\n) : nil
+
+            #html = %(<div class="test">
+        ##{title_html}<div class="content">
+        #TEST
+        #</div>
+        #</div>)
+
+            Jekyll.logger.warn("SAMPLES " + samplesDir() + "/" + target)
+            if (target != nil && File.exist?("#{samplesDir()}/#{target}"))
+            #    #samplesHtml = Asciidoctor.convert("[source,xml]\n----\n#{File.read("#{samplesDir}/#{target}")}\n----")
+                Jekyll.logger.warn("STARTED")
+                #samplesDoc = Asciidoctor.load '*This* is Asciidoctor.'
+                #Jekyll.logger.warn("LOADED")
+                #samplesHtml = samplesDoc.convert
+                fileExt = File.extname(target)[1..-1]
+                if fileExt == "csv"
+                    csv_content = <<~CSV
+                      [format="csv",options="header"]
+                      |===
+                      include::#{samplesDir}/#{target}[]
+                      |===
+                    CSV
+                    samplesHtml, _ = Open3.capture2("asciidoctor -e -", stdin_data: csv_content)
+                  else
+                    source_content = <<~SOURCE
+                      [source,#{fileExt}]
+                      ----
+                      #{File.read("#{samplesDir}/#{target}")}
+                      ----
+                    SOURCE
+                    samplesHtml, _ = Open3.capture2("asciidoctor -e -", stdin_data: source_content)
+                  end
+
+                Jekyll.logger.warn("CONVERTED " + samplesHtml)
+                create_pass_block parent, samplesHtml, attrs, subs: nil
+            end
+
+        end
 
     end
 
@@ -468,5 +534,6 @@ Asciidoctor::Extensions.register do
   inline_macro Evolveum::WikiInlineMacro
   inline_macro Evolveum::BugInlineMacro
   inline_macro Evolveum::GlossrefInlineMacro
+  block_macro Evolveum::SamplesBlockMacro
   treeprocessor Evolveum::ImagePathTreeprocessor
 end

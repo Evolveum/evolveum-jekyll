@@ -24,13 +24,14 @@ module Evolveum
             page.data["visibility"] = "system"
             page.data["redirects"] = collectRedirects()
 
-            page.data["defaultBranch"] = findDefaultBranch()
+            page.data["defaultBranch"] = findDefaultBranch(site)
 
             @site.pages << page
         end
 
-        def findDefaultBranch()
-            verObject = YAML.load_file('/docs/_data/midpoint-versions.yml')
+        def findDefaultBranch(site)
+            docsDir = site.config['docs']['docsPath'] + site.config['docs']['docsDirName']
+            verObject = YAML.load_file("#{docsDir}/_data/midpoint-versions.yml")
             defaultBranch = ""
             verObject.each do |ver|
                 if ver['defaultBranch'] != nil && ver['defaultBranch'] == true

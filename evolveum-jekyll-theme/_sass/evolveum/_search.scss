@@ -202,6 +202,12 @@
     color: #DAA06D;
 }
 
+#ovalGuide.on {
+    color: white;
+    background-color: #DAA06D;
+    border-color: #DAA06D;
+}
+
 #ovalBook {
     outline-color: #fddd5c;
     color: #fddd5c;
@@ -211,12 +217,6 @@
     color: white;
     background-color: #fddd5c;
     border-color: #fddd5c;
-}
-
-#ovalGuide.on {
-    color: white;
-    background-color: #DAA06D;
-    border-color: #DAA06D;
 }
 
 #ovalReference {
