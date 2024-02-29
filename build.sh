@@ -21,7 +21,7 @@ for arg in "$@"; do
   esac
 done
 
-while getopts a:b:c:d:e:f:n:h flag
+while getopts a:b:c:d:e:f:n:l:h flag
 do
     case "${flag}" in
         a) DOCSPATH=${OPTARG}; CHANGED=true ;;
