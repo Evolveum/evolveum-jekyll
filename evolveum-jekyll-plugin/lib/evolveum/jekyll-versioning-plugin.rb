@@ -11,8 +11,8 @@ def installVersions(site)
   versions = arr[0]
   displayVersions = arr[1]
   defaultBranch = arr[2]
-  `rm -rf #{docsDir}/midpoint/reference/*`
-  `cp /mnt/index.html #{docsDir}/midpoint/reference/`
+  system("rm -rf #{docsDir}/midpoint/reference/*")
+  system("cp /mnt/index.html #{docsDir}/midpoint/reference/")
   negativeAssert = "?!(?:"
   versions.each do |version|
     versionWithoutDocs = version.gsub("docs/","")
@@ -28,12 +28,12 @@ def installVersions(site)
   versions.each_with_index do |version, index|
     versionWithoutDocs = version.gsub("docs/","")
     if Dir["#{mpPreDir}#{versionWithoutDocs}"].empty?
-      `cd #{site.config['docs']['midpointVersionsPath']} && git clone -b #{version} https://github.com/janmederly/testversioning #{site.config['docs']['midpointVersionsPrefix']}#{versionWithoutDocs} && rm #{mpPreDir}#{versionWithoutDocs}/docs/LICENSE` #maybe
+      system("cd #{site.config['docs']['midpointVersionsPath']} && git clone -b #{version} https://github.com/janmederly/testversioning #{site.config['docs']['midpointVersionsPrefix']}#{versionWithoutDocs} && rm #{mpPreDir}#{versionWithoutDocs}/docs/LICENSE") #maybe
     end
     if version != defaultBranch
-      `grep -rl :page-alias: #{mpPreDir}#{versionWithoutDocs}/docs/ | xargs -P 4 sed -i '/:page-alias:/d' 2> /dev/null || true`
+      system("grep -rl :page-alias: #{mpPreDir}#{versionWithoutDocs}/docs/ | xargs -P 4 sed -i '/:page-alias:/d' 2> /dev/null || true")
     end
-    `ln -s #{mpPreDir}#{versionWithoutDocs}/docs/ #{docsDir}/midpoint/reference/#{versionWithoutDocs}`
+    system("ln -s #{mpPreDir}#{versionWithoutDocs}/docs/ #{docsDir}/midpoint/reference/#{versionWithoutDocs}")
     system("sed -i 's/:page-nav-title: Configuration Reference/:page-nav-title: \"#{displayVersions[index]}\"/g' #{mpPreDir}#{versionWithoutDocs}/docs/index.adoc")
     system("find #{mpPreDir}#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv:\\/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} +")
     system("find #{mpPreDir}#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} +")

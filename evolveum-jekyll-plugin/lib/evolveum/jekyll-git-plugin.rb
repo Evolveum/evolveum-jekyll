@@ -51,7 +51,7 @@ module Evolveum
             if branch == nil
                 out = `git #{argString}`
             else
-                out = `cd #{mpDir}#{branch}/ && git #{argString}`
+                out = system("cd #{mpDir}#{branch}/ && git #{argString}")
             end
 
             if !$?.success?
