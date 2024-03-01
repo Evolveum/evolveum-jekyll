@@ -214,16 +214,63 @@ module Evolveum
 
         def render(context)
             navtree = context['site']['data']['nav']
-            s = StringIO.new
-            s << '<ul class="children">'
             children = navtree.children(context['page']['url'], @params)
-            children.each do |child|
-                s << '<li class="children-item">'
-                child.append_label_link(s)
-                s << '</li>'
+            @s = StringIO.new
+            if @params['style'] == 'table'
+                renderTable(children)
+            else
+                renderList(children)
             end
-            s << '</ul>'
-            s.string
+            @s.string
+        end
+
+        def renderList(children)
+            @s << '<ul class="children">'
+            children.each do |child|
+                @s << '<li class="children-item">'
+                child.append_label_link(@s)
+                @s << '</li>'
+            end
+            @s << '</ul>'
+        end
+
+        def renderTable(children)
+
+            if @params['heading'] == nil
+                heading = "Page"
+            else
+                heading = @params['heading']
+            end
+
+            @s << "<table class=\"tableblock frame-all grid-all fit-content\">\n"
+            @s << "  <colgroup>\n"
+            @s << "    <col>\n"
+            @s << "    <col>\n"
+            @s << "  </colgroup>\n"
+            @s << "  <thead>\n"
+            @s << "    <tr>\n"
+            @s << "      <th class=\"tableblock halign-left valign-top\">"
+            @s << heading
+            @s << "</th>\n"
+            @s << "      <th class=\"tableblock halign-left valign-top\">Description</th>\n"
+            @s << "    </tr>\n"
+            @s << "  </thead>\n"
+
+            @s << "  <tbody>\n"
+
+            children.each do |child|
+                @s << "    <tr>\n"
+                @s << "      <th class=\"tableblock halign-left valign-top\"><p class=\"tableblock\">"
+                child.append_label_link(@s)
+                @s << "</p></th>\n"
+                @s << "      <td class=\"tableblock halign-left valign-top\"><p class=\"tableblock\">"
+                @s << if child&.page&.data&.[]('description')
+                @s << "</p></td>\n"
+                @s << "    </tr>\n"
+            end
+
+            @s << "  </tbody>\n"
+            @s << "</table>\n"
         end
     end
 
