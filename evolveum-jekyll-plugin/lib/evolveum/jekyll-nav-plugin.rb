@@ -18,8 +18,6 @@
 
 module Evolveum
 
-    $stdout.reopen("/var/log/jekyll", "w")
-
     ##
     # Page generator.
     # Generates stub pages for URLs that do not have their own pages.
@@ -546,6 +544,9 @@ module Evolveum
 
         # NOTE: this may not work well until we have all labels generated correctly
         def presentableSubnodes(params = {})
+            #puts("test  #{subnodes.join(', ')} ")
+            #puts("test2 #{subnodes.select{ |node| node.presentable?(params) }.join(', ')}")
+            #puts("test3 #{subnodes[0].display_order} #{subnodes[0].url}")
             begin
                 subnodes.select{ |node| node.presentable?(params) }.sort{ |a,b| sortCompare(a,b) }
             rescue ArgumentError
@@ -559,8 +560,6 @@ module Evolveum
         end
 
         def sortCompare(a,b)
-            #puts("I am here #{a.url} #{a.label} #{b.url} #{b.label}")
-            #log = system("cd /docs/midpoint/reference/ && ls")
             sortBy = self&.page&.data&.[]('sub-sort-by')
             sortStrategy = self&.page&.data&.[]('sub-sort-strategy')
             sortDirection = self&.page&.data&.[]('sub-sort-direction')
@@ -574,11 +573,9 @@ module Evolveum
             if a.display_order != nil && b.display_order != nil
                 order = sortCompareValue(a.display_order, b.display_order)
                 if order != 0
-                    #puts("It was this, display orders - " + a.display_order.to_s + " b " + b.display_order.to_s + " orders " + order.to_s + " direction " + sortDirection.to_s)
                     return adjustSortOrder(order, sortDirection)
                 end
             end
-            #puts("No it is this #{a.label.downcase} #{b.label.downcase}")
             return adjustSortOrder(sortCompareValue(a.label.downcase, b.label.downcase), sortDirection)
         end
 
@@ -654,6 +651,11 @@ module Evolveum
                 processAllVisibleNavsLevel(subnav, &block)
             end
         end
+
+        def to_s()
+            return "Nav(#{@url})"
+        end
+
     end
 
 end
