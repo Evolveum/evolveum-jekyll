@@ -50,8 +50,10 @@ module Evolveum
         def self.git(argString, branch, mpDir)
             if branch == nil
                 out = `git #{argString}`
+                Jekyll.logger.warn(out.to_s)
             else
                 out = system("cd #{mpDir}#{branch}/ && git #{argString}")
+                Jekyll.logger.warn(out.to_s)
             end
 
             if !$?.success?
