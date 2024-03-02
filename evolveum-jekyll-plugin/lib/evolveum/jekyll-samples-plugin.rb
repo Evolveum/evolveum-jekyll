@@ -2,7 +2,7 @@
 def installSamples(site)
   samplesDir = site.config['docs']['midpointSamplesPath'] + site.config['docs']['midpointSamplesDirName']
   if Dir[samplesDir].empty?
-    `cd #{site.config['docs']['midpointSamplesPath']} && git clone https://github.com/Evolveum/midpoint-samples/ #{site.config['docs']['midpointSamplesDirName']}`
+    system("cd #{site.config['docs']['midpointSamplesPath']} && git clone https://github.com/Evolveum/midpoint-samples/ #{site.config['docs']['midpointSamplesDirName']}")
   end
 end
 
