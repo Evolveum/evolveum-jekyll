@@ -608,6 +608,7 @@ module Evolveum
         def to_s()
             return "Nav(#{@url})"
         end
+
     end
 
 end

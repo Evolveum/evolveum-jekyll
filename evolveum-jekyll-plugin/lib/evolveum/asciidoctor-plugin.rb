@@ -252,7 +252,9 @@ module Evolveum
                                 targetArr.each_with_index do |version, index|
                                     partTargetArr = targetArr[...index+1]
                                     escaped_target = Regexp.escape("#{partTargetArr.join("/")}/\*")
+
                                     output = system("grep -rl \":page-moved-from: /#{escaped_target}\" #{docsDir()}/")
+                                  
                                     if (output != nil && output != "")
                                         movedPart = system("sed -n -e '/^:page-moved-from: /p' #{output.split("\n")[0]}")
                                         movedPart = movedPart.gsub(":page-moved-from:", "")
@@ -391,6 +393,7 @@ module Evolveum
         #TEST
         #</div>
         #</div>)
+
             if (target != nil && File.exist?("#{samplesDir()}/#{target}"))
             #    #samplesHtml = Asciidoctor.convert("[source,xml]\n----\n#{File.read("#{samplesDir}/#{target}")}\n----")
                 #samplesDoc = Asciidoctor.load '*This* is Asciidoctor.'
