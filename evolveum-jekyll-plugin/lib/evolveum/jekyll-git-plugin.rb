@@ -9,6 +9,7 @@
 #
 
 require 'date'
+require 'open3'
 
 module Evolveum
 
@@ -52,7 +53,7 @@ module Evolveum
                 out = `git #{argString}`
                 Jekyll.logger.warn(out.to_s)
             else
-                out = system("cd #{mpDir}#{branch}/ && git #{argString}")
+                out, _ = Open3.capture2("cd #{mpDir}#{branch}/ && git #{argString}")  
                 Jekyll.logger.warn(out.to_s)
             end
 
