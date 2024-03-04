@@ -9,6 +9,7 @@
 #
 
 require 'date'
+require 'open3'
 
 module Evolveum
 
@@ -51,7 +52,7 @@ module Evolveum
             if branch == nil
                 out = `git #{argString}`
             else
-                out = `cd #{mpDir}#{branch}/ && git #{argString}`
+                out, _ = Open3.capture2("cd #{mpDir}#{branch}/ && git #{argString}")  
             end
 
             if !$?.success?
