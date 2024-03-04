@@ -262,7 +262,7 @@ module Evolveum
                 child.append_label_link(@s)
                 @s << "</p></th>\n"
                 @s << "      <td class=\"tableblock halign-left valign-top\"><p class=\"tableblock\">"
-                @s << if child&.page&.data&.[]('description')
+                @s << child&.page&.data&.[]('description')
                 @s << "</p></td>\n"
                 @s << "    </tr>\n"
             end
