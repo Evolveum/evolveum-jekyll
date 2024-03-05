@@ -379,7 +379,7 @@ module Evolveum
             targetUrl = "https://support.evolveum.com/projects/midpoint/work_packages/#{target}"
         else
             sourceFile = parent.document.attributes["docfile"]
-            Jekyll.logger.error("Wrong bug reference:#{target} in #{sourceFile}")
+            Jekyll.logger.error("Wrong bug reference bug:#{target} in #{sourceFile}")
         end
 
         if targetUrl
