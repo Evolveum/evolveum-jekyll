@@ -306,7 +306,7 @@ module Evolveum
         #verArr = readVersions(docsDir()) #???????????????????????
         versions = VersionReader.get_config_value('filteredVersions')
 
-        Jekyll.warn(versions)
+        Jekyll.logger.warn(versions)
         sourceFile = parent.document.attributes["docfile"]
         versions.each do |version|
             versionWithoutDocs = version.gsub("docs/","")
