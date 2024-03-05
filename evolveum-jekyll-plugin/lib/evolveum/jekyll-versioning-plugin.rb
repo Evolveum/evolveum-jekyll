@@ -7,7 +7,7 @@ require 'yaml'
 module VersionReader
   @config = {}
 
-  def self.load_config()
+  def self.load_config(docsDir)
     verObject = YAML.load_file("#{docsDir}/_data/midpoint-versions.yml")
     @config['filteredVersions'] = []
     @config['filteredDisplayVersions'] = []
@@ -40,7 +40,7 @@ end
 def installVersions(site)
   docsDir = site.config['docs']['docsPath'] + site.config['docs']['docsDirName']
   mpPreDir = site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix']
-  VersionReader.load_config()
+  VersionReader.load_config(docsDir)
   #arr = readVersions(docsDir)
   #versions = arr[0]
   #displayVersions = arr[1]
