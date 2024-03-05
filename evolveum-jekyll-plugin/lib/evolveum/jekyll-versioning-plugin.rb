@@ -23,7 +23,7 @@ module VersionReader
         end
       end
     end
-    if defaultBranch == ""
+    if @config['defaultBranch'] == ""
       @config['defaultBranch'] = "master"
     end
     @config['filteredVersions'].push("docs/before-4.8")
