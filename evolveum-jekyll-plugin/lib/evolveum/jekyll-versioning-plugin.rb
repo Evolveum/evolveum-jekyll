@@ -12,11 +12,13 @@ module VersionReader
     @config['filteredVersions'] = []
     @config['filteredDisplayVersions'] = []
     @config['defaultBranch'] = ""
+    @config['negativeLookAhead'] = "(?!(?:"
     verObject.each do |ver|
       if ver['docsBranch'] != nil && ver['docsDisplayBranch']
         #puts("version" + ver['docsBranch'])
         @config['filteredVersions'].push(ver['docsBranch'])
         @config['filteredDisplayVersions'].push(ver['docsDisplayBranch'])
+        @config['negativeLookAhead'] << "#{ver['docsBranch'].gsub("docs/","")}|"
         #puts ver['defaultBranch']
         if ver['defaultBranch'] != nil && ver['defaultBranch'] == true
           @config['defaultBranch'] = ver['docsBranch']
@@ -26,6 +28,8 @@ module VersionReader
     if @config['defaultBranch'] == ""
       @config['defaultBranch'] = "master"
     end
+    @config['negativeLookAhead'].chop!
+    @config['negativeLookAhead'] << "))"
     @config['filteredVersions'].push("docs/before-4.8")
     @config['filteredDisplayVersions'].push("4.7 and earlier")
     @config['filteredVersions'].push("master")
@@ -56,8 +60,8 @@ def installVersions(site)
   negativeAssert.chop!
   negativeAssert << ")"
   puts(negativeAssert)
-  system("find #{docsDir} -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv:\\/midpoint\\/reference\\/#{VersionReader.get_config_value('defaultBranch').gsub("docs/","")}\\//g' {} +")
-  system("find #{docsDir} -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{VersionReader.get_config_value('defaultBranch').gsub("docs/","")}\\//g' {} +")
+  #system("find #{docsDir} -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv:\\/midpoint\\/reference\\/#{VersionReader.get_config_value('defaultBranch').gsub("docs/","")}\\//g' {} +")
+  #system("find #{docsDir} -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{VersionReader.get_config_value('defaultBranch').gsub("docs/","")}\\//g' {} +")
 
   VersionReader.get_config_value('filteredVersions').each_with_index do |version, index|
     versionWithoutDocs = version.gsub("docs/","")
@@ -69,8 +73,8 @@ def installVersions(site)
     end
     system("cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionWithoutDocs}/docs/ \"$PWD\"/#{site.config['docs']['docsDirName']}/midpoint/reference/#{versionWithoutDocs}")
     system("sed -i 's/:page-nav-title: Configuration Reference/:page-nav-title: \"#{VersionReader.get_config_value('filteredDisplayVersions')[index]}\"/g' #{mpPreDir}#{versionWithoutDocs}/docs/index.adoc")
-    system("find #{mpPreDir}#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv:\\/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} +")
-    system("find #{mpPreDir}#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} +")
+    #system("find #{mpPreDir}#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv:\\/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} +")
+    #system("find #{mpPreDir}#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} +")
   end
 end
 

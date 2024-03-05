@@ -307,17 +307,43 @@ module Evolveum
       # Check if there is an sprecific midpoint version included in link
       def process(parent, target, attrs)
         #verArr = readVersions(docsDir()) #???????????????????????
-        versions = VersionReader.get_config_value('filteredVersions')
 
-        sourceFile = parent.document.attributes["docfile"]
-        versions.each do |version|
-            versionWithoutDocs = version.gsub("docs/","")
-            if target.include?("/" + versionWithoutDocs + "/")
-                Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{sourceFile}")
-                puts("Specific version included")
+        document_path = parent.document.attributes['docfile']
+
+        negativeLookAhead = VersionReader.get_config_value('negativeLookAhead')
+
+        if (!document_path.include?("/midpoint/reference/"))
+            if (!target.include?("/midpoint/reference/"))
+                processXRefLink(parent, target, attrs)
+            elsif (target.match?(negativeLookAhead))
+                processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs)
+            else
+                Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
+                processXRefLink(parent, target, attrs)
             end
+        else
+            if (!target.include?("/midpoint/reference/"))
+                processXRefLink(parent, target, attrs)
+            elsif (target.match?(negativeLookAhead))
+                processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{document_path.split("/")[3]}/"), attrs)
+            else
+                Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
+                processXRefLink(parent, target, attrs)
+            end
+            #currentPage = findCurrentPage(parent.document)S
         end
-        processXRefLink(parent, target, attrs)
+
+
+        #versions = VersionReader.get_config_value('filteredVersions')
+
+        #sourceFile = parent.document.attributes["docfile"]
+        #versions.each do |version|
+        #    versionWithoutDocs = version.gsub("docs/","")
+        #    if target.include?("/" + versionWithoutDocs + "/")
+        #        Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{sourceFile}")
+        #        puts("Specific version included")
+        #    end
+        #end
       end
     end
 
