@@ -238,12 +238,12 @@ module Evolveum
                     if ignoreLinkBreak?(parent, targetPath)
                         Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
                     else
-                        output = system("grep -rl \":page-moved-from: #{target}\" #{docsDir()}/")
+                        output, _ = Open3.capture2("grep -rl \":page-moved-from: #{target}\" #{docsDir()}/")
                         if (output != nil && output != "")
                             Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
                         else
                             escaped_target = Regexp.escape("\nmoved-from: #{target}\n")
-                            output = system("grep -rl #{escaped_target} #{docsDir()}/")
+                            output, _ = Open3.capture2("grep -rl #{escaped_target} #{docsDir()}/")
                             if (output != nil && output != "")
                                 Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
                             else
@@ -253,10 +253,10 @@ module Evolveum
                                     partTargetArr = targetArr[...index+1]
                                     escaped_target = Regexp.escape("#{partTargetArr.join("/")}/\*")
 
-                                    output = system("grep -rl \":page-moved-from: /#{escaped_target}\" #{docsDir()}/")
-                                  
+                                    output, _ = Open3.capture2("grep -rl \":page-moved-from: /#{escaped_target}\" #{docsDir()}/")
+
                                     if (output != nil && output != "")
-                                        movedPart = system("sed -n -e '/^:page-moved-from: /p' #{output.split("\n")[0]}")
+                                        movedPart, _ = Open3.capture2("sed -n -e '/^:page-moved-from: /p' #{output.split("\n")[0]}")
                                         movedPart = movedPart.gsub(":page-moved-from:", "")
                                         movedPart = movedPart.gsub("*", "")
                                         movedPart = movedPart.gsub(/\n/, "")
