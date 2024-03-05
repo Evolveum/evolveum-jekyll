@@ -371,9 +371,21 @@ module Evolveum
 
       def process(parent, target, attrs)
 
-        targetUrl = "https://jira.evolveum.com/browse/#{target}"
-#        puts "BBBUG: #{target} -> #{targetUrl}"
-        createLink(targetUrl, parent, attrs, target)
+        targetUrl = nil
+        mid = /\AMID\-(\d+)\z/.match(target)
+        if mid
+            targetUrl = "https://support.evolveum.com/projects/midpoint/work_packages/#{mid[1]}"
+        elsif /\A\d+\z/.match(target)
+            targetUrl = "https://support.evolveum.com/projects/midpoint/work_packages/#{target}"
+        else
+            sourceFile = parent.document.attributes["docfile"]
+            Jekyll.logger.error("Wrong bug reference:#{target} in #{sourceFile}")
+        end
+
+        if targetUrl
+#            puts "BBBUG: #{target} -> #{targetUrl}"
+            createLink(targetUrl, parent, attrs, target)
+        end
       end
     end
 
