@@ -28,8 +28,9 @@ module Evolveum
                 #puts(page.path)
                 # todo add somewhere index.html
                 if page.path != "midpoint/reference/index.html" && page.path.include?("midpoint/reference/")
-                    urlSplitted = page.path.split("/")
-                    branch = urlSplitted[2]
+                    #urlSplitted = page.path.split("/")
+                    #branch = urlSplitted[2]
+                    branch = page.data['version']
                     dateString = git("log -1 --pretty='format:%ci' 'docs/#{urlSplitted.drop(3).join("/")}'", branch, mpDir)
                 elsif
                     dateString = git("log -1 --pretty='format:%ci' '#{page.path}'", nil, nil)
@@ -52,7 +53,7 @@ module Evolveum
             if branch == nil
                 out = `git #{argString}`
             else
-                out, _ = Open3.capture2("cd #{mpDir}#{branch}/ && git #{argString}")  
+                out, _ = Open3.capture2("cd #{mpDir}#{branch}/ && git #{argString}")
             end
 
             if !$?.success?

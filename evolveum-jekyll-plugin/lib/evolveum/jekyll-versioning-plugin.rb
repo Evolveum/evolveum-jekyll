@@ -89,7 +89,7 @@ def setupPathVerData(page)
   displayVersions = VersionReader.get_config_value('filteredDisplayVersions')
   Jekyll.logger.warn("URL: " + page.path + " ver: " + ver)
   index = versionsWhDocs.find_index(ver)
-  Jekyll.logger.warn("index: " + index)
+  Jekyll.logger.warn("index: " + index.to_s)
   page.data['version'] = versions[index]
   page.data['versionWhDocs'] = versionsWhDocs[index]
   page.data['displayVersion'] = displayVersions[index]
@@ -101,7 +101,6 @@ Jekyll::Hooks.register :site, :after_init do |site|
 end
 
 Jekyll::Hooks.register :pages, :post_init do |page|
-  puts "=========[ EVOLVEUM VERSIONNING ]============== post_init"
   if (page.path.include?("midpoint/reference/"))
     setupPathVerData(page)
   end
