@@ -87,6 +87,7 @@ def setupPathVerData(page)
   versionsWhDocs = VersionReader.get_config_value('filteredVersionsWhDocs')
   versions = VersionReader.get_config_value('filteredVersions')
   displayVersions = VersionReader.get_config_value('filteredDisplayVersions')
+  Jekyll.logger.warn("URL: " + page.path + " ver: " + ver + " index: " + index)
   index = versionsWhDocs.find_index(ver)
   page.data['version'] = versions[index]
   page.data['versionWhDocs'] = versionsWhDocs[index]
