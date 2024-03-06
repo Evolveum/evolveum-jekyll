@@ -15,6 +15,7 @@
 # The tree represents the hierarchy of pages as Jekyll knows them.
 # The tree is then used by other code to create navigation panel, breadcrumbs, list of child pages, etc.
 
+require_relative 'jekyll-versioning-plugin.rb'
 
 module Evolveum
 
@@ -325,6 +326,19 @@ module Evolveum
             if parent_url == nil
                 Jekyll.logger.warn("No parent in alias specification in page #{page.url}, ignoring")
                 return
+            end
+            negativeLookAhead = VersionReader.get_config_value('negativeLookAhead')
+            if (parent_url.include?("/midpoint/reference/"))
+                if (page.data['version'] == nil)
+                    Jekyll.logger.error("Page alias error: referencing reference documentation outside of reference documentation inn page #{page.url}")
+                end
+                if (parent_url.match?(negativeLookAhead))
+                    if (page.data['versionWhDocs'] == nil)
+                        parent_url.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/")
+                    else
+                        parent_url.gsub("/midpoint/reference/", "/midpoint/reference/#{page.data['versionWhDocs']}/")
+                    end
+                end
             end
             parent_nav = index_path(parent_url)
             slug = aliasdef['slug']
