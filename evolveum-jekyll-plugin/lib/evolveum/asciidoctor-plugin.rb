@@ -315,7 +315,7 @@ module Evolveum
         if (!document_path.include?("/midpoint/reference/"))
             if (!target.include?("/midpoint/reference/"))
                 processXRefLink(parent, target, attrs)
-            elsif (negativeLookAhead.match?(target))
+            elsif (target.match?(negativeLookAhead))
                 processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs)
             else
                 Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
@@ -324,10 +324,11 @@ module Evolveum
         else
             if (!target.include?("/midpoint/reference/"))
                 processXRefLink(parent, target, attrs)
-            elsif (negativeLookAhead.match?(target))
-                verCaptures = /\/midpoint\/reference\/(?<ver>)\//.match(document_path).named_captures
-                processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{verCaptures['ver']}/"), attrs)
-                Jekyll.logger.warn(document_path)
+            elsif (target.match?(negativeLookAhead))
+                currentPage = findCurrentPage(parent.document)
+                version = currentPage.data['version']
+                processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{version}/"), attrs)
+                Jekyll.logger.warn(version)
             else
                 Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
                 processXRefLink(parent, target, attrs)

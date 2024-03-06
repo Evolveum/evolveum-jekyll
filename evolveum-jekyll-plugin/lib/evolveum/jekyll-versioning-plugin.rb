@@ -11,12 +11,14 @@ module VersionReader
     verObject = YAML.load_file("#{docsDir}/_data/midpoint-versions.yml")
     @config['filteredVersions'] = []
     @config['filteredDisplayVersions'] = []
+    @config['filteredVersionsWhDocs'] = []
     @config['defaultBranch'] = ""
     @config['negativeLookAhead'] = "(?!(?:"
     verObject.each do |ver|
       if ver['docsBranch'] != nil && ver['docsDisplayBranch']
         #puts("version" + ver['docsBranch'])
         @config['filteredVersions'].push(ver['docsBranch'])
+        @config['filteredVersionsWhDocs'].push(ver['docsBranch'].gsub("docs/",""))
         @config['filteredDisplayVersions'].push(ver['docsDisplayBranch'])
         @config['negativeLookAhead'] << "#{ver['docsBranch'].gsub("docs/","")}|"
         #puts ver['defaultBranch']
@@ -31,9 +33,11 @@ module VersionReader
     @config['negativeLookAhead'].chop!
     @config['negativeLookAhead'] << "))"
     @config['filteredVersions'].push("docs/before-4.8")
+    @config['filteredVersionsWhDocs'].push("before-4.8")
     @config['filteredDisplayVersions'].push("4.7 and earlier")
     @config['filteredVersions'].push("master")
     @config['filteredDisplayVersions'].push("Development")
+    @config['filteredVersionsWhDocs'].push("master")
   end
 
   def self.get_config_value(key)
@@ -78,7 +82,25 @@ def installVersions(site)
   end
 end
 
+def setupPathVerData(page)
+  ver = page.path.split("/")[2]
+  versionsWhDocs = VersionReader.get_config_value('filteredVersionsWhDocs')
+  versions = VersionReader.get_config_value('filteredVersions')
+  displayVersions = VersionReader.get_config_value('filteredDisplayVersions')
+  index = versionsWhDocs.find_index(ver)
+  page.data['version'] = versions[index]
+  page.data['versionWhDocs'] = versionsWhDocs[index]
+  page.data['displayVersion'] = displayVersions[index]
+end
+
 Jekyll::Hooks.register :site, :after_init do |site|
   puts "=========[ EVOLVEUM VERSIONNING ]============== after_init"
   installVersions(site)
+end
+
+Jekyll::Hooks.register :pages, :post_init do |page|
+  puts "=========[ EVOLVEUM VERSIONNING ]============== post_init"
+  if (page.path.include?("midpoint/reference/"))
+    setupPathVerData(page)
+  end
 end
