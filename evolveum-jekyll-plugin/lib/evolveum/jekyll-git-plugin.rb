@@ -31,7 +31,7 @@ module Evolveum
                     #urlSplitted = page.path.split("/")
                     #branch = urlSplitted[2]
                     branch = page.data['version']
-                    dateString = git("log -1 --pretty='format:%ci' 'docs/#{urlSplitted.drop(3).join("/")}'", branch, mpDir)
+                    dateString = git("log -1 --pretty='format:%ci' '#{branch}'", page.data['versionWhDocs'], mpDir)
                 elsif
                     dateString = git("log -1 --pretty='format:%ci' '#{page.path}'", nil, nil)
                 end
