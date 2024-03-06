@@ -101,7 +101,7 @@ Jekyll::Hooks.register :site, :after_init do |site|
 end
 
 Jekyll::Hooks.register :pages, :post_init do |page|
-  if (page.path.include?("midpoint/reference/"))
+  if (page.path.include?("midpoint/reference/") && page.path != "midpoint/reference/index.html")
     setupPathVerData(page)
   end
 end

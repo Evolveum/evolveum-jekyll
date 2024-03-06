@@ -312,7 +312,7 @@ module Evolveum
 
         negativeLookAhead = VersionReader.get_config_value('negativeLookAhead')
 
-        if (!document_path.include?("/midpoint/reference/"))
+        if (!document_path.include?("/midpoint/reference/") || document_path.include?("midpoint/reference/index.html"))
             if (!target.include?("/midpoint/reference/"))
                 processXRefLink(parent, target, attrs)
             elsif (target.match?(negativeLookAhead))
