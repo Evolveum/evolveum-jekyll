@@ -93,9 +93,14 @@ def setupPathVerData(page)
   page.data['displayVersion'] = displayVersions[index]
 end
 
+def setDefaultBranch(site)
+  site.defaultBranch = VersionReader.get_config_value('defaultBranch')
+end
+
 Jekyll::Hooks.register :site, :after_init do |site|
   puts "=========[ EVOLVEUM VERSIONNING ]============== after_init"
   installVersions(site)
+  setDefaultBranch(site)
 end
 
 Jekyll::Hooks.register :pages, :post_init do |page|
