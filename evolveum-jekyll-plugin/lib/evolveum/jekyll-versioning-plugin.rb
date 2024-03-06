@@ -94,7 +94,7 @@ def setupPathVerData(page)
 end
 
 def setDefaultBranch(site)
-  site.defaultBranch = VersionReader.get_config_value('defaultBranch')
+  site.data['defaultBranch'] = VersionReader.get_config_value('defaultBranch')
 end
 
 Jekyll::Hooks.register :site, :after_init do |site|
