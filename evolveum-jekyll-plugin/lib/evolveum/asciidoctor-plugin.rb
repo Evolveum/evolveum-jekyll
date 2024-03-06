@@ -298,26 +298,42 @@ module Evolveum
     end
 
     class XrefInlineMacro < JekyllInlineMacro
-      use_dsl
+        use_dsl
 
-      named :xref
-      name_positional_attributes 'linktext'
+        named :xref
+        name_positional_attributes 'linktext'
 
-      # Check if there is an sprecific midpoint version included in link
-      def process(parent, target, attrs)
-        verArr = readVersions(docsDir()) #???????????????????????
-        versions = verArr[0]
-        sourceFile = parent.document.attributes["docfile"]
-        versions.each do |version|
-            versionWithoutDocs = version.gsub("docs/","")
-            if target.include?("/" + versionWithoutDocs + "/")
-                Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{sourceFile}")
-                puts("Specific version included")
-            end
+        # Check if there is an sprecific midpoint version included in link
+        def process(parent, target, attrs)
+          #verArr = readVersions(docsDir()) #???????????????????????
+
+          document_path = parent.document.attributes['docfile']
+
+          negativeLookAhead = VersionReader.get_config_value('negativeLookAhead')
+
+          if (!document_path.include?("/midpoint/reference/") || document_path.include?("midpoint/reference/index.html"))
+              if (!target.include?("/midpoint/reference/"))
+                  processXRefLink(parent, target, attrs)
+              elsif (target.match?(negativeLookAhead))
+                  processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs)
+              else
+                  Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
+                  processXRefLink(parent, target, attrs)
+              end
+          else
+              if (!target.include?("/midpoint/reference/"))
+                  processXRefLink(parent, target, attrs)
+              elsif (target.match?(negativeLookAhead))
+                  currentPage = findCurrentPage(parent.document)
+                  version = currentPage.data['versionWhDocs']
+                  processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{version}/"), attrs)
+              else
+                  Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
+                  processXRefLink(parent, target, attrs)
+              end
+          end
         end
-        processXRefLink(parent, target, attrs)
       end
-    end
 
     class XrefVInlineMacro < JekyllInlineMacro
         use_dsl
