@@ -95,7 +95,7 @@
             let docsProblemSelected = $(".docsReportAProblemOption.selected")
             let docsProblemCategory = "Not defined"
             if (docsProblemSelected[0] != undefined) {
-                docsProblemCategory = docsProblemSelected[0].childNodes[0].textContent
+                docsProblemCategory = docsProblemSelected[0].childNodes[1].textContent
             }
     
             let reportdocsQuery = {
