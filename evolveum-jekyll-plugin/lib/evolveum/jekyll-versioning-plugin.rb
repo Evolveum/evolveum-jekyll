@@ -12,11 +12,22 @@ module VersionReader
     @config['filteredVersions'] = []
     @config['filteredDisplayVersions'] = []
     @config['filteredVersionsWhDocs'] = []
+    versions = []
+    @config['latestVersions'] = []
     @config['defaultBranch'] = ""
     @config['negativeLookAhead'] = "(?!(?:"
     verObject.each do |ver|
+      versions.each_with_index do |version, index|
+        if (ver["status"] == "released" && ver["version"].include?(version))
+          if (ver["version"].gsub("\.", "").to_i > latestVersions[index].gsub("\.", "").to_i)
+            latestVersions[index] = ver['version']
+          end
+        end
+      end
       if ver['docsBranch'] != nil && ver['docsDisplayBranch']
         #puts("version" + ver['docsBranch'])
+        versions.push(ver['version'])
+        @config['latestVersions'].push(ver['version'])
         @config['filteredVersions'].push(ver['docsBranch'])
         @config['filteredVersionsWhDocs'].push(ver['docsBranch'].gsub("docs/",""))
         @config['filteredDisplayVersions'].push(ver['docsDisplayBranch'])
@@ -35,9 +46,11 @@ module VersionReader
     @config['filteredVersions'].push("docs/before-4.8")
     @config['filteredVersionsWhDocs'].push("before-4.8")
     @config['filteredDisplayVersions'].push("4.7 and earlier")
+    @config['latestVersions'].push("4.7.4")
     @config['filteredVersions'].push("master")
     @config['filteredDisplayVersions'].push("Development")
     @config['filteredVersionsWhDocs'].push("master")
+    @config['latestVersions'].push("master")
   end
 
   def self.get_config_value(key)
@@ -91,6 +104,7 @@ def setupPathVerData(page)
   page.data['version'] = versions[index]
   page.data['versionWhDocs'] = versionsWhDocs[index]
   page.data['displayVersion'] = displayVersions[index]
+  page.data['latestVersion'] = VersionReader.get_config_value('latestVersions')[index]
 end
 
 Jekyll::Hooks.register :site, :after_init do |site|
