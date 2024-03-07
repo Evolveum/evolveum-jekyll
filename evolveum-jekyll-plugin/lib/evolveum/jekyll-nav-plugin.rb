@@ -339,6 +339,10 @@ module Evolveum
                         parent_url = parent_url.gsub("/midpoint/reference/", "/midpoint/reference/#{page.data['versionWhDocs']}/")
                     end
                 end
+            elsif (page.url.include?("/midpoint/reference/"))
+                if (page.data['version'] != VersionReader.get_config_value('defaultBranch'))
+                    return
+                end
             end
             parent_nav = index_path(parent_url)
             slug = aliasdef['slug']
