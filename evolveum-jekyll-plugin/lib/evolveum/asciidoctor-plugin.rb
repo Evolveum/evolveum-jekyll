@@ -326,7 +326,7 @@ module Evolveum
                 processXRefLink(parent, target, attrs)
             elsif (target.match?(negativeLookAhead))
                 currentPage = findCurrentPage(parent.document)
-                version = currentPage.data['versionWhDocs']
+                version = currentPage.data['midpointBranchSlug']
                 processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{version}/"), attrs)
             else
                 Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")

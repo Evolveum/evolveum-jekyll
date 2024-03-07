@@ -101,10 +101,10 @@ def setupPathVerData(page)
   versions = VersionReader.get_config_value('filteredVersions')
   displayVersions = VersionReader.get_config_value('filteredDisplayVersions')
   index = versionsWhDocs.find_index(ver)
-  page.data['version'] = versions[index]
-  page.data['versionWhDocs'] = versionsWhDocs[index]
-  page.data['displayVersion'] = displayVersions[index]
-  page.data['latestVersion'] = VersionReader.get_config_value('latestVersions')[index]
+  page.data['midpointBranch'] = versions[index]
+  page.data['midpointBranchSlug'] = versionsWhDocs[index]
+  page.data['midpointBranchDisplayName'] = displayVersions[index]
+  page.data['midpointVersion'] = VersionReader.get_config_value('latestVersions')[index]
 end
 
 Jekyll::Hooks.register :site, :after_init do |site|
