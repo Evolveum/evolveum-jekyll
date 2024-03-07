@@ -349,7 +349,11 @@ module Evolveum
             nav = index_path(page.url)
             nav.url = page.url
             nav.page = page
-            nav.title = page.data['nav-title'] || page.data['title']
+            if (page.data['nav-title'] == "Configuration Reference")
+                nav.title = page.data['midpointBranchDisplayName']
+            else
+                nav.title = page.data['nav-title'] || page.data['title']
+            end
             if page.data['visibility'] != nil
                 nav.visibility = page.data['visibility']
             end
