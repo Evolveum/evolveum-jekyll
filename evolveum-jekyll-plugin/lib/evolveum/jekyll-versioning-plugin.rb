@@ -19,8 +19,8 @@ module VersionReader
     verObject.each do |ver|
       versions.each_with_index do |version, index|
         if (ver["status"] == "released" && ver["version"].include?(version))
-          if (ver["version"].gsub("\.", "").to_i > latestVersions[index].gsub("\.", "").to_i)
-            latestVersions[index] = ver['version']
+          if (ver["version"].gsub("\.", "").to_i > @config['latestVersions'][index].gsub("\.", "").to_i)
+            @config['latestVersions'][index] = ver['version']
           end
         end
       end
