@@ -28,10 +28,7 @@ module Evolveum
                 #puts(page.path)
                 # todo add somewhere index.html
                 if page.path != "midpoint/reference/index.html" && page.path.include?("midpoint/reference/")
-                    #urlSplitted = page.path.split("/")
-                    #branch = urlSplitted[2]
-                    branch = page.data['version']
-                    dateString = git("log -1 --pretty='format:%ci' '#{branch}'", page.data['versionWhDocs'], mpDir)
+                    dateString = git("log -1 --pretty='format:%ci' '#{page.path.gsub("midpoint/reference/#{page.data['midpointBranchSlug']}/","docs/")}'", page.data['midpointBranchSlug'], mpDir)
                 elsif
                     dateString = git("log -1 --pretty='format:%ci' '#{page.path}'", nil, nil)
                 end

@@ -373,6 +373,23 @@ module Evolveum
                 Jekyll.logger.warn("No parent in alias specification in page #{page.url}, ignoring")
                 return
             end
+            if (parent_url.include?("/midpoint/reference/"))
+                negativeLookAhead = VersionReader.get_config_value('negativeLookAhead')
+                if (page.data['midpointBranch'] == nil)
+                    Jekyll.logger.error("Page alias error: referencing reference documentation outside of reference documentation in page #{page.url}")
+                end
+                if (parent_url.match?(negativeLookAhead))
+                    if (page.data['midpointBranchSlug'] == nil)
+                        parent_url = parent_url.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/")
+                    else
+                        parent_url = parent_url.gsub("/midpoint/reference/", "/midpoint/reference/#{page.data['midpointBranchSlug']}/")
+                    end
+                end
+            elsif (page.url.include?("/midpoint/reference/"))
+                if (page.data['midpointBranch'] != VersionReader.get_config_value('defaultBranch'))
+                    return
+                end
+            end
             parent_nav = index_path(parent_url)
             slug = aliasdef['slug']
             if slug == nil

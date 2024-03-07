@@ -300,40 +300,39 @@ module Evolveum
     class XrefInlineMacro < JekyllInlineMacro
         use_dsl
 
-        named :xref
-        name_positional_attributes 'linktext'
+      named :xref
+      name_positional_attributes 'linktext'
 
-        # Check if there is an sprecific midpoint version included in link
-        def process(parent, target, attrs)
-          #verArr = readVersions(docsDir()) #???????????????????????
+      # Check if there is an sprecific midpoint version included in link
+      def process(parent, target, attrs)
 
-          document_path = parent.document.attributes['docfile']
+        document_path = parent.document.attributes['docfile']
 
-          negativeLookAhead = VersionReader.get_config_value('negativeLookAhead')
+        negativeLookAhead = VersionReader.get_config_value('negativeLookAhead')
 
-          if (!document_path.include?("/midpoint/reference/") || document_path.include?("midpoint/reference/index.html"))
-              if (!target.include?("/midpoint/reference/"))
-                  processXRefLink(parent, target, attrs)
-              elsif (target.match?(negativeLookAhead))
-                  processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs)
-              else
-                  Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
-                  processXRefLink(parent, target, attrs)
-              end
-          else
-              if (!target.include?("/midpoint/reference/"))
-                  processXRefLink(parent, target, attrs)
-              elsif (target.match?(negativeLookAhead))
-                  currentPage = findCurrentPage(parent.document)
-                  version = currentPage.data['versionWhDocs']
-                  processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{version}/"), attrs)
-              else
-                  Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
-                  processXRefLink(parent, target, attrs)
-              end
-          end
+        if (!document_path.include?("/midpoint/reference/") || document_path.include?("midpoint/reference/index.html"))
+            if (!target.include?("/midpoint/reference/"))
+                processXRefLink(parent, target, attrs)
+            elsif (target.match?(negativeLookAhead))
+                processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs)
+            else
+                Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
+                processXRefLink(parent, target, attrs)
+            end
+        else
+            if (!target.include?("/midpoint/reference/"))
+                processXRefLink(parent, target, attrs)
+            elsif (target.match?(negativeLookAhead))
+                currentPage = findCurrentPage(parent.document)
+                version = currentPage.data['midpointBranchSlug']
+                processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{version}/"), attrs)
+            else
+                Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
+                processXRefLink(parent, target, attrs)
+            end
         end
       end
+    end
 
     class XrefVInlineMacro < JekyllInlineMacro
         use_dsl
