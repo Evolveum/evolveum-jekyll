@@ -396,7 +396,7 @@
         searchQuery.size = pagesShown;
         const query = document.getElementById('searchbar').value.toLowerCase();
 
-        if (query.slice(-1) == '"' && query.slice(0,1 == '"')) {
+        if (query.slice(-1) == '"' && query.slice(0,1) == '"') {
             searchQuery.query.bool.must[0].function_score.query.multi_match.operator = "and"
             searchQuery.query.bool.should[3].multi_match.operator = "and"
             //searchQuery.query.bool.should[2].term['search-alias.keyword'].operator = "and"
