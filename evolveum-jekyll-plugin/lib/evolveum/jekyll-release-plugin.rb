@@ -30,17 +30,17 @@ def installReleaseNotes(site)
 
     if (!File.exist?("#{docsDir}/midpoint/release/#{ver}/index.adoc"))
       if (docsBranches.include?(versionsReleaseBranches[index]))
-        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","")}/release-notes.adoc \"$DOCSPATHVAR\"/#{docsDir}/midpoint/release/#{ver}/index.adoc")
+        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","")}/release-notes.adoc \"$DOCSPATHVAR\"/#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/index.adoc")
       else
-        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/release-notes.adoc \"$DOCSPATHVAR\"/#{docsDir}/midpoint/release/#{ver}/index.adoc")
+        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/release-notes.adoc \"$DOCSPATHVAR\"/#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/index.adoc")
       end
     end
 
     if (!File.exist?("#{docsDir}/midpoint/release/#{ver}/install.adoc"))
       if (docsBranches.include?(versionsReleaseBranches[index]))
-        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","")}/install-dist.adoc \"$DOCSPATHVAR\"/#{docsDir}/midpoint/release/#{ver}/install.adoc")
+        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","")}/install-dist.adoc \"$DOCSPATHVAR\"/#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
       else
-        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/install-dist.adoc \"$DOCSPATHVAR\"/#{docsDir}/midpoint/release/#{ver}/install.adoc")
+        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/install-dist.adoc \"$DOCSPATHVAR\"/#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
       end
     end
   end
