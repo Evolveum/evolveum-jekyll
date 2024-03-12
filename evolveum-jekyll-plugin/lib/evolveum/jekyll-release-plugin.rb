@@ -14,6 +14,10 @@ def installReleaseNotes(site)
       system("cd #{docsDir}/midpoint/release/ && mkdir #{ver}")
     end
 
+    if Dir["#{releaseDir}/#{ver}"].empty?
+      system("cd #{site.config['docs']['midpointReleasePath']} && mkdir -p #{releaseDir}/#{ver}")
+    end
+
     if (!docsBranches.include?(versionsReleaseBranches[index]))
       if (!File.exist?("#{releaseDir}/#{ver}/index.adoc"))
         system("cd #{releaseDir}/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/release-notes.adoc && mv release-notes.adoc index.adoc")
