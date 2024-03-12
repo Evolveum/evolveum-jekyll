@@ -1,5 +1,6 @@
 
 require 'yaml'
+require 'open3'
 
 def installReleaseNotes(site)
   docsDir = site.config['docs']['docsPath'] + site.config['docs']['docsDirName']
@@ -34,6 +35,12 @@ def installReleaseNotes(site)
       else
         system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/release-notes.adoc \"$DOCSPATHVAR\"/#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/index.adoc")
       end
+    else
+      output, _ = Open3.capture2("cd #{docsDir}/midpoint/release/#{ver}/ && ls -F index.adoc")
+      if (output.include?("index.adoc"))
+        system("cp -f #{releaseDir}/#{ver}/index.adoc #{docsDir}/midpoint/release/#{ver}/")
+        Jekyll.logger.warn("Existing index.adoc file in /midpoint/release/#{ver}/, updating content")
+      end
     end
 
     if (!File.exist?("#{docsDir}/midpoint/release/#{ver}/install.adoc"))
@@ -41,6 +48,12 @@ def installReleaseNotes(site)
         system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","")}/install-dist.adoc \"$DOCSPATHVAR\"/#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
       else
         system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/install-dist.adoc \"$DOCSPATHVAR\"/#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
+      end
+    else
+      output, _ = Open3.capture2("cd #{docsDir}/midpoint/release/#{ver}/ && ls -F install.adoc")
+      if (output.include?("install.adoc"))
+        system("cp -f #{releaseDir}/#{ver}/install.adoc #{docsDir}/midpoint/release/#{ver}/")
+        Jekyll.logger.warn("Existing install.adoc file in /midpoint/release/#{ver}/, updating content")
       end
     end
   end
