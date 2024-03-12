@@ -176,7 +176,7 @@
             contentStatusValuesArray = ["obsolete", "deprecated", "experimental", "planned", "outdated"]
             contentStatus = "" // TODO as array
             filtredArray = contentStatusArray.filter(function(element, index) {
-                if (element != undefined && (element || element == "true")) {
+                if (element != undefined && (element == "true")) {
                     contentStatus = contentStatusValuesArray[index]
                     return true;
                 } else {
