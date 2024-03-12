@@ -14,11 +14,11 @@ def installReleaseNotes(site)
 
     Jekyll.logger.warn(docsBranches.join(" ") + " " + ver + " " + versionsReleaseBranches[index])
 
-    if (!docsBranches.include?(versionsReleaseBranches[index]))
-      if Dir["#{docsDir}/midpoint/release/#{ver}"].empty?
-        system("cd #{docsDir}/midpoint/release/ && mkdir #{ver}")
-      end
+    if Dir["#{docsDir}/midpoint/release/#{ver}"].empty?
+      system("cd #{docsDir}/midpoint/release/ && mkdir #{ver}")
+    end
 
+    if (!docsBranches.include?(versionsReleaseBranches[index]))
       if Dir["#{releaseDir}/#{ver}"].empty?
         system("cd #{site.config['docs']['midpointReleasePath']} && mkdir -p #{releaseDir}/#{ver}")
       end
