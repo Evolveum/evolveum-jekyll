@@ -23,11 +23,11 @@ def installReleaseNotes(site)
 
     if (!docsBranches.include?(versionsReleaseBranches[index]))
       if (!File.exist?("#{releaseDir}/#{ver}/index.adoc"))
-        system("cd #{releaseDir}/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/release-notes.adoc && mv release-notes.adoc index.adoc")
+        system("cd #{releaseDir}/#{ver}/ && wget -q https://raw.githubusercontent.com/janmederly/testversioning/#{versionsReleaseBranches[index]}/release-notes.adoc && mv release-notes.adoc index.adoc")
       end
 
       if (!File.exist?("#{releaseDir}/#{ver}/install.adoc"))
-        system("cd #{releaseDir}/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/install-dist.adoc && mv install-dist.adoc install.adoc")
+        system("cd #{releaseDir}/#{ver}/ && wget -q https://raw.githubusercontent.com/janmederly/testversioning/#{versionsReleaseBranches[index]}/install-dist.adoc && mv install-dist.adoc install.adoc")
       end
     end
 
