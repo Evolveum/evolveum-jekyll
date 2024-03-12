@@ -20,6 +20,8 @@ docs:
   midpointVersionsPrefix: mp-
   midpointSamplesPath: ../
   midpointSamplesDirName: mp-samples
+  midpointReleasePath: ../
+  midpointReleaseDir: mp-release-notes
 
 
 highlighter: rouge

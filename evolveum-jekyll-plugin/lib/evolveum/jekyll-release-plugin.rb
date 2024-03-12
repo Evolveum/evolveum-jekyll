@@ -3,6 +3,7 @@ require 'yaml'
 
 def installReleaseNotes(site)
   docsDir = site.config['docs']['docsPath'] + site.config['docs']['docsDirName']
+  releaseDir = site.config['docs']['midpointReleasePath'] + site.config['docs']['midpointReleaseDir']
   returnedVerArr = readReleaseVersions(docsDir)
   versions = returnedVerArr[0]
   versionsReleaseBranches = returnedVerArr[1]
@@ -13,19 +14,29 @@ def installReleaseNotes(site)
       system("cd #{docsDir}/midpoint/release/ && mkdir #{ver}")
     end
 
+    if (!docsBranches.include?(versionsReleaseBranches[index]))
+      if (!File.exist?("#{releaseDir}/#{ver}/index.adoc"))
+        system("cd #{releaseDir}/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/release-notes.adoc && mv release-notes.adoc index.adoc")
+      end
+
+      if (!File.exist?("#{releaseDir}/#{ver}/install.adoc"))
+        system("cd #{releaseDir}/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/install-dist.adoc && mv install-dist.adoc install.adoc")
+      end
+    end
+
     if (!File.exist?("#{docsDir}/midpoint/release/#{ver}/index.adoc"))
       if (docsBranches.include?(versionsReleaseBranches[index]))
-        system("ln -s /mp-#{versionsReleaseBranches[index].gsub("docs/","")}/release-notes.adoc #{docsDir}/midpoint/release/#{ver}/index.adoc")
+        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=($PWD) && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","")}/release-notes.adoc \"$DOCSPATHVAR\"/#{docsDir}/midpoint/release/#{ver}/index.adoc")
       else
-        system("cd #{docsDir}/midpoint/release/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/release-notes.adoc && mv release-notes.adoc index.adoc")
+        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=($PWD) && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/release-notes.adoc \"$DOCSPATHVAR\"/#{docsDir}/midpoint/release/#{ver}/index.adoc")
       end
     end
 
     if (!File.exist?("#{docsDir}/midpoint/release/#{ver}/install.adoc"))
       if (docsBranches.include?(versionsReleaseBranches[index]))
-        system("ln -s /mp-#{versionsReleaseBranches[index].gsub("docs/","")}/install-dist.adoc #{docsDir}/midpoint/release/#{ver}/install.adoc")
+        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=($PWD) && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","")}/install-dist.adoc \"$DOCSPATHVAR\"/#{docsDir}/midpoint/release/#{ver}/install.adoc")
       else
-        system("cd #{docsDir}/midpoint/release/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/install-dist.adoc && mv install-dist.adoc install.adoc")
+        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=($PWD) && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/install-dist.adoc \"$DOCSPATHVAR\"/#{docsDir}/midpoint/release/#{ver}/install.adoc")
       end
     end
   end
