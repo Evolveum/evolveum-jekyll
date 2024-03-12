@@ -34,7 +34,7 @@ def installReleaseNotes(site)
 
     if (!File.exist?("#{docsDir}/midpoint/release/#{ver}/index.adoc"))
       if (docsBranches.include?(versionsReleaseBranches[index]))
-        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","")}/index.adoc \"$DOCSPATHVAR\"#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/index.adoc")
+        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","")}/release-notes.adoc \"$DOCSPATHVAR\"#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/index.adoc")
       else
         system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/release-notes.adoc \"$DOCSPATHVAR\"#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/index.adoc")
       end
@@ -42,7 +42,7 @@ def installReleaseNotes(site)
       output, _ = Open3.capture2("cd #{docsDir}/midpoint/release/#{ver}/ && ls -F index.adoc")
       if (output.include?("index.adoc"))
         if (docsBranches.include?(versionsReleaseBranches[index]))
-          system("cp -f #{site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix'] + versionsReleaseBranches[index].gsub("docs/","")}/index.adoc #{docsDir}/midpoint/release/#{ver}/")
+          system("cp -f #{site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix'] + versionsReleaseBranches[index].gsub("docs/","")}/release-notes.adoc #{docsDir}/midpoint/release/#{ver}/ && cd #{docsDir}/midpoint/release/#{ver}/ && mv release-notes.adoc index.adoc")
         else
           system("cp -f #{releaseDir}/#{ver}/index.adoc #{docsDir}/midpoint/release/#{ver}/")
         end
@@ -52,7 +52,7 @@ def installReleaseNotes(site)
 
     if (!File.exist?("#{docsDir}/midpoint/release/#{ver}/install.adoc"))
       if (docsBranches.include?(versionsReleaseBranches[index]))
-        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","")}/install.adoc \"$DOCSPATHVAR\"#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
+        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","")}/install-dist.adoc \"$DOCSPATHVAR\"#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
       else
         system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/install-dist.adoc \"$DOCSPATHVAR\"#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
       end
@@ -60,7 +60,7 @@ def installReleaseNotes(site)
       output, _ = Open3.capture2("cd #{docsDir}/midpoint/release/#{ver}/ && ls -F install.adoc")
       if (output.include?("install.adoc"))
         if (docsBranches.include?(versionsReleaseBranches[index]))
-          system("cp -f #{site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix'] + versionsReleaseBranches[index].gsub("docs/","")}/install.adoc #{docsDir}/midpoint/release/#{ver}/")
+          system("cp -f #{site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix'] + versionsReleaseBranches[index].gsub("docs/","")}/install-dist.adoc #{docsDir}/midpoint/release/#{ver}/ && cd #{docsDir}/midpoint/release/#{ver}/ && mv install-dist.adoc install.adoc")
         else
           system("cp -f #{releaseDir}/#{ver}/install.adoc #{docsDir}/midpoint/release/#{ver}/")
         end
