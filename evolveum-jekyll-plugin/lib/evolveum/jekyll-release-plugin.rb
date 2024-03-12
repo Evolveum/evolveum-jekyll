@@ -52,9 +52,9 @@ def installReleaseNotes(site)
 
     if (!File.exist?("#{docsDir}/midpoint/release/#{ver}/install.adoc"))
       if (docsBranches.include?(versionsReleaseBranches[index]))
-        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","")}/install.adoc \"$DOCSPATHVAR\"/#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
+        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","")}/install.adoc \"$DOCSPATHVAR\"#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
       else
-        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/install-dist.adoc \"$DOCSPATHVAR\"/#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
+        system("cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/install-dist.adoc \"$DOCSPATHVAR\"#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
       end
     else
       output, _ = Open3.capture2("cd #{docsDir}/midpoint/release/#{ver}/ && ls -F install.adoc")
