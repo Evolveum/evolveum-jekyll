@@ -12,8 +12,6 @@ def installReleaseNotes(site)
   versions.each_with_index do |ver, index|
     puts("ver " + ver + " index " + index.to_s + " releaseBranch " + versionsReleaseBranches[index] + " docsBranches " + docsBranches.join(" "))
 
-    Jekyll.logger.warn(docsBranches.join(" ") + " " + ver + " " + versionsReleaseBranches[index])
-
     if Dir["#{docsDir}/midpoint/release/#{ver}"].empty?
       system("cd #{docsDir}/midpoint/release/ && mkdir #{ver}")
     end
