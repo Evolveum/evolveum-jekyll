@@ -1,31 +1,68 @@
 
 require 'yaml'
+require 'open3'
 
 def installReleaseNotes(site)
   docsDir = site.config['docs']['docsPath'] + site.config['docs']['docsDirName']
+  releaseDir = site.config['docs']['midpointReleasePath'] + site.config['docs']['midpointReleaseDir']
   returnedVerArr = readReleaseVersions(docsDir)
   versions = returnedVerArr[0]
   versionsReleaseBranches = returnedVerArr[1]
   docsBranches = returnedVerArr[2]
   versions.each_with_index do |ver, index|
     puts("ver " + ver + " index " + index.to_s + " releaseBranch " + versionsReleaseBranches[index] + " docsBranches " + docsBranches.join(" "))
+
     if Dir["#{docsDir}/midpoint/release/#{ver}"].empty?
       system("cd #{docsDir}/midpoint/release/ && mkdir #{ver}")
     end
 
+    if (!docsBranches.include?(versionsReleaseBranches[index]))
+      if Dir["#{releaseDir}/#{ver}"].empty?
+        system("cd #{site.config['docs']['midpointReleasePath']} && mkdir -p #{releaseDir}/#{ver}")
+      end
+
+      if (!File.exist?("#{releaseDir}/#{ver}/index.adoc"))
+        system("cd #{releaseDir}/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/release-notes.adoc && mv release-notes.adoc index.adoc")
+      end
+
+      if (!File.exist?("#{releaseDir}/#{ver}/install.adoc"))
+        system("cd #{releaseDir}/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/install-dist.adoc && mv install-dist.adoc install.adoc")
+      end
+    end
+
     if (!File.exist?("#{docsDir}/midpoint/release/#{ver}/index.adoc"))
       if (docsBranches.include?(versionsReleaseBranches[index]))
-        system("ln -s /mp-#{versionsReleaseBranches[index].gsub("docs/","")}/release-notes.adoc #{docsDir}/midpoint/release/#{ver}/index.adoc")
+        system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","")}/release-notes.adoc \"$DOCSPATHVAR\"#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/index.adoc")
       else
-        system("cd #{docsDir}/midpoint/release/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/release-notes.adoc && mv release-notes.adoc index.adoc")
+        system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/#{ver}/index.adoc \"$DOCSPATHVAR\"#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/index.adoc")
+      end
+    else
+      output, _ = Open3.capture2("cd #{docsDir}/midpoint/release/#{ver}/ && ls -F index.adoc")
+      if (output.include?("index.adoc"))
+        if (docsBranches.include?(versionsReleaseBranches[index]))
+          system("cp -f #{site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix'] + versionsReleaseBranches[index].gsub("docs/","")}/release-notes.adoc #{docsDir}/midpoint/release/#{ver}/ && cd #{docsDir}/midpoint/release/#{ver}/ && mv release-notes.adoc index.adoc")
+        else
+          system("cp -f #{releaseDir}/#{ver}/index.adoc #{docsDir}/midpoint/release/#{ver}/")
+        end
+        Jekyll.logger.warn("Existing index.adoc file in /midpoint/release/#{ver}/, updating content")
       end
     end
 
     if (!File.exist?("#{docsDir}/midpoint/release/#{ver}/install.adoc"))
       if (docsBranches.include?(versionsReleaseBranches[index]))
-        system("ln -s /mp-#{versionsReleaseBranches[index].gsub("docs/","")}/install-dist.adoc #{docsDir}/midpoint/release/#{ver}/install.adoc")
+        system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","")}/install-dist.adoc \"$DOCSPATHVAR\"#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
       else
-        system("cd #{docsDir}/midpoint/release/#{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/install-dist.adoc && mv install-dist.adoc install.adoc")
+        system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/#{ver}/install.adoc \"$DOCSPATHVAR\"#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
+      end
+    else
+      output, _ = Open3.capture2("cd #{docsDir}/midpoint/release/#{ver}/ && ls -F install.adoc")
+      if (output.include?("install.adoc"))
+        if (docsBranches.include?(versionsReleaseBranches[index]))
+          system("cp -f #{site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix'] + versionsReleaseBranches[index].gsub("docs/","")}/install-dist.adoc #{docsDir}/midpoint/release/#{ver}/ && cd #{docsDir}/midpoint/release/#{ver}/ && mv install-dist.adoc install.adoc")
+        else
+          system("cp -f #{releaseDir}/#{ver}/install.adoc #{docsDir}/midpoint/release/#{ver}/")
+        end
+        Jekyll.logger.warn("Existing install.adoc file in /midpoint/release/#{ver}/, updating content")
       end
     end
   end

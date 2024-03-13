@@ -15,6 +15,7 @@
 # The tree represents the hierarchy of pages as Jekyll knows them.
 # The tree is then used by other code to create navigation panel, breadcrumbs, list of child pages, etc.
 
+require_relative 'jekyll-versioning-plugin.rb'
 
 module Evolveum
 
