@@ -220,6 +220,7 @@ module Evolveum
 
               File.open(file, 'r') do |f|
                 lines = f.each_line.first(20)
+                lines.each { |line| line.force_encoding('utf-8') }
                 Jekyll.logger.warn(lines[0] + " test " + lines[1])
                 results << file if lines.any? { |line| line.match(target) }
               end
