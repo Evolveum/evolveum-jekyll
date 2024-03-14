@@ -38,7 +38,7 @@ def installReleaseNotes(site)
       end
     else
       output, _ = Open3.capture2("cd #{docsDir}/midpoint/release/#{ver}/ && ls -F index.adoc")
-      if (output.include?("index.adoc"))
+      if (!output.include?("index.adoc@"))
         if (docsBranches.include?(versionsReleaseBranches[index]))
           system("cp -f #{site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix'] + versionsReleaseBranches[index].gsub("docs/","")}/release-notes.adoc #{docsDir}/midpoint/release/#{ver}/ && cd #{docsDir}/midpoint/release/#{ver}/ && mv release-notes.adoc index.adoc")
         else
@@ -56,7 +56,7 @@ def installReleaseNotes(site)
       end
     else
       output, _ = Open3.capture2("cd #{docsDir}/midpoint/release/#{ver}/ && ls -F install.adoc")
-      if (output.include?("install.adoc"))
+      if (!output.include?("install.adoc@"))
         if (docsBranches.include?(versionsReleaseBranches[index]))
           system("cp -f #{site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix'] + versionsReleaseBranches[index].gsub("docs/","")}/install-dist.adoc #{docsDir}/midpoint/release/#{ver}/ && cd #{docsDir}/midpoint/release/#{ver}/ && mv install-dist.adoc install.adoc")
         else
