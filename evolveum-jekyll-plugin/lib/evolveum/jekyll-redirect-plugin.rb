@@ -59,7 +59,7 @@ module Evolveum
                     end
                 end
             end
-            return redirects
+            return redirects, pageRedirects
         end
 
         def createPageRedirect(movedFrom, page)
