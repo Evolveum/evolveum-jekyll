@@ -12,6 +12,7 @@ require 'pathname'
 require 'pp'
 require 'open3'
 require_relative 'jekyll-versioning-plugin.rb' # We need readVersions method for checking if xfer path includes exact midpoint version
+require_relative 'jekyll-redirect-plugin.rb'
 
 module Evolveum
 
@@ -213,80 +214,56 @@ module Evolveum
         end
 
         def processXRefLink(parent, target, attrs)
-        #    puts "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXREF -------> Processing #{parent} #{targetFile} #{attrs}"
+            #    puts "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXREF -------> Processing #{parent} #{targetFile} #{attrs}"
 
-            targetPath, fragmentSuffix = parseFragment(target)
-            sourceFile = parent.document.attributes["docfile"]
-            # puts "targetPath=#{targetPath}, fragment=#{fragmentSuffix}"
+                targetPath, fragmentSuffix = parseFragment(target)
+                sourceFile = parent.document.attributes["docfile"]
+                # puts "targetPath=#{targetPath}, fragment=#{fragmentSuffix}"
 
-            if targetPath == nil
-                # document-local link, use as is
-                return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert
-            end
+                if targetPath == nil
+                    # document-local link, use as is
+                    return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert
+                end
 
-            targetPage = findPageByTarget(parent.document, targetPath)
-            #puts("DEBUG XREF #{targetPath} -> found page #{targetPage&.url} in #{sourceFile}")
+                targetPage = findPageByTarget(parent.document, targetPath)
+                #puts("DEBUG XREF #{targetPath} -> found page #{targetPage&.url} in #{sourceFile}")
 
-            # Checking if target includes specific midpoint versions
+                # Checking if target includes specific midpoint versions
 
 
-            if targetPage == nil
-                # No page. But there still may be a plain file (e.g. a PDF file)
-                fileUrl = findFileByTarget(parent.document, targetPath)
-                output = ""
-                if fileUrl == nil
-                    if ignoreLinkBreak?(parent, targetPath)
-                        Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
-                    else
-                        output, _ = Open3.capture2("grep -rl \":page-moved-from: #{target}\" #{docsDir()}/")
-                        if (output != nil && output != "")
-                            Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
+                if targetPage == nil
+                    # No page. But there still may be a plain file (e.g. a PDF file)
+                    fileUrl = findFileByTarget(parent.document, targetPath)
+                    output = []
+                    if fileUrl == nil
+                        if ignoreLinkBreak?(parent, targetPath)
+                            Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
                         else
-                            escaped_target = Regexp.escape("\nmoved-from: #{target}\n")
-                            output, _ = Open3.capture2("grep -rl #{escaped_target} #{docsDir()}/")
-                            if (output != nil && output != "")
-                                Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
-                            else
-                                targetArr = target.split("/").drop(1)
-                                matched = false
-                                targetArr.each_with_index do |version, index|
-                                    partTargetArr = targetArr[...index+1]
-                                    escaped_target = Regexp.escape("#{partTargetArr.join("/")}/\*")
-
-                                    output, _ = Open3.capture2("grep -rl \":page-moved-from: /#{escaped_target}\" #{docsDir()}/")
-
-                                    if (output != nil && output != "")
-                                        movedPart, _ = Open3.capture2("sed -n -e '/^:page-moved-from: /p' #{output.split("\n")[0]}")
-                                        movedPart = movedPart.gsub(":page-moved-from:", "")
-                                        movedPart = movedPart.gsub("*", "")
-                                        movedPart = movedPart.gsub(/\n/, "")
-                                        targetPath = movedPart + targetArr[index+1...].join("/") + "/"
-                                        targetPage = findPageByTarget(parent.document, targetPath)
-                                        if targetPage == nil
-                                            Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
-                                        else
-                                            Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
-                                        end
-
-                                        matched = true
-                                        break
-                                    end
-                                end
-                                if (!matched)
-                                    Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
+                            #Jekyll.logger.warn(Evolveum.getPageRedirects().to_s)
+                            matches = false
+                            Evolveum.getPageRedirects().each do |redirect|
+                                if target.match?(redirect['pattern'])
+                                    matches = true
+                                    Jekyll.logger.warn(redirect['pattern'].to_s + " test " + target)
+                                    break
                                 end
                             end
+
+                            if matches
+                                Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
+                            else
+                                Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
+                            end
                         end
+                        # Leave the target of broken link untouched. Redirects may still be able to handle it.
+                        return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert
+                    else
+                        createLink(target, parent, attrs, fileUrl)
                     end
-                    # Leave the target of broken link untouched. Redirects may still be able to handle it.
-                    return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert
                 else
-                    createLink(target, parent, attrs, fileUrl)
+                    createLink(addFragmentSuffix(targetPage.url,fragmentSuffix), parent, attrs, targetPage.data['title'])
                 end
-            else
-                createLink(addFragmentSuffix(targetPage.url,fragmentSuffix), parent, attrs, targetPage.data['title'])
             end
-        end
 
 
     end

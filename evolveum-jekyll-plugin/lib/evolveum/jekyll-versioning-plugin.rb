@@ -41,6 +41,8 @@ module VersionReader
     if @config['defaultBranch'] == ""
       @config['defaultBranch'] = "master"
     end
+    @config['negativeLookAhead'] << "before-4.8|"
+    @config['negativeLookAhead'] << "master|"
     @config['negativeLookAhead'].chop!
     @config['negativeLookAhead'] << "))"
     @config['filteredVersions'].push("docs/before-4.8")
@@ -62,10 +64,6 @@ def installVersions(site)
   docsDir = site.config['docs']['docsPath'] + site.config['docs']['docsDirName']
   mpPreDir = site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix']
   VersionReader.load_config(docsDir)
-  #arr = readVersions(docsDir)
-  #versions = arr[0]
-  #displayVersions = arr[1]
-  #defaultBranch = arr[2]
   system("rm -rf #{docsDir}/midpoint/reference/*")
   system("cp /mnt/index.html #{docsDir}/midpoint/reference/")
   negativeAssert = "?!(?:"
@@ -77,21 +75,13 @@ def installVersions(site)
   negativeAssert.chop!
   negativeAssert << ")"
   puts(negativeAssert)
-  #system("find #{docsDir} -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv:\\/midpoint\\/reference\\/#{VersionReader.get_config_value('defaultBranch').gsub("docs/","")}\\//g' {} +")
-  #system("find #{docsDir} -mindepth 1 -not -path '*/[@.]*' -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{VersionReader.get_config_value('defaultBranch').gsub("docs/","")}\\//g' {} +")
 
   VersionReader.get_config_value('filteredVersions').each_with_index do |version, index|
     versionWithoutDocs = version.gsub("docs/","")
     if Dir["#{mpPreDir}#{versionWithoutDocs}"].empty?
-      system("cd #{site.config['docs']['midpointVersionsPath']} && git clone -b #{version} https://github.com/Evolveum/midpoint #{site.config['docs']['midpointVersionsPrefix']}#{versionWithoutDocs}") #maybe && rm #{mpPreDir}#{versionWithoutDocs}/docs/LICENSE"
+      system("cd #{site.config['docs']['midpointVersionsPath']} && git clone -b #{version} https://github.com/janmederly/testversioning #{site.config['docs']['midpointVersionsPrefix']}#{versionWithoutDocs}") #maybe && rm #{mpPreDir}#{versionWithoutDocs}/docs/LICENSE"
     end
-    #if version != VersionReader.get_config_value('defaultBranch')
-    # system("grep -rl :page-alias: #{mpPreDir}#{versionWithoutDocs}/docs/ | xargs -P 4 sed -i '/:page-alias:/d' 2> /dev/null || true")
-    #end
     system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionWithoutDocs}/docs/ \"$DOCSPATHVAR\"/#{site.config['docs']['docsDirName']}/midpoint/reference/#{versionWithoutDocs}")
-    #system("sed -i 's/:page-nav-title: Configuration Reference/:page-nav-title: \"#{VersionReader.get_config_value('filteredDisplayVersions')[index]}\"/g' #{mpPreDir}#{versionWithoutDocs}/docs/index.adoc")
-    #system("find #{mpPreDir}#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/xref:\\/midpoint\\/reference\\/(#{negativeAssert})/xrefv:\\/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} +")
-    #system("find #{mpPreDir}#{versionWithoutDocs}/docs -type f -exec perl -pi -e 's/midpoint\\/reference\\/(#{negativeAssert})/midpoint\\/reference\\/#{versionWithoutDocs}\\//g' {} +")
   end
 end
 
