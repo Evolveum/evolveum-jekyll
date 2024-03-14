@@ -9,7 +9,15 @@
 
 module Evolveum
 
-    @@pageRedirects = []
+    @pageRedirects = []
+
+    def getPageRedirects()
+        return @pageRedirects
+    end
+
+    def setPageRedirects(newPageRedirects)
+        @pageRedirects = newPageRedirects
+    end
 
     class HtaccessGenerator < Generator
         priority :lowest
@@ -24,9 +32,9 @@ module Evolveum
             page.content = File.read(sourceFilePath(FILENAME))
             page.data["layout"] = nil
             page.data["visibility"] = "system"
-            page.data["redirects"], Evolveum::pageRedirects = collectRedirects()
+            page.data["redirects"], pRedirects = collectRedirects()
 
-            Jekyll.logger.warn(Evolveum::pageRedirects.to_s)
+            setPageRedirects(pRedirects)
 
             page.data["defaultBranch"] = findDefaultBranch(site)
 
