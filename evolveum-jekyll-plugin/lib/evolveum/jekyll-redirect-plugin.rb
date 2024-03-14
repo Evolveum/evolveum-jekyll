@@ -11,11 +11,11 @@ module Evolveum
 
     @pageRedirects = []
 
-    def getPageRedirects()
+    def self.getPageRedirects()
         return @pageRedirects
     end
 
-    def setPageRedirects(newPageRedirects)
+    def self.setPageRedirects(newPageRedirects)
         @pageRedirects = newPageRedirects
     end
 
@@ -34,7 +34,7 @@ module Evolveum
             page.data["visibility"] = "system"
             page.data["redirects"], pRedirects = collectRedirects()
 
-            setPageRedirects(pRedirects)
+            Evolveum.setPageRedirects(pRedirects)
 
             page.data["defaultBranch"] = findDefaultBranch(site)
 
