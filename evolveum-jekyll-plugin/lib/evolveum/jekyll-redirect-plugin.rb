@@ -24,9 +24,9 @@ module Evolveum
             page.content = File.read(sourceFilePath(FILENAME))
             page.data["layout"] = nil
             page.data["visibility"] = "system"
-            page.data["redirects"], @@pageRedirects = collectRedirects()
+            page.data["redirects"], Evolveum::pageRedirects = collectRedirects()
 
-            Jekyll.logger.warn(@@pageRedirects.to_s)
+            Jekyll.logger.warn(Evolveum::pageRedirects.to_s)
 
             page.data["defaultBranch"] = findDefaultBranch(site)
 
