@@ -254,8 +254,9 @@ module Evolveum
                         Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
                     else
                         #output, _ = Open3.capture2("grep -rl \":page-moved-from: #{target}\" #{docsDir()}/")
-                        Jekyll.logger.warn(":page-moved-from: #{target}")
-                        output = findAttrInFiles(":page-moved-from: #{target}", docsDir())
+                        escaped_target = Regexp.escape(":page-moved-from: #{target}")
+                        Jekyll.logger.warn(escaped_target)
+                        output = findAttrInFiles(escaped_target, docsDir())
                         Jekyll.logger.warn("FIRST: " + output.to_s + " docsDir: " + docsDir())
                         if (output != nil && output != [])
                             Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
@@ -338,6 +339,7 @@ module Evolveum
             if (!target.include?("/midpoint/reference/"))
                 processXRefLink(parent, target, attrs)
             elsif (target.match?(negativeLookAhead))
+                Jekyll.logger.warn(negativeLookAhead)
                 processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs)
             else
                 Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
