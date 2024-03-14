@@ -218,7 +218,7 @@ module Evolveum
             Dir.glob(File.join(directory, '**', '*')).each do |file|
               next unless File.file?(file)
 
-              File.open(file, 'r', encoding: 'utf-8') do |f|
+              File.open(file, 'r') do |f|
                 lines = f.each_line.first(20)
                 results << file if lines.any? { |line| line.match(/#{target}/) }
               end
@@ -254,6 +254,7 @@ module Evolveum
                         Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
                     else
                         #output, _ = Open3.capture2("grep -rl \":page-moved-from: #{target}\" #{docsDir()}/")
+                        Jekyll.logger.warn(":page-moved-from: #{target}")
                         output = findAttrInFiles(":page-moved-from: #{target}", docsDir())
                         Jekyll.logger.warn("FIRST: " + output.to_s + " docsDir: " + docsDir())
                         if (output != nil && output != [])
@@ -261,6 +262,7 @@ module Evolveum
                         else
                             escaped_target = Regexp.escape("\nmoved-from: #{target}\n")
                             #output, _ = Open3.capture2("grep -rl #{escaped_target} #{docsDir()}/")
+                            Jekyll.logger.warn("#{escaped_target}")
                             output = findAttrInFiles(escaped_target, docsDir())
                             Jekyll.logger.warn("SECOND: " + output.to_s + " docsDir: " + docsDir())
                             if (output != nil && output != [])
@@ -272,6 +274,7 @@ module Evolveum
                                     partTargetArr = targetArr[...index+1]
                                     escaped_target = Regexp.escape("#{partTargetArr.join("/")}/\*")
                                     #output, _ = Open3.capture2("grep -rl \":page-moved-from: /#{escaped_target}\" #{docsDir()}/")
+                                    Jekyll.logger.warn(":page-moved-from: /#{escaped_target}")
                                     output = findAttrInFiles(":page-moved-from: /#{escaped_target}", docsDir())
                                     Jekyll.logger.warn("THIRD: " + output.to_s + " docsDir: " + docsDir())
                                     if (output != nil && output != [])
