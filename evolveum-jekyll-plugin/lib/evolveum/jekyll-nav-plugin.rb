@@ -444,6 +444,19 @@ module Evolveum
             @subnodes.find { |nav| nav.slug == slug }
         end
 
+        def resolvePath(path)
+            node = self
+            path.split('/').each do |slug|
+                if slug != nil and !slug.strip.empty?
+                    node = node.resolve(slug)
+                    if !node
+                        raise ArgumentError, "Cannot resolve #{path} on #{self}, last slug: #{slug}"
+                    end
+                end
+            end
+            return node
+        end
+
         def add(subnode)
             @subnodes << subnode
         end
@@ -704,11 +717,11 @@ Liquid::Template.register_tag('children', Evolveum::ChildrenTag)
 # We update the tree at this point, to have correct page titles later when the pages are rendered.
 
 Jekyll::Hooks.register :site, :post_read do |site|
-    #putsts "=========[ EVOLVEUM ]============== post_read"
+    puts "=========[ EVOLVEUM nav ]============== post_read"
     site.data['nav'] = Evolveum::Nav.construct(site)
 end
 
 Jekyll::Hooks.register :site, :pre_render do |site|
-    #puts "=========[ EVOLVEUM ]============== pre_render"
+    puts "=========[ EVOLVEUM nav ]============== pre_render"
     site.data['nav'].update(site)
 end
