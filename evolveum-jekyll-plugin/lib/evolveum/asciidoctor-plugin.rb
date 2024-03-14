@@ -264,9 +264,9 @@ module Evolveum
                         #Jekyll.logger.warn(Evolveum.getPageRedirects().to_s)
                         matches = false
                         Evolveum.getPageRedirects().each do |redirect|
-                            if target.match?(redirect.pattern)
+                            if target.match?(redirect['pattern'])
                                 matches = true
-                                Jekyll.logger.warn(redirect.pattern.to_s + " test " + target)
+                                Jekyll.logger.warn(redirect['pattern'].to_s + " test " + target)
                                 break
                             end
                         end
