@@ -260,54 +260,55 @@ module Evolveum
                     if ignoreLinkBreak?(parent, targetPath)
                         Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
                     else
+                        Jekyll.logger.warn(@pageRedirects.to_s)
                         #output, _ = Open3.capture2("grep -rl \":page-moved-from: #{target}\" #{docsDir()}/")
-                        escaped_target = Regexp.escape(":page-moved-from: #{target}")
-                        Jekyll.logger.warn(escaped_target)
-                        output = findAttrInFiles(escaped_target, docsDir())
-                        Jekyll.logger.warn("FIRST: " + output.to_s + " docsDir: " + docsDir())
-                        if (output != nil && output != [])
-                            Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
-                        else
-                            escaped_target = Regexp.escape("\nmoved-from: #{target}\n")
-                            #output, _ = Open3.capture2("grep -rl #{escaped_target} #{docsDir()}/")
-                            Jekyll.logger.warn("#{escaped_target}")
-                            output = findAttrInFiles(escaped_target, docsDir())
-                            Jekyll.logger.warn("SECOND: " + output.to_s + " docsDir: " + docsDir())
-                            if (output != nil && output != [])
-                                Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
-                            else
-                                targetArr = target.split("/").drop(1)
-                                matched = false
-                                targetArr.each_with_index do |version, index|
-                                    partTargetArr = targetArr[...index+1]
-                                    escaped_target = Regexp.escape("#{partTargetArr.join("/")}/\*")
-                                    #output, _ = Open3.capture2("grep -rl \":page-moved-from: /#{escaped_target}\" #{docsDir()}/")
-                                    Jekyll.logger.warn(":page-moved-from: /#{escaped_target}")
-                                    output = findAttrInFiles(":page-moved-from: /#{escaped_target}", docsDir())
-                                    Jekyll.logger.warn("THIRD: " + output.to_s + " docsDir: " + docsDir())
-                                    if (output != nil && output != [])
-                                        #movedPart, _ = Open3.capture2("sed -n -e '/^:page-moved-from: /p' #{output.split("\n")[0]}")
-                                        movedPart = output[0]
-                                        movedPart = movedPart.gsub(":page-moved-from:", "")
-                                        movedPart = movedPart.gsub("*", "")
-                                        movedPart = movedPart.gsub(/\n/, "")
-                                        targetPath = movedPart + targetArr[index+1...].join("/") + "/"
-                                        targetPage = findPageByTarget(parent.document, targetPath)
-                                        if targetPage == nil
-                                            Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
-                                        else
-                                            Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
-                                        end
+                        # escaped_target = Regexp.escape(":page-moved-from: #{target}")
+                        # Jekyll.logger.warn(escaped_target)
+                        # output = findAttrInFiles(escaped_target, docsDir())
+                        # Jekyll.logger.warn("FIRST: " + output.to_s + " docsDir: " + docsDir())
+                        # if (output != nil && output != [])
+                        #     Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
+                        # else
+                        #     escaped_target = Regexp.escape("\nmoved-from: #{target}\n")
+                        #     #output, _ = Open3.capture2("grep -rl #{escaped_target} #{docsDir()}/")
+                        #     Jekyll.logger.warn("#{escaped_target}")
+                        #     output = findAttrInFiles(escaped_target, docsDir())
+                        #     Jekyll.logger.warn("SECOND: " + output.to_s + " docsDir: " + docsDir())
+                        #     if (output != nil && output != [])
+                        #         Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
+                        #     else
+                        #         targetArr = target.split("/").drop(1)
+                        #         matched = false
+                        #         targetArr.each_with_index do |version, index|
+                        #             partTargetArr = targetArr[...index+1]
+                        #             escaped_target = Regexp.escape("#{partTargetArr.join("/")}/\*")
+                        #             #output, _ = Open3.capture2("grep -rl \":page-moved-from: /#{escaped_target}\" #{docsDir()}/")
+                        #             Jekyll.logger.warn(":page-moved-from: /#{escaped_target}")
+                        #             output = findAttrInFiles(":page-moved-from: /#{escaped_target}", docsDir())
+                        #             Jekyll.logger.warn("THIRD: " + output.to_s + " docsDir: " + docsDir())
+                        #             if (output != nil && output != [])
+                        #                 #movedPart, _ = Open3.capture2("sed -n -e '/^:page-moved-from: /p' #{output.split("\n")[0]}")
+                        #                 movedPart = output[0]
+                        #                 movedPart = movedPart.gsub(":page-moved-from:", "")
+                        #                 movedPart = movedPart.gsub("*", "")
+                        #                 movedPart = movedPart.gsub(/\n/, "")
+                        #                 targetPath = movedPart + targetArr[index+1...].join("/") + "/"
+                        #                 targetPage = findPageByTarget(parent.document, targetPath)
+                        #                 if targetPage == nil
+                        #                     Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
+                        #                 else
+                        #                     Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
+                        #                 end
 
-                                        matched = true
-                                        break
-                                    end
-                                end
-                                if (!matched)
-                                    Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
-                                end
-                            end
-                        end
+                        #                 matched = true
+                        #                 break
+                        #             end
+                        #         end
+                        #         if (!matched)
+                        #             Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
+                        #         end
+                        #     end
+                        # end
                     end
                     # Leave the target of broken link untouched. Redirects may still be able to handle it.
                     return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert

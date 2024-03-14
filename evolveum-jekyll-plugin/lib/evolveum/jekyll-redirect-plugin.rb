@@ -9,6 +9,8 @@
 
 module Evolveum
 
+    @pageRedirects = []
+
     class HtaccessGenerator < Generator
         priority :lowest
 
@@ -22,7 +24,7 @@ module Evolveum
             page.content = File.read(sourceFilePath(FILENAME))
             page.data["layout"] = nil
             page.data["visibility"] = "system"
-            page.data["redirects"] = collectRedirects()
+            page.data["redirects"], @pageRedirects = collectRedirects()
 
             page.data["defaultBranch"] = findDefaultBranch(site)
 
@@ -48,14 +50,23 @@ module Evolveum
 
         def collectRedirects()
             redirects = []
+            pageRedirects = []
             @site.pages.each do |page|
                 if page.data['moved-from']
                     Array(page.data['moved-from']).each do |movedFrom|
                         redirects << createRedirect(movedFrom, page)
+                        pageRedirects << createPageRedirect(movedFrom, page)
                     end
                 end
             end
             return redirects
+        end
+
+        def createPageRedirect(movedFrom, page)
+            if movedFrom.end_with?('*')
+                movedFrom = movedFrom.sub("*", ".*")
+            end
+            return { "pattern" => movedFrom,  "substitution" => page.url }
         end
 
         def createRedirect(movedFrom, page)
