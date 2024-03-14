@@ -26,6 +26,8 @@ module Evolveum
             page.data["visibility"] = "system"
             page.data["redirects"], @pageRedirects = collectRedirects()
 
+            Jekyll.logger.warn(@pageRedirects.to_s)
+
             page.data["defaultBranch"] = findDefaultBranch(site)
 
             @site.pages << page
