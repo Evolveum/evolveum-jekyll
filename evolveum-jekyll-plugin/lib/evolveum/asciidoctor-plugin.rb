@@ -218,7 +218,7 @@ module Evolveum
             Dir.glob(File.join(directory, '**', '*')).each do |file|
               next unless File.file?(file)
 
-              File.open(file, 'r') do |f|
+              File.open(file, 'r', encoding: 'utf-8') do |f|
                 lines = f.each_line.first(20)
                 results << file if lines.any? { |line| line.match(/#{target}/) }
               end
