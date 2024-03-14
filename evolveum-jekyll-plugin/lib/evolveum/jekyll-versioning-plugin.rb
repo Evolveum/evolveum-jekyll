@@ -43,7 +43,6 @@ module VersionReader
     end
     @config['negativeLookAhead'] << "before-4.8|"
     @config['negativeLookAhead'] << "master|"
-    @config['negativeLookAhead'] << "#{ver['docsBranch'].gsub("docs/","")}|"
     @config['negativeLookAhead'].chop!
     @config['negativeLookAhead'] << "))"
     @config['filteredVersions'].push("docs/before-4.8")
