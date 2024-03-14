@@ -261,7 +261,7 @@ module Evolveum
                     if ignoreLinkBreak?(parent, targetPath)
                         Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
                     else
-                        Jekyll.logger.warn(Evolveum.getPageRedirects().to_s)
+                        Jekyll.logger.warn(getPageRedirects().to_s)
                         #output, _ = Open3.capture2("grep -rl \":page-moved-from: #{target}\" #{docsDir()}/")
                         # escaped_target = Regexp.escape(":page-moved-from: #{target}")
                         # Jekyll.logger.warn(escaped_target)
