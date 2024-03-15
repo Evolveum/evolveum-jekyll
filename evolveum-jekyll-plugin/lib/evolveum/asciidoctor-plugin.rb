@@ -460,6 +460,37 @@ module Evolveum
 
     end
 
+    class FeatureInlineMacro < JekyllInlineMacro
+      use_dsl
+
+      named :feature
+      name_positional_attributes 'linktext'
+
+      def process(parent, target, attrs)
+
+        feature = findFeature(target)
+        if feature == nil
+            sourceFile = parent.document.attributes["docfile"]
+            Jekyll.logger.error("BROKEN FEATURE inline REFERENCE #{target} in #{sourceFile}")
+            defaultLabel = target
+        else
+            defaultLabel = feature['title']
+        end
+        targetUrl = feature['url']
+#        puts "FEATURE: #{target} -> #{targetUrl}"
+
+        createLink(targetUrl, parent, attrs, defaultLabel, "feature")
+      end
+
+      def findFeature(entry_id)
+        features = jekyllData('midpoint-features')
+        feature = features.detect {|e| e['id'] == entry_id }
+#        puts "FEATURE:entry: #{feature['title']}"
+        return feature
+      end
+
+    end
+
     class JekyllTreeprocessor < Asciidoctor::Extensions::Treeprocessor
         include JekyllUtilMixin
 
@@ -531,6 +562,7 @@ Asciidoctor::Extensions.register do
   inline_macro Evolveum::WikiInlineMacro
   inline_macro Evolveum::BugInlineMacro
   inline_macro Evolveum::GlossrefInlineMacro
+  inline_macro Evolveum::FeatureInlineMacro
   block_macro Evolveum::SamplesBlockMacro
   treeprocessor Evolveum::ImagePathTreeprocessor
 end
