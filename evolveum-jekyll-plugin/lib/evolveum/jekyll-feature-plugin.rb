@@ -3,6 +3,7 @@
 # Evolveum page Plugin for Jekyll
 #
 # Plugin to compile information about midpoint features, and generates feature pages.
+# The plugin is also processing compliance controls, generating details pages for them.
 
 require 'yaml'
 
@@ -12,6 +13,7 @@ module Evolveum
         priority :lowest
 
         FEATURES_URL = '/midpoint/features/current/'
+        ISO27001_URL = '/midpoint/compliance/iso27001/'
 
         def self.collect(site)
             generator = Evolveum::FeatureGenerator.new()
@@ -102,17 +104,22 @@ module Evolveum
 
         def generate(site)
 #            puts "=========[ EVOLVEUM feature ]============== generate"
-            @site = site
+            init(site)
             @nav = site.data['nav']
             @navFeatures = @nav.resolvePath(FEATURES_URL)
-            @features = site.data['midpoint-features']
+            @navIso27001 = @nav.resolvePath(ISO27001_URL)
+            @isoDisplayOrder = 100
 
             @features.each do |feature|
-                @site.pages << generatePage(feature)
+                @site.pages << generateFeaturePage(feature)
+            end
+
+            @iso27001.each do |control|
+                @site.pages << generateIso27001Page(control)
             end
         end
 
-        def generatePage(feature)
+        def generateFeaturePage(feature)
             slug = feature['id']
 #            puts("  [F] GEN #{slug}")
             # WARNING: Magic follows.
@@ -134,6 +141,34 @@ module Evolveum
             @navFeatures.add(nav)
 
             feature['url'] = url
+
+            page
+        end
+
+        def generateIso27001Page(control)
+            slug = control['id']
+            puts("  [FC] GEN #{slug}")
+            # WARNING: Magic follows.
+            # We create new "virtual" page using PageWithoutAFile class.
+            # This page has no source file, we will explicitly read the content from feature.html "template"
+            url = ISO27001_URL + slug
+            page = Jekyll::PageWithoutAFile.new(@site, __dir__, url, "index.html")
+            # The "stub.html" template is in the gem, in the same dir as this source code (hence __dir__)
+            page.content = File.read(File.join(__dir__, 'iso27001.html'))
+            page.data["layout"] = "iso27001"
+            page.data['title'] = 'ISO/IEC 27001 Control ' + control['id'] + ': ' + control['title']
+            page.data['nav-title'] = control['id']
+            page.data['display-order'] = @isoDisplayOrder.to_s
+            @isoDisplayOrder = @isoDisplayOrder + 1
+            page.data['control'] = control
+
+            nav = Evolveum::Nav.new(slug)
+            nav.page = page
+            nav.url = url
+            nav.title = control['id']
+            @navIso27001.add(nav)
+
+            control['url'] = url
 
             page
         end
