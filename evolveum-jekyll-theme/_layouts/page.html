@@ -24,7 +24,7 @@ layout: default
                 <option data-tokens="before-4.8" >4.7 and earlier</option>
             </select>
         </span></div>{% else %}
-        <div id="titleAndSelectVerDiv"><span><h1>{{ page.title }}</h1></span><span id="select-version">
+        <div id="titleAndSelectVerDiv"><span><h1>{{ page.title | escape }}</h1></span><span id="select-version">
             <select class="selectpicker" id="select-version-picker" data-style="versioningButton btn-light">
                 <option data-tokens="master">Development</option>
                 {% assign versions = site.data.midpoint-versions | reverse %}
@@ -35,29 +35,16 @@ layout: default
                 {% endfor %}
                 <option data-tokens="before-4.8" >4.7 and earlier</option>
             </select>
-        </span></div>{% endif %} {% if page.author %}<address class="author" rel="author">{{ page.author }}</address>{% endif %} {% if page.lastModificationDate %}
+        </span></div>{% endif %}
+        {% if page.author %}<address class="author" rel="author">{{ page.author }}</address>{% endif %} {% if page.lastModificationDate %}
         <div class="page-meta">Last modified {{ page.lastModificationDate | date: "%d %b %Y %H:%M %Z" }}</div>{% endif %} {% include page-warnings.html %} {% if page.toc %}
         <div class="toc-{{page.toc}}">
             <title>Table of Contents</title>
             {{ page.document | tocify_asciidoc }}
         </div>
-        {% endif %} {{ content }}
+        {% endif %}
+        {{ content }}
         {% include page-ending.html %}
-        <div id="pageEval" style="text-align: center;">
-            <div id="helpfullPageText">Was this page helpful?</div>
-            <div class="siteReviewThumbs">
-                <span id="yesSiteReviewThumb" class="siteReviewThumb noselect">
-              <i class="fas fa-thumbs-up"></i>
-                YES
-          </span>
-                <span id="noSiteReviewThumb" class="siteReviewThumb noselect" data-toggle="popover" data-html="true">
-              <i class="fas fa-thumbs-down"></i>
-               NO
-          </span>
-            </div>
-            <div class="thanksFeedback">
-                Thanks for your feedback
-            </div>
-        </div>
+        {% include page-eval.html %}
     </div>
 </div>
