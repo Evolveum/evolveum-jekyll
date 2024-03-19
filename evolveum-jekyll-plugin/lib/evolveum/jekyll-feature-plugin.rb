@@ -36,15 +36,20 @@ module Evolveum
         end
 
         def collectPage(page)
+
             feature = page.data['midpoint-feature']
 #                puts("  [F] #{page.url}: #{feature}")
-            if feature == nil
-                return
+            if feature != nil
+                if feature.kind_of?(Array)
+                    feature.each { |f| collectPageFeature(page, f) }
+                else
+                    collectPageFeature(page, feature)
+                end
             end
-            if feature.kind_of?(Array)
-                feature.each { |f| collectPageFeature(page, f) }
-            else
-                collectPageFeature(page, feature)
+
+            compliance = page.data['compliance']
+            if compliance != nil
+                collectPageCompliance(page, compliance)
             end
         end
 
@@ -80,6 +85,40 @@ module Evolveum
             f['doc'][version][type] << page
         end
 
+        def collectPageCompliance(page, compliance)
+            iso = compliance['iso27001']
+            if iso != nil
+                collectPageComplianceIso27001(page, iso)
+            end
+        end
+
+        def collectPageComplianceIso27001(page, complianceIso)
+            complianceIso.each { |id,val| collectPageComplianceIso27001Control(page,id,val) }
+        end
+
+        def collectPageComplianceIso27001Control(page, controlId, info)
+            version = page.data['midpointBranchDisplayName']
+#            puts("  [C] #{page.url}: ISO27001 #{controlId} v#{version}")
+            control = findIso27001Control(controlId)
+            if !control
+                Jekyll.logger.warn("Referencing unknown ISO27001 control #{controlId} in #{page.url}")
+                return
+            end
+            if !version
+                version = 'global'
+            end
+#            puts("  [FF] #{f}")
+            if !control.key?('doc')
+                control['doc'] = {}
+            end
+            if !control['doc'].key?(version)
+                control['doc'][version] = []
+            end
+            i = info.clone
+            i['page'] = page
+            control['doc'][version] << i
+        end
+
         def processCompliance()
             @features.each { |feature| processComplianceFeature(feature) }
         end
@@ -100,6 +139,10 @@ module Evolveum
 
         def findFeature(feature)
             @features.find { |f| f['id'] == feature }
+        end
+
+        def findIso27001Control(controlId)
+            @iso27001.find { |c| c['id'] == controlId }
         end
 
         def generate(site)
@@ -147,7 +190,7 @@ module Evolveum
 
         def generateIso27001Page(control)
             slug = control['id']
-            puts("  [FC] GEN #{slug}")
+#            puts("  [FC] GEN #{slug}")
             # WARNING: Magic follows.
             # We create new "virtual" page using PageWithoutAFile class.
             # This page has no source file, we will explicitly read the content from feature.html "template"
