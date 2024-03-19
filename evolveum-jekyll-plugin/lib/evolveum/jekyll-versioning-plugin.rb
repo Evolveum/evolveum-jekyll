@@ -84,7 +84,11 @@ def installVersions(site)
     if Dir["#{mpPreDir}#{versionWithoutDocs}"].empty?
       system("cd #{site.config['docs']['midpointVersionsPath']} && git clone -b #{version} https://github.com/Evolveum/midpoint #{site.config['docs']['midpointVersionsPrefix']}#{versionWithoutDocs}") #maybe && rm #{mpPreDir}#{versionWithoutDocs}/docs/LICENSE"
     end
-    system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionWithoutDocs}/docs/ \"$DOCSPATHVAR\"#{site.config['docs']['docsDirName']}/midpoint/reference/#{versionWithoutDocs}")
+    if (site.config['docs']['docsPath'] == "/")
+      system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionWithoutDocs}/docs/ \"$DOCSPATHVAR\"#{site.config['docs']['docsDirName']}/midpoint/reference/#{versionWithoutDocs}")
+    else
+      system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionWithoutDocs}/docs/ \"$DOCSPATHVAR\"/#{site.config['docs']['docsDirName']}/midpoint/reference/#{versionWithoutDocs}")
+    end
   end
 end
 
