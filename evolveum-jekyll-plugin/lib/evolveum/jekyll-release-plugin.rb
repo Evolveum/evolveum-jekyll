@@ -9,10 +9,10 @@ def installReleaseNotes(site)
   versions = returnedVerArr[0]
   versionsReleaseBranches = returnedVerArr[1]
   docsBranches = returnedVerArr[2]
-  let addedSlash = "/"
-  if (site.config['docs']['docsPath'] == "/") {
+  addedSlash = "/"
+  if (site.config['docs']['docsPath'] == "/")
     addedSlash = ""
-  }
+  end
   versions.each_with_index do |ver, index|
     puts("ver " + ver + " index " + index.to_s + " releaseBranch " + versionsReleaseBranches[index] + " docsBranches " + docsBranches.join(" "))
 
