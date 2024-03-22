@@ -333,7 +333,9 @@
                 "wiki-metadata-create-user",
                 "url",
                 "type",
-                "branch"
+                "branch",
+                "sections1",
+                "secondTitles"
             ],
             _source: false,
             highlight: {
