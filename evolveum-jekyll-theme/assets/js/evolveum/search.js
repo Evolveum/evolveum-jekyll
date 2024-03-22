@@ -335,7 +335,7 @@
                 "type",
                 "branch",
                 "sections1",
-                "secondTitles"
+                "second_titles"
             ],
             _source: false,
             highlight: {
