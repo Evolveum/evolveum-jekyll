@@ -56,24 +56,20 @@
     $('#ragPopover').popover({
         html: true,
         sanitize: false,
+        placement: "left",
         container: '#search-modal',
         title: "Please tell us more about what you don't like",
-        content: `<div>
+        content: `<div id="ragChatBody">
                     <div class="form-group">
-                        <label for="docsReportAProblemSelect">Type of a problem</label>
-                        <select id="docsReportAProblemSelect" data-style="btn-light btn-sm btndocsSelectReport" title="Type of a problem" data-width="auto">
-                            <option class="input-sm docsReportAProblemOption">Visual bug</option>
-                            <option class="input-sm docsReportAProblemOption">Functional bug</option>
-                            <option class="input-sm docsReportAProblemOption">Problem with content</option>
-                        </select>
+                        <label for="llmResponseArea">Response</label>
+                        <textarea class="form-control" id="llmResponseArea" rows="12"></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="docsReportTextArea">Details of the problem</label>
-                        <textarea class="form-control" id="docsReportTextArea" rows="5"></textarea>
+                        <label for="userQueryArea">Query</label>
+                        <textarea class="form-control" id="userQueryArea" rows="2"></textarea>
                     </div>
                     <span>
-                        <button type="button" class="btn btn-primary" id="reportDocsProblemPopoverClose">Close</button>
-                        <button type="button" class="btn btn-primary" id="reportDocsProblemPopoverSend">Send message</button>
+                        <button type="button" class="btn btn-primary" id="ragChatCloseButton">Close</button>
                     </span>
                 </div>`
     });
