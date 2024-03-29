@@ -71,6 +71,7 @@
                     </div>
                     <span>
                         <button type="button" class="btn btn-primary" id="ragChatCloseButton">Close</button>
+                        <button type="button" class="btn btn-primary" id="ragChatSendButton">Send message</button>
                     </span>
                 </div>`
     })
