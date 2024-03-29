@@ -72,6 +72,12 @@
                         <button type="button" class="btn btn-primary" id="ragChatCloseButton">Close</button>
                     </span>
                 </div>`
+    }).on("show.bs.popover", function() {
+        $($(this).data("bs.popover").getTipElement()).css("width", "50rem");
+    });;
+
+    $('#ragChatCloseButton').click(function() {
+        $('#ragPopover').popover('hide');
     });
 
     // $('#noSiteReviewThumb').on('inserted.bs.popover', function() {
