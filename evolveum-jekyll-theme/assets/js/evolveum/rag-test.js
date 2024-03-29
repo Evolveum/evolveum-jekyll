@@ -59,10 +59,11 @@
         placement: "left",
         container: '#search-modal',
         title: "Please tell us more about what you don't like",
+        template: '<div class="popover" style="width: 50rem;" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
         content: `<div id="ragChatBody">
                     <div class="form-group">
                         <label for="llmResponseArea">Response</label>
-                        <textarea class="form-control" id="llmResponseArea" rows="12"></textarea>
+                        <textarea class="form-control readonly" id="llmResponseArea" rows="12"></textarea>
                     </div>
                     <div class="form-group">
                         <label for="userQueryArea">Query</label>
@@ -72,9 +73,7 @@
                         <button type="button" class="btn btn-primary" id="ragChatCloseButton">Close</button>
                     </span>
                 </div>`
-    }).on("show.bs.popover", function() {
-        $($(this).data("bs.popover").getTipElement()).css("width", "50rem");
-    });;
+    })
 
     $('#ragChatCloseButton').click(function() {
         $('#ragPopover').popover('hide');
