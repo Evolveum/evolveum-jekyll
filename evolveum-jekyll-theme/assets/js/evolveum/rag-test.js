@@ -58,7 +58,7 @@
         sanitize: false,
         placement: "left",
         container: '#search-modal',
-        title: "Please tell us more about what you don't like",
+        title: "Chat with an ai. Please be cautious, this ai is prone to hallucinate",
         template: '<div class="popover" style="width: 50rem; max-width: 50rem;" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
         content: `<div id="ragChatBody">
                     <div class="form-group">
@@ -76,9 +76,90 @@
                 </div>`
     })
 
-    $('#ragChatCloseButton').click(function() {
-        $('#ragPopover').popover('hide');
+    $('#ragPopover').on('inserted.bs.popover', function() {
+        $('#ragChatCloseButton').click(function() {
+            $('#ragPopover').popover('hide');
+        });
+        $('#ragChatSendButton').click(function() {
+            sendRagRequest()
+        });
     });
+
+    async function sendRagRequest() {
+        const postData = {
+                "_source": {
+                    "excludes": [
+                        "passage_embedding"
+                    ]
+                },
+                "indices_boost": [
+                    { "pass1-nlp-index": 1.0 },
+                    { "bookpass-nlp-index": 1.5 }
+                ],
+                "query": {
+                    "bool": {
+                        "filter": {
+                            "terms": { "branch.keyword": ["support-4.8", "notBranched"] }
+                        },
+                        "should": [{
+                                "script_score": {
+                                    "query": {
+                                        "neural": {
+                                            "passage_embedding": {
+                                                "query_text": "Object template examples",
+                                                "model_id": "ueVVfo4Bvd-X9jaivNwl",
+                                                "k": 100
+                                            }
+                                        }
+                                    },
+                                    "script": {
+                                        "source": "_score * 1.5"
+                                    }
+                                }
+                            },
+                            {
+                                "script_score": {
+                                    "query": {
+                                        "match": {
+                                            "text": "Object template examples"
+                                        }
+                                    },
+                                    "script": {
+                                        "source": "_score * 0.8"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+            // const customHeaders = {
+            //     'Content-Type': 'application/json'
+            // };
+            // // Define your Axios configuration
+            // const axiosConfig = {
+            //     // Your Axios configuration here
+            //     headers: customHeaders,
+            //     responseType: 'stream' // Set the responseType to 'stream' to receive a stream response
+            // };
+
+        // let context = []
+
+        const rawResponse = await fetch('https://rag-test.lab.evolveum.com', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: postData
+        });
+
+        // Iterate response.body (a ReadableStream) asynchronously
+        for await (const chunk of rawResponse.body) {
+            // Do something with each chunk
+            // Here we just accumulate the size of the response.
+            console.log(chunk)
+        }
+    }
 
     // $('#noSiteReviewThumb').on('inserted.bs.popover', function() {
     //     $('#reportDocsProblemPopoverClose').click(function() {
