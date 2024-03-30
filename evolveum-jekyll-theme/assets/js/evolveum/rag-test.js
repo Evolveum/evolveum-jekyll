@@ -59,17 +59,17 @@
         placement: "left",
         container: '#search-modal',
         title: "Please tell us more about what you don't like",
-        template: '<div class="popover" style="width: 50rem;" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
+        template: '<div class="popover" style="width: 50rem; max-width: 50rem;" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
         content: `<div id="ragChatBody">
                     <div class="form-group">
                         <label for="llmResponseArea">Response</label>
-                        <textarea class="form-control readonly" id="llmResponseArea" rows="12"></textarea>
+                        <textarea class="form-control" id="llmResponseArea" rows="12" readonly></textarea>
                     </div>
                     <div class="form-group">
                         <label for="userQueryArea">Query</label>
                         <textarea class="form-control" id="userQueryArea" rows="2"></textarea>
                     </div>
-                    <span>
+                    <span id="ragChatPopoverButtons">
                         <button type="button" class="btn btn-primary" id="ragChatCloseButton">Close</button>
                         <button type="button" class="btn btn-primary" id="ragChatSendButton">Send message</button>
                     </span>
