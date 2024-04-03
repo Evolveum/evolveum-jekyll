@@ -150,7 +150,7 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: postData
+            body: JSON.stringify(postData)
         });
 
         // Iterate response.body (a ReadableStream) asynchronously
