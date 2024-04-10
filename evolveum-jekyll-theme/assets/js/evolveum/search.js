@@ -333,7 +333,8 @@
                 "wiki-metadata-create-user",
                 "url",
                 "type",
-                "branch"
+                "branch",
+                "second_titles"
             ],
             _source: false,
             highlight: {
@@ -486,7 +487,13 @@
                     }
 
                     if (title == undefined || !title) {
-                        title = data.hits.hits[i].fields.title[0]
+                        if (data.hits.hits[i].fields.title[0] != undefined) {
+                            title = data.hits.hits[i].fields.title[0]
+                        } else if (data.hits.hits[i].fields.second_titles[0] != undefined) {
+                            title = data.hits.hits[i].fields.second_titles[0]
+                        } else {
+                            title = "Not defined"
+                        }
                     }
 
                     setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id, data.hits.hits[i].fields.title[0]), 130);
