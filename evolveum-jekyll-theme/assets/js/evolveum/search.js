@@ -486,17 +486,21 @@
                         preview = preview.replaceAll("7U3pTwKZCEwGRrgirF9cydI9cQWP2mzOiofD2Pl/HjFwxoekr5fRpg==", "</strong>")
                     }
 
-                    if (title == undefined || !title) {
-                        if (data.hits.hits[i].fields.title != undefined) {
-                            title = data.hits.hits[i].fields.title[0]
-                        } else if (data.hits.hits[i].fields.second_titles != undefined) {
-                            title = data.hits.hits[i].fields.second_titles[0]
-                        } else {
-                            title = "Not defined"
-                        }
+                    let cleanTitle = "" // Title without highlighting used for setSearchItemOnclick
+                    
+                    if (data.hits.hits[i].fields.title != undefined) {
+                        cleanTitle = data.hits.hits[i].fields.title[0]
+                    } else if (data.hits.hits[i].fields.second_titles != undefined) {
+                        cleanTitle = data.hits.hits[i].fields.second_titles[0]
+                    } else {
+                        cleanTitle = "Not defined"
                     }
 
-                    setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id, data.hits.hits[i].fields.title[0]), 130);
+                    if (title == undefined || !title) {
+                        title = cleanTitle
+                    }
+
+                    setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id, cleanTitle), 130);
 
                     const parsedDate = Date.parse(data.hits.hits[i].fields.lastModificationDate[0])
                     const date = new Date(parsedDate)
