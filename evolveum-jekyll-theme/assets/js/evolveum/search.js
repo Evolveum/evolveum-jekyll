@@ -487,9 +487,9 @@
                     }
 
                     if (title == undefined || !title) {
-                        if (data.hits.hits[i].fields.title[0] != undefined) {
+                        if (data.hits.hits[i].fields.title != undefined) {
                             title = data.hits.hits[i].fields.title[0]
-                        } else if (data.hits.hits[i].fields.second_titles[0] != undefined) {
+                        } else if (data.hits.hits[i].fields.second_titles != undefined) {
                             title = data.hits.hits[i].fields.second_titles[0]
                         } else {
                             title = "Not defined"
