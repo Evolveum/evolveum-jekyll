@@ -175,6 +175,7 @@ module Evolveum
             page.data["layout"] = "feature"
             page.data['title'] = feature['title']
             page.data['midpoint-feature'] = feature['id']
+            page.data['doc-type'] = 'feature'
             page.data['feature'] = feature
 
             nav = Evolveum::Nav.new(slug)
@@ -204,6 +205,7 @@ module Evolveum
             page.data['display-order'] = @isoDisplayOrder.to_s
             @isoDisplayOrder = @isoDisplayOrder + 1
             page.data['control'] = control
+            page.data['doc-type'] = 'compliance'
 
             nav = Evolveum::Nav.new(slug)
             nav.page = page
