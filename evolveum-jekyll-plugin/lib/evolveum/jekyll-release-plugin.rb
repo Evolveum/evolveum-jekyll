@@ -48,7 +48,7 @@ def installReleaseNotes(site)
         else
           system("cp -f #{releaseDir}/#{ver}/index.adoc #{docsDir}/midpoint/release/#{ver}/")
         end
-        Jekyll.logger.warn("Existing index.adoc file in /midpoint/release/#{ver}/, updating content")
+        Jekyll.logger.warn("Unexpexted index.adoc file in /midpoint/release/#{ver}/, replacing with release notes from midPoint repository.")
       end
     end
 
@@ -66,7 +66,7 @@ def installReleaseNotes(site)
         else
           system("cp -f #{releaseDir}/#{ver}/install.adoc #{docsDir}/midpoint/release/#{ver}/")
         end
-        Jekyll.logger.warn("Existing install.adoc file in /midpoint/release/#{ver}/, updating content")
+        Jekyll.logger.warn("Unexpexted install.adoc file in /midpoint/release/#{ver}/, replacing with release notes from midPoint repository.")
       end
     end
   end
