@@ -2,6 +2,27 @@
 require 'yaml'
 require 'open3'
 
+def readReleaseVersions(docsDir)
+  verObject = YAML.load_file("#{docsDir}/_data/midpoint-versions.yml")
+  versionsNumbers = []
+  versionBranches = []
+  docsBranches = []
+  verObject.each do |ver|
+    if ver['docsBranch'] != nil && ver['docsDisplayBranch']
+      docsBranches.push(ver['docsBranch'])
+    end
+    if ((!ver.key?("legacyDocs") || ver["legacyDocs"] != true ))
+      if (ver["docsReleaseBranch"] != nil)
+        versionBranches.push(ver["docsReleaseBranch"])
+        versionsNumbers.push(ver["version"])
+      end
+    end
+  end
+  docsBranches.push("docs/before-4.8")
+  docsBranches.push("master")
+  return versionsNumbers, versionBranches, docsBranches
+end
+
 def installReleaseNotes(site)
   docsDir = site.config['docs']['docsPath'] + site.config['docs']['docsDirName']
   releaseDir = site.config['docs']['midpointReleasePath'] + site.config['docs']['midpointReleaseDir']
@@ -25,13 +46,13 @@ def installReleaseNotes(site)
         system("cd #{site.config['docs']['midpointReleasePath']} && mkdir -p #{releaseDir}/#{ver}")
       end
 
-      if (!File.exist?("#{releaseDir}/#{ver}/index.adoc"))
+      #if (!File.exist?("#{releaseDir}/#{ver}/index.adoc"))
         system("cd #{releaseDir}/#{ver}/ && wget -q https://raw.githubusercontent.com/janmederly/testversioning/#{versionsReleaseBranches[index]}/release-notes.adoc && mv release-notes.adoc index.adoc")
-      end
+      #end
 
-      if (!File.exist?("#{releaseDir}/#{ver}/install.adoc"))
+      #if (!File.exist?("#{releaseDir}/#{ver}/install.adoc"))
         system("cd #{releaseDir}/#{ver}/ && wget -q https://raw.githubusercontent.com/janmederly/testversioning/#{versionsReleaseBranches[index]}/install-dist.adoc && mv install-dist.adoc install.adoc")
-      end
+      #end
     end
 
     if (!File.exist?("#{docsDir}/midpoint/release/#{ver}/index.adoc"))
@@ -70,27 +91,6 @@ def installReleaseNotes(site)
       end
     end
   end
-end
-
-def readReleaseVersions(docsDir)
-  verObject = YAML.load_file("#{docsDir}/_data/midpoint-versions.yml")
-  versionsNumbers = []
-  versionBranches = []
-  docsBranches = []
-  verObject.each do |ver|
-    if ver['docsBranch'] != nil && ver['docsDisplayBranch']
-      docsBranches.push(ver['docsBranch'])
-    end
-    if ((!ver.key?("legacyDocs") || ver["legacyDocs"] != true ))
-      if (ver["docsReleaseBranch"] != nil)
-        versionBranches.push(ver["docsReleaseBranch"])
-        versionsNumbers.push(ver["version"])
-      end
-    end
-  end
-  docsBranches.push("docs/before-4.8")
-  docsBranches.push("master")
-  return versionsNumbers, versionBranches, docsBranches
 end
 
 Jekyll::Hooks.register :site, :after_init do |site|
