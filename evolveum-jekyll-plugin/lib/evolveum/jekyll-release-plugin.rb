@@ -57,7 +57,7 @@ def installReleaseNotes(site)
 
     if (!File.exist?("#{docsDir}/midpoint/release/#{ver}/index.adoc"))
       if (docsBranches.include?(versionsReleaseBranches[index]))
-        system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","")}/release-notes.adoc \"$DOCSPATHVAR\"#{addedSlash}#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/index.adoc")
+        system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","").gsub("/", "__SLASH__")}/release-notes.adoc \"$DOCSPATHVAR\"#{addedSlash}#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/index.adoc")
       else
         system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/#{ver}/index.adoc \"$DOCSPATHVAR\"#{addedSlash}#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/index.adoc")
       end
@@ -75,7 +75,7 @@ def installReleaseNotes(site)
 
     if (!File.exist?("#{docsDir}/midpoint/release/#{ver}/install.adoc"))
       if (docsBranches.include?(versionsReleaseBranches[index]))
-        system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","")}/install-dist.adoc \"$DOCSPATHVAR\"#{addedSlash}#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
+        system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","").gsub("/", "__SLASH__")}/install-dist.adoc \"$DOCSPATHVAR\"#{addedSlash}#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
       else
         system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/#{ver}/install.adoc \"$DOCSPATHVAR\"#{addedSlash}#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
       end
