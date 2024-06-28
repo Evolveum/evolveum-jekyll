@@ -1,5 +1,5 @@
----
----
+-- -
+-- -
 (function() {
 
     let letters = new Set(["Guide", "Book", "Reference", "Other"]);
@@ -396,25 +396,25 @@
 
         searchQuery.size = pagesShown;
         const query = document.getElementById('searchbar').value.toLowerCase();
-        
-        if (query.slice(-1) == '"' && query.slice(0,1) == '"') {
+
+        if (query.slice(-1) == '"' && query.slice(0, 1) == '"') {
             searchQuery.query.bool.must[0].function_score.query.multi_match.operator = "and"
             searchQuery.query.bool.should[3].multi_match.operator = "and"
-            //searchQuery.query.bool.should[2].term['search-alias.keyword'].operator = "and"
-            //searchQuery.query.bool.should[1].term['keywords.keyword'].operator = "and"
-            //searchQuery.query.bool.should[0].term['title.keyword'].operator = "and"
+                //searchQuery.query.bool.should[2].term['search-alias.keyword'].operator = "and"
+                //searchQuery.query.bool.should[1].term['keywords.keyword'].operator = "and"
+                //searchQuery.query.bool.should[0].term['title.keyword'].operator = "and"
             searchQuery.highlight.fields.title.highlight_query.match.title.operator = "and"
             searchQuery.highlight.fields.text.highlight_query.match.text.operator = "and"
         } else {
             searchQuery.query.bool.must[0].function_score.query.multi_match.operator = "or"
             searchQuery.query.bool.should[3].multi_match.operator = "or"
-            //searchQuery.query.bool.should[2].term['search-alias.keyword'].operator = "or"
-            //searchQuery.query.bool.should[1].term['keywords.keyword'].operator = "or"
-            //searchQuery.query.bool.should[0].term['title.keyword'].operator = "or"
+                //searchQuery.query.bool.should[2].term['search-alias.keyword'].operator = "or"
+                //searchQuery.query.bool.should[1].term['keywords.keyword'].operator = "or"
+                //searchQuery.query.bool.should[0].term['title.keyword'].operator = "or"
             searchQuery.highlight.fields.title.highlight_query.match.title.operator = "or"
             searchQuery.highlight.fields.text.highlight_query.match.text.operator = "or"
         }
-        
+
         searchQuery.query.bool.must[0].function_score.query.multi_match.query = query
         searchQuery.query.bool.should[3].multi_match.query = query
         searchQuery.query.bool.should[2].term['search-alias.keyword'].value = query
@@ -487,7 +487,7 @@
                     }
 
                     let cleanTitle = "" // Title without highlighting used for setSearchItemOnclick
-                    
+
                     if (data.hits.hits[i].fields.title != undefined) {
                         cleanTitle = data.hits.hits[i].fields.title[0]
                     } else if (data.hits.hits[i].fields.second_titles != undefined) {
@@ -502,8 +502,13 @@
 
                     setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id, cleanTitle), 130);
 
-                    const parsedDate = Date.parse(data.hits.hits[i].fields.lastModificationDate[0])
-                    const date = new Date(parsedDate)
+                    let displayDate = "Not defined"
+
+                    if (data.hits.hits[i].fields.lastModificationDate[0] != undefined) {
+                        const parsedDate = Date.parse(data.hits.hits[i].fields.lastModificationDate[0])
+                        const date = new Date(parsedDate)
+                        displayDate = date.toLocaleDateString('en-GB', { timeZone: 'UTC' })
+                    }
 
                     let authorRaw = data.hits.hits[i].fields.author
                     let author = ""
@@ -560,7 +565,7 @@
                     }
 
                     showItems.push(`<div><span class="trigger-details searchResult" data-toggle="tooltip" data-toggle="tooltip" data-placement="left" 
-                    data-html="true" title='<span class="tooltip-preview"><p>Last modification date: ${date.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</p>
+                    data-html="true" title='<span class="tooltip-preview"><p>Last modification date: ${displayDate}</p>
                     <p>Upkeep status: ${upkeepStatus} <i id="upkeep${upkeepStatus}" class="fa fa-circle"></i>
                     </p><p>Search likes: ${searchUpvotes}</p><p>Docs likes: ${docsUpvotes}</p><p>Version: ${tooltipVer}</p><p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${data.hits.hits[i].fields.url[0]}" 
                     id="${data.hits.hits[i]._id}site"><li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i>
