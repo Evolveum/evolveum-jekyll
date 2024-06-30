@@ -1,5 +1,5 @@
--- -
--- -
+---
+---
 (function() {
 
     let letters = new Set(["Guide", "Book", "Reference", "Other"]);
