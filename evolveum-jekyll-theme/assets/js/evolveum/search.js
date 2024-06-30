@@ -504,7 +504,7 @@
 
                     let displayDate = "Not defined"
 
-                    if (data.hits.hits[i].fields.lastModificationDate[0] != undefined) {
+                    if (data.hits.hits[i].fields.lastModificationDate != undefined) {
                         const parsedDate = Date.parse(data.hits.hits[i].fields.lastModificationDate[0])
                         const date = new Date(parsedDate)
                         displayDate = date.toLocaleDateString('en-GB', { timeZone: 'UTC' })
