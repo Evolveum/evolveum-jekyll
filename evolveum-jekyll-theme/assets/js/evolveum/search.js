@@ -191,7 +191,7 @@
                                         if (doc.upvotes.size()!=0) {
                                             totalScore = totalScore*(1.0+${data._source.multipliers.upvotes}*doc.upvotes.value);
                                         }
-                                        if (doc.docslikes.size()!=0) {
+                                        if (doc.containsKey('docslikes') && doc.docslikes.size()!=0) {
                                             totalScore = totalScore*(1.0+${data._source.multipliers.docslikes}*doc.docslikes.value);
                                         }
                                         if (doc['_index'].value == "mpbook") {
