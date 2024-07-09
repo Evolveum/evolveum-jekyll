@@ -191,8 +191,8 @@
                                         if (doc.upvotes.size()!=0) {
                                             totalScore = totalScore*(1.0+${data._source.multipliers.upvotes}*doc.upvotes.value);
                                         }
-                                        if (doc.upvotes.size()!=0) {
-                                            totalScore = totalScore*(1.0+${data._source.multipliers.docslikes}*doc.upvotes.value);
+                                        if (doc.docslikes.size()!=0) {
+                                            totalScore = totalScore*(1.0+${data._source.multipliers.docslikes}*doc.docslikes.value);
                                         }
                                         if (doc['_index'].value == "mpbook") {
                                             totalScore = totalScore*${data._source.multipliers.book};
@@ -287,9 +287,25 @@
                         },
                         {
                             term: {
-                                "keywords.keyword": {
+                                "second_titles.keyword": {
                                     value: "",
-                                    boost: `${data._source.multipliers.queryKeywordExactMatch}`
+                                    boost: `${data._source.multipliers.querySecondTitleExactMatch}`
+                                }
+                            }
+                        },
+                        {
+                            term: {
+                                "third_titles.keyword": {
+                                    value: "",
+                                    boost: `${data._source.multipliers.queryThirdTitleExactMatch}`
+                                }
+                            }
+                        },
+                        {
+                            term: {
+                                "fourth_titles.keyword": {
+                                    value: "",
+                                    boost: `${data._source.multipliers.queryFourthTitleExactMatch}`
                                 }
                             }
                         },
