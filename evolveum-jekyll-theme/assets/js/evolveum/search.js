@@ -281,7 +281,8 @@
                             term: {
                                 "title.keyword": {
                                     value: "",
-                                    boost: `${data._source.multipliers.queryTitleExactMatch}`
+                                    boost: `${data._source.multipliers.queryTitleExactMatch}`,
+                                    case_insensitive: true
                                 }
                             }
                         },
@@ -289,7 +290,8 @@
                             term: {
                                 "second_titles.keyword": {
                                     value: "",
-                                    boost: `${data._source.multipliers.querySecondTitleExactMatch}`
+                                    boost: `${data._source.multipliers.querySecondTitleExactMatch}`,
+                                    case_insensitive: true
                                 }
                             }
                         },
@@ -297,7 +299,8 @@
                             term: {
                                 "third_titles.keyword": {
                                     value: "",
-                                    boost: `${data._source.multipliers.queryThirdTitleExactMatch}`
+                                    boost: `${data._source.multipliers.queryThirdTitleExactMatch}`,
+                                    case_insensitive: true
                                 }
                             }
                         },
@@ -305,7 +308,8 @@
                             term: {
                                 "fourth_titles.keyword": {
                                     value: "",
-                                    boost: `${data._source.multipliers.queryFourthTitleExactMatch}`
+                                    boost: `${data._source.multipliers.queryFourthTitleExactMatch}`,
+                                    case_insensitive: true
                                 }
                             }
                         },
@@ -313,7 +317,8 @@
                             term: {
                                 "keywords.keyword": {
                                     value: "",
-                                    boost: `${data._source.multipliers.queryKeywordExactMatch}`
+                                    boost: `${data._source.multipliers.queryKeywordExactMatch}`,
+                                    case_insensitive: true
                                 }
                             }
                         },
@@ -321,7 +326,8 @@
                             term: {
                                 "search-alias.keyword": {
                                     value: "",
-                                    boost: `${data._source.multipliers.querySearchAliasExactMatch}`
+                                    boost: `${data._source.multipliers.querySearchAliasExactMatch}`,
+                                    case_insensitive: true
                                 }
                             }
                         },
