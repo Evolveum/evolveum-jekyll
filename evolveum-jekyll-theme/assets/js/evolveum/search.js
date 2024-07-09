@@ -311,6 +311,14 @@
                         },
                         {
                             term: {
+                                "keywords.keyword": {
+                                    value: "",
+                                    boost: `${data._source.multipliers.queryKeywordExactMatch}`
+                                }
+                            }
+                        },
+                        {
+                            term: {
                                 "search-alias.keyword": {
                                     value: "",
                                     boost: `${data._source.multipliers.querySearchAliasExactMatch}`
@@ -416,7 +424,7 @@
 
         if (query.slice(-1) == '"' && query.slice(0, 1) == '"') {
             searchQuery.query.bool.must[0].function_score.query.multi_match.operator = "and"
-            searchQuery.query.bool.should[3].multi_match.operator = "and"
+            searchQuery.query.bool.should[6].multi_match.operator = "and"
                 //searchQuery.query.bool.should[2].term['search-alias.keyword'].operator = "and"
                 //searchQuery.query.bool.should[1].term['keywords.keyword'].operator = "and"
                 //searchQuery.query.bool.should[0].term['title.keyword'].operator = "and"
@@ -424,7 +432,7 @@
             searchQuery.highlight.fields.text.highlight_query.match.text.operator = "and"
         } else {
             searchQuery.query.bool.must[0].function_score.query.multi_match.operator = "or"
-            searchQuery.query.bool.should[3].multi_match.operator = "or"
+            searchQuery.query.bool.should[6].multi_match.operator = "or"
                 //searchQuery.query.bool.should[2].term['search-alias.keyword'].operator = "or"
                 //searchQuery.query.bool.should[1].term['keywords.keyword'].operator = "or"
                 //searchQuery.query.bool.should[0].term['title.keyword'].operator = "or"
@@ -433,9 +441,12 @@
         }
 
         searchQuery.query.bool.must[0].function_score.query.multi_match.query = query
-        searchQuery.query.bool.should[3].multi_match.query = query
-        searchQuery.query.bool.should[2].term['search-alias.keyword'].value = query
-        searchQuery.query.bool.should[1].term['keywords.keyword'].value = query
+        searchQuery.query.bool.should[6].multi_match.query = query
+        searchQuery.query.bool.should[5].term['search-alias.keyword'].value = query
+        searchQuery.query.bool.should[4].term['keywords.keyword'].value = query
+        searchQuery.query.bool.should[3].term['fourth_titles.keyword'].value = query
+        searchQuery.query.bool.should[2].term['third_titles.keyword'].value = query
+        searchQuery.query.bool.should[1].term['second_titles.keyword'].value = query
         searchQuery.query.bool.should[0].term['title.keyword'].value = query
         searchQuery.highlight.fields.title.highlight_query.match.title.query = query
         searchQuery.highlight.fields.text.highlight_query.match.text.query = query
