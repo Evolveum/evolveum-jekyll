@@ -362,7 +362,20 @@ module Evolveum
             if (!target.include?("/midpoint/reference/"))
                 processXRefLink(parent, target, attrs)
             elsif (target.match?(negativeLookAhead))
-                processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs)
+                if document_path.match?(/\/midpoint\/release\/.+/)
+                    parentVer = document_path.split("/")[3]
+                    puts parentVer
+                    if (VersionReader.get_config_value('releaseDocsVerMap').key?(parentVer))
+                        processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('releaseDocsVerMap')[parentVer]}/"), attrs)
+                        puts "IT is"
+                    else
+                        processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs)
+                        puts "it isnt"
+                    end
+                    puts VersionReader.get_config_value('releaseDocsVerMap')[parentVer]
+                else
+                    processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs)
+                end
             else
                 Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
                 processXRefLink(parent, target, attrs)

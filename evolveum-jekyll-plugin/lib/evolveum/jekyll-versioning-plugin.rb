@@ -14,19 +14,23 @@ module VersionReader
     @config['filteredVersionsWhDocs'] = []
     versions = []
     @config['latestVersions'] = []
+    @config['releaseDocsVerMap'] = {}
     @config['defaultBranch'] = ""
     @config['negativeLookAhead'] = "(?!(?:"
+    actVer = 'before-4.8'
     verObject.each do |ver|
       versions.each_with_index do |version, index|
         if (ver["status"] == "released" && ver["version"].include?(version))
           if (ver["version"].gsub("\.", "").to_i > @config['latestVersions'][index].gsub("\.", "").to_i)
             @config['latestVersions'][index] = ver['version']
+            @config['releaseDocsVerMap'][ver['version']] = actVer
           end
         end
       end
       if ver['docsBranch'] != nil && ver['docsDisplayBranch']
         #puts("version" + ver['docsBranch'])
         versions.push(ver['version'])
+        @config['releaseDocsVerMap'][ver['version']] = ver['docsBranch']
         @config['latestVersions'].push(ver['version'])
         @config['filteredVersions'].push(ver['docsBranch'])
         @config['filteredVersionsWhDocs'].push(ver['docsBranch'].gsub("docs/",""))
@@ -36,6 +40,7 @@ module VersionReader
         if ver['defaultBranch'] != nil && ver['defaultBranch'] == true
           @config['defaultBranch'] = ver['docsBranch']
         end
+        actVer = ver['docsBranch']
       end
     end
     if @config['defaultBranch'] == ""
