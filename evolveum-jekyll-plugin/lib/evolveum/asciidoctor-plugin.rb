@@ -364,15 +364,15 @@ module Evolveum
             elsif (target.match?(negativeLookAhead))
                 if document_path.match?(/\/midpoint\/release\/.+/)
                     parentVer = document_path.split("/")[3]
-                    puts parentVer
+                    Jekyll.logger.warn(parentVer.to_s)
                     if (VersionReader.get_config_value('releaseDocsVerMap').key?(parentVer))
                         processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('releaseDocsVerMap')[parentVer]}/"), attrs)
-                        puts "IT is"
+                        Jekyll.logger.warn("IT is")
                     else
                         processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs)
-                        puts "it isnt"
+                        Jekyll.logger.warn("it isnt")
                     end
-                    puts VersionReader.get_config_value('releaseDocsVerMap')[parentVer]
+                    Jekyll.logger.warn(VersionReader.get_config_value('releaseDocsVerMap')[parentVer].to_s)
                 else
                     processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs)
                 end
