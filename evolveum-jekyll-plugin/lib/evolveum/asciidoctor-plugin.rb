@@ -363,7 +363,7 @@ module Evolveum
                 processXRefLink(parent, target, attrs)
             elsif (target.match?(negativeLookAhead))
                 if document_path.match?(/\/midpoint\/release\/.+/)
-                    parentVer = document_path.split("/")[3]
+                    parentVer = document_path.split("/")[4]
                     Jekyll.logger.warn(parentVer.to_s)
                     if (VersionReader.get_config_value('releaseDocsVerMap').key?(parentVer))
                         processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('releaseDocsVerMap')[parentVer]}/"), attrs)
