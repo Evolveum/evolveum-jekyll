@@ -57,6 +57,7 @@ window.addEventListener('load', function() {
 
         if (datatable.attr('data-order') != undefined) {
             order = datatable.attr('data-order');
+            console.log(order);
         }
         
         if (datatable.attr('data-paging') === 'true') {
