@@ -3,7 +3,8 @@ window.addEventListener('load', function() {
 
     // TODO add scroll
 
-    for (let datatable in datatables) {
+    datatables.each(function() {
+        let datatable = $(this);
         let paging = false;
         let lengthMenu = [10, 25, 50, 100];
         let lengthMax = 100;
@@ -14,20 +15,20 @@ window.addEventListener('load', function() {
         let orderColumn = 0;
 
         if (paging) {
-            if ($(datatable).attr('data-length-menu') != undefined) {
-                lengthMenu = $(datatable).attr('data-length-menu').split(',').length > 0 ? $(datatable).attr('data-length-menu').split(',') : lengthMenu;
+            if (datatable.attr('data-length-menu') != undefined) {
+                lengthMenu = datatable.attr('data-length-menu').split(',').length > 0 ? datatable.attr('data-length-menu').split(',') : lengthMenu;
             } else {
-                if ($(datatable).attr('data-length-menu-max') != undefined) {
-                    lengthMax = $(datatable).attr('data-length-menu-max').toInteger();
+                if (datatable.attr('data-length-menu-max') != undefined) {
+                    lengthMax = datatable.attr('data-length-menu-max').toInteger();
                 }
     
-                if ($(datatable).attr('data-length-menu-min') != undefined) {
+                if (datatable.attr('data-length-menu-min') != undefined) {
                     lengthMin = $(datatable).attr('data-length-menu-min').toInteger();
                 }
     
-                if ($(datatable).attr('data-length-menu-auto') != undefined || $(datatable).attr('data-length-menu-auto') != 'false') {
-                    if ($(datatable).attr('data-length-menu-length') != undefined) {
-                        lengthMenuLength = $(datatable).attr('data-length-menu-length').toInteger();
+                if (datatable.attr('data-length-menu-auto') != undefined || datatable.attr('data-length-menu-auto') != 'false') {
+                    if (datatable.attr('data-length-menu-length') != undefined) {
+                        lengthMenuLength = datatable.attr('data-length-menu-length').toInteger();
                     }
     
                     let step = (lengthMax - lengthMin) / (lengthMenuLength - 2);
@@ -45,28 +46,28 @@ window.addEventListener('load', function() {
             pageLength = lengthMenu[0];
         }
 
-        if ($(datatable).attr('data-order-column') != undefined) {
-            orderColumn = $(datatable).attr('data-order-column');
+        if (datatable.attr('data-order-column') != undefined) {
+            orderColumn = datatable.attr('data-order-column');
         }
         
 
-        if ($(datatable).attr('data-pageLength') != undefined) {
-            pageLength = $(datatable).attr('data-pageLength');
+        if (datatable.attr('data-pageLength') != undefined) {
+            pageLength = datatable.attr('data-pageLength');
         }
 
-        if ($(datatable).attr('data-order') != undefined) {
-            order = $(datatable).attr('data-order');
+        if (datatable.attr('data-order') != undefined) {
+            order = datatable.attr('data-order');
         }
         
-        if ($(datatable).attr('data-paging') === 'true') {
+        if (datatable.attr('data-paging') === 'true') {
             paging = true;
         }
 
-        $(datatable).DataTable({
+        datatable.DataTable({
             "paging": paging,
             lengthMenu: lengthMenu,
             pageLength: pageLength,
             order: [[orderColumn, order]]
         });
-    }
+    });
 })
