@@ -79,10 +79,12 @@ module Evolveum
             if !f['doc'].key?(version)
                 f['doc'][version] = {}
             end
-            if !f['doc'][version].key?(type)
-                f['doc'][version][type] = []
+            Array(type).each do |t|
+                if !f['doc'][version].key?(t)
+                    f['doc'][version][t] = []
+                end
+                f['doc'][version][t] << page
             end
-            f['doc'][version][type] << page
         end
 
         def collectPageCompliance(page, compliance)
