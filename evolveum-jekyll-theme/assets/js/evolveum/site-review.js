@@ -22,7 +22,7 @@
         }).fail(function(data) {
             console.log(data);
         });
-        //OSrequest("POST", "https://searchtest.evolveum.com/docs/_update/" + id + "?refresh", queryUpvote, true)
+        //OSrequest("POST", "https://search.evolveum.com/docs/_update/" + id + "?refresh", queryUpvote, true)
     }
     
     $("#yesSiteReviewThumb").on("click", function() {

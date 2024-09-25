@@ -191,8 +191,8 @@
                                         if (doc.upvotes.size()!=0) {
                                             totalScore = totalScore*(1.0+${data._source.multipliers.upvotes}*doc.upvotes.value);
                                         }
-                                        if (doc.upvotes.size()!=0) {
-                                            totalScore = totalScore*(1.0+${data._source.multipliers.docslikes}*doc.upvotes.value);
+                                        if (doc.containsKey('docslikes') && doc.docslikes.size()!=0) {
+                                            totalScore = totalScore*(1.0+${data._source.multipliers.docslikes}*doc.docslikes.value);
                                         }
                                         if (doc['_index'].value == "mpbook") {
                                             totalScore = totalScore*${data._source.multipliers.book};
@@ -281,7 +281,35 @@
                             term: {
                                 "title.keyword": {
                                     value: "",
-                                    boost: `${data._source.multipliers.queryTitleExactMatch}`
+                                    boost: `${data._source.multipliers.queryTitleExactMatch}`,
+                                    case_insensitive: true
+                                }
+                            }
+                        },
+                        {
+                            term: {
+                                "second_titles.keyword": {
+                                    value: "",
+                                    boost: `${data._source.multipliers.querySecondTitleExactMatch}`,
+                                    case_insensitive: true
+                                }
+                            }
+                        },
+                        {
+                            term: {
+                                "third_titles.keyword": {
+                                    value: "",
+                                    boost: `${data._source.multipliers.queryThirdTitleExactMatch}`,
+                                    case_insensitive: true
+                                }
+                            }
+                        },
+                        {
+                            term: {
+                                "fourth_titles.keyword": {
+                                    value: "",
+                                    boost: `${data._source.multipliers.queryFourthTitleExactMatch}`,
+                                    case_insensitive: true
                                 }
                             }
                         },
@@ -289,7 +317,8 @@
                             term: {
                                 "keywords.keyword": {
                                     value: "",
-                                    boost: `${data._source.multipliers.queryKeywordExactMatch}`
+                                    boost: `${data._source.multipliers.queryKeywordExactMatch}`,
+                                    case_insensitive: true
                                 }
                             }
                         },
@@ -297,7 +326,8 @@
                             term: {
                                 "search-alias.keyword": {
                                     value: "",
-                                    boost: `${data._source.multipliers.querySearchAliasExactMatch}`
+                                    boost: `${data._source.multipliers.querySearchAliasExactMatch}`,
+                                    case_insensitive: true
                                 }
                             }
                         },
@@ -334,6 +364,7 @@
                 "url",
                 "type",
                 "branch",
+                "sections1",
                 "second_titles"
             ],
             _source: false,
@@ -399,7 +430,7 @@
 
         if (query.slice(-1) == '"' && query.slice(0, 1) == '"') {
             searchQuery.query.bool.must[0].function_score.query.multi_match.operator = "and"
-            searchQuery.query.bool.should[3].multi_match.operator = "and"
+            searchQuery.query.bool.should[6].multi_match.operator = "and"
                 //searchQuery.query.bool.should[2].term['search-alias.keyword'].operator = "and"
                 //searchQuery.query.bool.should[1].term['keywords.keyword'].operator = "and"
                 //searchQuery.query.bool.should[0].term['title.keyword'].operator = "and"
@@ -407,7 +438,7 @@
             searchQuery.highlight.fields.text.highlight_query.match.text.operator = "and"
         } else {
             searchQuery.query.bool.must[0].function_score.query.multi_match.operator = "or"
-            searchQuery.query.bool.should[3].multi_match.operator = "or"
+            searchQuery.query.bool.should[6].multi_match.operator = "or"
                 //searchQuery.query.bool.should[2].term['search-alias.keyword'].operator = "or"
                 //searchQuery.query.bool.should[1].term['keywords.keyword'].operator = "or"
                 //searchQuery.query.bool.should[0].term['title.keyword'].operator = "or"
@@ -416,9 +447,12 @@
         }
 
         searchQuery.query.bool.must[0].function_score.query.multi_match.query = query
-        searchQuery.query.bool.should[3].multi_match.query = query
-        searchQuery.query.bool.should[2].term['search-alias.keyword'].value = query
-        searchQuery.query.bool.should[1].term['keywords.keyword'].value = query
+        searchQuery.query.bool.should[6].multi_match.query = query
+        searchQuery.query.bool.should[5].term['search-alias.keyword'].value = query
+        searchQuery.query.bool.should[4].term['keywords.keyword'].value = query
+        searchQuery.query.bool.should[3].term['fourth_titles.keyword'].value = query
+        searchQuery.query.bool.should[2].term['third_titles.keyword'].value = query
+        searchQuery.query.bool.should[1].term['second_titles.keyword'].value = query
         searchQuery.query.bool.should[0].term['title.keyword'].value = query
         searchQuery.highlight.fields.title.highlight_query.match.title.query = query
         searchQuery.highlight.fields.text.highlight_query.match.text.query = query

@@ -24,7 +24,7 @@ layout: default
                 <option data-tokens="before-4.8" >4.7 and earlier</option>
             </select>
         </span></div>{% else %}
-        <div id="titleAndSelectVerDiv"><span><h1>{{ page.title | escape }}</h1></span><span id="select-version">
+        <div id="titleAndSelectVerDiv"><span><h1>{% if page.name contains ".adoc" %} {{ page.title}} {% else %} {{ page.title | escape }} {% endif %}</h1></span><span id="select-version">
             <select class="selectpicker" id="select-version-picker" data-style="versioningButton btn-light">
                 <option data-tokens="master">Development</option>
                 {% assign versions = site.data.midpoint-versions | reverse %}

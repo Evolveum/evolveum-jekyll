@@ -355,6 +355,7 @@ module Evolveum
             else
                 nav.title = page.data['nav-title'] || page.data['title']
             end
+
             if page.data['visibility'] != nil
                 nav.visibility = page.data['visibility']
             end
@@ -394,6 +395,7 @@ module Evolveum
                 if (page.data['midpointBranch'] != VersionReader.get_config_value('defaultBranch'))
                     return
                 end
+                Jekyll.logger.error("Page alias error: referencing non-reference documentation from reference documentation in page #{page.url}")
             end
             parent_nav = index_path(parent_url)
             slug = aliasdef['slug']

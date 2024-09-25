@@ -459,3 +459,18 @@
         max-width: 540px;
     }
 }
+
+#ragChatLinkDiv {
+    text-align: center;
+    margin-top: 0.4rem;
+}
+
+#ragChatCloseButton {
+    color: #2f81d4;
+    background-color: white;
+}
+
+#ragChatPopoverButtons {
+    display: flex;
+    justify-content: space-around;
+}
