@@ -213,34 +213,12 @@ module Evolveum
             return ignoredPrefixes.any? { |prefix|  targetPath.start_with?(prefix) }
         end
 
-        # def findAttrInFiles(target, directory)
-        #     results = []
-
-        #     Dir.glob(File.join(directory, '**', '*')).each do |file|
-        #       next unless File.file?(file)
-
-        #       File.open(file, 'r') do |f|
-        #         lines = f.each_line.first(20)
-        #         lines.each do |line|
-        #             begin
-        #               line.force_encoding('utf-8')
-        #               results << file if line.match(target)
-        #             rescue ArgumentError => e
-        #               puts "Skipping line due to invalid UTF-8 encoding: #{e.message}"
-        #             end
-        #           end
-        #       end
-        #     end
-
-        #     return results
-        #   end
 
         def processXRefLink(parent, target, attrs)
             #    puts "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXREF -------> Processing #{parent} #{targetFile} #{attrs}"
 
             targetPath, fragmentSuffix = parseFragment(target)
             sourceFile = parent.document.attributes["docfile"]
-            # puts "targetPath=#{targetPath}, fragment=#{fragmentSuffix}"
 
             if targetPath == nil
                 # document-local link, use as is
@@ -248,7 +226,6 @@ module Evolveum
             end
 
             targetPage = findPageByTarget(parent.document, targetPath)
-            #puts("DEBUG XREF #{targetPath} -> found page #{targetPage&.url} in #{sourceFile}")
 
             # Checking if target includes specific midpoint versions
 
@@ -276,54 +253,6 @@ module Evolveum
                         else
                             Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
                         end
-                        #output, _ = Open3.capture2("grep -rl \":page-moved-from: #{target}\" #{docsDir()}/")
-                        # escaped_target = Regexp.escape(":page-moved-from: #{target}")
-                        # Jekyll.logger.warn(escaped_target)
-                        # output = findAttrInFiles(escaped_target, docsDir())
-                        # Jekyll.logger.warn("FIRST: " + output.to_s + " docsDir: " + docsDir())
-                        # if (output != nil && output != [])
-                        #     Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
-                        # else
-                        #     escaped_target = Regexp.escape("\nmoved-from: #{target}\n")
-                        #     #output, _ = Open3.capture2("grep -rl #{escaped_target} #{docsDir()}/")
-                        #     Jekyll.logger.warn("#{escaped_target}")
-                        #     output = findAttrInFiles(escaped_target, docsDir())
-                        #     Jekyll.logger.warn("SECOND: " + output.to_s + " docsDir: " + docsDir())
-                        #     if (output != nil && output != [])
-                        #         Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
-                        #     else
-                        #         targetArr = target.split("/").drop(1)
-                        #         matched = false
-                        #         targetArr.each_with_index do |version, index|
-                        #             partTargetArr = targetArr[...index+1]
-                        #             escaped_target = Regexp.escape("#{partTargetArr.join("/")}/\*")
-                        #             #output, _ = Open3.capture2("grep -rl \":page-moved-from: /#{escaped_target}\" #{docsDir()}/")
-                        #             Jekyll.logger.warn(":page-moved-from: /#{escaped_target}")
-                        #             output = findAttrInFiles(":page-moved-from: /#{escaped_target}", docsDir())
-                        #             Jekyll.logger.warn("THIRD: " + output.to_s + " docsDir: " + docsDir())
-                        #             if (output != nil && output != [])
-                        #                 #movedPart, _ = Open3.capture2("sed -n -e '/^:page-moved-from: /p' #{output.split("\n")[0]}")
-                        #                 movedPart = output[0]
-                        #                 movedPart = movedPart.gsub(":page-moved-from:", "")
-                        #                 movedPart = movedPart.gsub("*", "")
-                        #                 movedPart = movedPart.gsub(/\n/, "")
-                        #                 targetPath = movedPart + targetArr[index+1...].join("/") + "/"
-                        #                 targetPage = findPageByTarget(parent.document, targetPath)
-                        #                 if targetPage == nil
-                        #                     Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
-                        #                 else
-                        #                     Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
-                        #                 end
-
-                        #                 matched = true
-                        #                 break
-                        #             end
-                        #         end
-                        #         if (!matched)
-                        #             Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
-                        #         end
-                        #     end
-                        # end
                     end
                     # Leave the target of broken link untouched. Redirects may still be able to handle it.
                     if attrs['linktext'] == nil || attrs['linktext'].strip.empty?
@@ -396,17 +325,6 @@ module Evolveum
             end
             #currentPage = findCurrentPage(parent.document)S
         end
-
-        #versions = VersionReader.get_config_value('filteredVersions')
-
-        #sourceFile = parent.document.attributes["docfile"]
-        #versions.each do |version|
-        #    versionWithoutDocs = version.gsub("docs/","")
-        #    if target.include?("/" + versionWithoutDocs + "/")
-        #        Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{sourceFile}")
-        #        puts("Specific version included")
-        #    end
-        #end
       end
     end
 
@@ -488,19 +406,7 @@ module Evolveum
 
         def process(parent, target, attrs)
 
-            #title_html = (attrs.has_key? 'title') ?
-            #%(<div class="title">#{attrs['title']}</div>\n) : nil
-
-            #html = %(<div class="test">
-        ##{title_html}<div class="content">
-        #TEST
-        #</div>
-        #</div>)
             if (target != nil && File.exist?("#{samplesDir()}/#{target}"))
-            #    #samplesHtml = Asciidoctor.convert("[source,xml]\n----\n#{File.read("#{samplesDir}/#{target}")}\n----")
-                #samplesDoc = Asciidoctor.load '*This* is Asciidoctor.'
-                #Jekyll.logger.warn("LOADED")
-                #samplesHtml = samplesDoc.convert
                 fileExt = File.extname(target)[1..-1]
                 if fileExt == "csv"
                     csv_content = <<~CSV
