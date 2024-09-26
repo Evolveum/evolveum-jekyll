@@ -48,7 +48,7 @@ module VersionReader
       # TODO - for now it works but there should be a check if the versions are in the correct order
       @config['releaseDocsVerMap'][ver['version']] = actVer
     end
-    Jekyll.logger.warn("RELEASE MAP #{@config['releaseDocsVerMap'].to_s}")
+    #Jekyll.logger.warn("RELEASE MAP #{@config['releaseDocsVerMap'].to_s}")
     if @config['defaultBranch'] == ""
       @config['defaultBranch'] = "master"
     end
