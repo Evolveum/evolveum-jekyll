@@ -43,9 +43,7 @@ def installReleaseNotes(site)
 
     if (!docsBranches.include?(versionsReleaseBranches[index]))
       if !Dir.exist?("#{releaseDir}/#{ver}")
-        puts("DIR: #{releaseDir}/#{ver} does not exist, creating...")
-        puts("#{system("cd #{releaseDir} && ls")}")
-        puts("#{system("cd #{site.config['docs']['midpointReleasePath']} && ls")}")
+        Jekyll.logger.info("DIR: #{releaseDir}/#{ver} does not exist, creating...")
         system("cd #{site.config['docs']['midpointReleasePath']} && mkdir -p #{site.config['docs']['midpointReleaseDir']}/#{ver}")
       end
 
