@@ -3,13 +3,26 @@ $(document).ready(function() {
     let adocDataTableConfigs = document.getElementsByClassName('datatable-config');
 
     Array.from(adocDataTableConfigs).forEach(function(configObject) {
-        const configStringData = $(configObject).children().first().text();
-        const configData = JSON.parse(configStringData);
-        let datatableObject = $(configObject).next();
-        for (const [key, value] of Object.entries(configData)) {
-            datatableObject.attr('data-' + key, value);
+        if (configObject.tagName === 'TABLE') {
+            $(configObject).removeClass('datatable-config');
+            configObject.classList.add('dataTable');
+        } else {
+            const configStringData = $(configObject).children().first().text();
+            let configData;
+            try {
+                configData = JSON.parse(configStringData);
+            } catch (error) {
+                console.warn("Invalid JSON:", error.message);
+                configData = {};
+            }
+            let datatableObject = $(configObject).next();
+            if (datatableObject.prop('tagName') === 'TABLE') {
+                for (const [key, value] of Object.entries(configData)) {
+                    datatableObject.attr('data-' + key, value);
+                }
+                datatableObject.addClass('dataTable');
+            }
         }
-        datatableObject.addClass('dataTable');
     });
 
     let datatables = $('.dataTable');
@@ -26,7 +39,7 @@ $(document).ready(function() {
         let lengthMenuLength = 4; // Only active when lengthMenuAuto is set to true
         let order = "asc";
         let pageLength = 10;
-        let orderColumn = 0;
+        let orderColumn = 0; // Defaults to the first column, is the same as setting order-column to 1
 
         if (paging) {
             if (datatable.attr('data-length-menu') != undefined) {
@@ -41,7 +54,7 @@ $(document).ready(function() {
                     lengthMin = parseInt(datatable.attr('data-length-menu-min'), 10);
                 }
 
-                if (datatable.attr('data-length-menu-auto') != undefined || datatable.attr('data-length-menu-auto') != 'false') {
+                if (datatable.attr('data-length-menu-auto') != undefined && datatable.attr('data-length-menu-auto') != 'false') {
                     if (datatable.attr('data-length-menu-length') != undefined) {
                         lengthMenuLength = parseInt(datatable.attr('data-length-menu-length'), 10);
                     }
@@ -62,11 +75,11 @@ $(document).ready(function() {
         }
 
         if (datatable.attr('data-order-column') != undefined) {
-            orderColumn = parseInt(datatable.attr('data-order-column'), 10);
+            orderColumn = parseInt(datatable.attr('data-order-column'), 10) - 1;
         }
 
-        if (datatable.attr('data-pageLength') != undefined) {
-            pageLength = parseInt(datatable.attr('data-pageLength'), 10);
+        if (datatable.attr('data-page-length') != undefined) {
+            pageLength = parseInt(datatable.attr('data-page-length'), 10);
         }
 
         if (datatable.attr('data-order') != undefined) {

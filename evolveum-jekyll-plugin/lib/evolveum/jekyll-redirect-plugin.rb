@@ -36,7 +36,9 @@ module Evolveum
 
             Evolveum.setPageRedirects(pRedirects)
 
-            page.data["defaultBranch"] = findDefaultBranch(site)
+            if site.config['environment']['name'].include?("docs")
+                page.data["defaultBranch"] = findDefaultBranch(site)
+            end
 
             @site.pages << page
         end

@@ -30,6 +30,10 @@ module Evolveum
             return (jekyllSite().config['docs']['midpointSamplesPath'] + jekyllSite().config['docs']['midpointSamplesDirName'])
         end
 
+        def midpointVersionsDir(branch)
+            return (jekyllSite().config['docs']['midpointVersionsPath'] + jekyllSite().config['docs']['midpointVersionsPrefix'] + branch.gsub("docs/",""))
+        end
+
         def jekyllData(dataName)
             return jekyllSite().data[dataName]
         end
@@ -235,8 +239,10 @@ module Evolveum
                 fileUrl = findFileByTarget(parent.document, targetPath)
                 output = []
                 if fileUrl == nil
+                    ignore = false
                     if ignoreLinkBreak?(parent, targetPath)
                         Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
+                        ignore = true
                     else
                         #Jekyll.logger.warn(Evolveum.getPageRedirects().to_s)
                         matches = false
@@ -256,7 +262,9 @@ module Evolveum
                     end
                     # Leave the target of broken link untouched. Redirects may still be able to handle it.
                     if attrs['linktext'] == nil || attrs['linktext'].strip.empty?
-                        Jekyll.logger.error("NO linktext ATTRIBUTE IN BROKEN LINK xref:#{target} in #{sourceFile}")
+                        if (!ignore)
+                            Jekyll.logger.error("NO linktext ATTRIBUTE IN BROKEN LINK xref:#{target} in #{sourceFile}")
+                        end
                         return (create_anchor parent, "link", type: :link, target: target).convert
                     else
                         return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert
@@ -269,12 +277,89 @@ module Evolveum
             end
         end
 
-
     end
 
     class JekyllBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
         include JekyllUtilMixin
         use_dsl
+
+        def processCodeInclude(parent, target, attrs, filePath, branch)
+            if (target != nil && File.exist?(filePath))
+                fileExt = File.extname(target)[1..-1]
+                startLine = 1
+                endLine = -1
+                if (attrs['lines'] != nil)
+                    splittedAttrs = attrs['lines'].split("..")
+                    if (splittedAttrs.length == 2)
+                        startLine = splittedAttrs[0].to_i
+                        endLine = splittedAttrs[1].to_i
+                    elsif branch != nil
+                        Jekyll.logger.error("BROKEN MIDPOINT REFERENCE - INCORRECT LINE SELECTION FORMAT midpointRef:#{target}, branch:#{branch} in #{parent.document.attributes["docfile"]}")
+                    else
+                        Jekyll.logger.error("BROKEN SAMPLE REFERENCE - INCORRECT LINE SELECTION FORMAT sampleRef:#{target} in #{parent.document.attributes["docfile"]}")
+                    end
+                end
+
+                puts "STARTLINE: #{startLine}" if attrs['lines']
+                puts "ENDLINE: #{endLine}" if attrs['lines']
+
+                lines = []
+
+                current_line = 0
+
+                IO.foreach(filePath) do |line|
+                    current_line += 1
+                    next if current_line < startLine
+                    break if endLine != -1 && current_line > endLine
+                    lines << line
+                end
+
+                if fileExt == "csv"
+                    if (startLine > 1 && (attrs['includeHeader'] == nil || attrs['includeHeader'] == true))
+                        header = IO.foreach(filePath).first
+                        csv_content = <<~CSV
+                        [format="csv",options="header"]
+                        |===
+                        #{header}
+                        #{lines.join("\n")}
+                        |===
+                        CSV
+                    elsif startLine > 1
+                        csv_content = <<~CSV
+                        [format="csv"]
+                        |===
+
+                        #{lines.join("\n")}
+                        |===
+                        CSV
+                    else
+                        csv_content = <<~CSV
+                        [format="csv",options="header"]
+                        |===
+                        #{lines.join("\n")}
+                        |===
+                        CSV
+                    end
+                    samplesHtml = Asciidoctor.convert(csv_content, safe: :safe, extensions: false)
+                else
+                    source_content = <<~SOURCE
+                      [source,#{fileExt}]
+                      ----
+                      #{lines.join("\n")}
+                      ----
+                    SOURCE
+                    samplesHtml = Asciidoctor.convert(source_content, safe: :safe, extensions: false, attributes: { 'source-highlighter' => 'rouge' })
+                end
+
+                create_pass_block parent, samplesHtml, attrs, subs: nil
+            elsif (branch != nil)
+                Jekyll.logger.error("BROKEN MIDPOINT REFERENCE midpointRef:#{target}, branch:#{branch} in #{parent.document.attributes["docfile"]}")
+                create_pass_block parent, " ", attrs, subs: nil
+            else
+                Jekyll.logger.error("BROKEN SAMPLE REFERENCE sampleRef:#{target} in #{parent.document.attributes["docfile"]}")
+                create_pass_block parent, " ", attrs, subs: nil
+            end
+        end
 
     end
 
@@ -288,42 +373,47 @@ module Evolveum
       def process(parent, target, attrs)
         #verArr = readVersions(docsDir()) #???????????????????????
 
-        document_path = parent.document.attributes['docfile']
+        if jekyllSite().config['environment']['name'].include?("docs")
 
-        negativeLookAhead = VersionReader.get_config_value('negativeLookAhead')
+            document_path = parent.document.attributes['docfile']
 
-        if (!document_path.include?("/midpoint/reference/") || document_path.include?("midpoint/reference/index.html"))
-            if (!target.include?("/midpoint/reference/"))
-                processXRefLink(parent, target, attrs)
-            elsif (target.match?(negativeLookAhead))
-                if document_path.match?(/\/midpoint\/release\/.+/)
-                    parentVer = document_path.split("/")[4]
-                    if (VersionReader.get_config_value('releaseDocsVerMap').key?(parentVer))
-                        replaceVersion = VersionReader.get_config_value('releaseDocsVerMap')[parentVer].to_s
-                        editedTarget = target.gsub("/midpoint/reference/", "/midpoint/reference/#{replaceVersion}/")
-                        processXRefLink(parent, editedTarget, attrs)
+            negativeLookAhead = VersionReader.get_config_value('negativeLookAhead')
+
+            if (!document_path.include?("/midpoint/reference/") || document_path.include?("midpoint/reference/index.html"))
+                if (!target.include?("/midpoint/reference/"))
+                    processXRefLink(parent, target, attrs)
+                elsif (target.match?(negativeLookAhead))
+                    if document_path.match?(/\/midpoint\/release\/.+/)
+                        parentVer = document_path.split("/")[4]
+                        if (VersionReader.get_config_value('releaseDocsVerMap').key?(parentVer))
+                            replaceVersion = VersionReader.get_config_value('releaseDocsVerMap')[parentVer].to_s
+                            editedTarget = target.gsub("/midpoint/reference/", "/midpoint/reference/#{replaceVersion}/")
+                            processXRefLink(parent, editedTarget, attrs)
+                        else
+                            processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs)
+                        end
                     else
                         processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs)
                     end
                 else
-                    processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs)
+                    Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
+                    processXRefLink(parent, target, attrs)
                 end
             else
-                Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
-                processXRefLink(parent, target, attrs)
+                if (!target.include?("/midpoint/reference/"))
+                    processXRefLink(parent, target, attrs)
+                elsif (target.match?(negativeLookAhead))
+                    currentPage = findCurrentPage(parent.document)
+                    version = currentPage.data['midpointBranchSlug']
+                    processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{version}/"), attrs)
+                else
+                    Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
+                    processXRefLink(parent, target, attrs)
+                end
+                #currentPage = findCurrentPage(parent.document)S
             end
         else
-            if (!target.include?("/midpoint/reference/"))
-                processXRefLink(parent, target, attrs)
-            elsif (target.match?(negativeLookAhead))
-                currentPage = findCurrentPage(parent.document)
-                version = currentPage.data['midpointBranchSlug']
-                processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{version}/"), attrs)
-            else
-                Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
-                processXRefLink(parent, target, attrs)
-            end
-            #currentPage = findCurrentPage(parent.document)S
+            processXRefLink(parent, target, attrs)
         end
       end
     end
@@ -402,33 +492,27 @@ module Evolveum
         use_dsl
 
         named :sampleRef
-        #name_positional_attributes 'linktext'
+        name_positional_attributes 'lines'
 
         def process(parent, target, attrs)
+            processCodeInclude(parent, target, attrs, "#{samplesDir()}/#{target}", nil)
+        end
 
-            if (target != nil && File.exist?("#{samplesDir()}/#{target}"))
-                fileExt = File.extname(target)[1..-1]
-                if fileExt == "csv"
-                    csv_content = <<~CSV
-                      [format="csv",options="header"]
-                      |===
-                      include::#{samplesDir}/#{target}[]
-                      |===
-                    CSV
-                    samplesHtml, _ = Open3.capture2("asciidoctor -e -", stdin_data: csv_content)
-                  else
-                    source_content = <<~SOURCE
-                      [source,#{fileExt}]
-                      ----
-                      #{File.read("#{samplesDir}/#{target}")}
-                      ----
-                    SOURCE
-                    samplesHtml, _ = Open3.capture2("asciidoctor -e -", stdin_data: source_content)
-                  end
+    end
 
-                create_pass_block parent, samplesHtml, attrs, subs: nil
+    # This plugin is for include code snippets from midpoint repository
+    class MidpointBlockMacro < JekyllBlockMacro
+        use_dsl
+
+        named :midpointRef
+        name_positional_attributes 'branch','lines'
+
+        def process(parent, target, attrs)
+            branch = "support-4.8"
+            if attrs['branch'] != nil
+                branch = attrs['branch']
             end
-
+            processCodeInclude(parent, target, attrs, "#{midpointVersionsDir(branch)}/#{target}", branch)
         end
 
     end
@@ -568,5 +652,6 @@ Asciidoctor::Extensions.register do
   inline_macro Evolveum::GlossrefInlineMacro
   inline_macro Evolveum::FeatureInlineMacro
   block_macro Evolveum::SamplesBlockMacro
+  block_macro Evolveum::MidpointBlockMacro
   treeprocessor Evolveum::ImagePathTreeprocessor
 end

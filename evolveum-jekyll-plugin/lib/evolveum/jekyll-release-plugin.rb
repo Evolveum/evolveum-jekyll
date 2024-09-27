@@ -58,8 +58,8 @@ def installReleaseNotes(site)
       installInode = File.stat("#{releaseDir}/#{ver}/install.adoc").ino
 
     else
-      releaseInode = File.stat("#{site.config['docs']['midpointVersionPath']}/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","").gsub("/", "__SLASH__")}/release-notes.adoc").ino
-      installInode = File.stat("#{site.config['docs']['midpointVersionPath']}/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","").gsub("/", "__SLASH__")}/install-dist.adoc").ino
+      releaseInode = File.stat("#{site.config['docs']['midpointVersionsPath']}#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","").gsub("/", "__SLASH__")}/release-notes.adoc").ino
+      installInode = File.stat("#{site.config['docs']['midpointVersionsPath']}#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","").gsub("/", "__SLASH__")}/install-dist.adoc").ino
     end
 
     if (!File.exist?("#{docsDir}/midpoint/release/#{ver}/index.adoc"))
@@ -72,6 +72,7 @@ def installReleaseNotes(site)
       output, _ = Open3.capture2("cd #{docsDir}/midpoint/release/#{ver}/ && ls -F index.adoc")
       if (!output.include?("index.adoc@"))
         if (docsBranches.include?(versionsReleaseBranches[index]))
+          # DOES THIS WORK?????
           system("cp -f #{site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix'] + versionsReleaseBranches[index].gsub("docs/","")}/release-notes.adoc #{docsDir}/midpoint/release/#{ver}/ && cd #{docsDir}/midpoint/release/#{ver}/ && mv release-notes.adoc index.adoc")
         else
           system("cp -f #{releaseDir}/#{ver}/index.adoc #{docsDir}/midpoint/release/#{ver}/")
@@ -124,5 +125,7 @@ end
 
 Jekyll::Hooks.register :site, :after_init do |site|
   puts "=========[ EVOLVEUM RELEASE NOTES INSTALL ]============== after_init"
-  installReleaseNotes(site)
+  if site.config['environment']['name'].include?("docs")
+    installReleaseNotes(site)
+  end
 end

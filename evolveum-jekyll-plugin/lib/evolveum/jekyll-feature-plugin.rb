@@ -148,19 +148,21 @@ module Evolveum
         end
 
         def generate(site)
+            if site.config['environment']['name'].include?("docs")
 #            puts "=========[ EVOLVEUM feature ]============== generate"
-            init(site)
-            @nav = site.data['nav']
-            @navFeatures = @nav.resolvePath(FEATURES_URL)
-            @navIso27001 = @nav.resolvePath(ISO27001_URL)
-            @isoDisplayOrder = 100
+                init(site)
+                @nav = site.data['nav']
+                @navFeatures = @nav.resolvePath(FEATURES_URL)
+                @navIso27001 = @nav.resolvePath(ISO27001_URL)
+                @isoDisplayOrder = 100
 
-            @features.each do |feature|
-                @site.pages << generateFeaturePage(feature)
-            end
+                @features.each do |feature|
+                    @site.pages << generateFeaturePage(feature)
+                end
 
-            @iso27001.each do |control|
-                @site.pages << generateIso27001Page(control)
+                @iso27001.each do |control|
+                    @site.pages << generateIso27001Page(control)
+                end
             end
         end
 
@@ -229,5 +231,7 @@ end
 
 Jekyll::Hooks.register :site, :post_read do |site|
 #    puts "=========[ EVOLVEUM feature ]============== post_read"
-    Evolveum::FeatureGenerator.collect(site)
+    if site.config['environment']['name'].include?("docs")
+        Evolveum::FeatureGenerator.collect(site)
+    end
 end

@@ -22,6 +22,7 @@
                                 <input autocomplete="off" onkeypress="return event.keyCode!=13" class="form-control form-control-sm mr-sm-2" id="searchbar" type="search" placeholder="Type to search" name="q" aria-label="Search">
 
                             </form>
+                            {% if site.environment.name contains 'docs' %}
                             <div id="version-search-select">
                                 <select class="selectpicker" id="select-version-picker-search" data-style="versioningButton versioningButtonSearch btn-light" multiple title="Versions">
                                     <option data-tokens="master">Development</option>
@@ -34,11 +35,13 @@
                                     <option data-tokens="before-4.8" >4.7 and earlier</option>
                                 </select>
                             </div>
+                            {% endif %}
                             <button id="docssearchbutton" class="btn btn-outline-secondary btn-sm my-2 my-sm-0">Search</button>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
+                        {% if site.environment.name contains 'docs' %}
                         <div id="checkboxes">
                             <span id="ovalGuide" class="oval on ovalSearch"><i id="checkGuide" class="fas fa-check"></i>&nbsp;GUIDE</span>
                             <span id="ovalBook" class="oval on ovalSearch"><i id="checkBook" class="fas fa-check"></i>&nbsp;BOOK</span>
@@ -46,6 +49,7 @@
                             <span id="ovalOther" class="oval on ovalSearch"><i id="checkOther" class="fas fa-check"></i>&nbsp;OTHER</span>
                             <span id="ovalDeveloper" class="oval ovalSearch"><i id="checkDeveloper" class=""></i>&nbsp;DEVELOPER</span>
                         </div>
+                        {% endif %}
                     </div>
                     <div class="modal-body">
                         <div class="list-group" id="autocombox">
