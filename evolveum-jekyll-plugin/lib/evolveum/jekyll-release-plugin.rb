@@ -50,10 +50,16 @@ def installReleaseNotes(site)
       #if (!File.exist?("#{releaseDir}/#{ver}/index.adoc"))
         system("ls && echo #{releaseDir} && cd #{releaseDir} && ls && cd #{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/release-notes.adoc && mv release-notes.adoc index.adoc")
       #end
+      releaseInode = File.stat("#{releaseDir}/#{ver}/index.adoc").ino
 
       #if (!File.exist?("#{releaseDir}/#{ver}/install.adoc"))
         system("ls && echo #{releaseDir} && cd #{releaseDir} && ls && cd #{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/install-dist.adoc && mv install-dist.adoc install.adoc")
       #end
+      installInode = File.stat("#{releaseDir}/#{ver}/install.adoc").ino
+
+    else
+      releaseInode = File.stat("#{site.config['docs']['midpointVersionPath']}/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","").gsub("/", "__SLASH__")}/release-notes.adoc").ino
+      installInode = File.stat("#{site.config['docs']['midpointVersionPath']}/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","").gsub("/", "__SLASH__")}/install-dist.adoc").ino
     end
 
     if (!File.exist?("#{docsDir}/midpoint/release/#{ver}/index.adoc"))
@@ -71,6 +77,17 @@ def installReleaseNotes(site)
           system("cp -f #{releaseDir}/#{ver}/index.adoc #{docsDir}/midpoint/release/#{ver}/")
         end
         Jekyll.logger.warn("Unexpexted index.adoc file in /midpoint/release/#{ver}/, replacing with release notes from midPoint repository.")
+      else
+        releaseInodeNew = File.stat("#{docsDir}/midpoint/release/#{ver}/index.adoc").ino
+        if (releaseInodeNew != releaseInode)
+          Jekyll.logger.warn("index.adoc file in /midpoint/release/#{ver}/ changed original location, updating symlink")
+          system("cd #{docsDir}/midpoint/release/#{ver}/ && rm -f index.adoc")
+          if (docsBranches.include?(versionsReleaseBranches[index]))
+            system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","").gsub("/", "__SLASH__")}/release-notes.adoc \"$DOCSPATHVAR\"#{addedSlash}#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/index.adoc")
+          else
+            system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/#{ver}/index.adoc \"$DOCSPATHVAR\"#{addedSlash}#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/index.adoc")
+          end
+        end
       end
     end
 
@@ -89,6 +106,17 @@ def installReleaseNotes(site)
           system("cp -f #{releaseDir}/#{ver}/install.adoc #{docsDir}/midpoint/release/#{ver}/")
         end
         Jekyll.logger.warn("Unexpexted install.adoc file in /midpoint/release/#{ver}/, replacing with release notes from midPoint repository.")
+      else
+        installInodeNew = File.stat("#{docsDir}/midpoint/release/#{ver}/install.adoc").ino
+        if (installInodeNew != installInode)
+          Jekyll.logger.warn("install.adoc file in /midpoint/release/#{ver}/ changed original location, updating symlink")
+          system("cd #{docsDir}/midpoint/release/#{ver}/ && rm -f install.adoc")
+          if (docsBranches.include?(versionsReleaseBranches[index]))
+            system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointVersionsPath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointVersionsPrefix']}#{versionsReleaseBranches[index].gsub("docs/","").gsub("/", "__SLASH__")}/install-dist.adoc \"$DOCSPATHVAR\"#{addedSlash}#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
+          else
+            system("ACTPATH=$PWD && cd #{site.config['docs']['docsPath']} && DOCSPATHVAR=$PWD && cd $ACTPATH && cd #{site.config['docs']['midpointReleasePath']} && ln -s \"$PWD\"/#{site.config['docs']['midpointReleaseDir']}/#{ver}/install.adoc \"$DOCSPATHVAR\"#{addedSlash}#{site.config['docs']['docsDirName']}/midpoint/release/#{ver}/install.adoc")
+          end
+        end
       end
     end
   end
