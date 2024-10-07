@@ -40,6 +40,14 @@
     color: #3F4B8C;
 }
 
+.LMDLimpactRemoved {
+    color: #B31B1B;
+}
+
+.LMDLimpactCreated {
+    color: #367c2b;
+}
+
 .LMDLimpactMajor {
     color: #74481a;
 }

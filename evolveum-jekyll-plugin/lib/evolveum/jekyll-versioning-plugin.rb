@@ -131,11 +131,12 @@ end
 
 Jekyll::Hooks.register :site, :after_init do |site|
   puts "=========[ EVOLVEUM VERSIONNING ]============== after_init"
-  installVersions(site)
-end
-
-Jekyll::Hooks.register :pages, :post_init do |page|
-  if (page.path.include?("midpoint/reference/") && page.path != "midpoint/reference/index.html")
-    setupPathVerData(page)
+  if site.config['environment']['name'].include?("docs")
+    installVersions(site)
+    Jekyll::Hooks.register :pages, :post_init do |page|
+      if (page.path.include?("midpoint/reference/") && page.path != "midpoint/reference/index.html")
+        setupPathVerData(page)
+      end
+    end
   end
 end

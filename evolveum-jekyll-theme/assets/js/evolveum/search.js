@@ -2,11 +2,11 @@
 ---
 (function() {
 
+    {% if site.environment.name contains "docs" %}
     let letters = new Set(["Guide", "Book", "Reference", "Other"]);
     let branches = new Set(["notBranched"])
     let notMasterBranchMult = 0
-
-
+    
     $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
         let newVersionEdited = DOCSBRANCHMAP[newVersion]
@@ -62,6 +62,8 @@
         searchForPhrase()
     });
 
+    {% endif %}
+
     var typingTimer = null;
     let logTimer = null;
     let logScheduled = false
@@ -71,7 +73,9 @@
             if (!$("#search-modal").hasClass('show')) {
                 $("#search-modal").modal()
                 typingTimer = setTimeout(searchForPhrase, 200)
+                {% if site.environment.name contains "docs" %}
                 logTimer = setTimeout(sendSearchLog, 2000)
+                {% endif %}
                 logScheduled = true
             }
         }
@@ -149,6 +153,11 @@
             query = undefined
         }
         $.ajax({
+            {% if site.environment.name contains "guide" %}
+            headers: {
+                "Authorization": "Basic " + btoa("{{ site.environment.osUsername }}" + ":" + "{{ site.environment.osPassword }}")
+            },
+            {% endif %}
             method: method,
             url: url,
             crossDomain: true,
@@ -172,16 +181,20 @@
     });
 
     function setSearchQuery(data) {
+        {% if site.environment.name contains "docs" %}
         console.log("DEFAULT: " + DEFAULTDOCSBRANCH)
         notMasterBranchMult = data._source.multipliers.notMasterBranch
+        {% endif %}
         searchQuery = {
             query: {
                 bool: {
+                    {% if site.environment.name contains "docs" %}
                     filter: [{
                         terms: {
                             "type.keyword": Array.from(letters)
                         }
                     }],
+                    {% endif %}
                     must: [{
                         function_score: {
                             script_score: {
@@ -241,6 +254,7 @@
                                                 totalScore = totalScore*${data._source.multipliers.obsolete};
                                             }
                                         }
+                                        {% if site.environment.name contains "docs" %}
                                         if (doc.containsKey('type.keyword') && doc['type.keyword'].size()!=0) {
                                             if (doc['type.keyword'].value == "Other") {
                                                 totalScore = totalScore*${data._source.multipliers.other};
@@ -251,6 +265,7 @@
                                                 totalScore = totalScore*${data._source.multipliers.notMasterBranch};
                                             }
                                         }
+                                        {% endif %}
                                         return totalScore;
                                     ` //ADD ONLY BEFORE BRANCH PART
                                 }
@@ -275,6 +290,15 @@
                                     prefix_length: 2,
                                 }
                             }
+                        }
+                    }],
+                    must_not: [{
+                        term: {
+                            "visibility": "hidden"
+                        }
+                    },{
+                        term: {
+                            "effectiveVisibility": "hidden"
                         }
                     }],
                     should: [{
@@ -362,8 +386,10 @@
                 "outdated",
                 "wiki-metadata-create-user",
                 "url",
+                {% if site.environment.name contains "docs" %}
                 "type",
                 "branch",
+                {% endif %}
                 "sections1",
                 "second_titles"
             ],
@@ -412,7 +438,9 @@
             }
             if ($('#searchbar').val()) {
                 typingTimer = setTimeout(searchForPhrase, 200);
+                {% if site.environment.name contains "docs" %}
                 logTimer = setTimeout(sendSearchLog, 2000)
+                {% endif %}
                 console.log("timer and logtimer added")
                 logScheduled = true
             }
@@ -473,12 +501,13 @@
                 for (let i = 0; i < pagesShown && i < numberOfItems; i++) {
                     let text = undefined
                     let title = undefined
+                    {% if site.environment.name contains "docs" %}
                     let branch = data.hits.hits[i].fields.branch
                     let branchClass = "searchResultNotBranched"
                     let branchLabel = ""
                     let displayBranch = ""
                     let tooltipVer = "not versioned"
-
+                    
                     console.log(DOCSBRANCHESCOLORS)
 
                     if (branch != null && branch != "notBranched") {
@@ -491,6 +520,7 @@
                     } else {
                         branch = "notBranched"
                     }
+                    {% endif %}
 
                     if (data.hits.hits[i].highlight != undefined) {
                         text = data.hits.hits[i].highlight.text
@@ -592,18 +622,20 @@
                         contentTriangleClass = ""
                     }
 
+                    {% if site.environment.name contains "docs" %}
                     let typeRaw = data.hits.hits[i].fields.type
                     let type = "other"
                     if (typeRaw != undefined && typeRaw) {
                         type = typeRaw[0]
                     }
+                    {% endif %}
 
                     showItems.push(`<div><span class="trigger-details searchResult" data-toggle="tooltip" data-toggle="tooltip" data-placement="left" 
                     data-html="true" title='<span class="tooltip-preview"><p>Last modification date: ${displayDate}</p>
                     <p>Upkeep status: ${upkeepStatus} <i id="upkeep${upkeepStatus}" class="fa fa-circle"></i>
-                    </p><p>Search likes: ${searchUpvotes}</p><p>Docs likes: ${docsUpvotes}</p><p>Version: ${tooltipVer}</p><p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${data.hits.hits[i].fields.url[0]}" 
+                    </p><p>Search likes: ${searchUpvotes}</p><p>Docs likes: ${docsUpvotes}</p>{% if site.environment.name contains "docs" %}<p>Version: ${tooltipVer}</p>{% endif %}<p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${data.hits.hits[i].fields.url[0]}" 
                     id="${data.hits.hits[i]._id}site"><li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i>
-                    <span class="font1 searchResultTitle ${branchClass}">&nbsp;${title}</span><span id="label${type}" class="typeLabel">${type.toUpperCase()}</span>${branchLabel}<i class="${contentTriangleClass}"></i><br><span class="font2">${preview}</span></li></a></span>
+                    <span class="font1 searchResultTitle {% if site.environment.name contains "docs" %}${branchClass}{% endif %}">&nbsp;${title}</span>{% if site.environment.name contains "docs" %}<span id="label${type}" class="typeLabel">${type.toUpperCase()}</span>${branchLabel}{% endif %}<i class="${contentTriangleClass}"></i><br><span class="font2">${preview}</span></li></a></span>
                     <span class="vote" id="${data.hits.hits[i]._id}up"><i class="fas fa-thumbs-up"></i></span></div>`);
                 }
 
@@ -633,7 +665,7 @@
 
         }
 
-        OSrequest("GET", "https://{{ site.environment.searchUrl }}/docs,mpbook/_search", searchQuery, true, showResults)
+        OSrequest("GET", "https://{{ site.environment.searchUrl }}/{% if site.environment.name contains "docs" %}docs,mpbook{% else %}guide{% endif %}/_search", searchQuery, true, showResults)
     }
 
     function setHighlighting() {
@@ -683,6 +715,7 @@
         });
     }
 
+    {% if site.environment.name contains "docs" %}
     function sendSearchLog(id, title) {
         logScheduled = false
         const date = new Date();
@@ -693,6 +726,7 @@
         }
         OSrequest("POST", "https://{{ site.environment.searchUrl }}/finalsearchlogs/_doc/", logPayload, true)
     }
+    {% endif %}
 
     function setSearchItemOnclick(id, title) {
 
@@ -710,18 +744,19 @@
                 }
             }
 
-            OSrequest("POST", "https://{{ site.environment.searchUrl }}/docs/_update/" + id + "?refresh", queryUpvote, true)
+            OSrequest("POST", "https://{{ site.environment.searchUrl }}/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}/_update/" + id + "?refresh", queryUpvote, true)
 
             $(this).toggleClass('on');
         };
 
+        {% if site.environment.name contains "docs" %}
         // TODO for now, we suppose that cases in which the user did not select "open in a new tab" or just triggered the "mousedown" event and did not click are statistically insignificant
         let site = document.getElementById(id + "site")
         site.addEventListener("mousedown", (event) => {
             if (event.button == 0 || event.button == 2) {
 
                 const date = new Date();
-
+                
                 if (logScheduled) {
                     clearTimeout(logTimer);
                     logTimer = null;
@@ -748,6 +783,7 @@
                 event.button == 0 ? OSrequest("POST", "https://{{ site.environment.searchUrl }}/click_logs/_doc/", queryClick, false) : OSrequest("POST", "https://{{ site.environment.searchUrl }}/click_logs/_doc/", queryClick, true);
             }
         });
+        {% endif %}
     }
 
 })();

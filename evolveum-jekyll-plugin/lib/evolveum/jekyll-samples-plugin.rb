@@ -8,5 +8,7 @@ end
 
 Jekyll::Hooks.register :site, :after_init do |site|
   puts "=========[ EVOLVEUM SAMPLES INSTALL ]============== after_init"
-  installSamples(site)
+  if site.config['environment']['name'].include?("docs")
+    installSamples(site)
+  end
 end
