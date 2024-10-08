@@ -40,7 +40,7 @@ $(document).ready(function() {
         let order = "asc";
         let pageLength = 10;
         let orderColumn = 0; // Defaults to the first column, is the same as setting order-column to 1
-        let originalOrder = false;
+        let originalOrder = true;
         let autoWidth = true;
 
         // We need to remove the colgroup element from the table, because DataTables will add it again
@@ -79,18 +79,14 @@ $(document).ready(function() {
             pageLength = lengthMenu[0];
         }
 
-        if (datatable.attr('data-original-order') != undefined) {
-            originalOrder = datatable.attr('data-original-order') === 'true';
+        if (datatable.attr('data-order-column') != undefined) {
+            orderColumn = parseInt(datatable.attr('data-order-column'), 10) - 1;
+            originalOrder = false;
         }
 
-        if (originalOrder) {
-            if (datatable.attr('data-order-column') != undefined) {
-                orderColumn = parseInt(datatable.attr('data-order-column'), 10) - 1;
-            }
-
-            if (datatable.attr('data-order') != undefined) {
-                order = datatable.attr('data-order');
-            }
+        if (datatable.attr('data-order') != undefined) {
+            order = datatable.attr('data-order');
+            originalOrder = false;
         }
 
         if (datatable.attr('data-page-length') != undefined) {
@@ -126,7 +122,7 @@ $(document).ready(function() {
         }
         
         // Remove data attributes from the table
-        datatable.removeAttr('data-length-menu data-length-menu-max data-length-menu-min data-length-menu-auto data-length-menu-length data-order-column data-page-length data-order data-paging data-custom-layout data-layout data-searchable data-original-order data-auto-width');
+        datatable.removeAttr('data-length-menu data-length-menu-max data-length-menu-min data-length-menu-auto data-length-menu-length data-order-column data-page-length data-order data-paging data-custom-layout data-layout data-searchable data-auto-width');
 
         // Log the values before initializing DataTable
         console.log('Original order:', originalOrder);
