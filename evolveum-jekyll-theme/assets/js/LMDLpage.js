@@ -4,7 +4,7 @@
 
     let allSearchCategory = ["Guide", "Book", "Reference", "Developer", "Other"]
     let searchCategory = new Set([]);
-    let allImportance = ["Major", "Significant", "Minor", "Removed", "Created"]
+    let allImportance = ["Removed", "Created", "Major", "Significant", "Minor"]
     let importance = new Set([]);
     let allSearchIn = ["Title", "Text", "Commit message"]
     let searchIn = new Set([])
