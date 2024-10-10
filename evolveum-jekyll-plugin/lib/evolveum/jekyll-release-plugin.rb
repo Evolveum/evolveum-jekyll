@@ -26,6 +26,7 @@ end
 def installReleaseNotes(site)
   docsDir = site.config['docs']['docsPath'] + site.config['docs']['docsDirName']
   releaseDir = site.config['docs']['midpointReleasePath'] + site.config['docs']['midpointReleaseDir']
+  mpRepo = site.config['environment']['midpointRepositoryGhName']
   returnedVerArr = readReleaseVersions(docsDir)
   versions = returnedVerArr[0]
   versionsReleaseBranches = returnedVerArr[1]
@@ -48,12 +49,12 @@ def installReleaseNotes(site)
       end
 
       #if (!File.exist?("#{releaseDir}/#{ver}/index.adoc"))
-        system("ls && echo #{releaseDir} && cd #{releaseDir} && ls && cd #{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/release-notes.adoc && mv release-notes.adoc index.adoc")
+        system("ls && echo #{releaseDir} && cd #{releaseDir} && ls && cd #{ver}/ && wget -q https://raw.githubusercontent.com/#{mpRepo}/#{versionsReleaseBranches[index]}/release-notes.adoc && mv release-notes.adoc index.adoc")
       #end
       releaseInode = File.stat("#{releaseDir}/#{ver}/index.adoc").ino
 
       #if (!File.exist?("#{releaseDir}/#{ver}/install.adoc"))
-        system("ls && echo #{releaseDir} && cd #{releaseDir} && ls && cd #{ver}/ && wget -q https://raw.githubusercontent.com/Evolveum/midpoint/#{versionsReleaseBranches[index]}/install-dist.adoc && mv install-dist.adoc install.adoc")
+        system("ls && echo #{releaseDir} && cd #{releaseDir} && ls && cd #{ver}/ && wget -q https://raw.githubusercontent.com/#{mpRepo}/#{versionsReleaseBranches[index]}/install-dist.adoc && mv install-dist.adoc install.adoc")
       #end
       installInode = File.stat("#{releaseDir}/#{ver}/install.adoc").ino
 

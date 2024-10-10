@@ -15,7 +15,19 @@
 
     let initialSearchQuery = {
         query: {
-            match_all: {}
+            bool: {
+                must_not: [{
+                    term: {
+                        "effectiveVisibility": "hidden"
+                    }
+                },
+                {
+                    term: {
+                        "visibility": "hidden"
+                    }
+                }
+                ]
+            }
         },
         fields: [
             "commitMessage",
@@ -69,7 +81,17 @@
                         }
                     }
 
-                ]
+                ],
+                must_not: [{
+                    term: {
+                        "effectiveVisibility": "hidden"
+                    }
+                },
+                {
+                    term: {
+                        "visibility": "hidden"
+                    }
+                }]
             }
         },
         fields: [

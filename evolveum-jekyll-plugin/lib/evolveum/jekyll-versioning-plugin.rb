@@ -76,6 +76,7 @@ end
 def installVersions(site)
   docsDir = site.config['docs']['docsPath'] + site.config['docs']['docsDirName']
   mpPreDir = site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix']
+  mpRepo = site.config['environment']['midpointRepositoryGhName']
   VersionReader.load_config(docsDir)
   #arr = readVersions(docsDir)
   #versions = arr[0]
@@ -101,7 +102,7 @@ def installVersions(site)
   VersionReader.get_config_value('filteredVersions').each_with_index do |version, index|
     versionWithoutDocs = version.gsub("docs/","")
     if Dir["#{mpPreDir}#{versionWithoutDocs}"].empty?
-      system("cd #{site.config['docs']['midpointVersionsPath']} && git clone -b #{version} https://github.com/Evolveum/midpoint #{site.config['docs']['midpointVersionsPrefix']}#{versionWithoutDocs}") #maybe && rm #{mpPreDir}#{versionWithoutDocs}/docs/LICENSE"
+      system("cd #{site.config['docs']['midpointVersionsPath']} && git clone -b #{version} https://github.com/#{mpRepo} #{site.config['docs']['midpointVersionsPrefix']}#{versionWithoutDocs}") #maybe && rm #{mpPreDir}#{versionWithoutDocs}/docs/LICENSE"
     end
     #if version != VersionReader.get_config_value('defaultBranch')
     # system("grep -rl :page-alias: #{mpPreDir}#{versionWithoutDocs}/docs/ | xargs -P 4 sed -i '/:page-alias:/d' 2> /dev/null || true")

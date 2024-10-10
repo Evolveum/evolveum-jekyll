@@ -12,7 +12,7 @@ layout: default
         <nav aria-label="breadcrumb">{% breadcrumbs %}</nav>
 
         {% if page.logo-title %}
-        <div id="titleAndSelectVerDiv"><span class="logo-title"><img src="{{page.logo-title}}" alt="{{ page.title }}" /></span><span id="select-version">
+        <div id="titleAndSelectVerDiv"><span class="logo-title"><img src="{{page.logo-title}}" alt="{{ page.title }}" /></span>{% if site.environment.name contains "docs" %}<span id="select-version">
             <select class="selectpicker" id="select-version-picker" data-style="versioningButton btn-light">
                 <option data-tokens="master">Development</option>
                 {% assign versions = site.data.midpoint-versions | reverse %}
@@ -23,8 +23,8 @@ layout: default
                 {% endfor %}
                 <option data-tokens="before-4.8" >4.7 and earlier</option>
             </select>
-        </span></div>{% else %}
-        <div id="titleAndSelectVerDiv"><span><h1>{% if page.name contains ".adoc" %} {{ page.title}} {% else %} {{ page.title | escape }} {% endif %}</h1></span><span id="select-version">
+        </span>{% endif %}</div>{% else %}
+        <div id="titleAndSelectVerDiv"><span><h1>{% if page.name contains ".adoc" %} {{ page.title}} {% else %} {{ page.title | escape }} {% endif %}</h1></span>{% if site.environment.name contains "docs" %}<span id="select-version">
             <select class="selectpicker" id="select-version-picker" data-style="versioningButton btn-light">
                 <option data-tokens="master">Development</option>
                 {% assign versions = site.data.midpoint-versions | reverse %}
@@ -35,7 +35,7 @@ layout: default
                 {% endfor %}
                 <option data-tokens="before-4.8" >4.7 and earlier</option>
             </select>
-        </span></div>{% endif %}
+        </span>{% endif %}</div>{% endif %}
         {% if page.author %}<address class="author" rel="author">{{ page.author }}</address>{% endif %} {% if page.lastModificationDate %}
         <div class="page-meta">Last modified {{ page.lastModificationDate | date: "%d %b %Y %H:%M %Z" }}</div>{% endif %} {% include page-warnings.html %} {% if page.toc %}
         <div class="toc-{{page.toc}}">
