@@ -265,8 +265,7 @@
                                                 totalScore = totalScore*${data._source.multipliers.notMasterBranch};
                                             }
                                         }
-                                        {% endif %}
-                                        return totalScore;
+                                        {% endif %}return totalScore;
                                     ` //ADD ONLY BEFORE BRANCH PART
                                 }
                             },
