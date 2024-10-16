@@ -128,6 +128,11 @@
         $.ajax({
             method: method,
             url: url,
+            {% if site.environment.name contains "guide" %}
+            headers: {
+                "Authorization": "Basic " + btoa("{{ site.environment.osUsername }}" + ":" + "{{ site.environment.osPassword }}")
+            },
+            {% endif %}
             crossDomain: true,
             async: async,
             data: JSON.stringify(query),
@@ -328,8 +333,11 @@
         $(window).scroll(scrollEvent); // TODO DO NOT REPEAT
 
 
-
+        {% if site.environment.name contains "docs" %}
         OSrequest("POST", "https://{{ site.environment.searchUrl }}/docs_commits/_search", afterSearchQuery, true, updateList)
+        {% else %}
+        OSrequest("POST", "https://{{ site.environment.searchUrl }}/guide_commits/_search", afterSearchQuery, true, updateList)
+        {% endif %}
     }
 
     $(document).ready(function() {
@@ -346,7 +354,11 @@
 
         $(".LMDLtooltipTh").tooltip()
 
+        {% if site.environment.name contains "docs" %}
         OSrequest("POST", "https://{{ site.environment.searchUrl }}/docs_commits/_search", initialSearchQuery, true, updateList)
+        {% else %}
+        OSrequest("POST", "https://{{ site.environment.searchUrl }}/guide_commits/_search", initialSearchQuery, true, updateList)
+        {% endif %}
 
         let request = {
             "aggs": {
@@ -364,7 +376,11 @@
             "size": 0
         }
 
+        {% if site.environment.name contains "docs" %}
         OSrequest("POST", "https://{{ site.environment.searchUrl }}/docs_commits/_search", request, true, setAuthors)
+        {% else %}
+        OSrequest("POST", "https://{{ site.environment.searchUrl }}/guide_commits/_search", request, true, setAuthors)
+        {% endif %}
 
         $(window).scroll(function() {
             if ($(window).scrollTop() >= $(document).height() - $(window).height() - 10) {
