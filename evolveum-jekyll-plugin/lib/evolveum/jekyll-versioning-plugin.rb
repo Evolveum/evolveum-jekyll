@@ -17,21 +17,22 @@ module VersionReader
     @config['releaseDocsVerMap'] = {}
     @config['defaultBranch'] = ""
     @config['negativeLookAhead'] = "(?!(?:"
+    @config['releaseBranchMap'] = {}
     actVer = 'before-4.8'
     verObject.each do |ver|
       versions.each_with_index do |version, index|
-        if (ver["status"] == "released" && ver["version"].include?(version))
-          if (ver["version"].gsub("\.", "").to_i > @config['latestVersions'][index].gsub("\.", "").to_i)
-            @config['latestVersions'][index] = ver['version']
+        if (ver["status"] == "released" && ver["version"].to_s.include?(version))
+          if (ver["version"].to_s.gsub("\.", "").to_i > @config['latestVersions'][index].gsub("\.", "").to_i)
+            @config['latestVersions'][index] = ver['version'].to_s
             #@config['releaseDocsVerMap'][ver['version']] = actVer
           end
         end
       end
       if ver['docsBranch'] != nil && ver['docsDisplayBranch']
         #puts("version" + ver['docsBranch'])
-        versions.push(ver['version'])
-        @config['releaseDocsVerMap'][ver['version']] = ver['docsBranch']
-        @config['latestVersions'].push(ver['version'])
+        versions.push(ver['version'].to_s)
+        @config['releaseDocsVerMap'][ver['version'].to_s] = ver['docsBranch']
+        @config['latestVersions'].push(ver['version'].to_s)
         @config['filteredVersions'].push(ver['docsBranch'])
         @config['filteredVersionsWhDocs'].push(ver['docsBranch'].gsub("docs/",""))
         @config['filteredDisplayVersions'].push(ver['docsDisplayBranch'])
@@ -47,10 +48,12 @@ module VersionReader
       elsif (actVer != 'before-4.8' && ver["type"] == "production" && ver["docsBranch"] == nil)
         actVer = "master"
       end
+      if ver['docsReleaseBranch'] != nil
+        @config['releaseBranchMap'][ver['version'].to_s] = ver['docsReleaseBranch']
+      end
       # TODO - for now it works but there should be a check if the versions are in the correct order
-      @config['releaseDocsVerMap'][ver['version']] = actVer
+      @config['releaseDocsVerMap'][ver['version'].to_s] = actVer
     end
-    Jekyll.logger.warn("RELEASE MAP #{@config['releaseDocsVerMap'].to_s}")
     if @config['defaultBranch'] == ""
       @config['defaultBranch'] = "master"
     end
@@ -131,12 +134,16 @@ def setupPathVerData(page)
 end
 
 Jekyll::Hooks.register :site, :after_init do |site|
-  puts "=========[ EVOLVEUM VERSIONNING ]============== after_init"
+  puts "=========[ EVOLVEUM VERSIONING ]============== after_init"
   if site.config['environment']['name'].include?("docs")
     installVersions(site)
     Jekyll::Hooks.register :pages, :post_init do |page|
       if (page.path.include?("midpoint/reference/") && page.path != "midpoint/reference/index.html")
         setupPathVerData(page)
+      end
+      if (page.path.include?("midpoint/release/") && page.path != "midpoint/release/index.html")
+        page.data['midpointVersion'] = page.path.split("/")[2]
+        page.data['docsReleaseBranch'] = VersionReader.get_config_value('releaseBranchMap')[page.data['midpointVersion']]
       end
     end
   end

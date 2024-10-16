@@ -9,7 +9,9 @@
     let allSearchIn = ["Title", "Text", "Commit message"]
     let searchIn = new Set([])
     let authors = new Set([])
+    {% if site.environment.name contains "docs" %}
     let filterBranches = new Set([])
+    {% endif %}
     let allAuthors = []
     var shouldIgnoreScroll = false;
 
@@ -44,8 +46,8 @@
             "author",
             "url",
             "id",
-            "gitUrl",
-            "branch"
+            "gitUrl"{% if site.environment.name contains "docs" %},
+            "branch"{% endif %}
         ],
         _source: false,
         size: 30,
@@ -109,8 +111,8 @@
             "author",
             "url",
             "id",
-            "gitUrl",
-            "branch"
+            "gitUrl"{% if site.environment.name contains "docs" %},
+            "branch"{% endif %}
         ],
         _source: false,
         size: 30,
@@ -126,6 +128,11 @@
         $.ajax({
             method: method,
             url: url,
+            {% if site.environment.name contains "guide" %}
+            headers: {
+                "Authorization": "Basic " + btoa("{{ site.environment.osUsername }}" + ":" + "{{ site.environment.osPassword }}")
+            },
+            {% endif %}
             crossDomain: true,
             async: async,
             data: JSON.stringify(query),
@@ -152,6 +159,7 @@
             }
             let unknownStatus = "";
 
+            {% if site.environment.name contains "docs" %}
             let contentVersion = "Not versioned"
             let contentDisplayVersion = "Not versioned"
             let versionColor = "#CACACA"
@@ -164,6 +172,7 @@
                     versionColor = DOCSBRANCHESCOLORS.get(contentDisplayVersion)
                 }
             }
+            {% endif %}
 
             if (commitMessage != undefined && commitMessage) {
                 commitMessage = commitMessage.replaceAll("<", "&lt;")
@@ -234,7 +243,7 @@
 
             listitems.push(`<tr>
         <th class="LMDLtitle" scope="row"><a href="${data.hits.hits[i].fields.url[0]}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='<span>Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></i>${unknownStatus}</span>'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="${data.hits.hits[i].fields.gitUrl[0]}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
-        <td class="LMDLcategory${contentVersion} LMDLcategory" style="color:${versionColor};">${contentDisplayVersion}</td>
+        {% if site.environment.name contains "docs" %}<td class="LMDLcategory${contentVersion} LMDLcategory" style="color:${versionColor};">${contentDisplayVersion}</td>{% endif %}
         <td class="LMDLcategory${contentType} LMDLcategory">${contentType.toUpperCase()}</td>
         <td class="tableCentered LMDLimpact${impactOfChange} LMDLimpact">${impactOfChange.toUpperCase()}</td>
         <td class="tableCentered LMDLauthor">${author}</td>
@@ -324,13 +333,18 @@
         $(window).scroll(scrollEvent); // TODO DO NOT REPEAT
 
 
-
+        {% if site.environment.name contains "docs" %}
         OSrequest("POST", "https://{{ site.environment.searchUrl }}/docs_commits/_search", afterSearchQuery, true, updateList)
+        {% else %}
+        OSrequest("POST", "https://{{ site.environment.searchUrl }}/guide_commits/_search", afterSearchQuery, true, updateList)
+        {% endif %}
     }
 
     $(document).ready(function() {
         setLMDLSearchIn()
+        {% if site.environment.name contains "docs" %}
         setLMDLVersion()
+        {% endif %}
         setLMDLCategory()
         setLMDLImpact()
 
@@ -340,7 +354,11 @@
 
         $(".LMDLtooltipTh").tooltip()
 
+        {% if site.environment.name contains "docs" %}
         OSrequest("POST", "https://{{ site.environment.searchUrl }}/docs_commits/_search", initialSearchQuery, true, updateList)
+        {% else %}
+        OSrequest("POST", "https://{{ site.environment.searchUrl }}/guide_commits/_search", initialSearchQuery, true, updateList)
+        {% endif %}
 
         let request = {
             "aggs": {
@@ -358,7 +376,11 @@
             "size": 0
         }
 
+        {% if site.environment.name contains "docs" %}
         OSrequest("POST", "https://{{ site.environment.searchUrl }}/docs_commits/_search", request, true, setAuthors)
+        {% else %}
+        OSrequest("POST", "https://{{ site.environment.searchUrl }}/guide_commits/_search", request, true, setAuthors)
+        {% endif %}
 
         $(window).scroll(function() {
             if ($(window).scrollTop() >= $(document).height() - $(window).height() - 10) {
@@ -438,6 +460,7 @@
         });
     }
 
+    {% if site.environment.name contains "docs" %}
     function setLMDLVersion() {
         let branchList = []
         for (let i = 0; i < DOCSBRANCHESDISPLAYNAMES.length; i++) {
@@ -470,7 +493,7 @@
             let parent = $('#selectpickerversion')[0].parentElement
             parent.id = "LMDLversionPicker"
         });
-    }
+    }{% endif %}
 
     function setLMDLCategory() {
         $('#selectpickercategory').selectpicker();
