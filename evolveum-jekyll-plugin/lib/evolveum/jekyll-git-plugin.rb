@@ -24,7 +24,7 @@ module Evolveum
 
         def self.update(page, mpDir)
             lastModDate = nil
-            if page.path != nil && File.exists?(page.path)
+            if page.path != nil && File.exist?(page.path)
                 #puts(page.path)
                 # todo add somewhere index.html
                 if page.path != "midpoint/reference/index.html" && page.path.include?("midpoint/reference/")
