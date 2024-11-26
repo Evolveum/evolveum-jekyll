@@ -29,7 +29,13 @@ module Evolveum
                 # todo add somewhere index.html
                 if page.path != "midpoint/reference/index.html" && page.path.include?("midpoint/reference/")
                     dateString = git("log -1 --pretty='format:%ci' '#{page.path.gsub("midpoint/reference/#{page.data['midpointBranchSlug']}/","docs/")}'", page.data['midpointBranchSlug'], mpDir)
-                elsif
+                elsif page.path != "midpoint/release/index.html" && page.path.include?("midpoint/release/") && page.data['docsReleaseBranch'] != nil && Dir.exist?("#{mpDir}#{page.data['docsReleaseBranch']}")
+                    if page.path.include?("install")
+                        dateString = git("log -1 --pretty='format:%ci' 'install-dist.adoc'", page.data['docsReleaseBranch'], mpDir)
+                    else
+                        dateString = git("log -1 --pretty='format:%ci' 'release-notes.adoc'", page.data['docsReleaseBranch'], mpDir)
+                    end
+                else
                     dateString = git("log -1 --pretty='format:%ci' '#{page.path}'", nil, nil)
                 end
 
