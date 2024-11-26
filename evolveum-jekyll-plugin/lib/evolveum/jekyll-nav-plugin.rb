@@ -395,7 +395,6 @@ module Evolveum
                 end
             elsif (page.url.include?("/midpoint/reference/"))
                 if (page.data['midpointBranch'] != VersionReader.get_config_value('defaultBranch'))
-                    Jekyll.logger.error("Page alias error: referencing non-reference documentation from non default branch of reference documentation in page #{page.url}")
                     return
                 end
                 #Jekyll.logger.error("Page alias error: referencing non-reference documentation from reference documentation in page #{page.url}")
