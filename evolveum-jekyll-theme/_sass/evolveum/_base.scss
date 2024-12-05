@@ -51,6 +51,10 @@ nav.navbar {
         // We need to figure something better in the future.
         max-width: 32rem;
     }
+
+    main, footer {
+        margin-left: 32rem; !important
+    }
 }
 
 .navtree {
@@ -99,10 +103,14 @@ nav.navbar {
     color: $navbar-light-color;
 }
 
+footer {
+    margin-left: 25%
+}
 
 main {
     margin-bottom: 2rem;
     margin-top: 93px;
+    margin-left: 25%
 }
 
 .logo-title {
