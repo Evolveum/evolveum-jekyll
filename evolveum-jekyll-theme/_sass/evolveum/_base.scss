@@ -34,8 +34,7 @@ nav.navbar {
         top: 69px;
         z-index: 99;
         padding-top: 23px;
-        height: 100vh;
-        min-height: 200px;
+        height: calc(100vh - 69px);
         scrollbar-color: #c1c1c1 transparent;
         scrollbar-width: none;
     }
