@@ -52,7 +52,7 @@ nav.navbar {
         max-width: 32rem;
     }
 
-    main, footer {
+    .content-left-margin {
         margin-left: 32rem !important;
     }
 }
@@ -104,13 +104,16 @@ nav.navbar {
 }
 
 footer {
-    margin-left: 25%
+    max-height: fit-content;
 }
 
 main {
     margin-bottom: 2rem;
     margin-top: 93px;
-    margin-left: 25%
+}
+
+.content-left-margin {
+    margin-left: 25%;
 }
 
 .logo-title {
