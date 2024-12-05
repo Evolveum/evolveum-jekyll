@@ -14,13 +14,43 @@ nav.navbar {
     border-bottom: 1px solid $separator-line-color;
 }
 
+.navbar-fixed {
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: $white !important;
+    z-index: 99;
+}
+
 
 // NAVTREE
 
-.navtree-column {
-    // Stop-gap measure for ridiculously wide browser windows.
-    // We need to figure something better in the future.
-    max-width: 32rem;
+@media (min-width: 576px) {
+    .navtree-fixed {
+        overflow-y: auto;
+        background: white;
+        position: fixed;
+        top: 69px;
+        z-index: 99;
+        padding-top: 23px;
+        height: 100vh;
+        min-height: 200px;
+        scrollbar-color: #c1c1c1 transparent;
+        scrollbar-width: none;
+    }
+
+    .navtree-fixed:hover {
+        scrollbar-width: thin;
+    }
+}
+
+@media (min-width: 1000px) {
+    .navtree-column {
+        // Stop-gap measure for ridiculously wide browser windows.
+        // We need to figure something better in the future.
+        max-width: 32rem;
+    }
 }
 
 .navtree {
@@ -72,6 +102,7 @@ nav.navbar {
 
 main {
     margin-bottom: 2rem;
+    margin-top: 93px;
 }
 
 .logo-title {
