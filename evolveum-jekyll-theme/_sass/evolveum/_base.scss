@@ -29,7 +29,7 @@ nav.navbar {
 @media (min-width: 576px) {
     .navtree-fixed {
         overflow-y: auto;
-        background: white;
+        background: $white;
         position: fixed;
         top: 69px;
         z-index: 99;
