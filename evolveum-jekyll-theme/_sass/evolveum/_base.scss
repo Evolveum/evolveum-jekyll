@@ -229,3 +229,11 @@ div.page-meta {
     font-style: italic;
     color: $indigo;
 }
+
+.table.release-nav-table {
+    margin-bottom: 0rem;
+}
+
+.nav.nav-tabs:has(.release-nav-table) {
+    margin-bottom: 2rem;
+}
