@@ -1,4 +1,54 @@
-<nav class="navbar navbar-light bg-transparent navbar-expand-md mb-4">
+<div class="modal fade2" id="search-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" id="modalHeader">
+                <div class="modal-h-frow">
+                    <form autocomplete="off" class="form-inline mt-2 mt-md-0 navbar-search searchbarform" method="get" id="search-ddg">
+                        <input autocomplete="off" type="hidden" name="sites" value="{{ site.environment.docsUrl }}">
+                        <input autocomplete="off" onkeypress="return event.keyCode!=13" class="form-control form-control-sm mr-sm-2" id="searchbar" type="search" placeholder="Type to search" name="q" aria-label="Search">
+
+                    </form>
+                    {% if site.environment.name contains 'docs' %}
+                    <div id="version-search-select">
+                        <select class="selectpicker" id="select-version-picker-search" data-style="versioningButton versioningButtonSearch btn-light" multiple title="Versions">
+                            <option data-tokens="master">Development</option>
+                            {% assign versions = site.data.midpoint-versions | reverse %}
+                            {% for v in versions %}
+                            {% if v.docsDisplayBranch != null %}
+                            <option data-default="{% if v.defaultBranch == true %}default{% else %}not{% endif %}" data-tokens="{{ v.docsBranch }}">{{ v.docsDisplayBranch}}</option>
+                            {% endif %}
+                            {% endfor %}
+                            <option data-tokens="before-4.8" >4.7 and earlier</option>
+                        </select>
+                    </div>
+                    {% endif %}
+                    <button id="docssearchbutton" class="btn btn-outline-secondary btn-sm my-2 my-sm-0">Search</button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% if site.environment.name contains 'docs' %}
+                <div id="checkboxes">
+                    <span id="ovalGuide" class="oval on ovalSearch"><i id="checkGuide" class="fas fa-check"></i>&nbsp;GUIDE</span>
+                    <span id="ovalBook" class="oval on ovalSearch"><i id="checkBook" class="fas fa-check"></i>&nbsp;BOOK</span>
+                    <span id="ovalReference" class="oval on ovalSearch"><i id="checkReference" class="fas fa-check"></i>&nbsp;REFERENCE</span>
+                    <span id="ovalOther" class="oval on ovalSearch"><i id="checkOther" class="fas fa-check"></i>&nbsp;OTHER</span>
+                    <span id="ovalDeveloper" class="oval ovalSearch"><i id="checkDeveloper" class=""></i>&nbsp;DEVELOPER</span>
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-body">
+                <div class="list-group" id="autocombox">
+                    <!-- here list is inserted from javascript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a id="reportSearchProblemPopover" data-toggle="popover" data-html="true" class="notShown">Report a problem&nbsp;<i class="far fa-flag" style="font-size: 0.69rem;"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+<nav class="navbar navbar-light navbar-fixed navbar-expand-md mb-4">
     <a class="navbar-brand" href="/">{{ site.title | default: "Evolveum"}}</a>
     <button class="navbar-toggler navbar-light" type="button" data-toggle="collapse" data-target="#navbar-list" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
   <span class="navbar-toggler-icon"></span>
@@ -11,57 +61,6 @@
             </li>
             {% endfor %}
         </ul>
-
-        <div class="modal fade2" id="search-modal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header" id="modalHeader">
-                        <div class="modal-h-frow">
-                            <form autocomplete="off" class="form-inline mt-2 mt-md-0 navbar-search searchbarform" method="get" id="search-ddg">
-                                <input autocomplete="off" type="hidden" name="sites" value="{{ site.environment.docsUrl }}">
-                                <input autocomplete="off" onkeypress="return event.keyCode!=13" class="form-control form-control-sm mr-sm-2" id="searchbar" type="search" placeholder="Type to search" name="q" aria-label="Search">
-
-                            </form>
-                            {% if site.environment.name contains 'docs' %}
-                            <div id="version-search-select">
-                                <select class="selectpicker" id="select-version-picker-search" data-style="versioningButton versioningButtonSearch btn-light" multiple title="Versions">
-                                    <option data-tokens="master">Development</option>
-                                    {% assign versions = site.data.midpoint-versions | reverse %}
-                                    {% for v in versions %}
-                                        {% if v.docsDisplayBranch != null %}
-                                            <option data-default="{% if v.defaultBranch == true %}default{% else %}not{% endif %}" data-tokens="{{ v.docsBranch }}">{{ v.docsDisplayBranch}}</option>
-                                        {% endif %}
-                                    {% endfor %}
-                                    <option data-tokens="before-4.8" >4.7 and earlier</option>
-                                </select>
-                            </div>
-                            {% endif %}
-                            <button id="docssearchbutton" class="btn btn-outline-secondary btn-sm my-2 my-sm-0">Search</button>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        {% if site.environment.name contains 'docs' %}
-                        <div id="checkboxes">
-                            <span id="ovalGuide" class="oval on ovalSearch"><i id="checkGuide" class="fas fa-check"></i>&nbsp;GUIDE</span>
-                            <span id="ovalBook" class="oval on ovalSearch"><i id="checkBook" class="fas fa-check"></i>&nbsp;BOOK</span>
-                            <span id="ovalReference" class="oval on ovalSearch"><i id="checkReference" class="fas fa-check"></i>&nbsp;REFERENCE</span>
-                            <span id="ovalOther" class="oval on ovalSearch"><i id="checkOther" class="fas fa-check"></i>&nbsp;OTHER</span>
-                            <span id="ovalDeveloper" class="oval ovalSearch"><i id="checkDeveloper" class=""></i>&nbsp;DEVELOPER</span>
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="modal-body">
-                        <div class="list-group" id="autocombox">
-                            <!-- here list is inserted from javascript -->
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <a id="reportSearchProblemPopover" data-toggle="popover" data-html="true" class="notShown">Report a problem&nbsp;<i class="far fa-flag" style="font-size: 0.69rem;"></i></a>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <form class="form-inline mt-2 mt-md-0 navbar-search" method="get" id="search" action="https://duckduckgo.com/">
             <input type="hidden" name="sites" value="{{ site.fqdn }}" />

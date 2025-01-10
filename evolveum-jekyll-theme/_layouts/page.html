@@ -3,12 +3,12 @@ layout: default
 ---
 
 <div class="row">
-    <div class="d-none d-md-block col-md-3 navtree-column">
+    <div class="d-none d-md-block col-md-3 navtree-column navtree-fixed pt-1">
         <div class="navtree">
             {% navtree %}
         </div>
     </div>
-    <div class="col-md-9 col-sm-12">
+    <div class="col-md-9 col-sm-12 content-left-margin">
         <nav aria-label="breadcrumb">{% breadcrumbs %}</nav>
 
         {% if page.logo-title %}

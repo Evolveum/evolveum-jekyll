@@ -105,13 +105,13 @@ function showMenu() {
         dA.push(AO);
 
     }
-    var codeDiv = document.createElement("div");
+    let codeDiv = document.createElement("div");
 
     dA.forEach(function(currentValue, index) {
         currentValue.addEventListener('click', function() {
 
-            var others = myUl.getElementsByClassName("nav-link active");
-            for (var j in others) {
+            let others = myUl.getElementsByClassName("nav-link active");
+            for (let j in others) {
                 others[j].className = "nav-link";
             }
 

@@ -77,12 +77,11 @@ module Evolveum
 
 
     ##
-    # Navigation tree Liguid tag.
+    # Navigation tree Liquid tag.
     #
     # This is a code for {% navtree %} Liquid tag.
-    # It rendets navigation tree suitable for navigation panel.
-    # This tree is "dynamic", it is sensitive to what current page is.
-    # The part of the tree that leads to current page is expanded, as are tree branches around it.
+    # It renders navigation tree suitable for navigation panel.
+    # This tree is "static", showing all items at levels where there is an active item.
     class NavtreeTag < Liquid::Tag
 
         def initialize(tag_name, text, tokens)
@@ -147,17 +146,30 @@ module Evolveum
                 s << "</ul>\n"
             else
                 # Active node is not on this level.
-                # Display just a single "slug" that lies on the way down and dive deeper.
-                node = topnode.presentableSubnodes.find { |nav| nav.slug == currentPageSlugs[level] }
-                if (node == nil) then return end
-                s << node.indent(level * 2 + 1)
+                # Display just a single level and dive deeper.
+                actNode = topnode.presentableSubnodes.find { |nav| nav.slug == currentPageSlugs[level] }
+                if (actNode == nil) then return end
+                s << topnode.indent(level * 2 + 1)
                 s << "<ul>\n"
-                append_li_label_start(s, node, currentPageUrl, level * 2 + 2)
-                dive(s, node, level + 1, currentPageUrl, currentPageSlugs)
-                s << node.indent(level * 2 + 2)
-                s << "</li>\n"
-                s << node.indent(level * 2 + 1)
+                topnode.presentableSubnodes.each do |node|
+                    append_li_label_start(s, node, currentPageUrl, level * 2 + 2)
+                    if node.slug == currentPageSlugs[level]
+                        dive(s, node, level + 1, currentPageUrl, currentPageSlugs)
+                    end
+                    s << node.indent(level * 2 + 2)
+                    s << "</li>\n"
+                end
+                s << topnode.indent(level * 2 + 1)
                 s << "</ul>\n"
+
+                # s << node.indent(level * 2 + 1)
+                # s << "<ul>\n"
+                # append_li_label_start(s, node, currentPageUrl, level * 2 + 2)
+                # dive(s, node, level + 1, currentPageUrl, currentPageSlugs)
+                # s << node.indent(level * 2 + 2)
+                # s << "</li>\n"
+                # s << node.indent(level * 2 + 1)
+                # s << "</ul>\n"
             end
         end
 
