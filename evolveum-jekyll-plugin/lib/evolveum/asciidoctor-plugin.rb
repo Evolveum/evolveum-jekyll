@@ -405,7 +405,7 @@ module Evolveum
                       create_pass_block parent, " ", attrs, subs: nil
                       return
                     elsif !found
-                      Jekyll.logger.warn("COPYRIGHT NOTICE NOT FOUND WHEN THE FIRST LINE WAS A COMMENT- sampleRef:#{target} in #{parent.document.attributes["docfile"]} - could not find copyright")
+                      #Jekyll.logger.warn("COPYRIGHT NOTICE NOT FOUND WHEN THE FIRST LINE WAS A COMMENT- sampleRef:#{target} in #{parent.document.attributes["docfile"]} - could not find copyright")
                       content.each_line do |line|
                         current_line += 1
                         next if line.include?('<!-- used in docs --->')
@@ -413,7 +413,7 @@ module Evolveum
                         lines << line
                       end
                     else
-                      Jekyll.logger.warn("COPYRIGHT NOTICE FOUND - sampleRef:#{target} in #{parent.document.attributes["docfile"]} - including content after notice")
+                      #Jekyll.logger.warn("COPYRIGHT NOTICE FOUND - sampleRef:#{target} in #{parent.document.attributes["docfile"]} - including content after notice")
                       allLines = content.split("\n")
                       strippedLines = allLines[current_temp_line..-1]
                       strippedLines.each do |line|
@@ -424,7 +424,7 @@ module Evolveum
                       end
                     end
                   else
-                    Jekyll.logger.warn("COPYRIGHT NOTICE NOT FOUND - sampleRef:#{target} in #{parent.document.attributes["docfile"]} - could not find copyright")
+                    #Jekyll.logger.warn("COPYRIGHT NOTICE NOT FOUND - sampleRef:#{target} in #{parent.document.attributes["docfile"]} - could not find copyright")
                     content.each_line do |line|
                       current_line += 1
                       #next if current_line < startLine
