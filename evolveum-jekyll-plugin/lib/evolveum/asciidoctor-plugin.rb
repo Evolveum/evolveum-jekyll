@@ -276,7 +276,6 @@ module Evolveum
                 createLink(addFragmentSuffix(targetPage.url,fragmentSuffix), parent, attrs, targetPage.data['title'])
             end
         end
-
     end
 
     class JekyllBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
@@ -288,6 +287,12 @@ module Evolveum
                 fileExt = File.extname(target)[1..-1]
                 startLine = 1
                 endLine = -1
+                includeCopyrightNotice = false
+                includeOnlyTag = nil
+                includeOnlyTagLevel = 0
+                includeOnlyTagOrder = 0
+                startPattern = nil
+                endPattern = nil
                 if (attrs['lines'] != nil)
                     splittedAttrs = attrs['lines'].split("..")
                     if (splittedAttrs.length == 2)
@@ -300,18 +305,223 @@ module Evolveum
                     end
                 end
 
-                puts "STARTLINE: #{startLine}" if attrs['lines']
-                puts "ENDLINE: #{endLine}" if attrs['lines']
+                #puts "STARTLINE: #{startLine}" if attrs['lines']
+                #puts "ENDLINE: #{endLine}" if attrs['lines']
+                #puts attrs['includeCopyrightNotice'] ? "INCLUDE_COPYRIGHT_NOTICE: #{attrs['includeCopyrightNotice']}" : "false - default"
+
+                if attrs['includeCopyrightNotice'].to_s.downcase == 'true'
+                  includeCopyrightNotice = true
+                end
+
+                if (attrs['includeOnlyTag'] != nil)
+                  includeOnlyTag = attrs['includeOnlyTag']
+                end
+
+                if (attrs['includeOnlyTagLevel'] != nil)
+                  includeOnlyTagLevel = attrs['includeOnlyTagLevel'].to_i
+                end
+
+                if (attrs['includeOnlyTagOrder'] != nil)
+                  includeOnlyTagOrder = attrs['includeOnlyTagOrder'].to_i
+                end
+
+                #Jekyll.logger.warn("STARTPATTERN: #{attrs['startPattern']}") if attrs['startPattern']
+                #Jekyll.logger.warn("ENDPATTERN: #{attrs['endPattern']}") if attrs['endPattern']
+
+                if (attrs['startPattern'] != nil && attrs['endPattern'] == nil)
+                  Jekyll.logger.error("BROKEN SAMPLE REFERENCE - INCORRECT PATTERN SELECTION FORMAT sampleRef:#{target} in #{parent.document.attributes["docfile"]} - startPattern is set but endPattern is not")
+                  create_pass_block parent, " ", attrs, subs: nil
+                  return
+                elsif (attrs['startPattern'] == nil && attrs['endPattern'] != nil)
+                  Jekyll.logger.error("BROKEN SAMPLE REFERENCE - INCORRECT PATTERN SELECTION FORMAT sampleRef:#{target} in #{parent.document.attributes["docfile"]} - endPattern is set but startPattern is not")
+                  create_pass_block parent, " ", attrs, subs: nil
+                  return
+                elsif (attrs['startPattern'] != nil && attrs['endPattern'] != nil && !includeCopyrightNotice)
+                  # When strartPattern and endPattern are set, we do not want to unnecessarily find the copyright, it would be filtered out be default
+                  includeCopyrightNotice = true
+                elsif (attrs['startPattern'] != nil && attrs['endPattern'] != nil && (attrs['includeOnlyTag'] != nil))
+                  Jekyll.logger.error("BROKEN SAMPLE REFERENCE - INCOMPATIBLE ATTRS sampleRef:#{target} in #{parent.document.attributes["docfile"]} - startPattern and endPattern are set, but includeOnlyTag is also set, for now using startPattern and endPattern")
+                  includeOnlyTag = nil
+                elsif ((attrs['startPattern'] != nil || attrs['endPattern'] != nil) && (attrs['includeOnlyTag'] != nil))
+                  Jekyll.logger.error("BROKEN SAMPLE REFERENCE - INCOMPATIBLE ATTRS sampleRef:#{target} in #{parent.document.attributes["docfile"]} - startPattern or endPattern are set, but includeOnlyTag is also set, did not recover")
+                  create_pass_block parent, " ", attrs, subs: nil
+                  return
+                elsif (includeOnlyTag != nil && !includeCopyrightNotice)
+                  # Removing copyright notice is unnecessary when we are including only specific tag
+                  includeCopyrightNotice = true
+                end
+                if (attrs['startPattern'] != nil && attrs['endPattern'] != nil)
+                  begin
+                    startPattern = Regexp.new(attrs['startPattern'])
+                    endPattern = Regexp.new(attrs['endPattern'])
+                  rescue RegexpError => e
+                    Jekyll.logger.error("BROKEN SAMPLE REFERENCE - INCORRECT PATTERN SELECTION FORMAT sampleRef:#{target} in #{parent.document.attributes["docfile"]} - invalid regular expression")
+                    create_pass_block parent, " ", attrs, subs: nil
+                    return
+                  end
+                end
 
                 lines = []
+                tempLines = []
 
                 current_line = 0
+                current_temp_line = 0
 
-                IO.foreach(filePath) do |line|
+                if ((fileExt == "xml" || fileExt == "xsd") && startLine < 2 && !includeCopyrightNotice)
+                  content = File.read(filePath)
+                  originalLines = content.lines.size
+                  # Remove leading whitespace (spaces, tabs, newlines)
+                  trimmed = content.lstrip
+                  trimmed = trimmed.sub(/\A<\?xml\s+.*?\?>\s*/, "")
+                  #Jekyll.logger.warn("REMOVING XML DECLARATION - sampleRef:#{target} in #{parent.document.attributes["docfile"]} - removing XML declaration, #{trimmed.lines.first}")
+                  trimmed = trimmed.lstrip
+                  trimmed = trimmed.sub(/^\s*<!--\s*used\s+in\s+docs\s*-->\s*(\r?\n|\r|\n)?/, "")
+                  #Jekyll.logger.warn("REMOVING COMMENT - sampleRef:#{target} in #{parent.document.attributes["docfile"]} - removing comment, #{trimmed.lines.first}")
+                  trimmed = trimmed.lstrip
+                  afterLines = trimmed.lines.size
+                  current_temp_line = originalLines - afterLines
+                  #Jekyll.logger.warn("REMOVED LINES - sampleRef:#{target} in #{parent.document.attributes["docfile"]} - removed #{current_temp_line} lines")
+                  found = false
+                  endedPrematurely = false
+                  if trimmed.start_with?('<!--')
+                    trimmed.each_line do |line|
+                      current_temp_line += 1
+                      if current_temp_line == endLine
+                        endedPrematurely = true
+                        break
+                      end
+                      if (line.include?('Copyright (c)') || line.include?('Copyright (C)') || line.include?('copyright (c)'))
+                        found = true
+                      end
+                      tempLines << line
+                      break if line.include?('-->')
+                    end
+                    if endedPrematurely && found
+                      Jekyll.logger.error("BROKEN SAMPLE REFERENCE - INCORRECT LINE SELECTION FORMAT sampleRef:#{target} in #{parent.document.attributes["docfile"]} - endLine reached at copyright notice that is set to be ignored (this is a default setting)")
+                      create_pass_block parent, " ", attrs, subs: nil
+                      return
+                    elsif endedPrematurely
+                      Jekyll.logger.warn("ENDLINE REACHED IN COMMENTED SECTION - sampleRef:#{target} in #{parent.document.attributes["docfile"]} - endLine reached before end of comment, could not determine if it contains copyright")
+                      create_pass_block parent, " ", attrs, subs: nil
+                      return
+                    elsif !found
+                      Jekyll.logger.warn("COPYRIGHT NOTICE NOT FOUND WHEN THE FIRST LINE WAS A COMMENT- sampleRef:#{target} in #{parent.document.attributes["docfile"]} - could not find copyright")
+                      content.each_line do |line|
+                        current_line += 1
+                        next if line.include?('<!-- used in docs --->')
+                        break if endLine != -1 && current_line > endLine
+                        lines << line
+                      end
+                    else
+                      Jekyll.logger.warn("COPYRIGHT NOTICE FOUND - sampleRef:#{target} in #{parent.document.attributes["docfile"]} - including content after notice")
+                      allLines = content.split("\n")
+                      strippedLines = allLines[current_temp_line..-1]
+                      strippedLines.each do |line|
+                        current_line += 1
+                        next if line.include?('<!-- used in docs --->')
+                        break if endLine != -1 && current_line > endLine
+                        lines << line + "\n"
+                      end
+                    end
+                  else
+                    Jekyll.logger.warn("COPYRIGHT NOTICE NOT FOUND - sampleRef:#{target} in #{parent.document.attributes["docfile"]} - could not find copyright")
+                    content.each_line do |line|
+                      current_line += 1
+                      #next if current_line < startLine
+                      next if line.include?('<!-- used in docs --->')
+                      break if endLine != -1 && current_line > endLine
+                      lines << line
+                    end
+                  end
+                elsif (startPattern != nil && endPattern != nil)
+                  foundStart = false
+                  foundEnd = false
+                  #Jekyll.logger.warn("PATTERN SELECTION - sampleRef:#{target} in #{parent.document.attributes["docfile"]} - startPattern: #{startPattern}, endPattern: #{endPattern}")
+                  IO.foreach(filePath) do |line|
                     current_line += 1
                     next if current_line < startLine
+                    next if line.include?('<!-- used in docs --->')
+                    break if endLine != -1 && current_line > endLine
+                    if foundStart && line.match?(endPattern)
+                      lines << line
+                      foundEnd = true
+                      break
+                    elsif foundStart
+                      lines << line
+                    elsif !foundStart && line.match?(startPattern)
+                      foundStart = true
+                      lines << line
+                    end
+                  end
+                  if !foundStart
+                    Jekyll.logger.error("BROKEN SAMPLE REFERENCE - INCORRECT PATTERN SELECTION FORMAT sampleRef:#{target} in #{parent.document.attributes["docfile"]} - startPattern not found")
+                    create_pass_block parent, " ", attrs, subs: nil
+                    return
+                  elsif !foundEnd
+                    Jekyll.logger.error("BROKEN SAMPLE REFERENCE - INCORRECT PATTERN SELECTION FORMAT sampleRef:#{target} in #{parent.document.attributes["docfile"]} - endPattern not found")
+                    create_pass_block parent, " ", attrs, subs: nil
+                    return
+                  end
+                elsif (includeOnlyTag != nil)
+                  foundStart = false
+                  foundStartCorrectOrder = false
+                  foundEnd = false
+                  currentTagLevel = 0
+                  currentOrder = 0
+                  #Jekyll.logger.warn("TAG SELECTION - sampleRef:#{target} in #{parent.document.attributes["docfile"]} - includeOnlyTag: #{includeOnlyTag}, includeOnlyTagLevel: #{includeOnlyTagLevel}, includeOnlyTagOrder: #{includeOnlyTagOrder}")
+                  IO.foreach(filePath) do |line|
+                    current_line += 1
+                    next if current_line < startLine
+                    next if line.include?('<!-- used in docs --->')
+                    break if endLine != -1 && current_line > endLine
+                    if (line.include?("<#{includeOnlyTag}") && currentTagLevel == includeOnlyTagLevel)
+                      foundStart = true
+                      currentTagLevel += 1
+                      if currentOrder == includeOnlyTagOrder
+                        foundStartCorrectOrder = true
+                        lines << line
+                      end
+                    elsif (line.include?("<#{includeOnlyTag}") && foundStartCorrectOrder)
+                      currentTagLevel += 1
+                      lines << line
+                    elsif (line.include?("<#{includeOnlyTag}"))
+                      currentTagLevel += 1
+                    elsif (line.include?("</#{includeOnlyTag}") && currentTagLevel == includeOnlyTagLevel+1)
+                      currentTagLevel -= 1
+                      if foundStartCorrectOrder == true
+                        foundEnd = true
+                        lines << line
+                        break
+                      else
+                        foundStart = false
+                        currentOrder += 1
+                      end
+                    elsif (line.include?("</#{includeOnlyTag}") && foundStartCorrectOrder)
+                      currentTagLevel -= 1
+                      lines << line
+                    elsif (line.include?("</#{includeOnlyTag}") && foundStart)
+                      currentTagLevel -= 1
+                    elsif foundStartCorrectOrder
+                      lines << line
+                    end
+                  end
+                  if !foundStartCorrectOrder
+                    Jekyll.logger.error("BROKEN SAMPLE REFERENCE - INCORRECT TAG SELECTION FORMAT sampleRef:#{target} in #{parent.document.attributes["docfile"]} - start tag not found")
+                    create_pass_block parent, " ", attrs, subs: nil
+                    return
+                  elsif !foundEnd
+                    Jekyll.logger.error("BROKEN SAMPLE REFERENCE - INCORRECT TAG SELECTION FORMAT sampleRef:#{target} in #{parent.document.attributes["docfile"]} - end tag not found")
+                    create_pass_block parent, " ", attrs, subs: nil
+                    return
+                  end
+                else
+                  IO.foreach(filePath) do |line|
+                    current_line += 1
+                    next if current_line < startLine
+                    next if line.include?('<!-- used in docs --->')
                     break if endLine != -1 && current_line > endLine
                     lines << line
+                  end
                 end
 
                 if fileExt == "csv"
@@ -345,7 +555,7 @@ module Evolveum
                     source_content = <<~SOURCE
                       [source,#{fileExt}]
                       ----
-                      #{lines.join("\n")}
+                      #{lines.join("")}
                       ----
                     SOURCE
                     samplesHtml = Asciidoctor.convert(source_content, safe: :safe, extensions: false, attributes: { 'source-highlighter' => 'rouge' })
@@ -355,9 +565,11 @@ module Evolveum
             elsif (branch != nil)
                 Jekyll.logger.error("BROKEN MIDPOINT REFERENCE midpointRef:#{target}, branch:#{branch} in #{parent.document.attributes["docfile"]}")
                 create_pass_block parent, " ", attrs, subs: nil
+                return
             else
                 Jekyll.logger.error("BROKEN SAMPLE REFERENCE sampleRef:#{target} in #{parent.document.attributes["docfile"]}")
                 create_pass_block parent, " ", attrs, subs: nil
+                return
             end
         end
 
@@ -541,8 +753,13 @@ module Evolveum
 
       def findGlossaryEntry(entry_id)
         glossary = jekyllData('glossary')
-        glossentry = glossary.detect {|e| e['id'] == entry_id }
+        if glossary == nil
+            Jekyll.logger.error("GLOSSARY DATA NOT FOUND, maybe the glossary.yml file is missing? This error can occur of you are using glossref macro in guide. If you want to have glossary in guide please contact Jan directly or open a ticket")
+            return nil
+        else
+          glossentry = glossary.detect {|e| e['id'] == entry_id }
 #        puts "GLOSSREF:entry: #{glossentry}"
+        end
         return glossentry
       end
 
@@ -639,9 +856,7 @@ module Evolveum
 
             return diffedTargetPathname.to_s
        end
-
     end
-
 end
 
 Asciidoctor::Extensions.register do
