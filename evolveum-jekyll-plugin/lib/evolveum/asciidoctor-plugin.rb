@@ -11,6 +11,7 @@ require 'asciidoctor/extensions'
 require 'pathname'
 require 'pp'
 require 'open3'
+require 'cgi'
 require_relative 'jekyll-versioning-plugin.rb' # We need readVersions method for checking if xfer path includes exact midpoint version
 require_relative 'jekyll-redirect-plugin.rb'
 
@@ -228,6 +229,8 @@ module Evolveum
                 # document-local link, use as is
                 return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert
             end
+
+            targetPath = CGI.unescapeHTML(targetPath)
 
             targetPage = findPageByTarget(parent.document, targetPath)
 
