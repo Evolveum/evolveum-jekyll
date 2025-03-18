@@ -232,3 +232,14 @@ div.page-meta {
 .nav.nav-tabs:has(.release-nav-table) {
     margin-bottom: 2rem;
 }
+
+table {
+    max-width: 100%;
+    overflow-x: auto;
+    display: block;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+}
