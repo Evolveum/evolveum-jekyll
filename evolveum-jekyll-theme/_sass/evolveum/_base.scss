@@ -5,7 +5,7 @@ h1 {
 p {
     @if $paragraph-max-width != 0 {
         max-width: $paragraph-max-width;
-      }
+    }
 }
 
 // NAVBAR
@@ -23,7 +23,6 @@ nav.navbar {
     z-index: 99;
 }
 
-
 // NAVTREE
 
 @media (min-width: 576px) {
@@ -37,6 +36,10 @@ nav.navbar {
         height: calc(100vh - 69px);
         scrollbar-color: #c1c1c1 transparent;
         scrollbar-width: none;
+    }
+
+    .content-left-margin {
+        margin-left: 25%;
     }
 
     .navtree-fixed:hover {
@@ -67,7 +70,7 @@ nav.navbar {
     }
 
     li > a {
-            color: $navbar-light-color;
+        color: $navbar-light-color;
     }
 
     li.active {
@@ -91,7 +94,6 @@ nav.navbar {
         // top-level nodes, we want it closer to margin
         padding-left: 0.5rem;
     }
-
 }
 
 .navbar-brand {
@@ -111,12 +113,7 @@ main {
     margin-top: 93px;
 }
 
-.content-left-margin {
-    margin-left: 25%;
-}
-
 .logo-title {
-
     // Same margin as ordinary h1 title
     margin-bottom: 2rem;
 
@@ -159,7 +156,6 @@ main {
     }
 
     .footer-list {
-
     }
 
     a {
@@ -204,18 +200,17 @@ div.page-meta {
     color: $light;
 }
 
-
 .max-width {
     max-width: 1440px;
 }
-
 
 .synopsis-table {
     margin-top: 2rem;
     margin-bottom: 3rem;
     border-bottom: $table-border-width solid $table-border-color;
 
-    th, td {
+    th,
+    td {
         padding-top: 0.5rem;
         padding-bottom: 0.5rem;
     }
