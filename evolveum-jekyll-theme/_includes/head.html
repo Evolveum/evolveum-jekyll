@@ -1,22 +1,58 @@
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> {% if page.description %}
-    <meta name="description" content="{{ page.description | escape }}">{% endif %} {% if page.keywords %}
-    <meta name="keywords" content="{{ page.keywords | escape }}">{% endif %} {% if page.author %}
-    <meta name="author" content="{{ page.author | escape }}">{% endif %}
-    <link rel="stylesheet" href="/assets/main.css">
-    <link rel="stylesheet" href="/assets/css/datatables.min.css">
-    <link rel="stylesheet" href="/assets/css/fa.css">
-    <link rel="stylesheet" href="/assets/css/rouge-github.css">
-    <link rel="stylesheet" href="/assets/css/bootstrap-select.min.css">
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono|Roboto+Slab:300|Roboto:400" rel="stylesheet">
-    <link rel="apple-touch-icon" href="/assets/favicon/apple-touch-icon.png" sizes="72x72">
-    <link rel="icon" type="image/png" href="/assets/favicon/favicon32.png" sizes="32x32">
-    <link rel="icon" type="image/png" href="/assets/favicon/favicon16.png" sizes="16x16">
-    <link rel="shortcut icon" href="/assets/favicon/favicon.ico">
-    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
-    <title>{% if page.title %}{{ page.title }} - {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    {% if page.description %}
+    <meta name="description" content="{{ page.description | escape }}" />
+    {% endif %} {% if page.keywords %}
+    <meta name="keywords" content="{{ page.keywords | escape }}" />
+    {% endif %} {% if page.author %}
+    <meta name="author" content="{{ page.author | escape }}" />
+    {% endif %}
+    <link rel="stylesheet" href="/assets/main.css" />
+    <link rel="stylesheet" href="/assets/css/datatables.min.css" />
+    <link rel="stylesheet" href="/assets/css/fontawesome.min.css" />
+    <link rel="stylesheet" href="/assets/css/v5-font-face.min.css" />
+    <link rel="stylesheet" href="/assets/css/rouge-github.css" />
+    <link rel="stylesheet" href="/assets/css/bootstrap-select.min.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet"
+    />
+    <link
+        href="https://fonts.googleapis.com/css?family=Roboto+Mono|Roboto+Slab:300|Roboto:400"
+        rel="stylesheet"
+    />
+    <link
+        rel="apple-touch-icon"
+        href="/assets/favicon/apple-touch-icon.png"
+        sizes="72x72"
+    />
+    <link
+        rel="icon"
+        type="image/png"
+        href="/assets/favicon/favicon32.png"
+        sizes="32x32"
+    />
+    <link
+        rel="icon"
+        type="image/png"
+        href="/assets/favicon/favicon16.png"
+        sizes="16x16"
+    />
+    <link rel="shortcut icon" href="/assets/favicon/favicon.ico" />
+    <link
+        rel="sitemap"
+        type="application/xml"
+        title="Sitemap"
+        href="/sitemap.xml"
+    />
+    <title>
+        {% if page.title %}{{ page.title }} - {{ site.title }}{% else %}{{
+        site.title }}{% endif %}
+    </title>
 </head>
