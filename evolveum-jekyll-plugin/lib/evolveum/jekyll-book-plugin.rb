@@ -11,7 +11,7 @@ module Evolveum
             @docsDir = site.config['docs']['docsPath'] + site.config['docs']['docsDirName']
         end
 
-        def createBookDir()s
+        def createBookDir()
             if (!File.exist?(@bookDir))
                 system("mkdir -p #{@bookDir}")
             end
