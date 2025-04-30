@@ -1,6 +1,6 @@
 permalink: pretty
 twitter_username: evolveum
-github_username:  Evolveum
+github_username: Evolveum
 
 plugins:
   - evolveum-jekyll-plugin
@@ -22,6 +22,8 @@ docs:
   midpointSamplesDirName: mp-samples
   midpointReleasePath: ../
   midpointReleaseDir: mp-release-notes
-
+  bookPath: ../
+  bookDirName: book
+  bookGH: "https://github.com/Evolveum/midpoint-book.git"
 
 highlighter: rouge
