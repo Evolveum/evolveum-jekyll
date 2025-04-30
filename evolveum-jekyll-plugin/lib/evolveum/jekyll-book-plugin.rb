@@ -1,6 +1,6 @@
 
 
-class Evolveum
+module Evolveum
 
     class BookInitializator
 
