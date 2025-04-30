@@ -50,8 +50,10 @@ module Evolveum
               source_dir = "#{@bookDir}/#{special_dir}"
               target_symlink = "#{target_dir}#{special_dir}"
 
-              if File.directory?(source_dir) && !File.exist?(target_symlink)
+              if File.directory?(source_dir) && !File.exist?(target_symlink) && !File.symlink?(target_symlink)
                 FileUtils.ln_sf(source_dir, target_symlink)
+              elsif !File.symlink?(target_symlink) && File.exist?(target_symlink)
+                Jekyll.logger.error "ERROR: #{target_symlink} exists and is not a symlink. Skipping."
               end
             end
         end
