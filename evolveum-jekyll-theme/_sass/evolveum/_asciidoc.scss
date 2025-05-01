@@ -447,8 +447,11 @@ p.tableblock {
 // Quotes
 
 .quoteblock {
-  margin: 1.5rem 1rem $paragraph-margin-bottom $asciidoc-block-indent;
+  margin: 1.5rem 1rem $paragraph-margin-bottom 2rem;
   display: table; // enables auto width
+  @if $paragraph-max-width != 0 {
+    max-width: calc(#{$paragraph-max-width} - 3rem);
+  }
   &:not(.excerpt) > .title {
     margin-left: -1.5em;
     margin-bottom: 0.75em;
@@ -1257,3 +1260,4 @@ sup.footnoteref {
   }
 
 }
+
