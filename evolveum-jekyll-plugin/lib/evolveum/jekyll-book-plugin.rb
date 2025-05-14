@@ -6,6 +6,7 @@ module Evolveum
 
         def initialize(site)
             @site = site
+            @bookTag = nil
 
             bookPath = site.config['docs']['bookPath']
             bookPath = File.expand_path(bookPath, site.source) unless File.absolute_path?(bookPath) == bookPath
@@ -13,7 +14,11 @@ module Evolveum
             docsPath = site.config['docs']['docsPath']
             docsPath = File.expand_path(docsPath, site.source) unless File.absolute_path?(docsPath) == docsPath
 
-            Jekyll.logger.warn("INFO: Book path is set to #{bookPath}, docs path is set to #{docsPath}")
+            if site.config['environment'].include?("bookTag")
+                @bookTag = site.config['environment']['bookTag']
+            end
+
+            #Jekyll.logger.warn("INFO: Book path is set to #{bookPath}, docs path is set to #{docsPath}")
 
             # Use File.join for proper path construction
             @bookDir = File.join(bookPath, site.config['docs']['bookDirName'])
@@ -47,7 +52,7 @@ module Evolveum
             chapters = []
             File.open(@bookDir + "/master.adoc", 'r:UTF-8') do |file|
                 file.each_line do |line|
-                    if line =~ /include::(.*)\[(.*)\]/
+                    if line =~ /^include::(.*)\[(.*)\]/
                           chapter_name = line.sub(/include::/, '').sub(/\[(.*)\]/, '').strip
                           # In colophon there are some variables that we currently cannot add
                           if chapter_name != "colophon.adoc"
@@ -60,37 +65,84 @@ module Evolveum
             book_files.each do |file|
                 relative_path = file.sub(@bookDir + '/', '')
                 if chapters.include?(relative_path)
-                    # Set visibility and order for the chapter
-                      content = File.read(file, encoding: 'UTF-8')
-                      # Check if the file already contains a page-visibility attribute
-                      if !(content =~ /^:page-visibility:/)
-                        # Add the page-visibility attribute at the beginning of the file
-                        if !(content.strip[0] != ":")
-                          content = "\n" + content
-                        end
-                        content = ":page-visibility: visible\n" + content
-                      end
-                      # Check if the file already contains a page-order attribute
-                      if !(content =~ /^:page-order:/)
-                        # Add the page-order attribute at the beginning of the file
-                        content = ":page-display-order: #{chapters.index(relative_path) + 1}\n" + content
-                      end
+                    original_content = File.read(file, encoding: 'UTF-8')
+                    current_lines = original_content.lines # Array of lines, each with \n
 
-                      if !(content =~ /^:imagesdir:/)
-                        # Add the imagesdir attribute at the beginning of the file
-                        content = ":imagesdir: images\n" + content
-                      end
-                      # Write the modified content back to the file
-                      File.write(file, content)
-                else
-                    content = File.read(file, encoding: 'UTF-8')
-                    if !(content =~ /^:page-visibility:/)
-                        # Add the page-visibility attribute at the beginning of the file
-                        new_content = ":page-visibility: hidden\n\n" + content
-                        File.write(file, new_content)
+                    # 1. Remove include::chapter-include.adoc[]
+                    initial_line_count = current_lines.length
+                    current_lines.reject! { |line| line.strip == 'include::chapter-include.adoc[]' }
+                    include_removed = current_lines.length != initial_line_count
+
+                    # 2. Find title line index (line starting with a single '= ')
+                    # We need to operate on stripped lines for matching, but keep original lines for reconstruction
+                    title_line_index = current_lines.index { |l| stripped_line = l.strip; stripped_line.start_with?('= ') && !stripped_line.start_with?('==') }
+
+                    unless title_line_index
+                        Jekyll.logger.warn("WARN: No main title found in #{file}. Skipping attribute injection for this file.")
+                        if include_removed # If only include was removed, write the file
+                            File.write(file, current_lines.join)
+                        end
+                        next
                     end
+
+                    # 3. Determine which attributes are missing (check against original_content to avoid re-adding if already present)
+                    attributes_to_add = []
+                    # Use multiline match 'm' for checking attributes that could be anywhere
+                    unless original_content =~ /^:page-visibility:/m
+                        attributes_to_add << ":page-visibility: visible"
+                    end
+                    unless original_content =~ /^:page-display-order:/m
+                        attributes_to_add << ":page-display-order: #{chapters.index(relative_path) + 1}"
+                    end
+                    unless original_content =~ /^:imagesdir:/m
+                        attributes_to_add << ":imagesdir: images/"
+                    end
+
+                    # 4. If no attributes to add and include was not removed, nothing changed.
+                    if attributes_to_add.empty? && !include_removed
+                        next
+                    end
+
+                    # 5. If attributes need to be added
+                    if !attributes_to_add.empty?
+                        new_attributes_block_content = attributes_to_add.join("\n") + "\n" # Ensure a newline after the block itself
+
+                        # Determine the actual line index for insertion in the `current_lines` array
+                        # This will be the line immediately after the title line.
+                        insertion_array_index = title_line_index + 1
+
+                        prefix_newline_string = ""
+                        # Check if a blank line needs to be inserted *before* the attribute block.
+                        # This is if the line immediately after the title exists, is not empty, and is not an attribute definition.
+                        if current_lines.length > insertion_array_index # Check if a line exists after the title
+                            line_after_title_stripped = current_lines[insertion_array_index].strip
+                            if !line_after_title_stripped.empty? && !line_after_title_stripped.start_with?(':')
+                                prefix_newline_string = "\n" # Add a blank line before attributes
+                            end
+                        end
+
+                        final_attributes_string_to_insert = prefix_newline_string + new_attributes_block_content
+
+                        # Insert the string containing all new attributes (and potentially a leading prefix newline)
+                        # as a single element into the array of lines.
+                        current_lines.insert(insertion_array_index, final_attributes_string_to_insert)
+                    end
+
+                    # 6. Write modified content back to the file (if any changes were made)
+                    File.write(file, current_lines.join)
+                # else (code for files not in chapters, if any, was here)
+                #     content = File.read(file, encoding: 'UTF-8')
+                #     content = content.gsub(/^\s*include::chapter-include\.adoc\[\]\s*$?/, '')
+                #     if !(content =~ /^:page-visibility:/)
+                #         content = ":page-visibility: hidden\n\n" + content
+                #     end
+                #     if !(content =~ /^:imagesdir:/)
+                #       content = ":imagesdir: \"images/\"\n" + content
+                #     end
+                #     File.write(file, content)
                 end
             end
+            return chapters
         end
 
 
@@ -100,16 +152,32 @@ module Evolveum
             end
         end
 
-        def cloneBook()
-            if (!File.exist?(@bookDir + "/.git"))
-                system("cd #{@bookDir} && git clone #{@bookGH} .")
-            end
+        def config_recently_modified?(minutes = 7)
+          config_path = File.join(@docsDir, '_config.yml')
+          return false unless File.exist?(config_path)
+
+          file_mod_time = File.mtime(config_path)
+          #Jekyll.logger.warn "INFO: _config.yml last modified at #{file_mod_time}"
+          (Time.now - file_mod_time) < (minutes * 60)
         end
 
-        def updateSymlinks()
+        def cloneBook()
+          config_changed = config_recently_modified?
+
+          if (!File.exist?(@bookDir + "/.git"))
+            @bookTag ? system("cd #{@bookDir} && git clone -b #{@bookTag} #{@bookGH} .") : system("cd #{@bookDir} && git clone #{@bookGH} .")
+          elsif config_changed
+            # If config has changed, update the book
+            Jekyll.logger.info "INFO: _config.yml recently modified, updating book repository"
+            system("rm -rf  #{@bookDir} && mkdir -p #{@bookDir}")
+            @bookTag ? system("cd #{@bookDir} && git clone -b #{@bookTag} #{@bookGH} .") : system("cd #{@bookDir} && git clone #{@bookGH} .")
+          end
+        end
+
+        def updateSymlinks(chapters)
           target_dir = "#{@docsDir}/book/"
 
-          book_files = Dir.glob("#{@bookDir}/*.adoc").select { |f| File.file?(f) }
+          book_files = chapters.map { |chapter| File.join(@bookDir, chapter) }
 
           existing_symlinks = Dir.glob("#{target_dir}/*").select { |f| File.symlink?(f) }
           existing_symlink_paths = existing_symlinks.map { |s| File.expand_path(File.readlink(s), File.dirname(s)) }
@@ -147,8 +215,8 @@ module Evolveum
         def addBook()
             createBookDir()
             cloneBook()
-            setVisibilitiesAndOrders()
-            updateSymlinks()
+            chapters = setVisibilitiesAndOrders()
+            updateSymlinks(chapters)
         end
     end
 end

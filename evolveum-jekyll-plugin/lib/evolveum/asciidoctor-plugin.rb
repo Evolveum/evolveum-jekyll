@@ -811,15 +811,29 @@ module Evolveum
             #Jekyll.logger.info("Processing document #{document.attr("docfile")}")
 
             currentPage = findCurrentPage(document)
-            document.find_by(context: :image).each do |image|
+            imageArr = document.find_by(context: :image)
+            arrLenght = (imageArr.length) - 1
+            imageArr.each_with_index do |image,index|
                 target = image.attr('target')
-                image.set_attr("target",fixImagePath(target, document, currentPage))
+                if index == arrLenght
+                    image.set_attr("target",fixImagePath(target, document, currentPage, true))
+                else
+                    image.set_attr("target",fixImagePath(target, document, currentPage, false))
+                end
           end
         end
 
-        def fixImagePath(target, document, currentPage)
+        def fixImagePath(target, document, currentPage, last)
             #puts("IMAGEFIX: #{target}, #{currentPage.url}")
             targetPathname = Pathname.new(target)
+            #Jekyll.logger.warn("IMAGEFIX: #{target} (#{targetPathname})")
+            #Jekyll.logger.warn("IMAGESDIR: #{document.attr('imagesdir')}")
+            if document.attr('imagesdir') != nil
+              targetPathname = Pathname.new(document.attr('imagesdir') + target)
+              if last
+                  document.set_attr("imagesdir", nil)
+              end
+            end
             if targetPathname.absolute?
                 # No need to fix, absolute URLs are fine
                 #puts("IMAGEFIX: #{target} (no change, absolute)")
@@ -844,6 +858,8 @@ module Evolveum
             diffedTargetPathname = (diff + targetPathname)
 
             diffedTargetFilePathname =  urlizedPathname + diffedTargetPathname
+
+            #Jekyll.logger.warn("IMAGEFIX: #{target} --> #{diffedTargetPathname.to_s} (#{diffedTargetFilePathname})")
 
             if !diffedTargetFilePathname.exist?
                 sourceFile = document.attr("docfile")
