@@ -6,7 +6,7 @@
     let letters = new Set(["Guide", "Book", "Reference", "Other"]);
     let branches = new Set(["notBranched"])
     let notMasterBranchMult = 0
-    
+
     $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
         let newVersionEdited = DOCSBRANCHMAP[newVersion]
@@ -207,9 +207,11 @@
                                         if (doc.containsKey('docslikes') && doc.docslikes.size()!=0) {
                                             totalScore = totalScore*(1.0+${data._source.multipliers.docslikes}*doc.docslikes.value);
                                         }
-                                        if (doc['_index'].value == "mpbook") {
+                                        {% if site.environment.name contains "docs" %}
+                                        if (doc.containsKey('type.keyword') && doc['type.keyword'].value == "Book") {
                                             totalScore = totalScore*${data._source.multipliers.book};
                                         }
+                                        {% endif %}
                                         if (doc.containsKey('upkeep-status.keyword') && doc['upkeep-status.keyword'].size()!=0) {
                                             if (doc['upkeep-status.keyword'].value == "yellow") {
                                                 totalScore = totalScore*${data._source.multipliers.status_yellow};
@@ -506,7 +508,7 @@
                     let branchLabel = ""
                     let displayBranch = ""
                     let tooltipVer = "not versioned"
-                    
+
                     console.log(DOCSBRANCHESCOLORS)
 
                     if (branch != null && branch != "notBranched") {
@@ -629,10 +631,10 @@
                     }
                     {% endif %}
 
-                    showItems.push(`<div><span class="trigger-details searchResult" data-toggle="tooltip" data-toggle="tooltip" data-placement="left" 
+                    showItems.push(`<div><span class="trigger-details searchResult" data-toggle="tooltip" data-toggle="tooltip" data-placement="left"
                     data-html="true" title='<span class="tooltip-preview"><p>Last modification date: ${displayDate}</p>
                     <p>Upkeep status: ${upkeepStatus} <i id="upkeep${upkeepStatus}" class="fa fa-circle"></i>
-                    </p><p>Search likes: ${searchUpvotes}</p><p>Docs likes: ${docsUpvotes}</p>{% if site.environment.name contains "docs" %}<p>Version: ${tooltipVer}</p>{% endif %}<p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${data.hits.hits[i].fields.url[0]}" 
+                    </p><p>Search likes: ${searchUpvotes}</p><p>Docs likes: ${docsUpvotes}</p>{% if site.environment.name contains "docs" %}<p>Version: ${tooltipVer}</p>{% endif %}<p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${data.hits.hits[i].fields.url[0]}"
                     id="${data.hits.hits[i]._id}site"><li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i>
                     <span class="font1 searchResultTitle {% if site.environment.name contains "docs" %}${branchClass}{% endif %}">&nbsp;${title}</span>{% if site.environment.name contains "docs" %}<span id="label${type}" class="typeLabel">${type.toUpperCase()}</span>${branchLabel}{% endif %}<i class="${contentTriangleClass}"></i><br><span class="font2">${preview}</span></li></a></span>
                     <span class="vote" id="${data.hits.hits[i]._id}up"><i class="fas fa-thumbs-up"></i></span></div>`);
@@ -664,7 +666,7 @@
 
         }
 
-        OSrequest("GET", "https://{{ site.environment.searchUrl }}/{% if site.environment.name contains "docs" %}docs,mpbook{% else %}guide{% endif %}/_search", searchQuery, true, showResults)
+        OSrequest("GET", "https://{{ site.environment.searchUrl }}/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}/_search", searchQuery, true, showResults)
     }
 
     function setHighlighting() {
@@ -680,7 +682,7 @@
         document.addEventListener("keydown", function(event) {
             // Check for up/down key presses
             switch (event.keyCode) {
-                case 38: // Up arrow    
+                case 38: // Up arrow
                     // Remove the highlighting from the previous element
                     listItems[currentLI].classList.remove("highlightSearch");
                     if (listItems[currentLI].className == "aWithoutUnderline") {
@@ -688,7 +690,7 @@
                     }
                     listItems[currentLI].blur()
 
-                    currentLI = currentLI > 0 ? --currentLI : 0; // Decrease the counter      
+                    currentLI = currentLI > 0 ? --currentLI : 0; // Decrease the counter
                     listItems[currentLI].classList.add("highlightSearch"); // Highlight the new element
                     if (listItems[currentLI].id != "searchbar") {
                         listItems[currentLI].parentElement.parentElement.classList.add("highlightParentSearch");
@@ -703,7 +705,7 @@
                     }
                     listItems[currentLI].blur()
 
-                    currentLI = currentLI < listItems.length - 1 ? ++currentLI : listItems.length - 1; // Increase counter 
+                    currentLI = currentLI < listItems.length - 1 ? ++currentLI : listItems.length - 1; // Increase counter
                     listItems[currentLI].classList.add("highlightSearch"); // Highlight the new element
                     if (listItems[currentLI].id != "searchbar") {
                         listItems[currentLI].parentElement.parentElement.classList.add("highlightParentSearch");
@@ -755,7 +757,7 @@
             if (event.button == 0 || event.button == 2) {
 
                 const date = new Date();
-                
+
                 if (logScheduled) {
                     clearTimeout(logTimer);
                     logTimer = null;
