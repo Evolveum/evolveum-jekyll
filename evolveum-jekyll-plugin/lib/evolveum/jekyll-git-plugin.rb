@@ -25,7 +25,7 @@ module Evolveum
             end
         end
 
-        def self.update(page, mpDir)
+        def self.update(page, mpDir, bookDir)
             lastModDate = nil
             if page.path != nil && File.exist?(page.path)
                 #puts(page.path)
