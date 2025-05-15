@@ -17,8 +17,11 @@ module Evolveum
 
         def self.post_read(site)
             mpDir = site.config['docs']['midpointVersionsPath'] + site.config['docs']['midpointVersionsPrefix']
+            bookPath = site.config['docs']['bookPath']
+            bookPath = File.expand_path(bookPath, site.source) unless File.absolute_path?(bookPath) == bookPath
+            bookDir = File.join(bookPath, site.config['docs']['bookDirName'])
             site.pages.each do |page|
-                update(page, mpDir)
+                update(page, mpDir, bookDir)
             end
         end
 
@@ -35,6 +38,8 @@ module Evolveum
                     else
                         dateString = git("log -1 --pretty='format:%ci' 'release-notes.adoc'", page.data['docsReleaseBranch'], mpDir)
                     end
+                elsif page.path != "book/index.html" && page.path.include?("book/") && Dir.exist?("#{bookDir}")
+                  dateString = git("log -1 --pretty='format:%ci' '#{page.path.gsub("book/","")}'", nil, bookDir)
                 else
                     dateString = git("log -1 --pretty='format:%ci' '#{page.path}'", nil, nil)
                 end
@@ -52,11 +57,13 @@ module Evolveum
             #puts("  [U] #{page.path}: #{lastModDate}")
         end
 
-        def self.git(argString, branch, mpDir)
+        def self.git(argString, branch, dir, book = nil)
             if branch == nil
                 out = `git #{argString}`
+            elsif book
+                out = `cd #{dir} && git #{argString}`
             else
-                out, _ = Open3.capture2("cd #{mpDir}#{branch}/ && git #{argString}")
+                out, _ = Open3.capture2("cd #{dir}#{branch}/ && git #{argString}")
             end
 
             if !$?.success?
