@@ -39,7 +39,7 @@ module Evolveum
                         dateString = git("log -1 --pretty='format:%ci' 'release-notes.adoc'", page.data['docsReleaseBranch'], mpDir)
                     end
                 elsif page.path != "book/index.html" && page.path.include?("book/") && Dir.exist?("#{bookDir}")
-                  dateString = git("log -1 --pretty='format:%ci' '#{page.path.gsub("book/","")}'", nil, bookDir)
+                  dateString = git("log -1 --pretty='format:%ci' '#{page.path.gsub("book/","")}'", nil, bookDir, true)
                 else
                     dateString = git("log -1 --pretty='format:%ci' '#{page.path}'", nil, nil)
                 end
@@ -57,7 +57,7 @@ module Evolveum
             #puts("  [U] #{page.path}: #{lastModDate}")
         end
 
-        def self.git(argString, branch, dir, book = nil)
+        def self.git(argString, branch, dir = nil, book = nil)
             if branch == nil
                 out = `git #{argString}`
             elsif book
