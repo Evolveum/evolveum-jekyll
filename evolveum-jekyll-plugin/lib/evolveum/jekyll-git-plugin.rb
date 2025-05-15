@@ -58,7 +58,7 @@ module Evolveum
         end
 
         def self.git(argString, branch, dir = nil, book = nil)
-            if branch == nil
+            if branch == nil && !book
                 out = `git #{argString}`
             elsif book
                 out = `cd #{dir} && git #{argString}`
