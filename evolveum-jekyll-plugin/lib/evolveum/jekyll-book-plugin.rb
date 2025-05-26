@@ -26,6 +26,15 @@ module Evolveum
             @docsDir = File.join(docsPath, site.config['docs']['docsDirName'])
         end
 
+        def get_current_book_tag
+          current_tag = `cd #{@bookDir} && git describe --tags --exact-match 2>/dev/null`.strip
+          return current_tag unless current_tag.empty?
+
+          current_branch = `cd #{@bookDir} && git rev-parse --abbrev-ref HEAD`.strip
+          return current_branch unless current_branch.empty?
+          return nil
+        end
+
         # def update_chapter_include_file
         #   chapter_include_path = File.join(@bookDir, "chapter-include.adoc")
 
@@ -162,15 +171,19 @@ module Evolveum
         end
 
         def cloneBook()
-          config_changed = config_recently_modified?
-
-          if (!File.exist?(@bookDir + "/.git"))
-            @bookTag ? system("cd #{@bookDir} && git clone -b #{@bookTag} #{@bookGH} .") : system("cd #{@bookDir} && git clone #{@bookGH} .")
-          elsif config_changed
-            # If config has changed, update the book
-            Jekyll.logger.info "INFO: _config.yml recently modified, updating book repository"
-            system("rm -rf  #{@bookDir} && mkdir -p #{@bookDir}")
-            @bookTag ? system("cd #{@bookDir} && git clone -b #{@bookTag} #{@bookGH} .") : system("cd #{@bookDir} && git clone #{@bookGH} .")
+          if !Dir.exist?(@bookDir)
+            @bookTag ? system("cd #{@bookDir} && git clone -b #{@bookTag} #{@bookGH} . 1> /dev/null") : system("cd #{@bookDir} && git clone #{@bookGH} . 1> /dev/null")
+          elsif !File.exist?("#{@bookDir}/.git")
+            Jekyll.logger.warn "Book directory is not a git repository, Ignoring automatic update"
+          else
+            current_tag = get_current_book_tag
+            Jekyll.logger.warn "Current book tag is #{current_tag}"
+            expected_tag = @bookTag || "master"
+            if current_tag != expected_tag
+              Jekyll.logger.warn "Book tag is not the same as expected. Current: #{current_tag}, Expected: #{expected_tag}, updating..."
+              system("rm -rf  #{@bookDir} && mkdir -p #{@bookDir}")
+              @bookTag ? system("cd #{@bookDir} && git clone -b #{@bookTag} #{@bookGH} . 1> /dev/null") : system("cd #{@bookDir} && git clone #{@bookGH} . 1> /dev/null")
+            end
           end
         end
 
@@ -222,8 +235,8 @@ module Evolveum
 end
 
 Jekyll::Hooks.register :site, :after_init do |site|
-  puts "=========[ EVOLVEUM BOOK INITIALIZATION ]============== after_init"
   if site.config['environment']['name'].include?("docs")
+    puts "=========[ EVOLVEUM BOOK INITIALIZATION ]============== after_init"
     book_initializator = Evolveum::BookInitializator.new(site)
     book_initializator.addBook()
   end

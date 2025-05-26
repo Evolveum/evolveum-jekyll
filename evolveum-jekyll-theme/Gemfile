@@ -5,3 +5,4 @@ gemspec
 
 gem "evolveum-jekyll-plugin"
 gem "jekyll-asciidoc", "~> 2.0.2"
+gem "asciidoctor-bibtex"

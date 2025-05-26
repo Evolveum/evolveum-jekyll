@@ -5,6 +5,7 @@ github_username: Evolveum
 plugins:
   - evolveum-jekyll-plugin
   - jekyll-asciidoc
+  - asciidoctor-bibtex
 
 asciidoctor:
   base_dir: :docdir
