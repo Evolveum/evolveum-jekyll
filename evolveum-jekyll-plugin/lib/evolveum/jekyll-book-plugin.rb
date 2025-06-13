@@ -22,7 +22,7 @@ module Evolveum
 
             # Use File.join for proper path construction
             @bookDir = File.join(bookPath, site.config['docs']['bookDirName'])
-            @bookGH = site.config['docs']['bookGH']
+            @bookGH = site.config['docs']['bookGH'] # NOTE: this is in evolveum-jekyll repo
             @docsDir = File.join(docsPath, site.config['docs']['docsDirName'])
         end
 

@@ -153,11 +153,6 @@
             query = undefined
         }
         $.ajax({
-            {% if site.environment.name contains "guide" %}
-            headers: {
-                "Authorization": "Basic " + btoa("{{ site.environment.osUsername }}" + ":" + "{{ site.environment.osPassword }}")
-            },
-            {% endif %}
             method: method,
             url: url,
             crossDomain: true,
