@@ -5,7 +5,7 @@
 # TODO
 #
 # NOTE: This has to be a plugin, not just a couple of Liquid files, as Jekyll has this idealistic strict separation of design and content.
-
+require_relative 'jekyll-versioning-plugin.rb'
 
 module Evolveum
 
@@ -83,6 +83,12 @@ module Evolveum
 
         def createRedirect(movedFrom, page)
             out = movedFrom
+
+            negativeLookAhead = VersionReader.get_config_value('negativeLookAhead')
+
+            if out.include?('midpoint/reference/') && !out.include?('midpoint/reference/index.html') && out.match(negativeLookAhead)
+                out = out.sub("midpoint/reference/", "midpoint/reference/#{findDefaultBranch(@site)}/")
+            end
 
             if out.start_with?('/')
                 # We do not want to start pattern with /
