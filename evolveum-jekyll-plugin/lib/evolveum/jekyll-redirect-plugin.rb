@@ -87,7 +87,13 @@ module Evolveum
             negativeLookAhead = VersionReader.get_config_value('negativeLookAhead')
 
             if out.include?('midpoint/reference/') && !out.include?('midpoint/reference/index.html') && out.match(negativeLookAhead)
-                out = out.sub("midpoint/reference/", "midpoint/reference/#{findDefaultBranch(@site)}/")
+                branch = nil
+                if page.data['midpointBranchSlug'] != nil
+                    branch = page.data['midpointBranchSlug']
+                else
+                    branch = findDefaultBranch(@site)
+                end
+                out = out.sub("midpoint/reference/", "midpoint/reference/#{branch}/")
             end
 
             if out.start_with?('/')
