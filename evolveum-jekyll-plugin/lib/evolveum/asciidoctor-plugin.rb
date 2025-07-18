@@ -781,10 +781,11 @@ module Evolveum
             sourceFile = parent.document.attributes["docfile"]
             Jekyll.logger.error("BROKEN FEATURE inline REFERENCE #{target} in #{sourceFile}")
             defaultLabel = target
+            targetUrl = "#"  # fallback URL for broken references
         else
             defaultLabel = feature['title']
+            targetUrl = feature['url']
         end
-        targetUrl = feature['url']
 #        puts "FEATURE: #{target} -> #{targetUrl}"
 
         createLink(targetUrl, parent, attrs, defaultLabel, "feature")
@@ -806,7 +807,6 @@ module Evolveum
 
     class ImagePathTreeprocessor < JekyllTreeprocessor
         def process(document)
-
             # ATTENTION! Use this if there is an error in index.adoc file, and you do not know which one it is
             #Jekyll.logger.info("Processing document #{document.attr("docfile")}")
 
@@ -820,7 +820,7 @@ module Evolveum
                 else
                     image.set_attr("target",fixImagePath(target, document, currentPage, false))
                 end
-          end
+            end
         end
 
         def fixImagePath(target, document, currentPage, last)
@@ -874,7 +874,7 @@ module Evolveum
             #puts("IMAGEFIX: #{target} --> #{diffedTarget} (not found)")
 
             return diffedTargetPathname.to_s
-       end
+        end
     end
 end
 
