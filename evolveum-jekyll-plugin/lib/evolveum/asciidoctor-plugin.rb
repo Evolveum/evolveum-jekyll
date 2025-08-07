@@ -876,6 +876,63 @@ module Evolveum
             return diffedTargetPathname.to_s
         end
     end
+    
+    # This postprocessor wraps tables in a div with class "table-container"
+    # This is used to solve the dillema between display block and table
+    class TableWrapperPostprocessor < Asciidoctor::Extensions::Postprocessor
+      def process document, output
+        document_path = document.attributes['docfile']
+        log = false
+        if document_path.include?("/test/")
+          log = true
+        end
+        lines = output.split("\n")
+        result_lines = []
+        ignore = false
+        started = false
+        lines.each do |line|
+          if line.include?("datatable-config")
+            if log
+              Jekyll.logger.warn("TABLE WRAPPER: #{line}")
+            end
+            result_lines << line
+            if !line.include?("<table")
+              ignore = true
+            end
+          elsif ignore
+            if line.include?("</table>")
+              if log
+                Jekyll.logger.warn("TABLE WRAPPER: ignoring table end #{line}")
+              end
+              ignore = false
+            end
+            result_lines << line
+          elsif started
+            if line.include?("</table>")
+              result_lines << "#{line}</div>"
+              started = false
+            else
+              result_lines << line
+            end
+          else
+            if line.include?("<table")
+              if log
+                Jekyll.logger.warn("TABLE WRAPPER: wrapping table start #{line}")
+              end
+              if line.include?("</table>")
+                result_lines << "<div class=\"table-container\">#{line}</div>"
+              else
+                result_lines << "<div class=\"table-container\">#{line}"
+                started = true
+              end
+            else
+              result_lines << line
+            end
+          end
+        end
+        output = result_lines.join("\n")
+      end
+    end
 end
 
 Asciidoctor::Extensions.register do
@@ -888,4 +945,5 @@ Asciidoctor::Extensions.register do
   block_macro Evolveum::SamplesBlockMacro
   block_macro Evolveum::MidpointBlockMacro
   treeprocessor Evolveum::ImagePathTreeprocessor
+  postprocessor Evolveum::TableWrapperPostprocessor
 end
