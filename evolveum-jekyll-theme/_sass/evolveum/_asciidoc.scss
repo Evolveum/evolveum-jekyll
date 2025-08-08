@@ -1,30 +1,28 @@
 ////
 // VARIABLES
 ////
-
 // Also for adminitions
-$blockquote-cite-font-color: rgba(0,0,0,0.6);
+$blockquote-cite-font-color: rgba(0, 0, 0, 0.6);
 $admonition-icon-color: $black;
 $blockquote-font-color: $black;
-$blockquote-cite-font-color: rgba(0,0,0,0.6);
+$blockquote-cite-font-color: rgba(0, 0, 0, 0.6);
 $blockquote-cite-font-size: 1rem;
 $asciidoc-block-indent: 0rem;
 $asciidoc-block-margin-bottom: 2rem;
-
 $paragraph-margin-bottom: 2rem;
 $box-radius: 3px;
-
-$pre-font-family: "Droid Sans Mono", "DejaVu Sans Mono", "Monospace", monospace;
+$pre-font-family: "Droid Sans Mono",
+"DejaVu Sans Mono",
+"Monospace",
+monospace;
 $pre-font-color: $body-color;
 $pre-border-size: 0px;
 $pre-border-style: solid;
-$pre-border-color: rgba(0,0,0,0.6);
+$pre-border-color: rgba(0, 0, 0, 0.6);
 $pre-bg: #f7f7f8;
 $pre-padding: 0.5rem;
 $pre-line-height: 1.45;
-
 // Tables
-
 $table-head-font-size: inherit;
 $table-head-font-weight: bold;
 $table-head-font-color: $body-color !default;
@@ -38,19 +36,15 @@ $table-border-style: solid;
 $table-border-size: 1px;
 $table-padding: 0.5rem 0.625rem 0.625rem;
 $table-background: transparent;
-
 ////
 // IMPLEMENTATION
 ////
-
 // Adminitions, blocks
-
-.admonitionblock > table {
+.admonitionblock>table {
     border-collapse: separate;
     border: 0;
     background: none;
     width: 100%;
-
     td.content {
         padding-left: 1rem;
         padding-right: 1rem;
@@ -58,39 +52,31 @@ $table-background: transparent;
         padding-bottom: 1rem;
         color: $blockquote-cite-font-color;
         border-left: 1px solid #dddddd;
-
-        > :last-child > :last-child {
-          margin-bottom: 0;
+        > :last-child> :last-child {
+            margin-bottom: 0;
         }
     }
-
     td.icon {
         font-size: 1.75rem;
         text-align: center;
         width: 4rem;
         color: $admonition-icon-color;
         cursor: default;
-
         .icon-note:before {
-          content: "\f05a";
+            content: "\f05a";
         }
-
         .icon-tip:before {
-          content: "\f0eb";
+            content: "\f0eb";
         }
-
         .icon-warning:before {
-          content: "\f071";
+            content: "\f071";
         }
-
         .icon-caution:before {
-          content: "\f06d";
+            content: "\f06d";
         }
-
         .icon-important:before {
-          content: "\f06a";
+            content: "\f06a";
         }
-
     }
 }
 
@@ -130,57 +116,55 @@ table.tableblock,
 .ulist,
 .qlist,
 .hdlist {
-
-    > .title {
+    >.title {
         text-align: left;
         font-style: italic;
         margin-bottom: 0.25rem;
     }
 }
 
-
 // Code and pre-formatted
-
 pre {
-  color: $pre-font-color;
-  font-family: $pre-font-family;
-  line-height: $pre-line-height;
-  padding-top: $pre-padding;
-  padding-bottom: $pre-padding;
-  padding-left: $pre-padding * 2;
-  padding-right: $pre-padding * 2;
-  // NOTE syntax highlighters may deeply nest both code and pre tags
-  code, pre {
-    // QUESTION what about background?
-    color: inherit;
-    font-size: inherit;
-    line-height: inherit;
-  }
-  > code {
-    display: block;
-  }
+    color: $pre-font-color;
+    font-family: $pre-font-family;
+    line-height: $pre-line-height;
+    padding-top: $pre-padding;
+    padding-bottom: $pre-padding;
+    padding-left: $pre-padding * 2;
+    padding-right: $pre-padding * 2;
+    // NOTE syntax highlighters may deeply nest both code and pre tags
+    code,
+    pre {
+        // QUESTION what about background?
+        color: inherit;
+        font-size: inherit;
+        line-height: inherit;
+    }
+    >code {
+        display: block;
+    }
 }
 
 pre.nowrap,
 pre.nowrap pre {
-  white-space: pre;
-  //overflow-wrap: normal;
-  word-wrap: normal;
+    white-space: pre;
+    //overflow-wrap: normal;
+    word-wrap: normal;
 }
 
-.exampleblock > .content,
-.sidebarblock > .content {
-  // FIXME argh, review!
-  > :last-child > :last-child,
-  .olist > ol > li:last-child > :last-child,
-  .ulist > ul > li:last-child > :last-child,
-  .qlist > ol > li:last-child > :last-child {
-    margin-bottom: 0;
-  }
+.exampleblock>.content,
+.sidebarblock>.content {
+    // FIXME argh, review!
+    > :last-child> :last-child,
+    .olist>ol>li:last-child> :last-child,
+    .ulist>ul>li:last-child> :last-child,
+    .qlist>ol>li:last-child> :last-child {
+        margin-bottom: 0;
+    }
 }
 
 .literalblock pre,
-.listingblock > .content > pre {
+.listingblock>.content>pre {
     border: $pre-border-size $pre-border-style $pre-border-color;
     border-radius: $box-radius;
     //overflow-wrap: break-word;
@@ -197,205 +181,202 @@ pre.nowrap pre {
 
 // NOTE if highlight class is absent or in first position, we know source highlighter is not active
 .literalblock pre,
-.listingblock > .content > pre:not(.highlight),
-.listingblock > .content > pre[class="highlight"],
-.listingblock > .content > pre[class^="highlight "] {
-  background: $pre-bg;
+.listingblock>.content>pre:not(.highlight),
+.listingblock>.content>pre[class="highlight"],
+.listingblock>.content>pre[class^="highlight "] {
+    background: $pre-bg;
 }
 
 .literalblock.output pre {
-  // FIXME this doesn't work if pre-bg is an image!
-  color: $pre-bg;
-  background-color: $pre-font-color;
+    // FIXME this doesn't work if pre-bg is an image!
+    color: $pre-bg;
+    background-color: $pre-font-color;
 }
 
-.listingblock > .content {
-  // give floating language text a place to drop anchor
-  position: relative;
+.listingblock>.content {
+    // give floating language text a place to drop anchor
+    position: relative;
 }
 
 .listingblock code[data-lang]:before {
-  display: none;
-  content: attr(data-lang);
-  position: absolute;
-  font-size: 1.2rem;
-  //top: 0.5rem; // 0.67em
-  top: 0.425rem;
-  right: 0.5rem; // 0.67em
-  line-height: 1;
-  text-transform: uppercase;
-  color: inherit;
-  opacity: 0.5;
+    display: none;
+    content: attr(data-lang);
+    position: absolute;
+    font-size: 1.2rem;
+    //top: 0.5rem; // 0.67em
+    top: 0.425rem;
+    right: 0.5rem; // 0.67em
+    line-height: 1;
+    text-transform: uppercase;
+    color: inherit;
+    opacity: 0.5;
 }
 
 .listingblock:hover code[data-lang]:before {
-  display: block;
+    display: block;
 }
 
 .listingblock.terminal pre .command:before {
-  content: attr(data-prompt);
-  padding-right: 0.5em;
-  color: inherit;
-  opacity: 0.5;
+    content: attr(data-prompt);
+    padding-right: 0.5em;
+    color: inherit;
+    opacity: 0.5;
 }
 
 .listingblock.terminal pre .command:not([data-prompt]):before {
-  content: "$";
+    content: "$";
 }
 
 // overrides for built-in prettify styles
 @if not $pre-border-size {
-  .listingblock pre.prettyprint {
-    border-width: 0;
-  }
+    .listingblock pre.prettyprint {
+        border-width: 0;
+    }
 }
 
 // NOTE set the lowest priority background color in case prettify style doesn't provide one
 .prettyprint {
-  background: $pre-bg;
+    background: $pre-bg;
 }
 
 pre.prettyprint .linenums {
-  line-height: $pre-line-height;
-  margin-left: 2em;
+    line-height: $pre-line-height;
+    margin-left: 2em;
 }
 
 pre.prettyprint li {
-  background: none;
-  list-style-type: inherit;
-  padding-left: 0;
+    background: none;
+    list-style-type: inherit;
+    padding-left: 0;
 }
 
 pre.prettyprint li code[data-lang]:before {
-  opacity: 1;
+    opacity: 1;
 }
 
 pre.prettyprint li:not(:first-child) code[data-lang]:before {
-  display: none;
+    display: none;
 }
 
-
-
 // Tables
-
 table.tableblock {
     max-width: 100%;
     border-collapse: separate;
     border-radius: $box-radius;
-
     thead,
     tbody,
     tfoot {
-      border: $table-border-size $table-border-style $table-border-color;
-      background-color: $table-background;
+        border: $table-border-size $table-border-style $table-border-color;
+        background-color: $table-background;
     }
-
     // Caption
     caption {
-      padding: $table-padding;
-      font-weight: bold;
+        padding: $table-padding;
+        font-weight: bold;
     }
-
     // Table head and foot
-    thead, tfoot {
+    thead,
+    tfoot {
         background: $table-head-background-color;
         font-weight: $table-head-font-weight;
         font-size: $table-head-font-size;
-
         // Rows within head and foot
         tr {
             background: transparent;
         }
-
         // Cells within head and foot
-        th, td {
+        th,
+        td {
             padding: $table-padding;
             font-weight: normal;
             text-align: left;
         }
     }
-
     // Table rows
     tbody {
-      th, td {
-        padding: $table-padding;
-      }
-
-      th { // header columns
-        background: $table-head-background-color;
-        font-weight: $table-head-font-weight;
-      }
+        th,
+        td {
+            padding: $table-padding;
+        }
+        th {
+            // header columns
+            background: $table-head-background-color;
+            font-weight: $table-head-font-weight;
+        }
     }
 }
 
 p.tableblock:last-child {
-  margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 // NOTE compensate for bottom margin on last block in AsciiDoc table cell
-td.tableblock > .content {
-  margin-bottom: $paragraph-margin-bottom;
-  > :last-child {
-    margin-bottom: -$paragraph-margin-bottom;
-  }
+td.tableblock>.content {
+    margin-bottom: $paragraph-margin-bottom;
+    > :last-child {
+        margin-bottom: -$paragraph-margin-bottom;
+    }
 }
 
 // NOTE .grid-* selectors must be defined before .frame-* selectors in order for styles to cascade properly
-table.tableblock, th.tableblock, td.tableblock {
-  border: 0 solid $table-border-color;
+table.tableblock,
+th.tableblock,
+td.tableblock {
+    border: 0 solid $table-border-color;
 }
 
-table.grid-all > thead > tr > .tableblock,
-table.grid-all > tbody > tr > .tableblock {
-  border-width: 0 $table-border-size $table-border-size 0;
+table.grid-all>thead>tr>.tableblock,
+table.grid-all>tbody>tr>.tableblock {
+    border-width: 0 $table-border-size $table-border-size 0;
 }
 
-table.grid-all > tfoot > tr > .tableblock {
-  border-width: $table-border-size $table-border-size 0 0;
+table.grid-all>tfoot>tr>.tableblock {
+    border-width: $table-border-size $table-border-size 0 0;
 }
 
-table.grid-cols > * > tr > .tableblock {
-  border-width: 0 $table-border-size 0 0;
+table.grid-cols>*>tr>.tableblock {
+    border-width: 0 $table-border-size 0 0;
 }
 
-table.grid-rows > thead > tr > .tableblock,
-table.grid-rows > tbody > tr > .tableblock {
-  border-width: 0 0 $table-border-size 0;
+table.grid-rows>thead>tr>.tableblock,
+table.grid-rows>tbody>tr>.tableblock {
+    border-width: 0 0 $table-border-size 0;
 }
 
-table.grid-rows > tfoot > tr > .tableblock {
-  border-width: $table-border-size 0 0 0;
+table.grid-rows>tfoot>tr>.tableblock {
+    border-width: $table-border-size 0 0 0;
 }
 
-table.grid-all > * > tr > .tableblock:last-child,
-table.grid-cols > * > tr > .tableblock:last-child {
-  border-right-width: 0;
+table.grid-all>*>tr>.tableblock:last-child,
+table.grid-cols>*>tr>.tableblock:last-child {
+    border-right-width: 0;
 }
 
-table.grid-all > tbody > tr:last-child > .tableblock,
-table.grid-all > thead:last-child > tr > .tableblock,
-table.grid-rows > tbody > tr:last-child > .tableblock,
-table.grid-rows > thead:last-child > tr > .tableblock {
-  border-bottom-width: 0;
+table.grid-all>tbody>tr:last-child>.tableblock,
+table.grid-all>thead:last-child>tr>.tableblock,
+table.grid-rows>tbody>tr:last-child>.tableblock,
+table.grid-rows>thead:last-child>tr>.tableblock {
+    border-bottom-width: 0;
 }
 
 table.frame-all {
-  border-width: $table-border-size;
+    border-width: $table-border-size;
 }
 
 table.frame-sides {
-  border-width: 0 $table-border-size;
+    border-width: 0 $table-border-size;
 }
 
-table.frame-topbot, table.frame-ends {
-  border-width: $table-border-size 0;
+table.frame-topbot,
+table.frame-ends {
+    border-width: $table-border-size 0;
 }
 
 table.stripes-all tr,
 table.stripes-odd tr:nth-of-type(odd),
 table.stripes-even tr:nth-of-type(even),
 table.stripes-hover tr:hover {
-  background: $table-even-row-bg;
+    background: $table-even-row-bg;
 }
 
 // NOTE removing default stripes using script instead
@@ -404,195 +385,182 @@ table.stripes-hover tr:hover {
 //table.stripes-even tr:nth-of-type(odd) {
 //  background: none;
 //}
-
 @each $halign in (left, right, center) {
-  th.halign-#{$halign},
-  td.halign-#{$halign} {
-    text-align: $halign;
-  }
+    th.halign-#{$halign},
+    td.halign-#{$halign} {
+        text-align: $halign;
+    }
 }
 
 @each $valign in (top, bottom, middle) {
-  th.valign-#{$valign},
-  td.valign-#{$valign} {
-    vertical-align: $valign;
-  }
+    th.valign-#{$valign},
+    td.valign-#{$valign} {
+        vertical-align: $valign;
+    }
 }
 
 // NOTE Fix required in Foundation, user-agent stylesheet is overriding
 table.tableblock thead th,
 table.tableblock tfoot th {
-  font-weight: $table-head-font-weight;
+    font-weight: $table-head-font-weight;
 }
 
 // vertical table header (content)
 tbody tr th,
 tfoot tr th {
-  &, p {
-    color: $table-head-font-color;
-    font-weight: $table-head-font-weight;
-  }
+    &,
+    p {
+        color: $table-head-font-color;
+        font-weight: $table-head-font-weight;
+    }
 }
 
-p.tableblock > code:only-child {
-  background: none;
-  padding: 0;
+p.tableblock>code:only-child {
+    background: none;
+    padding: 0;
 }
 
 p.tableblock {
-  font-size: 1em;
+    font-size: 1em;
 }
 
-
 // Quotes
-
 .quoteblock {
-  margin: 1.5rem 1rem $paragraph-margin-bottom 2rem;
-  display: table; // enables auto width
-  @if $paragraph-max-width != 0 {
-    max-width: calc(#{$paragraph-max-width} - 3rem);
-  }
-  &:not(.excerpt) > .title {
-    margin-left: -1.5em;
-    margin-bottom: 0.75em;
-  }
-
-  blockquote, p {
-    color: $blockquote-font-color;
-    font-size: 1.15rem;
-    line-height: 1.75;
-    word-spacing: 0.1em;
-    letter-spacing: 0;
-    font-style: italic;
-    text-align: justify;
-  }
-
-  blockquote {
-    margin: 0;
-    padding: 0;
-    border: 0;
-
-    &:before {
-      content: "\201c";
-      float: left;
-      //font-size: 3em;
-      font-size: 2.75em;
-      font-weight: bold;
-      line-height: 0.6em; // use 0.67em if font-weight: normal
-      margin-left: -0.6em;
-      color: $blockquote-cite-font-color;
-      //text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    margin: 1.5rem 1rem $paragraph-margin-bottom 2rem;
+    display: table; // enables auto width
+    @if $paragraph-max-width !=0 {
+        max-width: calc(#{$paragraph-max-width} - 3rem);
     }
-
-    > .paragraph:last-child p {
-      margin-bottom: 0;
+    &:not(.excerpt)>.title {
+        margin-left: -1.5em;
+        margin-bottom: 0.75em;
     }
-  }
-
-  .attribution {
-    margin-top: 0.75em;
-    margin-right: 0.5ex;
-    text-align: right;
-  }
+    blockquote,
+    p {
+        color: $blockquote-font-color;
+        font-size: 1.15rem;
+        line-height: 1.75;
+        word-spacing: 0.1em;
+        letter-spacing: 0;
+        font-style: italic;
+        text-align: justify;
+    }
+    blockquote {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        &:before {
+            content: "\201c";
+            float: left;
+            //font-size: 3em;
+            font-size: 2.75em;
+            font-weight: bold;
+            line-height: 0.6em; // use 0.67em if font-weight: normal
+            margin-left: -0.6em;
+            color: $blockquote-cite-font-color;
+            //text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        >.paragraph:last-child p {
+            margin-bottom: 0;
+        }
+    }
+    .attribution {
+        margin-top: 0.75em;
+        margin-right: 0.5ex;
+        text-align: right;
+    }
 }
 
 .verseblock {
-  //margin: 0 0.5em $paragraph-margin-bottom 0.5em;
-  margin: 0 1em $paragraph-margin-bottom 1em;
-  pre {
-    // FIXME make me a variable
-    font-family: "Open Sans", "DejaVu Sans", sans;
-    font-size: 1.15rem;
-    color: $blockquote-font-color;
-    font-weight: 300;
-    text-rendering: optimizeLegibility;
-    strong {
-      font-weight: 400;
+    //margin: 0 0.5em $paragraph-margin-bottom 0.5em;
+    margin: 0 1em $paragraph-margin-bottom 1em;
+    pre {
+        // FIXME make me a variable
+        font-family: "Open Sans", "DejaVu Sans", sans;
+        font-size: 1.15rem;
+        color: $blockquote-font-color;
+        font-weight: 300;
+        text-rendering: optimizeLegibility;
+        strong {
+            font-weight: 400;
+        }
     }
-  }
-
-  .attribution {
-    margin-top: 1.25rem;
-    margin-left: 0.5ex;
-  }
+    .attribution {
+        margin-top: 1.25rem;
+        margin-left: 0.5ex;
+    }
 }
 
 .quoteblock,
 .verseblock {
-  .attribution {
-    font-size: $blockquote-cite-font-size;
-    line-height: 1.45;
-    font-style: italic;
-    br {
-      display: none;
+    .attribution {
+        font-size: $blockquote-cite-font-size;
+        line-height: 1.45;
+        font-style: italic;
+        br {
+            display: none;
+        }
+        cite {
+            display: block;
+            //letter-spacing: -0.05em;
+            letter-spacing: -0.025em;
+            color: $blockquote-cite-font-color;
+        }
     }
-    cite {
-      display: block;
-      //letter-spacing: -0.05em;
-      letter-spacing: -0.025em;
-      color: $blockquote-cite-font-color;
-    }
-  }
 }
 
 .quoteblock {
-  &.abstract,
-  &.excerpt,
-  .quoteblock {
-    blockquote {
-      &:before {
-        display: none;
-      }
+    &.abstract,
+    &.excerpt,
+    .quoteblock {
+        blockquote {
+            &:before {
+                display: none;
+            }
+        }
+        blockquote,
+        p {
+            line-height: 1.6;
+            word-spacing: 0;
+        }
     }
-
-    blockquote, p {
-      line-height: 1.6;
-      word-spacing: 0;
+    &.abstract {
+        margin: 0 1em $paragraph-margin-bottom 1em;
+        display: block;
+        >.title {
+            margin: 0 0 0.375em 0;
+            font-size: 1.15em;
+            text-align: center;
+        }
     }
-  }
-
-  &.abstract {
-    margin: 0 1em $paragraph-margin-bottom 1em;
-    display: block;
-    > .title {
-      margin: 0 0 0.375em 0;
-      font-size: 1.15em;
-      text-align: center;
+    &.excerpt>blockquote,
+    .quoteblock {
+        padding: 0 0 0.25em 1em;
+        border-left: 0.25em solid $hr-border-color;
     }
-  }
-
-  &.excerpt > blockquote,
-  .quoteblock {
-    padding: 0 0 0.25em 1em;
-    border-left: 0.25em solid $hr-border-color;
-  }
-
-  &.excerpt,
-  .quoteblock {
-    margin-left: 0;
-    blockquote, p {
-      //color: rgba(0, 0, 0, 0.6);
-      color: inherit;
-      font-size: 1.0625rem;
+    &.excerpt,
+    .quoteblock {
+        margin-left: 0;
+        blockquote,
+        p {
+            //color: rgba(0, 0, 0, 0.6);
+            color: inherit;
+            font-size: 1.0625rem;
+        }
+        .attribution {
+            //color: rgba(0, 0, 0, 0.6);
+            color: inherit;
+            text-align: left;
+            margin-right: 0;
+        }
     }
-    .attribution {
-      //color: rgba(0, 0, 0, 0.6);
-      color: inherit;
-      text-align: left;
-      margin-right: 0;
-    }
-  }
 }
-
-
-
 
 // trick to prevent caption from influencing width of an autowidth table
-table.tableblock.fit-content > caption.title {
-  white-space: nowrap;
-  width: 0;
+table.tableblock.fit-content>caption.title {
+    white-space: nowrap;
+    width: 0;
 }
-
 
 .toc {
     border: 1px solid #e0e0e0;
@@ -603,7 +571,6 @@ table.tableblock.fit-content > caption.title {
     width: max-content;
     padding-left: 30px;
     padding-right: 30px;
-
     title {
         display: block;
         font-size: large;
@@ -635,24 +602,23 @@ table.tableblock.fit-content > caption.title {
 }
 
 // More dense bullet lists in asciidoc-generated code
-li > p {
-  margin-bottom: 5px;
+li>p {
+    margin-bottom: 5px;
 }
-
 
 // asciidoc class [.red]
 span.red {
-    color: rgb(128,0,0);
+    color: rgb(128, 0, 0);
 }
 
 // asciidoc class [.green]
 span.green {
-    color: rgb(0,128,0);
+    color: rgb(0, 128, 0);
 }
 
 // asciidoc class [.blue]
 span.blue {
-    color: rgb(0,0,128);
+    color: rgb(0, 0, 128);
 }
 
 // div.imageblock {
@@ -664,68 +630,59 @@ span.blue {
 //         margin-top: 10px;
 //     }
 // }
-
-
-
 // Circled highlights
 .conum[data-value] {
-  display: inline-block;
-  color: #fff !important;
-  background: rgba(0,0,0,.8);
-  -webkit-border-radius: 1em;
-  border-radius: 1em;
-  text-align: center;
-  font-size: .75em;
-  width: 1.67em;
-  height: 1.67em;
-  line-height: 1.67em;
-  font-family: "Open Sans", "DejaVu Sans", sans-serif;
-  font-style: normal;
-  font-weight: bold;
+    display: inline-block;
+    color: #fff !important;
+    background: rgba(0, 0, 0, .8);
+    -webkit-border-radius: 1em;
+    border-radius: 1em;
+    text-align: center;
+    font-size: .75em;
+    width: 1.67em;
+    height: 1.67em;
+    line-height: 1.67em;
+    font-family: "Open Sans", "DejaVu Sans", sans-serif;
+    font-style: normal;
+    font-weight: bold;
 }
+
 .conum[data-value] * {
-  color: #fff !important;
+    color: #fff !important;
 }
-.conum[data-value] + b {
-  display: none;
+
+.conum[data-value]+b {
+    display: none;
 }
+
 .conum[data-value]::after {
-  content: attr(data-value);
+    content: attr(data-value);
 }
+
 pre .conum[data-value] {
-  position: relative;
-  top: -.125em;
+    position: relative;
+    top: -.125em;
 }
+
 b.conum * {
-  color: inherit !important;
+    color: inherit !important;
 }
+
 .conum:not([data-value]):empty {
-  display: none;
+    display: none;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 //////////////////////// OLD: NEEDS WORK
-
-
-
 // --------- VARIABLES
-
 // TODO: align with bootstrap
 $body-bg: white;
-$body-font-color: rgba(0,0,0,0.8);
-$body-font-family: "Noto Serif", "DejaVu Serif", serif;
-$header-font-family: "Open Sans", "DejaVu Sans", sans-serif;
+$body-font-color: rgba(0, 0, 0, 0.8);
+$body-font-family: "Noto Serif",
+"DejaVu Serif",
+serif;
+$header-font-family: "Open Sans",
+"DejaVu Sans",
+sans-serif;
 $header-font-weight: 300;
 $header-font-color: #ba3925;
 $header-line-height: 1.2;
@@ -738,111 +695,130 @@ $subheader-font-weight: normal;
 $subheader-font-style: italic;
 $panel-margin-bottom: 2rem;
 $hr-border-style: solid;
-
 $header-text-rendering: geometricPrecision;
 $subheader-text-rendering: $header-text-rendering !default;
-
 $list-side-margin: 1rem;
 $definition-list-content-margin-left: 1.5rem !default;
 $inline-list-bottom-margin: $paragraph-margin-bottom / 2;
 $inline-list-item-spacing: $paragraph-margin-bottom !default;
-
-$panel-padding: 2rem;;
+$panel-padding: 2rem;
+;
 $panel-border-style: solid;
 $panel-border-size: 1px;
 $panel-function-factor: 10%;
-$panel-font-color: rgba(0,0,0,0.75);
+$panel-font-color: rgba(0, 0, 0, 0.75);
 $panel-bg: #f8f8f7;
-
 $sidebar-header-align: center;
 $sidebar-header-border-style: solid !default;
 $sidebar-header-border-size: 0 !default;
 $sidebar-header-border-color: #ddd !default;
-
-
 $code-border-size: 0 !default;
-$code-font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
+$code-font-family: "Droid Sans Mono",
+"DejaVu Sans Mono",
+monospace;
 // NOTE will need to adjust code-font-size if we bump p font-size to 1.125em
 //$code-font-size: 0.95em;
 $code-font-size: 1rem;
 $code-font-weight: normal;
 // FIXME don't forget about code in a table cell
 $code-line-height: 1.45;
-$code-color: rgba(0,0,0,0.9);
+$code-color: rgba(0, 0, 0, 0.9);
 $code-bg-color: #f7f7f8;
 $code-padding: 0.1em 0.5ex;
 $code-word-spacing: -0.15em;
 $code-text-rendering: optimizeSpeed;
-
-
 $thumb-border-style: solid !default;
 $thumb-border-width: 4px !default;
 $thumb-border-color: #fff !default;
 $thumb-box-shadow: 0 0 0 1px #ddd !default;
-
 $include-asciidoc-role-classes: true !default;
-
 //--------- CUSTOM
-
-
-
 //
 // Global Foundation Mixins
 //
-
 // @mixins
 //
-
 @mixin panel($bg:$panel-bg, $padding:$panel-padding, $adjust:$panel-header-adjust) {
-
-  @if $bg {
-    $bg-lightness: lightness($bg);
-
-    border-style: $panel-border-style;
-    border-width: $panel-border-size;
-    border-color: scale-color($bg, $lightness: $panel-function-factor);
-    margin-bottom: $panel-margin-bottom;
-    padding: $padding;
-
-    background: $bg;
-    @if $bg-lightness >= 50% { color: $panel-font-color; }
-    @else { color: $panel-font-color-alt; }
-
-    // Respect the padding, fool.
-    &>:first-child { margin-top: 0; }
-    &>:last-child { margin-bottom: 0; }
-
-    @if $adjust {
-      // We set the font color based on the darkness of the bg.
-      @if $bg-lightness >= 50% {
-        h1,h2,h3,h4,h5,h6,p,li,dl { color: $panel-font-color; }
-      }
-      @else {
-        h1,h2,h3,h4,h5,h6,p,li,dl { color: $panel-font-color-alt; }
-      }
-
-      // reset header line-heights for panels
-      h1,h2,h3,h4,h5,h6 {
-        line-height: 1; margin-bottom: rem-calc(20) / 2;
-        &.subheader { line-height: 1.4; }
-      }
+    @if $bg {
+        $bg-lightness: lightness($bg);
+        border-style: $panel-border-style;
+        border-width: $panel-border-size;
+        border-color: scale-color($bg, $lightness: $panel-function-factor);
+        margin-bottom: $panel-margin-bottom;
+        padding: $padding;
+        background: $bg;
+        @if $bg-lightness>=50% {
+            color: $panel-font-color;
+        }
+        @else {
+            color: $panel-font-color-alt;
+        }
+        // Respect the padding, fool.
+        &>:first-child {
+            margin-top: 0;
+        }
+        &>:last-child {
+            margin-bottom: 0;
+        }
+        @if $adjust {
+            // We set the font color based on the darkness of the bg.
+            @if $bg-lightness>=50% {
+                h1,
+                h2,
+                h3,
+                h4,
+                h5,
+                h6,
+                p,
+                li,
+                dl {
+                    color: $panel-font-color;
+                }
+            }
+            @else {
+                h1,
+                h2,
+                h3,
+                h4,
+                h5,
+                h6,
+                p,
+                li,
+                dl {
+                    color: $panel-font-color-alt;
+                }
+            }
+            // reset header line-heights for panels
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                line-height: 1;
+                margin-bottom: rem-calc(20) / 2;
+                &.subheader {
+                    line-height: 1.4;
+                }
+            }
+        }
     }
-  }
 }
-
 
 //------ STOCK from _asciidoc.scss
+object,
+svg {
+    display: inline-block;
+    vertical-align: middle;
+}
 
-object, svg {
-  display: inline-block;
-  vertical-align: middle;
-}
 .center {
-  margin-left: auto;
-  margin-right: auto;
+    margin-left: auto;
+    margin-right: auto;
 }
+
 .stretch {
-  width: 100%;
+    width: 100%;
 }
 
 code {
@@ -850,107 +826,109 @@ code {
 }
 
 // :not([class^=L]) is for prettify; could also use :not(li)
-:not(pre):not([class^=L]) > code {
-  font-size: $code-font-size;
-  font-style: normal !important;
-  letter-spacing: 0;
-  padding: $code-padding;
-  @if $code-word-spacing != 0 {
-    word-spacing: $code-word-spacing;
-  }
-  @if $code-bg-color != inherit {
-    background-color: $code-bg-color;
-  }
-  @if $code-border-size != 0 {
-    border: $code-border-size $code-border-style $code-border-color;
-  }
-  //text-shadow: none;
-  line-height: $code-line-height;
-  @if $code-text-rendering != inherit {
-    text-rendering: $code-text-rendering;
-  }
-  //overflow-wrap: break-word;
-  word-wrap: break-word;
+:not(pre):not([class^=L])>code {
+    font-size: $code-font-size;
+    font-style: normal !important;
+    letter-spacing: 0;
+    padding: $code-padding;
+    @if $code-word-spacing !=0 {
+        word-spacing: $code-word-spacing;
+    }
+    @if $code-bg-color !=inherit {
+        background-color: $code-bg-color;
+    }
+    @if $code-border-size !=0 {
+        border: $code-border-size $code-border-style $code-border-color;
+    }
+    //text-shadow: none;
+    line-height: $code-line-height;
+    @if $code-text-rendering !=inherit {
+        text-rendering: $code-text-rendering;
+    }
+    //overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
-:not(pre) > code {
-  &.nobreak {
-    //overflow-wrap: normal;
-    word-wrap: normal;
-  }
-  &.nowrap {
-    white-space: nowrap;
-  }
+:not(pre)>code {
+    &.nobreak {
+        //overflow-wrap: normal;
+        word-wrap: normal;
+    }
+    &.nowrap {
+        white-space: nowrap;
+    }
 }
-
 
 .keyseq {
-  color: lighten($body-font-color, 20%);
+    color: lighten($body-font-color, 20%);
 }
 
 kbd {
-  font-family: $code-font-family;
-  display: inline-block;
-  color: $body-font-color;
-  font-size: 0.65em;
-  line-height: 1.45;
-  background-color: #f7f7f7;
-  border: 1px solid #ccc;
-  border-radius: $box-radius;
-  @include box-shadow(0 1px 0 rgba(0,0,0,0.2), 0 0 0 0.1em white inset);
-  margin: 0 0.15em;
-  padding: 0.2em 0.5em;
-  vertical-align: middle;
-  position: relative;
-  top: -0.1em;
-  white-space: nowrap;
+    font-family: $code-font-family;
+    display: inline-block;
+    color: $body-font-color;
+    font-size: 0.65em;
+    line-height: 1.45;
+    background-color: #f7f7f7;
+    border: 1px solid #ccc;
+    border-radius: $box-radius;
+    @include box-shadow(0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 0.1em white inset);
+    margin: 0 0.15em;
+    padding: 0.2em 0.5em;
+    vertical-align: middle;
+    position: relative;
+    top: -0.1em;
+    white-space: nowrap;
 }
 
 .keyseq kbd:first-child {
-  margin-left: 0;
+    margin-left: 0;
 }
 
 .keyseq kbd:last-child {
-  margin-right: 0;
+    margin-right: 0;
 }
 
-.menuseq, .menuref {
-  color: #000;
-  hyphens: none;
-  font-weight: bold;
+.menuseq,
+.menuref {
+    color: #000;
+    hyphens: none;
+    font-weight: bold;
 }
 
-.menuseq b:not(.caret), .menuref {
-  //font-weight: inherit;
+.menuseq b:not(.caret),
+.menuref {
+    //font-weight: inherit;
 }
 
 .menuseq {
-  word-spacing: -0.02em;
-  b.caret {
-    font-size: 1.25em;
-    line-height: 0.8;
-  }
-  i.caret {
-    font-weight: bold;
-    text-align: center;
-    width: 0.45em;
-  }
+    word-spacing: -0.02em;
+    b.caret {
+        font-size: 1.25em;
+        line-height: 0.8;
+    }
+    i.caret {
+        font-weight: bold;
+        text-align: center;
+        width: 0.45em;
+    }
 }
 
-b.button:before, b.button:after {
-  position: relative;
-  top: -1px;
-  font-weight: normal;
+b.button:before,
+b.button:after {
+    position: relative;
+    top: -1px;
+    font-weight: normal;
 }
 
 b.button:before {
-  content: "[";
-  padding: 0 3px 0 2px;
+    content: "[";
+    padding: 0 3px 0 2px;
 }
 
 b.button:after {
-  content: "]";
-  padding: 0 2px 0 3px;
+    content: "]";
+    padding: 0 2px 0 3px;
 }
 
 // these blocks don't receive a specialized margin
@@ -961,135 +939,135 @@ details,
 .listingblock,
 .stemblock,
 .videoblock {
-  margin-bottom: $panel-margin-bottom;
+    margin-bottom: $panel-margin-bottom;
 }
 
-
-
-.exampleblock > .content {
-  // FIXME add variable for $example-bg
-  @include panel($body-bg, $panel-padding, false);
-  border-radius: $box-radius;
-  //> :last-child > :last-child,
-  //// argh, review!
-  //.olist > ol > li:last-child > :last-child,
-  //.ulist > ul > li:last-child > :last-child,
-  //.qlist > ol > li:last-child > :last-child {
-  //  margin-bottom: 0;
-  //}
+.exampleblock>.content {
+    // FIXME add variable for $example-bg
+    @include panel($body-bg, $panel-padding, false);
+    border-radius: $box-radius;
+    //> :last-child > :last-child,
+    //// argh, review!
+    //.olist > ol > li:last-child > :last-child,
+    //.ulist > ul > li:last-child > :last-child,
+    //.qlist > ol > li:last-child > :last-child {
+    //  margin-bottom: 0;
+    //}
 }
 
 .sidebarblock {
-  @include panel(darken($panel-bg, 2%), $panel-padding, false);
-  border-radius: $box-radius;
-
-  > .content {
-    > .title {
-      @extend h3;
-      color: $subheader-font-color;
-      //color: darken($header-font-color, 15%); // name this panel-header-color?
-      //line-height: 1.45; // a touch up from the header line height
-      margin-top: 0;
-      @if $sidebar-header-align {
-        text-align: $sidebar-header-align;
-      }
-      @if $sidebar-header-border-size != 0 {
-        border-width: $sidebar-header-border-size;
-        border-style: $sidebar-header-border-style;
-        border-color: $sidebar-header-border-color;
-      }
+    @include panel(darken($panel-bg, 2%), $panel-padding, false);
+    border-radius: $box-radius;
+    >.content {
+        >.title {
+            @extend h3;
+            color: $subheader-font-color;
+            //color: darken($header-font-color, 15%); // name this panel-header-color?
+            //line-height: 1.45; // a touch up from the header line height
+            margin-top: 0;
+            @if $sidebar-header-align {
+                text-align: $sidebar-header-align;
+            }
+            @if $sidebar-header-border-size !=0 {
+                border-width: $sidebar-header-border-size;
+                border-style: $sidebar-header-border-style;
+                border-color: $sidebar-header-border-color;
+            }
+        }
     }
-  }
 }
 
-
-
-
 // AsciiDoc list styles
-
 ul li ol {
-  margin-left: $list-side-margin;
+    margin-left: $list-side-margin;
 }
 
 dl dd {
-  margin-left: $definition-list-content-margin-left;
+    margin-left: $definition-list-content-margin-left;
 }
 
 // argh
 dl dd:last-child,
-dl dd:last-child > :last-child {
-  margin-bottom: 0;
+dl dd:last-child> :last-child {
+    margin-bottom: 0;
 }
 
-ol > li p,
-ul > li p,
+ol>li p,
+ul>li p,
 ul dd,
 ol dd,
 .olist .olist,
 .ulist .ulist,
 .ulist .olist,
 .olist .ulist {
-  margin-bottom: $paragraph-margin-bottom / 4;
+    margin-bottom: $paragraph-margin-bottom / 4;
 }
 
 ul.checklist,
-ul.none, ol.none,
-ul.no-bullet, ol.no-bullet, ol.unnumbered,
-ul.unstyled, ol.unstyled {
-  list-style-type: none;
+ul.none,
+ol.none,
+ul.no-bullet,
+ol.no-bullet,
+ol.unnumbered,
+ul.unstyled,
+ol.unstyled {
+    list-style-type: none;
 }
 
-ul.no-bullet, ol.no-bullet, ol.unnumbered {
-  margin-left: 0.625em;
+ul.no-bullet,
+ol.no-bullet,
+ol.unnumbered {
+    margin-left: 0.625em;
 }
 
-ul.unstyled, ol.unstyled {
-  margin-left: 0;
+ul.unstyled,
+ol.unstyled {
+    margin-left: 0;
 }
 
 ul.checklist {
-  margin-left: 0.5rem;
+    margin-left: 0.5rem;
 }
 
 // use consistent size for checkbox
-ul.checklist li > p:first-child > .fa-square-o:first-child,
-ul.checklist li > p:first-child > .fa-check-square-o:first-child {
-  width: 1.25em;
-  font-size: 0.8em;
-  position: relative;
-  bottom: 0.125em;
+ul.checklist li>p:first-child>.fa-square-o:first-child,
+ul.checklist li>p:first-child>.fa-check-square-o:first-child {
+    width: 1.25em;
+    font-size: 0.8em;
+    position: relative;
+    bottom: 0.125em;
 }
 
-ul.checklist li > p:first-child > input[type="checkbox"]:first-child {
-  margin-right: 0.25em;
+ul.checklist li>p:first-child>input[type="checkbox"]:first-child {
+    margin-right: 0.25em;
 }
 
 ul.inline {
-  display: -ms-flexbox;
-  display: -webkit-box;
-  display: flex;
-  -ms-flex-flow: row wrap;
-  -webkit-flex-flow: row wrap;
-  flex-flow: row wrap;
-  list-style: none;
-  margin: 0 0 $inline-list-bottom-margin (-$inline-list-item-spacing);
+    display: -ms-flexbox;
+    display: -webkit-box;
+    display: flex;
+    -ms-flex-flow: row wrap;
+    -webkit-flex-flow: row wrap;
+    flex-flow: row wrap;
+    list-style: none;
+    margin: 0 0 $inline-list-bottom-margin (-$inline-list-item-spacing);
 }
 
-ul.inline > li {
-  margin-left: $inline-list-item-spacing;
+ul.inline>li {
+    margin-left: $inline-list-item-spacing;
 }
 
 // used when you need to style the term inline
 // or should we name it "natural"?
 .unstyled dl dt {
-  font-weight: normal;
-  font-style: normal;
+    font-weight: normal;
+    font-style: normal;
 }
 
 @mixin ordered-list-type($class, $type) {
-  ol.#{$class} {
-    list-style-type: #{$type};
-  }
+    ol.#{$class} {
+        list-style-type: #{$type};
+    }
 }
 
 @include ordered-list-type(arabic, decimal);
@@ -1101,163 +1079,152 @@ ul.inline > li {
 @include ordered-list-type(lowergreek, lower-greek);
 //@include ordered-list-type(armenian, armenian);
 //@include ordered-list-type(georgian, georgian);
-
-.hdlist > table,
-.colist > table {
-  border: 0;
-  background: none; // FIXME this wouldn't be required if a background was set on table.tableblock and not table
-  > tbody > tr {
-    background: none;
-  }
+.hdlist>table,
+.colist>table {
+    border: 0;
+    background: none; // FIXME this wouldn't be required if a background was set on table.tableblock and not table
+    >tbody>tr {
+        background: none;
+    }
 }
 
 td.hdlist1,
 td.hdlist2 {
-  vertical-align: top;
-  padding: 0 0.5rem;
+    vertical-align: top;
+    padding: 0 0.5rem;
 }
 
 td.hdlist1 {
-  font-weight: bold;
-  padding-bottom: $paragraph-margin-bottom;
+    font-weight: bold;
+    padding-bottom: $paragraph-margin-bottom;
 }
 
-.literalblock + .colist,
-.listingblock + .colist {
-  margin-top: -0.5em;
+.literalblock+.colist,
+.listingblock+.colist {
+    margin-top: -0.5em;
 }
 
 // NOTE be less specific so as not to override nested source block
 .colist td:not([class]) {
-  // number column
-  &:first-child {
-    padding: 0.4em 0.75em 0 0.75em;
-    line-height: 1;
-    vertical-align: top;
-    img {
-      max-width: none;
+    // number column
+    &:first-child {
+        padding: 0.4em 0.75em 0 0.75em;
+        line-height: 1;
+        vertical-align: top;
+        img {
+            max-width: none;
+        }
     }
-  }
-
-  // text column
-  &:last-child {
-    padding: 0.2rem 0;
-  }
+    // text column
+    &:last-child {
+        padding: 0.2rem 0;
+    }
 }
 
 .imageblock {
-  &.left {
-    margin: 0.2rem 0.5rem $panel-margin-bottom 0;
-  }
-  &.right {
-    margin: 0.2rem 0 $panel-margin-bottom 0.5rem;
-  }
-  //&.center {
-  //  display: table;
-  //}
-
-  > .title {
-    margin-bottom: 0;
-  }
-
-  &.thumb,
-  &.th {
-    border-width: $thumb-border-width + ($thumb-border-width * .5);
-    > .title {
-      padding: 0 0.2rem;
+    &.left {
+        margin: 0.2rem 0.5rem $panel-margin-bottom 0;
     }
-  }
+    &.right {
+        margin: 0.2rem 0 $panel-margin-bottom 0.5rem;
+    }
+    //&.center {
+    //  display: table;
+    //}
+    >.title {
+        margin-bottom: 0;
+    }
+    &.thumb,
+    &.th {
+        border-width: $thumb-border-width + ($thumb-border-width * .5);
+        >.title {
+            padding: 0 0.2rem;
+        }
+    }
 }
 
 a.image {
-  text-decoration: none;
-  // allow SVG to be a link
-  display: inline-block;
-  //object[type="image/svg+xml"] {
-  object {
-    pointer-events: none;
-  }
+    text-decoration: none;
+    // allow SVG to be a link
+    display: inline-block;
+    //object[type="image/svg+xml"] {
+    object {
+        pointer-events: none;
+    }
 }
 
 // AsciiDoc footnote styles
 sup.footnote,
 sup.footnoteref {
-  font-size: 0.75rem;
-  position: static;
-  vertical-align: super;
-  a {
-    text-decoration: none;
-    &:active {
-      text-decoration: underline;
+    font-size: 0.75rem;
+    position: static;
+    vertical-align: super;
+    a {
+        text-decoration: none;
+        &:active {
+            text-decoration: underline;
+        }
     }
-  }
 }
 
 #footnotes {
-  padding-top: 1.2rem;
-  padding-bottom: 1.2rem;
-  margin-bottom: $panel-margin-bottom / 2;
-  hr {
-    width: 20%;
-    min-width: 10rem;
-    margin: -0.25em 0 0.75em 0;
-    border-width: 1px 0 0 0;
-  }
-  .footnote {
-    padding: 0 0.375em 0 0.225em; // .15em difference is due to text-indent
-    line-height: 1.3334;
-    font-size: 1rem;
-    margin-left: 1.2em;
-    margin-bottom: 0.2em;
-    a:first-of-type {
-      font-weight: bold;
-      text-decoration: none;
-      margin-left: -1.05em;
+    padding-top: 1.2rem;
+    padding-bottom: 1.2rem;
+    margin-bottom: $panel-margin-bottom / 2;
+    hr {
+        width: 20%;
+        min-width: 10rem;
+        margin: -0.25em 0 0.75em 0;
+        border-width: 1px 0 0 0;
     }
-  }
-
-  .footnote:last-of-type {
-    margin-bottom: 0;
-  }
-
-  // footnotes in embedded documents
-  #content & {
-    margin-top: -$panel-margin-bottom / 2;
-    margin-bottom: 0;
-    padding: 1.2rem 0;
-  }
+    .footnote {
+        padding: 0 0.375em 0 0.225em; // .15em difference is due to text-indent
+        line-height: 1.3334;
+        font-size: 1rem;
+        margin-left: 1.2em;
+        margin-bottom: 0.2em;
+        >a:first-of-type {
+            font-weight: bold;
+            text-decoration: none;
+            margin-left: -1.05em;
+        }
+    }
+    .footnote:last-of-type {
+        margin-bottom: 0;
+    }
+    // footnotes in embedded documents
+    #content & {
+        margin-top: -$panel-margin-bottom / 2;
+        margin-bottom: 0;
+        padding: 1.2rem 0;
+    }
 }
 
 // for embedded gists
-.gist .file-data > table {
-  border: 0;
-  background: #fff;
-  width: 100%;
-  margin-bottom: 0;
-  td.line-data {
-    width: 99%;
-  }
+.gist .file-data>table {
+    border: 0;
+    background: #fff;
+    width: 100%;
+    margin-bottom: 0;
+    td.line-data {
+        width: 99%;
+    }
 }
 
 // AsciiDoc built-in roles
 @if $include-asciidoc-role-classes {
-  div.unbreakable {
-    page-break-inside: avoid;
-  }
-
-  .big {
-    font-size: larger;
-  }
-
-  .small {
-    font-size: smaller;
-  }
-
-  @each $decoration in (underline, overline, line-through) {
-    .#{$decoration} {
-      text-decoration: $decoration;
+    div.unbreakable {
+        page-break-inside: avoid;
     }
-  }
-
+    .big {
+        font-size: larger;
+    }
+    .small {
+        font-size: smaller;
+    }
+    @each $decoration in (underline, overline, line-through) {
+        .#{$decoration} {
+            text-decoration: $decoration;
+        }
+    }
 }
-

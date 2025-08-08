@@ -881,29 +881,22 @@ module Evolveum
     # This is used to solve the dillema between display block and table
     class TableWrapperPostprocessor < Asciidoctor::Extensions::Postprocessor
       def process document, output
+        # Saved around 2 seconds doing this :D
+        return output unless output.include?('<table')
         document_path = document.attributes['docfile']
-        log = false
-        if document_path.include?("/test/")
-          log = true
-        end
         lines = output.split("\n")
         result_lines = []
         ignore = false
         started = false
         lines.each do |line|
-          if line.include?("datatable-config")
-            if log
-              Jekyll.logger.warn("TABLE WRAPPER: #{line}")
-            end
+          # This is needed because the additional div can break datatables or admonition blocks like note or warning
+          if line.include?("datatable-config") || line.include?("admonitionblock")
             result_lines << line
             if !line.include?("<table")
               ignore = true
             end
           elsif ignore
             if line.include?("</table>")
-              if log
-                Jekyll.logger.warn("TABLE WRAPPER: ignoring table end #{line}")
-              end
               ignore = false
             end
             result_lines << line
@@ -916,9 +909,6 @@ module Evolveum
             end
           else
             if line.include?("<table")
-              if log
-                Jekyll.logger.warn("TABLE WRAPPER: wrapping table start #{line}")
-              end
               if line.include?("</table>")
                 result_lines << "<div class=\"table-container\">#{line}</div>"
               else

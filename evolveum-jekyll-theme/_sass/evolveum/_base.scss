@@ -246,11 +246,31 @@ img {
 
 table {
     max-width: 100%;
-    overflow-x: auto;
+    display: table;
+    table-layout: auto;
+}
+
+.table-container {
+    overflow-x: scroll;
+    max-width: 100%;
     display: block;
+    margin-bottom: 2rem;
+}
+
+.table-container>table {
+    margin-bottom: 0rem !important;
 }
 
 body {
     overflow-x: hidden;
     width: 100%;
+}
+
+div.dt-container div.dt-layout-table>div {
+    overflow-x: auto;
+    margin-bottom: 2rem;
+}
+
+.dataTable {
+    margin-bottom: 0rem !important;
 }
