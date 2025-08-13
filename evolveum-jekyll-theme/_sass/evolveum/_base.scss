@@ -1,7 +1,6 @@
 html {
-    scroll-padding-top: calc(
-        69px + 0.5rem
-    ); /* Offset for navbar, used for anchor links woth hashes */
+    scroll-padding-top: calc( 69px + 0.5rem);
+    /* Offset for navbar, used for anchor links woth hashes */
 }
 
 h1 {
@@ -9,13 +8,12 @@ h1 {
 }
 
 p {
-    @if $paragraph-max-width != 0 {
+    @if $paragraph-max-width !=0 {
         max-width: $paragraph-max-width;
     }
 }
 
 // NAVBAR
-
 nav.navbar {
     border-bottom: 1px solid $separator-line-color;
 }
@@ -30,8 +28,44 @@ nav.navbar {
 }
 
 // NAVTREE
+@media (max-width: 768px) {
+    #navtree-toggle:hover {
+        cursor: pointer;
+        &::after {
+            transform: scaleX(1);
+        }
+    }
+    #navtree-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.78rem;
+        font-style: italic;
+        color: $gray-600;
+        margin-left: 1rem;
+        position: relative;
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: currentColor;
+            transform: scaleX(0);
+            transition: transform 0.2s ease;
+        }
+        i {
+            margin-left: 0.25rem;
+            transition: transform 0.2s ease;
+        }
+    }
+}
 
 @media (min-width: 768px) {
+    #navtree-toggle {
+        display: none;
+    }
     .navtree-fixed {
         overflow-y: auto;
         background: $white;
@@ -43,11 +77,9 @@ nav.navbar {
         scrollbar-color: #c1c1c1 transparent;
         scrollbar-width: none;
     }
-
     .content-left-margin {
         margin-left: 25%;
     }
-
     .navtree-fixed:hover {
         scrollbar-width: thin;
     }
@@ -59,7 +91,6 @@ nav.navbar {
         // We need to figure something better in the future.
         max-width: 32rem;
     }
-
     .content-left-margin {
         margin-left: 32rem !important;
     }
@@ -67,36 +98,30 @@ nav.navbar {
 
 .navtree {
     list-style: none;
-
     li {
         list-style: none;
         padding-left: 1rem;
         text-indent: -1rem;
         color: $navbar-light-color;
     }
-
-    li > a {
+    li>a {
         color: $navbar-light-color;
     }
-
     li.active {
         list-style: none;
         padding-left: 1rem;
         text-indent: -1rem;
         color: $navbar-light-active-color;
     }
-
-    li.active > a {
+    li.active>a {
         color: $navbar-light-active-color;
     }
-
     ul {
         // deeper-level nodes
         // We them indented, but just a little. We want to fit in long labels.
         padding-left: 0.5rem;
     }
-
-    > ul {
+    >ul {
         // top-level nodes, we want it closer to margin
         padding-left: 0.5rem;
     }
@@ -106,7 +131,7 @@ nav.navbar {
     font-size: 1.75rem;
 }
 
-.breadcrumb-item > a {
+.breadcrumb-item>a {
     color: $navbar-light-color;
 }
 
@@ -122,7 +147,6 @@ main {
 .logo-title {
     // Same margin as ordinary h1 title
     margin-bottom: 2rem;
-
     img {
         max-height: 5rem;
     }
@@ -133,7 +157,6 @@ main {
 }
 
 // FOOTER
-
 .footer-logo {
     display: inline-block;
     vertical-align: middle;
@@ -147,31 +170,23 @@ main {
     background-color: $footer-background-color;
     margin-top: 2rem;
     border-top: 1px solid $separator-line-color !important;
-
     .footer-body {
         // padding-bottom: 1.25rem;
     }
-
     .footer-heading {
         font-size: x-large;
         margin-bottom: 1rem;
     }
-
     .footer-description {
         color: rgba($footer-color, 0.7);
     }
-
-    .footer-list {
-    }
-
+    .footer-list {}
     a {
         color: rgba($footer-color, 0.7);
     }
-
     .social {
         margin-right: 0.5rem;
     }
-
     .copyright {
         padding-top: 0.5rem;
         border-top: 1px solid $separator-line-color !important;
@@ -179,7 +194,6 @@ main {
 }
 
 // MISC
-
 div.bottomline {
     font-size: small;
     color: $light;
@@ -214,13 +228,11 @@ div.page-meta {
     margin-top: 2rem;
     margin-bottom: 3rem;
     border-bottom: $table-border-width solid $table-border-color;
-
     th,
     td {
         padding-top: 0.5rem;
         padding-bottom: 0.5rem;
     }
-
     th {
         width: 20%;
     }
