@@ -5,6 +5,7 @@
 # TODO
 #
 
+
 module Evolveum
 
     class VersionlinksTag < Liquid::Tag
@@ -45,17 +46,21 @@ module Evolveum
         def data()
             @s << "  <tbody>\n"
             if @config['development']
-                develEntry = @versions.select { |v| v['status'] == 'development'}[0]
-                versionEntry = develEntry.clone()
-                versionEntry['git-tag'] = "master"
-                versionEntry['maven-version'] = versionEntry['version'] + "-SNAPSHOT"
-                versionEntry['download-tag'] = "latest"
-                if @config['development'].is_a?(Hash) && @config['development']['columns']
-                    columnConfig = @config['development']['columns']
+                develEntry = @versions.select { |v| v['status'] == 'development' && ( v['docsReleaseBranch'] == 'master' || v['docsReleaseBranch'] == 'main') }[0]
+                if develEntry.nil?
+                    Jekyll.logger.warn "No development version found for versionlinks tag."
                 else
-                    columnConfig = @config['columns']
+                    versionEntry = develEntry.clone()
+                    versionEntry['git-tag'] = "master"
+                    versionEntry['maven-version'] = versionEntry['version'] + "-SNAPSHOT"
+                    versionEntry['download-tag'] = "latest"
+                    if @config['development'].is_a?(Hash) && @config['development']['columns']
+                        columnConfig = @config['development']['columns']
+                    else
+                        columnConfig = @config['columns']
+                    end
+                    versionRow(versionEntry, columnConfig)
                 end
-                versionRow(versionEntry, columnConfig)
             end
             @versions
                 .reverse
