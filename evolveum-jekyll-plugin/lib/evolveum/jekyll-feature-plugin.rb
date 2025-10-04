@@ -186,6 +186,7 @@ module Evolveum
             nav.page = page
             nav.url = url
             nav.title = feature['title']
+            nav.visibility = 'visible'
             @navFeatures.add(nav)
 
             feature['url'] = url
