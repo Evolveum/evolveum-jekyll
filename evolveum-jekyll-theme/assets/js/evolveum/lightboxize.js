@@ -79,13 +79,13 @@ function openLightbox(image) {
     function handleDoubleTap(e) {
         const currentTime = new Date().getTime();
         const tapLength = currentTime - lastTapTime;
-        
+
         if (tapLength < 300 && tapLength > 0) {
             // Prevent default to stop potential zooming or other default behaviors
             e.preventDefault();
             zoomImageInLightbox(image);
         }
-        
+
         lastTapTime = currentTime;
     }
 
@@ -115,7 +115,7 @@ function closeLightbox() {
 function zoomImageInLightbox(boxedImage) {
     boxedImage.classList.toggle(fitSizeClass);
     boxedImage.classList.toggle(zoomedSizeClass);
-    
+
     if (boxedImage.classList.contains(zoomedSizeClass)) {
         setupImagePanning(boxedImage);
     } else {
@@ -146,35 +146,35 @@ function setupImagePanning(image) {
     function startDrag(e) {
         // Prevent default for both mouse and touch events
         e.preventDefault();
-        
+
         // Only handle primary mouse button for mouse events
         if (e.type === 'mousedown' && e.button !== 0) return;
-        
+
         isDragging = true;
-        
+
         // Get coordinates
         const event = getEventCoordinates(e);
-        
+
         // Record the initial position
         startX = event.clientX;
         startY = event.clientY;
-        
+
         image.style.cursor = 'grabbing';
     }
 
     function drag(e) {
         if (!isDragging) return;
-        
+
         // Prevent default scrolling during drag
         e.preventDefault();
-        
+
         // Get coordinates
         const event = getEventCoordinates(e);
-        
+
         // Calculate the difference in movement
         const deltaX = event.clientX - startX;
         const deltaY = event.clientY - startY;
-        
+
         // Update total translation
         translateX = image.initialTranslation.x + deltaX;
         translateY = image.initialTranslation.y + deltaY;
@@ -194,14 +194,14 @@ function setupImagePanning(image) {
         if (translateY < (-image.height + (lightboxHeight / 2))) {
             translateY = (-image.height + (lightboxHeight / 2))
         }
-        
+
         // Apply translation
         image.style.transform = `translate(${translateX}px, ${translateY}px)`;
-        
+
         // Update the initial translation to the new position
         image.initialTranslation.x = translateX;
         image.initialTranslation.y = translateY;
-        
+
         // Reset start position for next move
         startX = event.clientX;
         startY = event.clientY;
@@ -238,9 +238,9 @@ function removeImagePanning(image) {
         image.panningListeners.forEach(event => {
             event.target.removeEventListener(event.type, event.listener);
         });
-        
+
         image.style.cursor = '';
-        
+
         // Reset transform and remove stored translation
         image.style.transform = '';
         delete image.initialTranslation;
@@ -251,7 +251,11 @@ function removeImagePanning(image) {
 images.forEach(img => {
     // Create a new anchor element
     const link = document.createElement('a');
-    
+
+    // Remove the hardcoded width attribute which comes probably from the template and conflicts with the lightbox
+    // (and, in general, seems unneeded).
+    img.removeAttribute('width');
+
     // Optionally, add a title or alt text
     link.setAttribute('title', img.alt || '');
     link.setAttribute('class', 'image-in-content-link');
@@ -271,7 +275,7 @@ images.forEach(img => {
 
     // Replace the image with the anchor element
     img.parentNode.replaceChild(link, img);
-    
+
     // Append the image inside the anchor
     link.appendChild(img);
     link.appendChild(label);
