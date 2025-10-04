@@ -1,5 +1,8 @@
 const images = document.querySelectorAll('img');
 
+const labelEl = document.createElement('p');
+labelEl.setAttribute('class', 'image-in-content-label');
+
 const fitSizeClass = 'image-in-lb-fit-size';
 const zoomedSizeClass = 'image-in-lb-zoomed-size';
 
@@ -28,9 +31,14 @@ const lightbox = document.createElement('div');
 lightbox.setAttribute('id', 'image-lightbox');
 lightbox.appendChild(lightboxCloseButton);
 
+const lightboxFence = document.createElement('div');
+lightboxFence.setAttribute('id', 'lightbox-fence');
+
+lightbox.appendChild(lightboxFence);
+
 lightboxWrapper.appendChild(lightbox);
 
-function openLightbox(image) {
+function openLightbox(image, imageLabel) {
     document.getElementById('image-lightbox-wrapper').style.display = 'block';
     lightboxKillingFloor.style.display = 'block';
 
@@ -40,10 +48,13 @@ function openLightbox(image) {
 
     const lightboxChildren = lightbox.childNodes;
     lightboxChildren.forEach(child => {
-        if (child.nodeName == 'IMG') {
+        if (child.nodeName == 'IMG' || child.nodeName == 'P') {
             lightbox.removeChild(child);
         }
     });
+
+    // Create label for the image and fill it with the alt text
+    labelEl.innerHTML = (imageLabel);
 
     if (image.src.includes('.svg')) {
         lightboxWidth = '90vw';
@@ -52,11 +63,23 @@ function openLightbox(image) {
     else {
         lightboxWidth = image.width + 'px';
     }
-    document.getElementById('image-lightbox').appendChild(image);
+    document.getElementById('lightbox-fence').appendChild(image);
+    if (imageLabel) {
+        image.parentNode.parentNode.appendChild(labelEl);
+    }
     document.getElementById('image-lightbox').style.display = 'block';
     document.body.style.overflow = 'hidden';
+
     lightbox.style.width = image.clientWidth + 'px';
     lightbox.style.height = image.clientHeight + 'px';
+
+    lightboxFence.style.width = image.clientWidth + 'px';
+    lightboxFence.style.height = image.clientHeight + 'px';
+
+    // Make sure the label is not higher than the ( viewport height minus image height ) divided by two
+    // The magical value of 50 is uncomfortable but needed.
+    // The solution is very suboptimal, it would be better to move the image higher and if that would not be enough, make it smaller.
+    labelEl.style.maxHeight = (window.innerHeight - image.clientHeight - 30) / 2 + 'px';
 
     // Determine whether to allow zoom&pan - if the lightbox is of the same size as the image 100% size, then do not allow zoom&pan
     if ((image.clientWidth < image.naturalWidth) || (image.clientHeight < image.naturalHeight)) {
@@ -260,17 +283,17 @@ images.forEach(img => {
     link.setAttribute('title', img.alt || '');
     link.setAttribute('class', 'image-in-content-link');
 
-    // Create label for the image and fill it with the alt text
-    const label = document.createElement('div');
-    label.innerHTML = (img.alt || '');
-    label.setAttribute('class', 'image-in-content-label');
+    let imageLabel = '';
+    if (img.parentNode.nextElementSibling) {
+        imageLabel = img.parentNode.nextElementSibling.innerHTML;
+    }
 
     // Add class
     img.setAttribute('class', 'image-in-content');
     const imgInLB = img.cloneNode();
     imgInLB.setAttribute('id', 'active-lightboxed-image');
     img.addEventListener('click', function() {
-        openLightbox(imgInLB);
+        openLightbox(imgInLB, imageLabel);
     });
 
     // Replace the image with the anchor element
@@ -278,5 +301,5 @@ images.forEach(img => {
 
     // Append the image inside the anchor
     link.appendChild(img);
-    link.appendChild(label);
+    // link.appendChild(labelEl);
 });
