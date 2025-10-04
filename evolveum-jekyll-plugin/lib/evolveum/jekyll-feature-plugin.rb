@@ -215,6 +215,7 @@ module Evolveum
             nav.page = page
             nav.url = url
             nav.title = control['id']
+            nav.visibility = 'visible'
             @navIso27001.add(nav)
 
             control['url'] = url
