@@ -92,9 +92,13 @@
   font-size: 30px;
   cursor: pointer;
   color: #000;
+  background: #fff;
+  height: 1lh;
+  width: 1lh;
   position: absolute;
-  top: 0px;
-  right: 0.5em;
+  top: calc(-1lh - 1px);
+  right: 0em;
+  border-bottom: 1px solid #00000066;
   z-index: 257;
   text-shadow:
     2px 0 2px #fff,
@@ -112,4 +116,3 @@
   left: 0;
   z-index: 256;
 }
-
