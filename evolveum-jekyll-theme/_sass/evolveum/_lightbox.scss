@@ -1,0 +1,115 @@
+.image-in-content {
+  max-width: 20vw;
+  margin: 1em;
+  cursor: pointer;
+
+  @media (max-width: 3000px) {
+    max-width: 30vw;
+  }
+  @media (max-width: 2000px) {
+    max-width: 40vw;
+  }
+  @media (max-width: 1280px) {
+    max-width: 70vw;
+  }
+  @media (max-width: 768px) {
+    max-width: 90vw;
+  }
+}
+
+.image-in-content-link {
+  text-decoration: none;
+}
+
+.image-in-content-label {
+  text-decoration: none;
+  color: #000;
+}
+
+#image-lightbox-wrapper {
+  display: none;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 255;
+  border: none;
+  background: #00000044;
+  backdrop-filter: blur(10px) grayscale(90%) contrast(70%);
+  text-align: center;
+}
+
+#image-lightbox {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 90%;
+  max-height: 90%;
+  z-index: 257;
+  border: none;
+
+  .image-in-lightbox {
+    background: #111;
+  }
+  .image-in-lb-fit-size {
+    max-width: 90vw;
+    max-height: 90vh;
+  }
+  .image-in-lb-zoomed-size {
+    position: relative;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    cursor: grab;
+    &:active {
+      cursor: grabbing;
+    }
+  }
+}
+
+#lightbox-fence {
+  overflow: hidden;
+}
+
+.image-in-content-label {
+  text-align: left;
+  background: #fff;
+  color: #000;
+  max-width: initial;
+  font-size: 100%;
+  overflow-y: scroll;
+  padding: 0.4em;
+  margin: 0 auto;
+  border-top: 1px solid #00000066;
+}
+
+#image-lightbox-close-btn {
+  font-size: 30px;
+  cursor: pointer;
+  color: #000;
+  background: #fff;
+  height: 1lh;
+  width: 1lh;
+  position: absolute;
+  top: calc(-1lh - 1px);
+  right: 0em;
+  border-bottom: 1px solid #00000066;
+  z-index: 257;
+  text-shadow:
+    2px 0 2px #fff,
+    0 -2px 2px #fff,
+    -2px 0 2px #fff,
+    0 2px 2px #fff;
+}
+
+#lightbox-killing-floor {
+  display: none;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 256;
+}
