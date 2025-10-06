@@ -10,7 +10,7 @@ require 'yaml'
 module Evolveum
 
     class FeatureGenerator < Generator
-        priority :lowest
+        priority :low
 
         FEATURES_URL = '/midpoint/features/current/'
         ISO27001_URL = '/midpoint/compliance/iso27001/'
@@ -231,7 +231,7 @@ module Evolveum
 
 end
 
-Jekyll::Hooks.register :site, :post_read do |site|
+Jekyll::Hooks.register :site, :post_read, priority: :high do |site|
 #    puts "=========[ EVOLVEUM feature ]============== post_read"
     if site.config['environment']['name'].include?("docs")
         Evolveum::FeatureGenerator.collect(site)
