@@ -1,3 +1,14 @@
+// Add document-wide event listener to close the lightbox on <Escape> key press
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+      // Fire closeLightbox() only if the fence element has a child (the image).
+      // If it does not, there is nothing to close.
+      if (document.getElementById('lightbox-fence').firstChild) {
+          closeLightbox();
+      }
+  }
+});
+
 // Enumerate all images in the page
 const images = document.querySelectorAll('img');
 
