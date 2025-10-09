@@ -32,7 +32,7 @@ lightboxWrapper.setAttribute('id', 'image-lightbox-wrapper');
 // Element to show hint about zoom on scroll. Only shown on first lightbox open until page reload
 const zoomHelperTip = document.createElement('div');
 zoomHelperTip.setAttribute('id', 'lightbox-zoom-helper-tip');
-zoomHelperTip.innerHTML = 'Zoom to scroll';
+zoomHelperTip.innerHTML = 'Scroll to zoom';
 // Remove the zoom helper from the DOM if user clicks it (i.e., wants to get rid of it)
 zoomHelperTip.addEventListener('click', function() {
     zoomHelperTip.remove();
