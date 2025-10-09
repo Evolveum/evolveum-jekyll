@@ -99,6 +99,10 @@ td {
   overflow: hidden;
 }
 
+#lightbox-fence img {
+  transition: transform-origin 500ms ease-out;
+}
+
 .image-in-content-label {
   text-align: left;
   position: relative;
