@@ -9,6 +9,10 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
+// Set up the current zoom scale variable globally because it is needed across multiple functions,
+// some of which are called via event listener callbacks, making it more painful to pass values across them all.
+let currentZoomScale = 0;
+
 // Enumerate all images in the page
 const images = document.querySelectorAll('img');
 
@@ -29,12 +33,31 @@ document.body.appendChild(lightboxWrapper);
 
 // The lightbox closing button
 const lightboxCloseButton = document.createElement('div');
-lightboxCloseButton.innerHTML = '×';
+lightboxCloseButton.innerHTML = '🞫';
 lightboxCloseButton.setAttribute('id', 'image-lightbox-close-btn');
 lightboxCloseButton.setAttribute('title', 'Close the image lightbox');
+lightboxCloseButton.setAttribute('alt', 'Close the image lightbox');
 lightboxCloseButton.addEventListener('click', function() {
     closeLightbox();
 });
+
+const lightboxZoomInButton = document.createElement('div');
+lightboxZoomInButton.setAttribute('id', 'zoom-in-btn');
+lightboxZoomInButton.innerHTML = '🞤';
+lightboxZoomInButton.setAttribute('title', 'Zoom in');
+lightboxZoomInButton.setAttribute('alt', 'Zoom in');
+
+const lightboxZoomOutButton = document.createElement('div');
+lightboxZoomOutButton.setAttribute('id', 'zoom-out-btn');
+lightboxZoomOutButton.innerHTML = '─';
+lightboxZoomOutButton.setAttribute('title', 'Zoom out');
+lightboxZoomOutButton.setAttribute('alt', 'Zoom out');
+
+const lightboxZoomResetButton = document.createElement('div');
+lightboxZoomResetButton.setAttribute('id', 'zoom-reset-btn');
+lightboxZoomResetButton.innerHTML = '🞕 ';
+lightboxZoomResetButton.setAttribute('title', 'Reset zoom');
+lightboxZoomResetButton.setAttribute('alt', 'Reset zoom');
 
 // Element in the wrapper but beneath the lightbox element to enable closing the lightbox when user clicks the blurred lightbox background
 const lightboxKillingFloor = document.createElement('div');
@@ -49,6 +72,9 @@ lightboxWrapper.appendChild(lightboxKillingFloor);
 const lightbox = document.createElement('div');
 lightbox.setAttribute('id', 'image-lightbox');
 lightbox.appendChild(lightboxCloseButton);
+lightbox.appendChild(lightboxZoomInButton);
+lightbox.appendChild(lightboxZoomOutButton);
+lightbox.appendChild(lightboxZoomResetButton);
 
 // Separate bounding box for the lightbox inside the lightbox element
 // It has to be separate to
@@ -121,19 +147,32 @@ function openLightbox(image, imageLabel) {
 
     // Determine whether to allow zoom&pan - if the lightbox is of the same size as the image 100% size, then do not allow zoom&pan
     // If zoom allowed, cal zoom function on double-click and double-touch
-    if ((image.clientWidth < image.naturalWidth) || (image.clientHeight < image.naturalHeight)) {
-        image.setAttribute('title', 'Double-click to toggle zoom');
+    // Temporarily commented out to allow zoom by scroll on smaller images.
+    // TODO: It would be preferable to enlarge and shrink the lightbox when zooming small images
+    // if ((image.clientWidth < image.naturalWidth) || (image.clientHeight < image.naturalHeight)) {
+        image.setAttribute('title', 'Scroll to zoom');
         image.style.cursor = 'zoom-in';
-        image.ondblclick = function() {
-            zoomImageInLightbox(image);
-        }
-        image.ontouchend = function(event) {
-            handleDoubleTap(event);
-        }
-    }
-    else {
-        console.log("Zooming not possible, image too small.");
-    }
+        let initialZoomScale = 1;
+        currentZoomScale = initialZoomScale;
+
+        lightboxZoomInButton.onclick = function() {
+            manualZoom(image, initialZoomScale, 'plus');
+        };
+
+        lightboxZoomOutButton.onclick = function() {
+            manualZoom(image, initialZoomScale, 'minus');
+        };
+
+        lightboxZoomResetButton.onclick = function() {
+            manualZoom(image, initialZoomScale, 'reset');
+        };
+
+        image.addEventListener("wheel", function() {
+           zoomImageByWheel(image, initialZoomScale);
+        });
+    // }
+    // else {
+    // }
 
     // Improved double-tap/double-click handling
     let lastTapTime = 0;
@@ -165,16 +204,21 @@ function closeLightbox() {
     if (lightboxedImageToClose.classList.contains(zoomedSizeClass)) {
         removeImagePanning(lightboxedImageToClose);
     }
-    lightboxedImageToClose.classList.remove(zoomedSizeClass);
-    lightboxedImageToClose.classList.remove(fitSizeClass);
-    lightboxedImageToClose.removeAttribute('style');
-    lightboxedImageToClose.remove();
+    document.getElementById('image-lightbox-wrapper').style.animation = 'fadeOut 0.5s ease-out forwards';
+    setTimeout(function() {
+        lightboxedImageToClose.classList.remove(zoomedSizeClass);
+        lightboxedImageToClose.classList.remove(fitSizeClass);
+        lightboxedImageToClose.removeAttribute('style');
+        lightboxedImageToClose.remove();
 
-    document.getElementById('image-lightbox-wrapper').style.display = 'none';
-    lightboxKillingFloor.style.display = 'none';
+        document.getElementById('image-lightbox-wrapper').style.animation = '';
+        document.getElementById('image-lightbox-wrapper').style.display = 'none';
+        lightboxKillingFloor.style.display = 'none';
 
-    document.body.style.overflow = 'auto';
-    document.getElementById('image-lightbox').style.display = 'none';
+        document.body.style.overflow = 'auto';
+        document.getElementById('image-lightbox').style.display = 'none';
+    }, 500);
+
     event.stopPropagation();
 }
 
@@ -193,10 +237,59 @@ function zoomImageInLightbox(boxedImage) {
     }
 }
 
+function zoomImageByWheel(image, initialZoomScale, zoomDirection = 0) {
+    const zoomStep = 0.3;
+    if (zoomDirection == 0) {
+        zoomDirection = event.deltaY;
+    }
+    else if (zoomDirection == 2) {
+        currentZoomScale = initialZoomScale;
+    }
+
+
+    if (zoomDirection != 2) {
+        if ((zoomDirection < 0) && (currentZoomScale + zoomStep >= 4)) {
+            currentZoomScale = 4;
+        }
+        else if ((zoomDirection < 0) && (currentZoomScale < 4)) {
+            currentZoomScale += 0.3;
+        }
+        else if (currentZoomScale - zoomStep > initialZoomScale) {
+            currentZoomScale -= 0.3;
+        }
+        else {
+            currentZoomScale = initialZoomScale;
+        }
+    }
+
+    if (currentZoomScale > 1) {
+        // image.classList.remove(fitSizeClass);
+        // image.classList.add(zoomedSizeClass);
+        setupImagePanning(image);
+    }
+    else {
+        removeImagePanning(image);
+        image.style.cursor = 'zoom-in';
+    }
+    image.style.transform = 'scale(' + currentZoomScale + ')';
+}
+
+function manualZoom(image, initialZoomScale, zoomDirection) {
+    if (zoomDirection == 'plus') {
+        zoomImageByWheel(image, initialZoomScale, -1)
+    }
+    else if (zoomDirection == 'minus') {
+        zoomImageByWheel(image, initialZoomScale, 1)
+    }
+    else if (zoomDirection == 'reset') {
+        zoomImageByWheel(image, initialZoomScale, 2)
+    }
+}
+
 function setupImagePanning(image) {
     let isDragging = false;
     let startX, startY;
-    let translateX = 0, translateY = 0;
+    let transformX = 0, transformY = 0;
 
     // Ensure initial translation is set up
     // Since the panning position is set in pixels, the initial panning position means recalculate the translation(50%, 50%) to pixels,
@@ -221,6 +314,10 @@ function setupImagePanning(image) {
         // Only handle primary mouse button for mouse events
         if (e.type === 'mousedown' && e.button !== 0) return;
 
+        // Do not allow panning if the image fits the lightbox (is not zoomed)
+        if (currentZoomScale <= 1) {
+            return;
+        }
         isDragging = true;
 
         // Get coordinates
@@ -247,31 +344,33 @@ function setupImagePanning(image) {
         const deltaY = event.clientY - startY;
 
         // Update total translation
-        translateX = image.initialTranslation.x + deltaX;
-        translateY = image.initialTranslation.y + deltaY;
+        transformX = image.initialTranslation.x + deltaX;
+        transformY = image.initialTranslation.y + deltaY;
 
         // Prevent panning the image beyond the visible lightbox borders
+        // Note that the transformX and transformY values are negative
+        // because they were used for translation in the past. 
         lightboxWidth = image.parentNode.clientWidth;
         lightboxHeight = image.parentNode.clientHeight;
-        if (translateX > (-lightboxWidth / 2)) {
-            translateX = (-lightboxWidth / 2)
+        if (transformX >= 0) {
+            transformX = 0;
         }
-        if (translateY > (-lightboxHeight / 2)) {
-            translateY = (-lightboxHeight / 2)
+        if (transformY >= 0) {
+            transformY = 0;
         }
-        if (translateX < (-image.width + (lightboxWidth / 2))) {
-            translateX = (-image.width + (lightboxWidth / 2))
+        if (transformX <= -lightboxWidth) {
+            transformX = -lightboxWidth;
         }
-        if (translateY < (-image.height + (lightboxHeight / 2))) {
-            translateY = (-image.height + (lightboxHeight / 2))
+        if (transformY <= -lightboxHeight) {
+            transformY = -lightboxHeight;
         }
 
-        // Apply translation
-        image.style.transform = `translate(${translateX}px, ${translateY}px)`;
+        // Apply origin transformation
+        image.style.transformOrigin = `${-transformX}px ${-transformY}px`;
 
         // Update the initial translation to the new position
-        image.initialTranslation.x = translateX;
-        image.initialTranslation.y = translateY;
+        image.initialTranslation.x = transformX;
+        image.initialTranslation.y = transformY;
 
         // Reset start position for next move
         startX = event.clientX;

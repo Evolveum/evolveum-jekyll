@@ -47,6 +47,21 @@ td {
   background: #00000044;
   backdrop-filter: blur(10px) grayscale(90%) contrast(70%);
   text-align: center;
+  animation: fadeIn 0.25s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.shown-to-hide {
+  animation: fadeOut 0.25s ease-out forwards;
 }
 
 #image-lightbox {
@@ -84,6 +99,10 @@ td {
   overflow: hidden;
 }
 
+#lightbox-fence img {
+  transition: transform-origin 300ms ease-out, transform 500ms ease-in-out;
+}
+
 .image-in-content-label {
   text-align: left;
   position: relative;
@@ -100,7 +119,7 @@ td {
   border-radius: 0 0 0.3rem 0.3rem;
 }
 
-#image-lightbox-close-btn {
+#image-lightbox-close-btn, #zoom-in-btn, #zoom-out-btn, #zoom-reset-btn  {
   font-size: 30px;
   cursor: pointer;
   color: #14205F;
@@ -109,12 +128,34 @@ td {
   width: 1lh;
   position: absolute;
   top: -1lh;
-  right: -7px;
   z-index: 257;
   border-radius: 0.3rem 0.3rem 0 0;
+  user-select: none;
 }
 
-#image-lightbox-close-btn:hover {
+#image-lightbox-close-btn {
+  right: -7px;
+}
+
+#zoom-in-btn {
+  left: -7px;
+  border-radius: 0.3rem 0 0 0;
+}
+
+#zoom-out-btn {
+  left: calc(1lh - 7px);
+  border-radius: 0 0 0 0;
+  border: solid #00000066;
+  border-width: 0 1px 0 1px;
+}
+
+#zoom-reset-btn {
+  left: 4em;
+  left: calc(2lh - 7px);
+  border-radius: 0 0.3rem 0 0;
+}
+
+#image-lightbox-close-btn:hover, #zoom-in-btn:hover, #zoom-out-btn:hover, #zoom-reset-btn:hover {
   color: #FF9B05;
 }
 
