@@ -127,24 +127,22 @@ td {
   height: 1lh;
   width: 1lh;
   position: absolute;
+  top: -1lh;
   z-index: 257;
   border-radius: 0.3rem 0.3rem 0 0;
   user-select: none;
 }
 
 #image-lightbox-close-btn {
-  top: -1lh;
   right: -7px;
 }
 
 #zoom-in-btn {
-  top: -1lh;
   left: -7px;
   border-radius: 0.3rem 0 0 0;
 }
 
 #zoom-out-btn {
-  top: -1lh;
   left: calc(1lh - 7px);
   border-radius: 0 0 0 0;
   border: solid #00000066;
@@ -152,7 +150,6 @@ td {
 }
 
 #zoom-reset-btn {
-  top: -1lh;
   left: 4em;
   left: calc(2lh - 7px);
   border-radius: 0 0.3rem 0 0;
