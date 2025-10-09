@@ -29,11 +29,22 @@ labelEl.setAttribute('class', 'image-in-content-label');
 const lightboxWrapper = document.createElement('div');
 lightboxWrapper.setAttribute('id', 'image-lightbox-wrapper');
 
+// Element to show hint about zoom on scroll. Only shown on first lightbox open until page reload
+const zoomHelperTip = document.createElement('div');
+zoomHelperTip.setAttribute('id', 'lightbox-zoom-helper-tip');
+zoomHelperTip.innerHTML = 'Zoom to scroll';
+// Remove the zoom helper from the DOM if user clicks it (i.e., wants to get rid of it)
+zoomHelperTip.addEventListener('click', function() {
+    zoomHelperTip.remove();
+});
+
+let zoomHelperDisplayedAlready = false;
+
 document.body.appendChild(lightboxWrapper);
 
 // The lightbox closing button
 const lightboxCloseButton = document.createElement('div');
-lightboxCloseButton.innerHTML = '🞫';
+lightboxCloseButton.innerHTML = '×';
 lightboxCloseButton.setAttribute('id', 'image-lightbox-close-btn');
 lightboxCloseButton.setAttribute('title', 'Close the image lightbox');
 lightboxCloseButton.setAttribute('alt', 'Close the image lightbox');
@@ -43,19 +54,19 @@ lightboxCloseButton.addEventListener('click', function() {
 
 const lightboxZoomInButton = document.createElement('div');
 lightboxZoomInButton.setAttribute('id', 'zoom-in-btn');
-lightboxZoomInButton.innerHTML = '🞤';
+lightboxZoomInButton.innerHTML = '+';
 lightboxZoomInButton.setAttribute('title', 'Zoom in');
 lightboxZoomInButton.setAttribute('alt', 'Zoom in');
 
 const lightboxZoomOutButton = document.createElement('div');
 lightboxZoomOutButton.setAttribute('id', 'zoom-out-btn');
-lightboxZoomOutButton.innerHTML = '─';
+lightboxZoomOutButton.innerHTML = '−';
 lightboxZoomOutButton.setAttribute('title', 'Zoom out');
 lightboxZoomOutButton.setAttribute('alt', 'Zoom out');
 
 const lightboxZoomResetButton = document.createElement('div');
 lightboxZoomResetButton.setAttribute('id', 'zoom-reset-btn');
-lightboxZoomResetButton.innerHTML = '🞕 ';
+lightboxZoomResetButton.innerHTML = '•';
 lightboxZoomResetButton.setAttribute('title', 'Reset zoom');
 lightboxZoomResetButton.setAttribute('alt', 'Reset zoom');
 
@@ -86,12 +97,26 @@ lightboxFence.setAttribute('id', 'lightbox-fence');
 lightbox.appendChild(lightboxFence);
 
 lightboxWrapper.appendChild(lightbox);
+lightboxWrapper.appendChild(zoomHelperTip);
 
 // Function to open the lightbox, set required properties and call functions
 function openLightbox(image, imageLabel) {
     // TODO: some element selections could be improved by using the variables holding the elements instead of using getElementById or …byClass.
     document.getElementById('image-lightbox-wrapper').style.display = 'block';
     lightboxKillingFloor.style.display = 'block';
+
+    // If the zoom helper has not been shown yet, let it show for N miliseconds
+    // and then give it a disappearing transition, and, after N+(transition time) miliseconds,
+    // remove it from the DOM.
+    if (!zoomHelperDisplayedAlready) {
+        setTimeout(function() {
+            zoomHelperTip.style.animation = 'fadeOut 700ms ease-out forwards';
+        }, 5000);
+        setTimeout(function() {
+            zoomHelperTip.remove();
+        }, 5700);
+        zoomHelperDisplayedAlready = true;
+    }
 
     // Switch classes from in-article image to in-lightbox image
     image.classList.remove('image-in-content');
@@ -151,7 +176,7 @@ function openLightbox(image, imageLabel) {
     // TODO: It would be preferable to enlarge and shrink the lightbox when zooming small images
     // if ((image.clientWidth < image.naturalWidth) || (image.clientHeight < image.naturalHeight)) {
         image.setAttribute('title', 'Scroll to zoom');
-        image.style.cursor = 'zoom-in';
+        // image.style.cursor = 'zoom-in';
         let initialZoomScale = 1;
         currentZoomScale = initialZoomScale;
 
@@ -233,7 +258,7 @@ function zoomImageInLightbox(boxedImage) {
         setupImagePanning(boxedImage);
     } else {
         removeImagePanning(boxedImage);
-        boxedImage.style.cursor = 'zoom-in';
+        // boxedImage.style.cursor = 'zoom-in';
     }
 }
 
@@ -269,7 +294,7 @@ function zoomImageByWheel(image, initialZoomScale, zoomDirection = 0) {
     }
     else {
         removeImagePanning(image);
-        image.style.cursor = 'zoom-in';
+        // image.style.cursor = 'zoom-in';
     }
     image.style.transform = 'scale(' + currentZoomScale + ')';
 }
