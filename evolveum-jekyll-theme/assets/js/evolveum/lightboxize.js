@@ -33,6 +33,11 @@ lightboxWrapper.setAttribute('id', 'image-lightbox-wrapper');
 const zoomHelperTip = document.createElement('div');
 zoomHelperTip.setAttribute('id', 'lightbox-zoom-helper-tip');
 zoomHelperTip.innerHTML = 'Zoom to scroll';
+// Remove the zoom helper from the DOM if user clicks it (i.e., wants to get rid of it)
+zoomHelperTip.addEventListener('click', function() {
+    zoomHelperTip.remove();
+});
+
 let zoomHelperDisplayedAlready = false;
 
 document.body.appendChild(lightboxWrapper);
@@ -100,13 +105,16 @@ function openLightbox(image, imageLabel) {
     document.getElementById('image-lightbox-wrapper').style.display = 'block';
     lightboxKillingFloor.style.display = 'block';
 
+    // If the zoom helper has not been shown yet, let it show for N miliseconds
+    // and then give it a disappearing transition, and, after N+(transition time) miliseconds,
+    // remove it from the DOM.
     if (!zoomHelperDisplayedAlready) {
         setTimeout(function() {
-            zoomHelperTip.style.animation = 'fadeOut 0.5s ease-out forwards';
-        }, 2000);
+            zoomHelperTip.style.animation = 'fadeOut 700ms ease-out forwards';
+        }, 5000);
         setTimeout(function() {
             zoomHelperTip.remove();
-        }, 2500);
+        }, 5700);
         zoomHelperDisplayedAlready = true;
     }
 
