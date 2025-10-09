@@ -100,7 +100,7 @@ td {
 }
 
 #lightbox-fence img {
-  transition: transform-origin 500ms ease-out;
+  transition: transform-origin 300ms ease-out, transform 500ms ease-in-out;
 }
 
 .image-in-content-label {
