@@ -9,6 +9,10 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
+// Set up the current zoom scale variable globally because it is needed across multiple functions,
+// some of which are called via event listener callbacks, making it more painful to pass values across them all.
+let currentZoomScale = 0;
+
 // Enumerate all images in the page
 const images = document.querySelectorAll('img');
 
@@ -149,22 +153,22 @@ function openLightbox(image, imageLabel) {
         image.setAttribute('title', 'Scroll to zoom');
         image.style.cursor = 'zoom-in';
         let initialZoomScale = 1;
-        let currentZoomScale = initialZoomScale;
+        currentZoomScale = initialZoomScale;
 
         lightboxZoomInButton.onclick = function() {
-            currentZoomScale = manualZoom(image, currentZoomScale, initialZoomScale, 'plus');
+            manualZoom(image, initialZoomScale, 'plus');
         };
 
         lightboxZoomOutButton.onclick = function() {
-            currentZoomScale = manualZoom(image, currentZoomScale, initialZoomScale, 'minus');
+            manualZoom(image, initialZoomScale, 'minus');
         };
 
         lightboxZoomResetButton.onclick = function() {
-            currentZoomScale = manualZoom(image, currentZoomScale, initialZoomScale, 'reset');
+            manualZoom(image, initialZoomScale, 'reset');
         };
 
         image.addEventListener("wheel", function() {
-           currentZoomScale = zoomImageByWheel(image, currentZoomScale, initialZoomScale);
+           zoomImageByWheel(image, initialZoomScale);
         });
     // }
     // else {
@@ -233,7 +237,7 @@ function zoomImageInLightbox(boxedImage) {
     }
 }
 
-function zoomImageByWheel(image, currentZoomScale, initialZoomScale, zoomDirection = 0) {
+function zoomImageByWheel(image, initialZoomScale, zoomDirection = 0) {
     const zoomStep = 0.3;
     if (zoomDirection == 0) {
         zoomDirection = event.deltaY;
@@ -268,20 +272,18 @@ function zoomImageByWheel(image, currentZoomScale, initialZoomScale, zoomDirecti
         image.style.cursor = 'zoom-in';
     }
     image.style.transform = 'scale(' + currentZoomScale + ')';
-    return currentZoomScale;
 }
 
-function manualZoom(image, currentZoomScale, initialZoomScale, zoomDirection) {
+function manualZoom(image, initialZoomScale, zoomDirection) {
     if (zoomDirection == 'plus') {
-        currentZoomScale = zoomImageByWheel(image, currentZoomScale, initialZoomScale, -1)
+        zoomImageByWheel(image, initialZoomScale, -1)
     }
     else if (zoomDirection == 'minus') {
-        currentZoomScale = zoomImageByWheel(image, currentZoomScale, initialZoomScale, 1)
+        zoomImageByWheel(image, initialZoomScale, 1)
     }
     else if (zoomDirection == 'reset') {
-        currentZoomScale = zoomImageByWheel(image, currentZoomScale, initialZoomScale, 2)
+        zoomImageByWheel(image, initialZoomScale, 2)
     }
-    return currentZoomScale;
 }
 
 function setupImagePanning(image) {
@@ -312,6 +314,10 @@ function setupImagePanning(image) {
         // Only handle primary mouse button for mouse events
         if (e.type === 'mousedown' && e.button !== 0) return;
 
+        // Do not allow panning if the image fits the lightbox (is not zoomed)
+        if (currentZoomScale <= 1) {
+            return;
+        }
         isDragging = true;
 
         // Get coordinates
