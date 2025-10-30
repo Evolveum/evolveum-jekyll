@@ -226,9 +226,7 @@ function openLightbox(image, imageLabel) {
 // Handle events when lightbox is closed - hide the lightbox, wrapper, image, remove zoomed classes
 function closeLightbox() {
     let lightboxedImageToClose = document.getElementById('active-lightboxed-image');
-    if (lightboxedImageToClose.classList.contains(zoomedSizeClass)) {
-        removeImagePanning(lightboxedImageToClose);
-    }
+    removeImagePanning(lightboxedImageToClose);
     document.getElementById('image-lightbox-wrapper').style.animation = 'fadeOut 0.5s ease-out forwards';
     setTimeout(function() {
         lightboxedImageToClose.classList.remove(zoomedSizeClass);
@@ -307,7 +305,9 @@ function zoomImageByWheel(image, initialZoomScale, zoomDirection = 0) {
     if (currentZoomScale > 1) {
         // image.classList.remove(fitSizeClass);
         // image.classList.add(zoomedSizeClass);
-        setupImagePanning(image);
+        if (!isPanningUp) {
+            setupImagePanning(image);
+        }
     }
     else {
         removeImagePanning(image);
@@ -330,7 +330,14 @@ function manualZoom(image, initialZoomScale, zoomDirection) {
     }
 }
 
+// This global variable lets us know if the panning is set up already
+// and helps prevent us from setting it up multiple times on the same image.
+// Without this check, the panning calculations are doubled after repeated zoom-in/outs,
+// and the panning distance per mouse movement increases to the point of making it unusable.
+let isPanningUp = false;
+
 function setupImagePanning(image) {
+    isPanningUp = true;
     let isDragging = false;
     let startX, startY;
     let transformX = 0, transformY = 0;
@@ -455,6 +462,8 @@ function removeImagePanning(image) {
         });
 
         image.style.cursor = '';
+
+        isPanningUp = false;
 
         // Reset transform and remove stored translation
         image.style.transform = '';
