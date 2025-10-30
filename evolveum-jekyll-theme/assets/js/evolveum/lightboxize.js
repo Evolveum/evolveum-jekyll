@@ -263,8 +263,8 @@ function zoomImageInLightbox(boxedImage) {
 }
 
 // zoomDirection:
-//  <1 means zoom in
-//  >1 means zoom out
+//  <0 means zoom in
+//  >0 means zoom out
 //      (Yes, the directions are reversed because that is what the mouse event sends and, by convention, we zoom in by wheel up.)
 //  ==2 means reset zoom
 //  The mouse wheel event typically sends ~60 in either direction constantly, the manual buttons in manualZoom() are set to send +/-1
