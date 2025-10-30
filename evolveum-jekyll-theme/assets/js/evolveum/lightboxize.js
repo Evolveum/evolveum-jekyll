@@ -262,31 +262,48 @@ function zoomImageInLightbox(boxedImage) {
     }
 }
 
+// zoomDirection:
+//  <1 means zoom in
+//  >1 means zoom out
+//      (Yes, the directions are reversed because that is what the mouse event sends and, by convention, we zoom in by wheel up.)
+//  ==2 means reset zoom
+//  The mouse wheel event typically sends ~60 in either direction constantly, the manual buttons in manualZoom() are set to send +/-1
 function zoomImageByWheel(image, initialZoomScale, zoomDirection = 0) {
+    // Arbitrarily chosen constant proven to zoom in/out by a reasonable step
     const zoomStep = 0.3;
+
+    // Default (direction not set) -> read the event deltaY value which is about 60 on either side
     if (zoomDirection == 0) {
         zoomDirection = event.deltaY;
     }
+    // Reset zoom
     else if (zoomDirection == 2) {
         currentZoomScale = initialZoomScale;
     }
 
-
+    // If zoom is not to be reset
     if (zoomDirection != 2) {
+        // If the zoom addition results in more than max zoom, set zoom to max
         if ((zoomDirection < 0) && (currentZoomScale + zoomStep >= 4)) {
             currentZoomScale = 4;
         }
+        // If there is still space too zoom in, do it
         else if ((zoomDirection < 0) && (currentZoomScale < 4)) {
             currentZoomScale += 0.3;
         }
+        // If there is still space to zoom out, do it
         else if (currentZoomScale - zoomStep > initialZoomScale) {
             currentZoomScale -= 0.3;
         }
+        // If the zoom subtraction results in less than initial scale, set initial scale.
+        // This is the last possible case so it needs not to be conditioned explicitly
         else {
             currentZoomScale = initialZoomScale;
         }
     }
 
+    // If the image is zoomed, set up panning (so that user can move around),
+    // otherwise, remove it
     if (currentZoomScale > 1) {
         // image.classList.remove(fitSizeClass);
         // image.classList.add(zoomedSizeClass);
@@ -296,6 +313,8 @@ function zoomImageByWheel(image, initialZoomScale, zoomDirection = 0) {
         removeImagePanning(image);
         // image.style.cursor = 'zoom-in';
     }
+
+    // And finally, set the image scale as calculated
     image.style.transform = 'scale(' + currentZoomScale + ')';
 }
 
