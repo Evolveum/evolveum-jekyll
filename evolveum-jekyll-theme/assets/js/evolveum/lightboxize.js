@@ -260,21 +260,61 @@ function zoomImageInLightbox(boxedImage) {
     }
 }
 
+
 // zoomDirection:
 //  <0 means zoom in
 //  >0 means zoom out
 //      (Yes, the directions are reversed because that is what the mouse event sends and, by convention, we zoom in by wheel up.)
 //  ==2 means reset zoom
-//  The mouse wheel event typically sends ~60 in either direction constantly, the manual buttons in manualZoom() are set to send +/-1
+//  The mouse wheel event sends deltaY between 0.X and a few hundreds, depending on the scroll speed setting in the operating system.
+//  The manual buttons in manualZoom() are set to send +/-1
+//
+// The function takes the event.deltaY ("scroll distance", see the paragraph above) and normalizes it roughly into a manageable range
+// (that is necessary because otherwise, it ranges in three orders of magnitude). Then, the normalized scroll distance (scrollMultiplier) is multiplied
+// by the base zoomStep (which is set very very low), resulting into normalizedZoomStep which drives the one-step magnification and can range between 0.007 and 0.315
+// Note that this normalization does not solve anything. Higher scroll speeds (system setting) cause the function be triggered many times repeatedly,
+// so the zoom can be quite erratic despite all my efforts to keep it calm, yet responsive. This is especially problematic on touchpads and trackpads
+// (because the scroll event is fired many dozens times per second, especially on touchpads - the deltaY is very low but it repeats very often).
+// The chosen "magic" numbers are purely empirical. #itWorksOnMyMachine
 function zoomImageByWheel(image, initialZoomScale, zoomDirection = 0) {
-    // Arbitrarily chosen constant proven to zoom in/out by a reasonable step
-    const zoomStep = 0.3;
+    // Base zoom step
+    const zoomStep = 0.007;
 
-    // Default (direction not set) -> read the event deltaY value which is about 60 on either side
-    if (zoomDirection == 0) {
-        zoomDirection = event.deltaY;
+    let scrollDistancea;
+    if (event.deltaY != null) {
+        scrollDistance = Math.abs(event.deltaY);
     }
-    // Reset zoom
+    else {
+        scrollDistance = 10;
+    }
+
+    let scrollMultiplier = 4;
+    if (scrollDistance > 25) {
+        scrollMultiplier = 45;
+    }
+    else if (scrollDistance > 5) {
+        scrollMultiplier = 15;
+    }
+    else if (scrollDistance > 0 && scrollDistance < 2) {
+        scrollMultiplier = 1;
+    }
+
+    let normalizedZoomStep;
+    normalizedZoomStep = zoomStep * scrollMultiplier;
+
+    // If zoom direction not set manually, read the event deltaY value
+    // (event.deltaY is negative for wheel up which we want to interpret as zoom in)
+    if (zoomDirection == 0) {
+        if (event.deltaY < 0) {
+            zoomDirection = -1;
+        }
+        else if (event.deltaY > 0) {
+            zoomDirection = 1;
+        }
+        // zoomDirection = event.deltaY;
+    }
+
+    // Reset zoom button pressed
     else if (zoomDirection == 2) {
         currentZoomScale = initialZoomScale;
     }
@@ -282,16 +322,16 @@ function zoomImageByWheel(image, initialZoomScale, zoomDirection = 0) {
     // If zoom is not to be reset
     if (zoomDirection != 2) {
         // If the zoom addition results in more than max zoom, set zoom to max
-        if ((zoomDirection < 0) && (currentZoomScale + zoomStep >= 4)) {
+        if ((zoomDirection < 0) && (currentZoomScale + normalizedZoomStep >= 4)) {
             currentZoomScale = 4;
         }
         // If there is still space too zoom in, do it
         else if ((zoomDirection < 0) && (currentZoomScale < 4)) {
-            currentZoomScale += 0.3;
+            currentZoomScale += normalizedZoomStep;
         }
         // If there is still space to zoom out, do it
-        else if (currentZoomScale - zoomStep > initialZoomScale) {
-            currentZoomScale -= 0.3;
+        else if (currentZoomScale - normalizedZoomStep > initialZoomScale) {
+            currentZoomScale -= normalizedZoomStep;
         }
         // If the zoom subtraction results in less than initial scale, set initial scale.
         // This is the last possible case so it needs not to be conditioned explicitly
