@@ -226,9 +226,7 @@ function openLightbox(image, imageLabel) {
 // Handle events when lightbox is closed - hide the lightbox, wrapper, image, remove zoomed classes
 function closeLightbox() {
     let lightboxedImageToClose = document.getElementById('active-lightboxed-image');
-    if (lightboxedImageToClose.classList.contains(zoomedSizeClass)) {
-        removeImagePanning(lightboxedImageToClose);
-    }
+    removeImagePanning(lightboxedImageToClose);
     document.getElementById('image-lightbox-wrapper').style.animation = 'fadeOut 0.5s ease-out forwards';
     setTimeout(function() {
         lightboxedImageToClose.classList.remove(zoomedSizeClass);
@@ -262,40 +260,101 @@ function zoomImageInLightbox(boxedImage) {
     }
 }
 
+
+// zoomDirection:
+//  <0 means zoom in
+//  >0 means zoom out
+//      (Yes, the directions are reversed because that is what the mouse event sends and, by convention, we zoom in by wheel up.)
+//  ==2 means reset zoom
+//  The mouse wheel event sends deltaY between 0.X and a few hundreds, depending on the scroll speed setting in the operating system.
+//  The manual buttons in manualZoom() are set to send +/-1
+//
+// The function takes the event.deltaY ("scroll distance", see the paragraph above) and normalizes it roughly into a manageable range
+// (that is necessary because otherwise, it ranges in three orders of magnitude). Then, the normalized scroll distance (scrollMultiplier) is multiplied
+// by the base zoomStep (which is set very very low), resulting into normalizedZoomStep which drives the one-step magnification and can range between 0.007 and 0.315
+// Note that this normalization does not solve anything. Higher scroll speeds (system setting) cause the function be triggered many times repeatedly,
+// so the zoom can be quite erratic despite all my efforts to keep it calm, yet responsive. This is especially problematic on touchpads and trackpads
+// (because the scroll event is fired many dozens times per second, especially on touchpads - the deltaY is very low but it repeats very often).
+// The chosen "magic" numbers are purely empirical. #itWorksOnMyMachine
 function zoomImageByWheel(image, initialZoomScale, zoomDirection = 0) {
-    const zoomStep = 0.3;
-    if (zoomDirection == 0) {
-        zoomDirection = event.deltaY;
+    // Base zoom step
+    const zoomStep = 0.007;
+
+    let scrollDistancea;
+    if (event.deltaY != null) {
+        scrollDistance = Math.abs(event.deltaY);
     }
+    else {
+        scrollDistance = 10;
+    }
+
+    let scrollMultiplier = 4;
+    if (scrollDistance > 25) {
+        scrollMultiplier = 45;
+    }
+    else if (scrollDistance > 5) {
+        scrollMultiplier = 15;
+    }
+    else if (scrollDistance > 0 && scrollDistance < 2) {
+        scrollMultiplier = 1;
+    }
+
+    let normalizedZoomStep;
+    normalizedZoomStep = zoomStep * scrollMultiplier;
+
+    // If zoom direction not set manually, read the event deltaY value
+    // (event.deltaY is negative for wheel up which we want to interpret as zoom in)
+    if (zoomDirection == 0) {
+        if (event.deltaY < 0) {
+            zoomDirection = -1;
+        }
+        else if (event.deltaY > 0) {
+            zoomDirection = 1;
+        }
+        // zoomDirection = event.deltaY;
+    }
+
+    // Reset zoom button pressed
     else if (zoomDirection == 2) {
         currentZoomScale = initialZoomScale;
     }
 
-
+    // If zoom is not to be reset
     if (zoomDirection != 2) {
-        if ((zoomDirection < 0) && (currentZoomScale + zoomStep >= 4)) {
+        // If the zoom addition results in more than max zoom, set zoom to max
+        if ((zoomDirection < 0) && (currentZoomScale + normalizedZoomStep >= 4)) {
             currentZoomScale = 4;
         }
+        // If there is still space too zoom in, do it
         else if ((zoomDirection < 0) && (currentZoomScale < 4)) {
-            currentZoomScale += 0.3;
+            currentZoomScale += normalizedZoomStep;
         }
-        else if (currentZoomScale - zoomStep > initialZoomScale) {
-            currentZoomScale -= 0.3;
+        // If there is still space to zoom out, do it
+        else if (currentZoomScale - normalizedZoomStep > initialZoomScale) {
+            currentZoomScale -= normalizedZoomStep;
         }
+        // If the zoom subtraction results in less than initial scale, set initial scale.
+        // This is the last possible case so it needs not to be conditioned explicitly
         else {
             currentZoomScale = initialZoomScale;
         }
     }
 
+    // If the image is zoomed, set up panning (so that user can move around),
+    // otherwise, remove it
     if (currentZoomScale > 1) {
         // image.classList.remove(fitSizeClass);
         // image.classList.add(zoomedSizeClass);
-        setupImagePanning(image);
+        if (!isPanningUp) {
+            setupImagePanning(image);
+        }
     }
     else {
         removeImagePanning(image);
         // image.style.cursor = 'zoom-in';
     }
+
+    // And finally, set the image scale as calculated
     image.style.transform = 'scale(' + currentZoomScale + ')';
 }
 
@@ -311,7 +370,14 @@ function manualZoom(image, initialZoomScale, zoomDirection) {
     }
 }
 
+// This global variable lets us know if the panning is set up already
+// and helps prevent us from setting it up multiple times on the same image.
+// Without this check, the panning calculations are doubled after repeated zoom-in/outs,
+// and the panning distance per mouse movement increases to the point of making it unusable.
+let isPanningUp = false;
+
 function setupImagePanning(image) {
+    isPanningUp = true;
     let isDragging = false;
     let startX, startY;
     let transformX = 0, transformY = 0;
@@ -436,6 +502,8 @@ function removeImagePanning(image) {
         });
 
         image.style.cursor = '';
+
+        isPanningUp = false;
 
         // Reset transform and remove stored translation
         image.style.transform = '';
