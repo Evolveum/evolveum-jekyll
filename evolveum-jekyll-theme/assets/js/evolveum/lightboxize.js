@@ -430,9 +430,26 @@ function setupImagePanning(image) {
         // Get coordinates
         const event = getEventCoordinates(e);
 
-        // Calculate the difference in movement
-        const deltaX = event.clientX - startX;
-        const deltaY = event.clientY - startY;
+        // Calculate the difference in movement (i.e., mouse position difference between the JS events)
+        let deltaX = event.clientX - startX;
+        let deltaY = event.clientY - startY;
+
+        // We need to perform some dark magic correcting the movement of the panned image.
+        // All the constants are chosen based on empirical experience during the testing.
+        // If the zoom scale == 2, no correction is needed because the image moves exactly as the mouse pointer does.
+        // The lesser than 2 the zoom scale is, the faster the image needs to move (the mouse position delta needs to be multiplied by >1).
+        //      In this case, the required correction is not even linear, hence the "to the power of three" operation.
+        //      The (3 - currentZoomScale) is done to always get a number greater than 1
+        //      but also keep the requirement that the closer to 2 the zoom scale is, the lower the multiplier needs to be (and vice versa).
+        // The greater than 2 the zoom scale is, the slower the image needs to move (delta needs to be multiplied by <1).
+        if (currentZoomScale < 2) {
+            deltaX = deltaX * ((3 - currentZoomScale) ** 3);
+            deltaY = deltaY * ((3 - currentZoomScale) ** 3);
+        }
+        else {
+            deltaX = deltaX * (2 / (currentZoomScale * 1.2));
+            deltaY = deltaY * (2 / (currentZoomScale * 1.2));
+        }
 
         // Update total translation
         transformX = image.initialTranslation.x + deltaX;
