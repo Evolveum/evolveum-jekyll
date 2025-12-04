@@ -925,15 +925,28 @@ module Evolveum
     end
 end
 
-Asciidoctor::Extensions.register do
-  inline_macro Evolveum::XrefInlineMacro
-  inline_macro Evolveum::XrefVInlineMacro
-  inline_macro Evolveum::WikiInlineMacro
-  inline_macro Evolveum::BugInlineMacro
-  inline_macro Evolveum::GlossrefInlineMacro
-  inline_macro Evolveum::FeatureInlineMacro
-  block_macro Evolveum::SamplesBlockMacro
-  block_macro Evolveum::MidpointBlockMacro
-  treeprocessor Evolveum::ImagePathTreeprocessor
-  postprocessor Evolveum::TableWrapperPostprocessor
+if !Jekyll.sites[0].config['environment'].key?('skipXref') || !Jekyll.sites[0].config['environment']['skipXref']
+  Asciidoctor::Extensions.register do
+    inline_macro Evolveum::XrefInlineMacro
+    inline_macro Evolveum::XrefVInlineMacro
+    inline_macro Evolveum::WikiInlineMacro
+    inline_macro Evolveum::BugInlineMacro
+    inline_macro Evolveum::GlossrefInlineMacro
+    inline_macro Evolveum::FeatureInlineMacro
+    block_macro Evolveum::SamplesBlockMacro
+    block_macro Evolveum::MidpointBlockMacro
+    treeprocessor Evolveum::ImagePathTreeprocessor
+    postprocessor Evolveum::TableWrapperPostprocessor
+  end
+else
+  Asciidoctor::Extensions.register do
+    inline_macro Evolveum::WikiInlineMacro
+    inline_macro Evolveum::BugInlineMacro
+    inline_macro Evolveum::GlossrefInlineMacro
+    inline_macro Evolveum::FeatureInlineMacro
+    block_macro Evolveum::SamplesBlockMacro
+    block_macro Evolveum::MidpointBlockMacro
+    treeprocessor Evolveum::ImagePathTreeprocessor
+    postprocessor Evolveum::TableWrapperPostprocessor
+  end
 end
