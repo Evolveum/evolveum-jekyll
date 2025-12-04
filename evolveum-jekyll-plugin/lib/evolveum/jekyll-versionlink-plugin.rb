@@ -48,7 +48,7 @@ module Evolveum
             if @config['development']
                 develEntry = @versions.select { |v| v['status'] == 'development' && ( v['docsReleaseBranch'] == 'master' || v['docsReleaseBranch'] == 'main') }[0]
                 if develEntry.nil?
-                    Jekyll.logger.warn "No development version found for versionlinks tag."
+                    Jekyll.logger.warn "No development version found for versionlinks tag in #{context['page']['url']}"
                 else
                     versionEntry = develEntry.clone()
                     versionEntry['git-tag'] = "master"
