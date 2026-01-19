@@ -49,7 +49,6 @@ module Evolveum
             defaultBranch = ""
             verObject.each do |ver|
                 if ver['defaultBranch'] != nil && ver['defaultBranch'] == true
-                    puts "default found"
                     defaultBranch = ver['docsBranch']
                 end
             end

@@ -55,7 +55,7 @@
         href="/sitemap.xml"
     />
     <title>
-        {% if page.title %}{{ page.title }} - {{ site.title }}{% else %}{{
+        {% if page.title %}{{ page.title | strip_html }} - {{ site.title }}{% else %}{{
         site.title }}{% endif %}
     </title>
 </head>
