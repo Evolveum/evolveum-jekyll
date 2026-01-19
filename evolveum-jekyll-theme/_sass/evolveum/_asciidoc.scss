@@ -723,7 +723,7 @@ $code-font-family: "Droid Sans Mono",
 monospace;
 // NOTE will need to adjust code-font-size if we bump p font-size to 1.125em
 //$code-font-size: 0.95em;
-$code-font-size: 1rem;
+$code-font-size: 1em;
 $code-font-weight: normal;
 // FIXME don't forget about code in a table cell
 $code-line-height: 1.45;
@@ -839,9 +839,6 @@ code {
     @if $code-word-spacing !=0 {
         word-spacing: $code-word-spacing;
     }
-    @if $code-bg-color !=inherit {
-        background-color: $code-bg-color;
-    }
     @if $code-border-size !=0 {
         border: $code-border-size $code-border-style $code-border-color;
     }
@@ -852,6 +849,12 @@ code {
     }
     //overflow-wrap: break-word;
     word-wrap: break-word;
+}
+
+code:not(:is(h1, h2, h3, h4, h5, h6) code) {
+    @if $code-bg-color !=inherit {
+        background-color: $code-bg-color;
+    }
 }
 
 :not(pre)>code {
