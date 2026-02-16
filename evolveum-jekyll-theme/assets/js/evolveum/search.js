@@ -147,7 +147,6 @@
     });
 
     function OSrequest(method, url, query, async, callback) {
-        const originalQuery = query;
         if (method == "GET" && query != undefined) {
             url = url + "?source_content_type=application/json&source=" + encodeURIComponent(JSON.stringify(query).replace(/\\n\s*/g, " "))
             console.log(url)
@@ -168,7 +167,7 @@
             contentType: 'application/json',
         }).done(function(data) {
             if (typeof callback !== 'undefined' && callback) {
-                callback(data, originalQuery)
+                callback(data)
             }
         }).fail(function(data) {
             console.log(data);
@@ -504,7 +503,7 @@
         searchQuery.highlight.fields.title.highlight_query.match.title.query = query
         searchQuery.highlight.fields.text.highlight_query.match.text.query = query
 
-        const showResults = function(data, query) {
+        const showResults = function(data) {
             console.log(data)
             const showItems = []
             const numberOfItems = data.hits.total.value
@@ -652,13 +651,12 @@
                     {% endif %}
                     
                     const cleanTitleLower = cleanTitle.toLowerCase()
-                    const queryLower = query.toLowerCase()
-                    if (!cleanTitleLower.includes(queryLower)) {
+                    if (!cleanTitleLower.includes(query)) {
                         let titleArr = data.hits.hits[i].fields.second_titles != undefined ? data.hits.hits[i].fields.second_titles : []
                         titleArr.push(data.hits.hits[i].fields.third_titles != undefined ? data.hits.hits[i].fields.third_titles[0] : "")
                         titleArr.push(data.hits.hits[i].fields.fourth_titles != undefined ? data.hits.hits[i].fields.fourth_titles[0] : "")
                         for (const titleOption of titleArr) {
-                            if (typeof titleOption != 'undefined' && titleOption.toLowerCase().includes(queryLower)) {
+                            if (typeof titleOption != 'undefined' && titleOption.toLowerCase().includes(query)) {
                                 pageUrl = pageUrl + "#" + makeAnchor(titleOption)
                                 break;
                             }
