@@ -147,6 +147,7 @@
     });
 
     function OSrequest(method, url, query, async, callback) {
+        const originalQuery = query;
         if (method == "GET" && query != undefined) {
             url = url + "?source_content_type=application/json&source=" + encodeURIComponent(JSON.stringify(query).replace(/\\n\s*/g, " "))
             console.log(url)
@@ -167,7 +168,7 @@
             contentType: 'application/json',
         }).done(function(data) {
             if (typeof callback !== 'undefined' && callback) {
-                callback(data, query)
+                callback(data, originalQuery)
             }
         }).fail(function(data) {
             console.log(data);
