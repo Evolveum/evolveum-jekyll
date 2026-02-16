@@ -463,6 +463,7 @@
         slug = slug.replace(/[\s-]+/g, '-');
         
         return slug;
+    }
 
     function searchForPhrase(pagesShown = 7) {
 
