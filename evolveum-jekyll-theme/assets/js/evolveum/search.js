@@ -44,6 +44,21 @@
         searchForPhrase()
     });
 
+    $('#advanced-search-toggle').on('change', function() {
+        let searchbar = $('#searchbar');
+        let currentValue = searchbar.val().trim();
+        
+        if (this.checked) {
+            if (!currentValue.startsWith('sq:')) {
+                searchbar.val('sq:' + currentValue);
+            }
+        } else {
+            if (currentValue.startsWith('sq:')) {
+                searchbar.val(currentValue.substring(3).trim());
+            }
+        }
+    });
+
     $('.ovalSearch').click(function() {
         $(this).toggleClass('on');
         let name = this.id.replace('oval', '')
@@ -175,6 +190,47 @@
     }
 
     let searchQuery = {}
+
+    // most advanced query -> default, fallback on error is simple advanced query
+    let advancedSearchQuery = {
+        query: {
+            bool: {
+            {% if site.environment.name contains "docs" %}
+                filter: [{
+                    terms: {
+                        "type.keyword": Array.from(letters)
+                    },
+                }],
+            {% endif %}
+                must: [{
+                    query_string: {
+                        "fields": ["title^2","secondTitle^1.5","thirdTitle^1.2","fourthTitle^1.1","fifthTitle^1.0","keywords^2", "search-alias^2.5", "text"],
+                        query: "",
+                    }
+                }]
+            }
+        }
+    }
+
+    let simpleAdvancedSearchQuery = {
+        query: {
+            bool: {
+            {% if site.environment.name contains "docs" %}
+                filter: [{
+                    terms: {
+                        "type.keyword": Array.from(letters)
+                    },
+                }],
+            {% endif %}
+                must: [{
+                    simple_query_string: {
+                        "fields": ["title^1.75","secondTitle^1.5","thirdTitle^1.2","fourthTitle^1.1","fifthTitle^1.0","keywords^2", "search-alias^2.5", "text"],
+                        query: "",
+                    }
+                }]
+            }
+        }
+    }
 
     window.addEventListener('load', function() {
         OSrequest("GET", "https://{{ site.environment.searchUrl }}/search_settings/_doc/1", undefined, true, setSearchQuery)
@@ -448,6 +504,14 @@
                 console.log("timer and logtimer added")
                 logScheduled = true
             }
+            
+            let advancedToggle = $('#advanced-search-toggle');
+            let searchValue = $('#searchbar').val();
+            if (searchValue.startsWith('sq:') && !advancedToggle.prop('checked')) {
+                advancedToggle.prop('checked', true);
+            } else if (!searchValue.startsWith('sq:') && advancedToggle.prop('checked')) {
+                advancedToggle.prop('checked', false);
+            }
         }
     });
 
@@ -471,37 +535,34 @@
 
         $('[data-toggle="tooltip"]').tooltip('hide')
 
-        searchQuery.size = pagesShown;
-        const query = document.getElementById('searchbar').value.toLowerCase();
+        actQuery = JSON.parse(JSON.stringify(searchQuery))
 
-        if (query.slice(-1) == '"' && query.slice(0, 1) == '"') {
-            searchQuery.query.bool.must[0].function_score.query.multi_match.operator = "and"
-            searchQuery.query.bool.should[6].multi_match.operator = "and"
-                //searchQuery.query.bool.should[2].term['search-alias.keyword'].operator = "and"
-                //searchQuery.query.bool.should[1].term['keywords.keyword'].operator = "and"
-                //searchQuery.query.bool.should[0].term['title.keyword'].operator = "and"
-            searchQuery.highlight.fields.title.highlight_query.match.title.operator = "and"
-            searchQuery.highlight.fields.text.highlight_query.match.text.operator = "and"
+        let query = document.getElementById('searchbar').value
+
+        if (query.startsWith('sq:')) {
+            query = query.substring(3).trim();
+            actQuery = JSON.parse(JSON.stringify(simpleAdvancedSearchQuery))
+            {% if site.environment.name contains "docs" %}
+            actQuery.query.bool.filter = searchQuery.query.bool.filter
+            {% endif %}
+            actQuery.query.bool.must[0].simple_query_string.query = query
         } else {
-            searchQuery.query.bool.must[0].function_score.query.multi_match.operator = "or"
-            searchQuery.query.bool.should[6].multi_match.operator = "or"
-                //searchQuery.query.bool.should[2].term['search-alias.keyword'].operator = "or"
-                //searchQuery.query.bool.should[1].term['keywords.keyword'].operator = "or"
-                //searchQuery.query.bool.should[0].term['title.keyword'].operator = "or"
-            searchQuery.highlight.fields.title.highlight_query.match.title.operator = "or"
-            searchQuery.highlight.fields.text.highlight_query.match.text.operator = "or"
+            query = query.toLowerCase();
+            actQuery.query.bool.must[0].function_score.query.multi_match.query = query
+            actQuery.query.bool.should[6].multi_match.query = query
+            actQuery.query.bool.should[5].term['search-alias.keyword'].value = query
+            actQuery.query.bool.should[4].term['keywords.keyword'].value = query
+            actQuery.query.bool.should[3].term['fourth_titles.keyword'].value = query
+            actQuery.query.bool.should[2].term['third_titles.keyword'].value = query
+            actQuery.query.bool.should[1].term['second_titles.keyword'].value = query
+            actQuery.query.bool.should[0].term['title.keyword'].value = query
+            actQuery.highlight.fields.title.highlight_query.match.title.query = query
+            actQuery.highlight.fields.text.highlight_query.match.text.query = query
         }
 
-        searchQuery.query.bool.must[0].function_score.query.multi_match.query = query
-        searchQuery.query.bool.should[6].multi_match.query = query
-        searchQuery.query.bool.should[5].term['search-alias.keyword'].value = query
-        searchQuery.query.bool.should[4].term['keywords.keyword'].value = query
-        searchQuery.query.bool.should[3].term['fourth_titles.keyword'].value = query
-        searchQuery.query.bool.should[2].term['third_titles.keyword'].value = query
-        searchQuery.query.bool.should[1].term['second_titles.keyword'].value = query
-        searchQuery.query.bool.should[0].term['title.keyword'].value = query
-        searchQuery.highlight.fields.title.highlight_query.match.title.query = query
-        searchQuery.highlight.fields.text.highlight_query.match.text.query = query
+        actQuery.size = pagesShown;
+
+        //if (query.slice(-1) == '"' && query.slice(0, 1) == '"') {
 
         const showResults = function(data) {
             console.log(data)
