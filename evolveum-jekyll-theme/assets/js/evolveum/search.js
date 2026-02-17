@@ -653,8 +653,12 @@
                     const cleanTitleLower = cleanTitle.toLowerCase()
                     if (!cleanTitleLower.includes(query)) {
                         let titleArr = data.hits.hits[i].fields.second_titles != undefined ? data.hits.hits[i].fields.second_titles : []
-                        titleArr.push(data.hits.hits[i].fields.third_titles != undefined ? data.hits.hits[i].fields.third_titles[0] : "")
-                        titleArr.push(data.hits.hits[i].fields.fourth_titles != undefined ? data.hits.hits[i].fields.fourth_titles[0] : "")
+                        if (data.hits.hits[i].fields.third_titles != undefined) {
+                            titleArr = titleArr.concat(data.hits.hits[i].fields.third_titles)
+                        }
+                        if (data.hits.hits[i].fields.fourth_titles != undefined) {
+                            titleArr = titleArr.concat(data.hits.hits[i].fields.fourth_titles)
+                        }
                         for (const titleOption of titleArr) {
                             if (typeof titleOption != 'undefined' && titleOption.toLowerCase().includes(query)) {
                                 pageUrl = pageUrl + "#" + makeAnchor(titleOption)
