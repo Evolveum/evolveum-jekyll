@@ -762,7 +762,7 @@
 
         }
 
-        OSrequest("GET", "https://{{ site.environment.searchUrl }}/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}/_search", searchQuery, true, showResults)
+        OSrequest("GET", "https://{{ site.environment.searchUrl }}/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}/_search", actQuery, true, showResults)
     }
 
     function setHighlighting() {
