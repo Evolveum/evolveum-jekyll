@@ -57,6 +57,8 @@
                 searchbar.val(currentValue.substring(3).trim());
             }
         }
+        $('#searchbar').trigger('focus')
+        searchForPhrase()
     });
 
     $('.ovalSearch').click(function() {
@@ -208,6 +210,53 @@
                         query: "",
                     }
                 }]
+            },
+            fields: [
+                "alternative_text",
+                "title",
+                "second_titles",
+                "third_titles",
+                "fourth_titles",
+                "lastModificationDate",
+                "author",
+                "upvotes",
+                "upkeep-status",
+                "obsolete",
+                "deprecated",
+                "experimental",
+                "planned",
+                "outdated",
+                "wiki-metadata-create-user",
+                "url",
+                {% if site.environment.name contains "docs" %}
+                "type",
+                "branch",
+                {% endif %}
+                "sections1",
+                "second_titles"
+            ],
+            _source: false,
+            highlight: {
+                pre_tags: ["<strong>"],
+                post_tags: ["</strong>"],
+                fields: {
+                    title: {
+                        highlight_query: {
+                            query_string: {
+                                query: "reverse",
+                                fields: ["title"]
+                            }
+                        }
+                    },
+                    text: {
+                        highlight_query: {
+                            query_string: {
+                                query: "reverse",
+                                fields: ["text"]
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -228,6 +277,53 @@
                         query: "",
                     }
                 }]
+            },
+            fields: [
+                "alternative_text",
+                "title",
+                "second_titles",
+                "third_titles",
+                "fourth_titles",
+                "lastModificationDate",
+                "author",
+                "upvotes",
+                "upkeep-status",
+                "obsolete",
+                "deprecated",
+                "experimental",
+                "planned",
+                "outdated",
+                "wiki-metadata-create-user",
+                "url",
+                {% if site.environment.name contains "docs" %}
+                "type",
+                "branch",
+                {% endif %}
+                "sections1",
+                "second_titles"
+            ],
+            _source: false,
+            highlight: {
+                pre_tags: ["<strong>"],
+                post_tags: ["</strong>"],
+                fields: {
+                    title: {
+                        highlight_query: {
+                            simple_query_string: {
+                                query: "reverse",
+                                fields: ["title"]
+                            }
+                        }
+                    },
+                    text: {
+                        highlight_query: {
+                            simple_query_string: {
+                                query: "reverse",
+                                fields: ["text"]
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -546,6 +642,8 @@
             actQuery.query.bool.filter = searchQuery.query.bool.filter
             {% endif %}
             actQuery.query.bool.must[0].simple_query_string.query = query
+            actQuery.highlight.fields.title.highlight_query.query_string.query = query
+            actQuery.highlight.fields.text.highlight_query.query_string.query = query
         } else {
             query = query.toLowerCase();
             actQuery.query.bool.must[0].function_score.query.multi_match.query = query
