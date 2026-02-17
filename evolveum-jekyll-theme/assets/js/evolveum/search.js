@@ -3,7 +3,8 @@
 (function() {
 
     {% if site.environment.name contains "docs" %}
-    let letters = new Set(["Guide", "Book", "Reference", "Other"]);
+    const originalCategories = ["Guide", "Book", "Reference", "Developer", "Other"]
+    let letters = new Set(["Guide", "Book", "Reference", "Developer", "Other"]);
     let branches = new Set(["notBranched"])
     let notMasterBranchMult = 0
 
@@ -44,6 +45,21 @@
         searchForPhrase()
     });
 
+    $('#select-category-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
+        if (isSelected) {
+            letters.add(originalCategories[clickedIndex])
+        } else {
+            letters.delete(originalCategories[clickedIndex])
+        }
+
+        if (letters.size == 0) {
+            letters = new Set(originalCategories)
+        }
+        searchForPhrase()
+    });
+
+    {% endif %}
+
     $('#advanced-search-toggle').on('change', function() {
         let searchbar = $('#searchbar');
         let currentValue = searchbar.val().trim();
@@ -60,26 +76,6 @@
         $('#searchbar').trigger('focus')
         searchForPhrase()
     });
-
-    $('.ovalSearch').click(function() {
-        $(this).toggleClass('on');
-        let name = this.id.replace('oval', '')
-        if (this.classList.contains('on')) {
-            document.getElementById("check" + name).className = 'fas fa-check'
-            this.innerHTML = this.innerHTML.replace(name.toUpperCase(), "&nbsp;" + name.toUpperCase())
-            console.log(this.innerHTML)
-            letters.add(name)
-        } else {
-            document.getElementById("check" + name).className = ''
-            this.innerHTML = this.innerHTML.replace("&nbsp;" + name.toUpperCase(), name.toUpperCase())
-            console.log(this.innerHTML + name.toUpperCase())
-            letters.delete(name)
-        }
-        searchQuery.query.bool.filter[0].terms["type.keyword"] = Array.from(letters)
-        searchForPhrase()
-    });
-
-    {% endif %}
 
     var typingTimer = null;
     let logTimer = null;
@@ -659,6 +655,7 @@
         }
 
         actQuery.size = pagesShown;
+        actQuery.query.bool.filter[0].terms["type.keyword"] = Array.from(letters)
 
         //if (query.slice(-1) == '"' && query.slice(0, 1) == '"') {
 
