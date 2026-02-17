@@ -790,7 +790,7 @@
         let site = document.getElementById(id + "site")
         site.addEventListener("mousedown", (event) => {
             if (event.button == 0 || event.button == 2) {
-                $(site).find('[data-toggle="tooltip"]').tooltip('hide');
+                $('.tooltip').tooltip('hide');
 
                 const date = new Date();
 
