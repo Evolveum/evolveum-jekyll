@@ -788,9 +788,11 @@
         {% if site.environment.name contains "docs" %}
         // TODO for now, we suppose that cases in which the user did not select "open in a new tab" or just triggered the "mousedown" event and did not click are statistically insignificant
         let site = document.getElementById(id + "site")
+        
         site.addEventListener("mousedown", (event) => {
             if (event.button == 0 || event.button == 2) {
-                $('.tooltip').tooltip('hide');
+                $(site).parent().tooltip('hide');
+                $('[data-toggle="tooltip"]').tooltip('hide');
 
                 const date = new Date();
 
@@ -819,6 +821,11 @@
 
                 event.button == 0 ? OSrequest("POST", "https://{{ site.environment.searchUrl }}/click_logs/_doc/", queryClick, false) : OSrequest("POST", "https://{{ site.environment.searchUrl }}/click_logs/_doc/", queryClick, true);
             }
+        });
+        
+        site.addEventListener("contextmenu", (event) => {
+            $(site).parent().tooltip('hide');
+            $('[data-toggle="tooltip"]').tooltip('hide');
         });
         {% endif %}
     }
