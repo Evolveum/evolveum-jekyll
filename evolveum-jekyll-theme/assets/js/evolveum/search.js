@@ -660,7 +660,7 @@
             
             let advancedToggle = $('#advanced-search-toggle');
             let searchValue = $('#searchbar').val();
-            if (searchValue.startsWith('qs:') && !advancedToggle.prop('checked')) {
+            if ((searchValue.startsWith('qs:') || (searchValue.startsWith("qs") && event.key == ":")) && !advancedToggle.prop('checked')) {
                 advancedToggle.prop('checked', true);
                 $("#advanced-search-help-row").show()
             } else if (!searchValue.startsWith('qs:') && advancedToggle.prop('checked')) {
