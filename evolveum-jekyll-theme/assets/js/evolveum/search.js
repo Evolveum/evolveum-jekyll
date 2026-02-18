@@ -48,6 +48,9 @@
 
     $('#select-category-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         if (isSelected) {
+            if (letters.size == originalCategories.length) {
+                letters = new Set()
+            }
             letters.add(originalCategories[clickedIndex])
         } else {
             letters.delete(originalCategories[clickedIndex])
