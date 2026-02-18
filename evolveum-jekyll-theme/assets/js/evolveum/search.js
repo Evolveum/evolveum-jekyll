@@ -852,7 +852,10 @@
         const showResults = function(data, isBackup, errorMessage) {
             console.log(data)
             const showItems = []
-            const numberOfItems = data.hits.hits.length
+            const numberOfItems = data.hits.total.value
+            if (data.hits.hits.length < pagesShown) {
+                numberOfItems = data.hits.hits.length
+            }
             const suggestionBox = document.getElementById("autocombox")
             if (isBackup && errorMessage != undefined) {
                 html_str_qs = `<p><i class="fas fa-exclamation-triangle"></i>&nbsp;${errorMessage}</p>
