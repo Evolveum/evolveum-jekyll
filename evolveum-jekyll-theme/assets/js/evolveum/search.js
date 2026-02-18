@@ -67,10 +67,12 @@
         if (this.checked) {
             if (!currentValue.startsWith('qs:')) {
                 searchbar.val('qs:' + currentValue);
+                $("#advanced-search-help-row").show()
             }
         } else {
             if (currentValue.startsWith('qs:')) {
                 searchbar.val(currentValue.substring(3).trim());
+                $("#advanced-search-help-row").hide()
             }
         }
         $('#searchbar').trigger('focus')
@@ -165,7 +167,7 @@
         let backUpUrl = undefined;
         if (method == "GET" && query != undefined) {
             if (backUpQuery != undefined) {
-                backUpUrl = url  + "?source_content_type=application/json&source=" + encodeURIComponent(JSON.stringify(backUpQuery.query).replace(/\\n\s*/g, " "))
+                backUpUrl = url  + "?source_content_type=application/json&source=" + encodeURIComponent(JSON.stringify(backUpQuery).replace(/\\n\s*/g, " "))
             }
             url = url + "?source_content_type=application/json&source=" + encodeURIComponent(JSON.stringify(query).replace(/\\n\s*/g, " "))
             //console.log(url)
@@ -193,13 +195,15 @@
                 console.log("Main query response:")
                 console.log(data)
                 mainResponseText = data.responseText
-                error = "unknown error"
+                error_main = "ERROR: unknown error"
                 try {
-                    error = JSON.parse(mainResponseText).error.root_cause[0].reason.split(".")[0]
-                    console.log("Parsed error message: " + error)
+                    error_raw_main = JSON.parse(mainResponseText).error.root_cause[0].reason.split(".")[0]
+                    console.log("Parsed error message: " + error_raw_main)
+                    error_main = "Error: " + error_raw_main
                 } catch (e) {
                     console.log("Failed to parse error message")
                 }
+
                 //$('#advanced-search-warning').html('<i class="fas fa-exclamation-triangle"></i>&nbsp;' + error)
                 $.ajax({
                     method: "GET",
@@ -208,7 +212,7 @@
                     async: async,
                 }).done(function(data) {
                     if (typeof callback !== 'undefined' && callback) {
-                        callback(data, true)
+                        callback(data, true, error_main)
                     }
                 }).fail(function(data) {
                     console.log("Both main and backup query failed")
@@ -634,8 +638,10 @@
             let searchValue = $('#searchbar').val();
             if (searchValue.startsWith('qs:') && !advancedToggle.prop('checked')) {
                 advancedToggle.prop('checked', true);
+                $("#advanced-search-help-row").show()
             } else if (!searchValue.startsWith('qs:') && advancedToggle.prop('checked')) {
                 advancedToggle.prop('checked', false);
+                $("#advanced-search-help-row").hide()
             }
         }
     });
@@ -699,11 +705,19 @@
 
         //if (query.slice(-1) == '"' && query.slice(0, 1) == '"') {
 
-        const showResults = function(data, isBackup) {
+        const showResults = function(data, isBackup, errorMessage) {
             console.log(data)
             const showItems = []
             const numberOfItems = data.hits.total.value
             const suggestionBox = document.getElementById("autocombox")
+            if (isBackup && errorMessage != undefined) {
+                html_str_qs = `<p><i class="fas fa-exclamation-triangle"></i>&nbsp;${errorMessage}</p>
+                <p><i class="fas fa-exclamation-triangle"></i>&nbsp; Defaulting to simple_query_string search</p>`
+                $("#advanced-search-warning").html(html_str_qs)
+                $("#advanced-search-warning").show()
+            } else {
+                $("#advanced-search-warning").hide()
+            }
             if (numberOfItems > 0) {
 
                 if (numberOfItems > 0) {
