@@ -225,6 +225,8 @@
     }
 
     let searchQuery = {}
+    // for "" and AND and + operators
+    let searchQueryEdited = {}
 
     // most advanced query -> default, fallback on error is simple advanced query
     let advancedSearchQuery = {
@@ -250,6 +252,7 @@
                     query_string: {
                         "fields": ["title^2","second_titles^1.5","third_titles^1.2","fourth_titles^1.1","fifth_titles^1.0","keywords^2", "search-alias^2.5", "text"],
                         query: "",
+                        analyzer: "standard"
                     }
                 }]
             }
@@ -286,6 +289,7 @@
                     highlight_query: {
                         query_string: {
                             query: "reverse",
+                            analyzer: "standard",
                             fields: ["title"]
                         }
                     }
@@ -328,6 +332,7 @@
                     simple_query_string: {
                         "fields": ["title^1.75","second_titles^1.5","third_titles^1.2","fourth_titles^1.1","fifth_titles^1.0","keywords^2", "search-alias^2.5", "text"],
                         query: "",
+                        analyzer: "standard",
                     }
                 }],
 
@@ -366,6 +371,7 @@
                     highlight_query: {
                         simple_query_string: {
                             query: "reverse",
+                            analyzer: "standard",
                             fields: ["title"]
                         }
                     }
@@ -386,14 +392,181 @@
     }
 
     window.addEventListener('load', function() {
-        OSrequest("GET", "https://{{ site.environment.searchUrl }}/search_settings/_doc/1", undefined, true, setSearchQuery)
+        OSrequest("GET", "https://{{ site.environment.searchUrl }}/search_settings/_doc/1", undefined, true, setSearchQueries)
     });
 
-    function setSearchQuery(data) {
+    function setDefaultSearchQueries(data) {
         {% if site.environment.name contains "docs" %}
         console.log("DEFAULT: " + DEFAULTDOCSBRANCH)
         notMasterBranchMult = data._source.multipliers.notMasterBranch
         {% endif %}
+        script_score_obj = {
+            script: { // TODO update script
+                source: `
+                    double totalScore = _score;
+                    if (doc.upvotes.size()!=0) {
+                        totalScore = totalScore*(1.0+${data._source.multipliers.upvotes}*doc.upvotes.value);
+                    }
+                    if (doc.containsKey('docslikes') && doc.docslikes.size()!=0) {
+                        totalScore = totalScore*(1.0+${data._source.multipliers.docslikes}*doc.docslikes.value);
+                    }
+                    {% if site.environment.name contains "docs" %}
+                    if (doc.containsKey('type.keyword') && doc['type.keyword'].value == "Book") {
+                        totalScore = totalScore*${data._source.multipliers.book};
+                    }
+                    {% endif %}
+                    if (doc.containsKey('upkeep-status.keyword') && doc['upkeep-status.keyword'].size()!=0) {
+                        if (doc['upkeep-status.keyword'].value == "yellow") {
+                            totalScore = totalScore*${data._source.multipliers.status_yellow};
+                        } else if (doc['upkeep-status.keyword'].value == "green") {
+                            totalScore = totalScore*${data._source.multipliers.status_green};
+                        } else if (doc['upkeep-status.keyword'].value == "red") {
+                            totalScore = totalScore*${data._source.multipliers.status_red};
+                        } else if (doc['upkeep-status.keyword'].value == "orange") {
+                            totalScore = totalScore*${data._source.multipliers.status_orange};
+                        }
+                    } else {
+                        totalScore = totalScore*${data._source.multipliers.status_absent};
+                    }
+                    if (doc.containsKey('lastModificationDate') && doc.lastModificationDate.size()!=0) {
+                        double timestampNow = (double)new Date().getTime();
+                        totalScore = totalScore*Math.max(${data._source.values.last_modification_min}, ${data._source.multipliers.last_modification_im}/(1+(timestampNow - doc.lastModificationDate.value.getMillis())/${data._source.values.last_modification * 24 * 60 * 60 * 1000}.0))
+                    } else {
+                        totalScore = totalScore*${data._source.multipliers.age_absent};
+                    }
+                    if (doc.containsKey('deprecated') && doc.deprecated.size()!=0) {
+                        if (doc.deprecated.value == true) {
+                            totalScore = totalScore*${data._source.multipliers.deprecated};
+                        }
+                    }
+                    if (doc.containsKey('experimental') && doc.experimental.size()!=0) {
+                        if (doc.experimental.value == true) {
+                            totalScore = totalScore*${data._source.multipliers.experimental};
+                        }
+                    }
+                    if (doc.containsKey('planned') && doc.planned.size()!=0) {
+                        if (doc.planned.value == true) {
+                            totalScore = totalScore*${data._source.multipliers.planned};
+                        }
+                    }
+                    if (doc.containsKey('outdated') && doc.outdated.size()!=0) {
+                        if (doc.outdated.value == true) {
+                            totalScore = totalScore*${data._source.multipliers.outdated};
+                        }
+                    }
+                    if (doc.containsKey('obsolete') && doc.obsolete.size()!=0) {
+                        if (doc.obsolete.value == true) {
+                            totalScore = totalScore*${data._source.multipliers.obsolete};
+                        }
+                    }
+                    {% if site.environment.name contains "docs" %}
+                    if (doc.containsKey('type.keyword') && doc['type.keyword'].size()!=0) {
+                        if (doc['type.keyword'].value == "Other") {
+                            totalScore = totalScore*${data._source.multipliers.other};
+                        }
+                    }
+                    if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
+                        if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
+                            totalScore = totalScore*${data._source.multipliers.notMasterBranch};
+                        }
+                    }
+                    {% endif %}return totalScore;
+                ` //ADD ONLY BEFORE BRANCH PART
+            }
+        }
+        searchQueryEdited = searchQuery = {
+            query: {
+                bool: {
+                    {% if site.environment.name contains "docs" %}
+                    filter: [{
+                        terms: {
+                            "type.keyword": Array.from(letters)
+                        }
+                    }],
+                    {% endif %}
+                    must: [{
+                        function_score: {
+                            script_score: script_score_obj,
+                            query: {
+                                simple_query_string: {
+                                    query: "",
+                                    analyzer: "standard",
+                                    fields: [
+                                        "text",
+                                        `title^${data._source.multipliers.title}`,
+                                        `second_titles^${data._source.multipliers.secondTitle}`,
+                                        `third_titles^${data._source.multipliers.thirdTitle}`,
+                                        `fourth_titles^${data._source.multipliers.fourthTitle}`,
+                                        `fifth_titles^${data._source.multipliers.fifthTitle}`,
+                                        "alternative_text^0.5", // TODO
+                                        `keywords^${data._source.multipliers.keywords}`,
+                                        `search-alias^${data._source.multipliers.searchAlias}`
+                                    ]
+                                }
+                            }
+                        }
+                    }],
+                    must_not: [{
+                        term: {
+                            "visibility": "hidden"
+                        }
+                    },{
+                        term: {
+                            "effectiveVisibility": "hidden"
+                        }
+                    }]
+                }
+            },
+            fields: [
+                "alternative_text",
+                "title",
+                "second_titles",
+                "third_titles",
+                "fourth_titles",
+                "lastModificationDate",
+                "author",
+                "upvotes",
+                "upkeep-status",
+                "obsolete",
+                "deprecated",
+                "experimental",
+                "planned",
+                "outdated",
+                "wiki-metadata-create-user",
+                "url",
+                {% if site.environment.name contains "docs" %}
+                "type",
+                "branch",
+                {% endif %}
+                "sections1",
+                "second_titles"
+            ],
+            _source: false,
+            highlight: {
+                pre_tags: ["<strong>"],
+                post_tags: ["</strong>"],
+                fields: {
+                    title: {
+                        highlight_query: {
+                            simple_query_string: {
+                                query: "reverse",
+                                analyzer: "simple",
+                                fields: ["title"]
+                            }
+                        }
+                    },
+                    text: {
+                        highlight_query: {
+                            simple_query_string: {
+                                query: "reverse",
+                                analyzer: "simple",
+                                fields: ["text"]
+                            }
+                        }
+                    }
+                }
+            }
+        }
         searchQuery = {
             query: {
                 bool: {
@@ -406,80 +579,7 @@
                     {% endif %}
                     must: [{
                         function_score: {
-                            script_score: {
-                                script: { // TODO update script
-                                    source: `
-                                        double totalScore = _score;
-                                        if (doc.upvotes.size()!=0) {
-                                            totalScore = totalScore*(1.0+${data._source.multipliers.upvotes}*doc.upvotes.value);
-                                        }
-                                        if (doc.containsKey('docslikes') && doc.docslikes.size()!=0) {
-                                            totalScore = totalScore*(1.0+${data._source.multipliers.docslikes}*doc.docslikes.value);
-                                        }
-                                        {% if site.environment.name contains "docs" %}
-                                        if (doc.containsKey('type.keyword') && doc['type.keyword'].value == "Book") {
-                                            totalScore = totalScore*${data._source.multipliers.book};
-                                        }
-                                        {% endif %}
-                                        if (doc.containsKey('upkeep-status.keyword') && doc['upkeep-status.keyword'].size()!=0) {
-                                            if (doc['upkeep-status.keyword'].value == "yellow") {
-                                                totalScore = totalScore*${data._source.multipliers.status_yellow};
-                                            } else if (doc['upkeep-status.keyword'].value == "green") {
-                                                totalScore = totalScore*${data._source.multipliers.status_green};
-                                            } else if (doc['upkeep-status.keyword'].value == "red") {
-                                                totalScore = totalScore*${data._source.multipliers.status_red};
-                                            } else if (doc['upkeep-status.keyword'].value == "orange") {
-                                                totalScore = totalScore*${data._source.multipliers.status_orange};
-                                            }
-                                        } else {
-                                            totalScore = totalScore*${data._source.multipliers.status_absent};
-                                        }
-                                        if (doc.containsKey('lastModificationDate') && doc.lastModificationDate.size()!=0) {
-                                            double timestampNow = (double)new Date().getTime();
-                                            totalScore = totalScore*Math.max(${data._source.values.last_modification_min}, ${data._source.multipliers.last_modification_im}/(1+(timestampNow - doc.lastModificationDate.value.getMillis())/${data._source.values.last_modification * 24 * 60 * 60 * 1000}.0))
-                                        } else {
-                                            totalScore = totalScore*${data._source.multipliers.age_absent};
-                                        }
-                                        if (doc.containsKey('deprecated') && doc.deprecated.size()!=0) {
-                                            if (doc.deprecated.value == true) {
-                                                totalScore = totalScore*${data._source.multipliers.deprecated};
-                                            }
-                                        }
-                                        if (doc.containsKey('experimental') && doc.experimental.size()!=0) {
-                                            if (doc.experimental.value == true) {
-                                                totalScore = totalScore*${data._source.multipliers.experimental};
-                                            }
-                                        }
-                                        if (doc.containsKey('planned') && doc.planned.size()!=0) {
-                                            if (doc.planned.value == true) {
-                                                totalScore = totalScore*${data._source.multipliers.planned};
-                                            }
-                                        }
-                                        if (doc.containsKey('outdated') && doc.outdated.size()!=0) {
-                                            if (doc.outdated.value == true) {
-                                                totalScore = totalScore*${data._source.multipliers.outdated};
-                                            }
-                                        }
-                                        if (doc.containsKey('obsolete') && doc.obsolete.size()!=0) {
-                                            if (doc.obsolete.value == true) {
-                                                totalScore = totalScore*${data._source.multipliers.obsolete};
-                                            }
-                                        }
-                                        {% if site.environment.name contains "docs" %}
-                                        if (doc.containsKey('type.keyword') && doc['type.keyword'].size()!=0) {
-                                            if (doc['type.keyword'].value == "Other") {
-                                                totalScore = totalScore*${data._source.multipliers.other};
-                                            }
-                                        }
-                                        if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
-                                            if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
-                                                totalScore = totalScore*${data._source.multipliers.notMasterBranch};
-                                            }
-                                        }
-                                        {% endif %}return totalScore;
-                                    ` //ADD ONLY BEFORE BRANCH PART
-                                }
-                            },
+                            script_score: script_score_obj,
                             query: {
                                 multi_match: {
                                     query: "",
@@ -698,6 +798,10 @@
 
         let query = document.getElementById('searchbar').value
 
+        {% if site.environment.name contains "docs" %}
+            actQuery.query.bool.filter[0].terms["type.keyword"] = Array.from(letters)
+        {% endif %}
+
         if (query.startsWith('qs:')) {
             query = query.substring(3).trim();
             actQuery = JSON.parse(JSON.stringify(advancedSearchQuery))
@@ -715,6 +819,18 @@
             } else if (actQuery.query.bool.must[0].query_string.fields == undefined) {
                 actQuery.query.bool.must[0].query_string.fields = ORIGFIELDS
             }
+            {% if site.environment.name contains "docs" %}
+            actQuery.query.bool.filter = JSON.parse(JSON.stringify(searchQuery.query.bool.filter))
+            backUpQuery.query.bool.filter = JSON.parse(JSON.stringify(searchQuery.query.bool.filter))
+            {% endif %}
+        } else if (query.includes(":") || query.includes("AND") || query.includes("OR") || query.includes(" + ")) {
+            actQuery = JSON.parse(JSON.stringify(searchQueryEdited))
+            actQuery.query.bool.must[0].function_score.query.simple_query_string.query = query
+            actQuery.highlight.fields.title.highlight_query.simple_query_string.query = query
+            actQuery.highlight.fields.text.highlight_query.simple_query_string.query = query
+            {% if site.environment.name contains "docs" %}
+            actQuery.query.bool.filter = JSON.parse(JSON.stringify(searchQuery.query.bool.filter))
+            {% endif %}
         } else {
             query = query.toLowerCase();
             actQuery.query.bool.must[0].function_score.query.multi_match.query = query
@@ -730,9 +846,6 @@
         }
 
         actQuery.size = pagesShown;
-        {% if site.environment.name contains "docs" %}
-            actQuery.query.bool.filter[0].terms["type.keyword"] = Array.from(letters)
-        {% endif %}
 
         //if (query.slice(-1) == '"' && query.slice(0, 1) == '"') {
 
