@@ -526,3 +526,8 @@
     display: flex;
     justify-content: space-around;
 }
+
+#version-search-select .bootstrap-select .bs-ok-default::after,
+#category-search-select .bootstrap-select .bs-ok-default::after {
+    border-width: 0 .15em .15em 0 !important;
+}

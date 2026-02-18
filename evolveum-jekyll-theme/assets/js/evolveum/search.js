@@ -192,6 +192,15 @@
             if (method == "GET" && backUpUrl != undefined) {
                 console.log("Main query response:")
                 console.log(data)
+                mainResponseText = data.responseText
+                error = "unknown error"
+                try {
+                    error = JSON.parse(mainResponseText).error.root_cause[0].reason.split(".")[0]
+                    console.log("Parsed error message: " + error)
+                } catch (e) {
+                    console.log("Failed to parse error message")
+                }
+                //$('#advanced-search-warning').html('<i class="fas fa-exclamation-triangle"></i>&nbsp;' + error)
                 $.ajax({
                     method: "GET",
                     url: backUpUrl,
