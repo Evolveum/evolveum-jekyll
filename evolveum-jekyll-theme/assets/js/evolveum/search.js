@@ -153,6 +153,8 @@
     }
 
     $("#search-modal").on('hidden.bs.modal', function() {
+        // Dispose all tooltips before clearing content
+        $('[data-toggle="tooltip"]').tooltip('dispose');
         document.getElementById("autocombox").innerHTML = "";
         document.getElementById("autocombox").style.display = "none";
         document.getElementById('searchToggle').value = "";
@@ -206,50 +208,50 @@
                         query: "",
                     }
                 }]
-            },
-            fields: [
-                "alternative_text",
-                "title",
-                "second_titles",
-                "third_titles",
-                "fourth_titles",
-                "lastModificationDate",
-                "author",
-                "upvotes",
-                "upkeep-status",
-                "obsolete",
-                "deprecated",
-                "experimental",
-                "planned",
-                "outdated",
-                "wiki-metadata-create-user",
-                "url",
-                {% if site.environment.name contains "docs" %}
-                "type",
-                "branch",
-                {% endif %}
-                "sections1",
-                "second_titles"
-            ],
-            _source: false,
-            highlight: {
-                pre_tags: ["<strong>"],
-                post_tags: ["</strong>"],
-                fields: {
-                    title: {
-                        highlight_query: {
-                            query_string: {
-                                query: "reverse",
-                                fields: ["title"]
-                            }
+            }
+        },
+        fields: [
+            "alternative_text",
+            "title",
+            "second_titles",
+            "third_titles",
+            "fourth_titles",
+            "lastModificationDate",
+            "author",
+            "upvotes",
+            "upkeep-status",
+            "obsolete",
+            "deprecated",
+            "experimental",
+            "planned",
+            "outdated",
+            "wiki-metadata-create-user",
+            "url",
+            {% if site.environment.name contains "docs" %}
+            "type",
+            "branch",
+            {% endif %}
+            "sections1",
+            "second_titles"
+        ],
+        _source: false,
+        highlight: {
+            pre_tags: ["<strong>"],
+            post_tags: ["</strong>"],
+            fields: {
+                title: {
+                    highlight_query: {
+                        query_string: {
+                            query: "reverse",
+                            fields: ["title"]
                         }
-                    },
-                    text: {
-                        highlight_query: {
-                            query_string: {
-                                query: "reverse",
-                                fields: ["text"]
-                            }
+                    }
+                },
+                text: {
+                    highlight_query: {
+                        query_string: {
+                            query: "reverse",
+                            fields: ["text"]
                         }
                     }
                 }
@@ -273,50 +275,50 @@
                         query: "",
                     }
                 }]
-            },
-            fields: [
-                "alternative_text",
-                "title",
-                "second_titles",
-                "third_titles",
-                "fourth_titles",
-                "lastModificationDate",
-                "author",
-                "upvotes",
-                "upkeep-status",
-                "obsolete",
-                "deprecated",
-                "experimental",
-                "planned",
-                "outdated",
-                "wiki-metadata-create-user",
-                "url",
-                {% if site.environment.name contains "docs" %}
-                "type",
-                "branch",
-                {% endif %}
-                "sections1",
-                "second_titles"
-            ],
-            _source: false,
-            highlight: {
-                pre_tags: ["<strong>"],
-                post_tags: ["</strong>"],
-                fields: {
-                    title: {
-                        highlight_query: {
-                            simple_query_string: {
-                                query: "reverse",
-                                fields: ["title"]
-                            }
+            }
+        },
+        fields: [
+            "alternative_text",
+            "title",
+            "second_titles",
+            "third_titles",
+            "fourth_titles",
+            "lastModificationDate",
+            "author",
+            "upvotes",
+            "upkeep-status",
+            "obsolete",
+            "deprecated",
+            "experimental",
+            "planned",
+            "outdated",
+            "wiki-metadata-create-user",
+            "url",
+            {% if site.environment.name contains "docs" %}
+            "type",
+            "branch",
+            {% endif %}
+            "sections1",
+            "second_titles"
+        ],
+        _source: false,
+        highlight: {
+            pre_tags: ["<strong>"],
+            post_tags: ["</strong>"],
+            fields: {
+                title: {
+                    highlight_query: {
+                        simple_query_string: {
+                            query: "reverse",
+                            fields: ["title"]
                         }
-                    },
-                    text: {
-                        highlight_query: {
-                            simple_query_string: {
-                                query: "reverse",
-                                fields: ["text"]
-                            }
+                    }
+                },
+                text: {
+                    highlight_query: {
+                        simple_query_string: {
+                            query: "reverse",
+                            fields: ["text"]
                         }
                     }
                 }
@@ -851,7 +853,10 @@
                 suggestionBox.style.display = "none";
             }
 
-            $('[data-toggle="tooltip"]').tooltip();
+            $('[data-toggle="tooltip"]').tooltip({
+                trigger: 'hover',
+                delay: { show: 100, hide: 100 }
+            });
 
             setTimeout(setHighlighting, 30);
 
