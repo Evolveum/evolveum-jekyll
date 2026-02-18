@@ -16,7 +16,7 @@
                 <div id="modal-controls-row">
                     {% if site.environment.name contains 'docs' %}
                     <div id="category-search-select" class="search-select">
-                        <select id="select-category-picker-search" class="selectpicker" data-style="categoryButton categoryButtonSearch btn-light" multiple="" data-actionsBox="true" title="Categories" data-style="btn-light btn-sm" data-width="9em">
+                        <select id="select-category-picker-search" class="selectpicker" data-selectedTextFormat="static" data-style="categoryButton categoryButtonSearch btn-light" multiple="" data-actionsBox="true" title="Categories" data-style="btn-light btn-sm" data-width="9em">
                             <option class="search-category-guide">Guide</option>
                             <option class="search-category-book">Book</option>
                             <option class="search-category-reference">Reference</option>
@@ -27,7 +27,7 @@
                     {% endif %}
                     {% if site.environment.name contains 'docs' %}
                     <div id="version-search-select" class="search-select">
-                        <select class="selectpicker" id="select-version-picker-search" data-style="versioningButton versioningButtonSearch btn-light" multiple title="Versions">
+                        <select class="selectpicker" id="select-version-picker-search" data-selectedTextFormat="static" data-style="versioningButton versioningButtonSearch btn-light" multiple title="Versions">
                             <option data-tokens="master">Development</option>
                             {% assign versions = site.data.midpoint-versions | reverse %}
                             {% for v in versions %}
@@ -50,18 +50,17 @@
                 <div id="advanced-search-help-row">
                     <div id="advanced-search-help-text">
                         <p>
-                            <i class="fa fa-lightbulb-o"></i>&nbsp;With Expert Search enabled, you can use the query string syntax.
+                            <i class="fa fa-lightbulb-o"></i>&nbsp;With the expert search on, you can use the query string (<code>qs:</code>) syntax.
                         </p>
                         <p>
-                            <i class="fa fa-code"></i>&nbsp;Example query: <code>qs: title:"search term" AND text:anotherterm</code>.
+                            <i class="fa fa-code"></i>&nbsp;For example: <code>qs: title:"exact term search in title" AND text:search in article body</code>.
                         </p>
                         <p>
-                            <i class="fa fa-file-text"></i>&nbsp;Documentaion for this mode is available <a href="https://docs.evolveum.com/about/" target="_blank">here</a>.
+                            <i class="fa fa-file-text"></i>&nbsp;Refer to the <a href="https://docs.evolveum.com/about/" target="_blank">expert search documentation</a>.
                         </p>
                     </div>
                     <div id="advanced-search-warning">
                         <i class="fas fa-exclamation-triangle"></i>&nbsp;
-                        ERROR: parse_exception: Encountered "<EOF>" at line 1, column 8
                     </div>
                 </div>
             </div>

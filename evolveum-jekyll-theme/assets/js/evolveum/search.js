@@ -199,7 +199,7 @@
                 try {
                     error_raw_main = JSON.parse(mainResponseText).error.root_cause[0].reason.split(".")[0]
                     console.log("Parsed error message: " + error_raw_main)
-                    error_main = "Error: " + error_raw_main
+                    error_main = "Error: " + $('<div/>').text(error_raw_main).html()
                 } catch (e) {
                     console.log("Failed to parse error message")
                 }
