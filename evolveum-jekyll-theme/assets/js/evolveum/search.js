@@ -290,6 +290,9 @@
                     }
                 }
             }
+        },
+        collapse: {
+            "field": "idWithoutBranch.keyword"
         }
     }
 
@@ -357,6 +360,9 @@
                     }
                 }
             }
+        },
+        collapse: {
+            "field": "idWithoutBranch.keyword"
         }
     }
 

@@ -16,7 +16,7 @@
                 <div id="modal-controls-row">
                     {% if site.environment.name contains 'docs' %}
                     <div id="category-search-select" class="search-select">
-                        <select id="select-category-picker-search" class="selectpicker" data-selectedTextFormat="static" data-style="categoryButton categoryButtonSearch btn-light" multiple="" data-actionsBox="true" title="Categories" data-style="btn-light btn-sm" data-width="9em">
+                        <select id="select-category-picker-search" class="selectpicker" data-selected-text-format="static" data-style="categoryButton categoryButtonSearch btn-light" multiple="" data-actionsBox="true" title="Categories" data-style="btn-light btn-sm" data-width="9em">
                             <option class="search-category-guide">Guide</option>
                             <option class="search-category-book">Book</option>
                             <option class="search-category-reference">Reference</option>
@@ -27,7 +27,7 @@
                     {% endif %}
                     {% if site.environment.name contains 'docs' %}
                     <div id="version-search-select" class="search-select">
-                        <select class="selectpicker" id="select-version-picker-search" data-selectedTextFormat="static" data-style="versioningButton versioningButtonSearch btn-light" multiple title="Versions">
+                        <select class="selectpicker" id="select-version-picker-search" data-selected-text-format="static" data-style="versioningButton versioningButtonSearch btn-light" multiple title="Versions">
                             <option data-tokens="master">Development</option>
                             {% assign versions = site.data.midpoint-versions | reverse %}
                             {% for v in versions %}
