@@ -709,8 +709,8 @@
             backUpQuery.highlight.fields.title.highlight_query.simple_query_string.query = query
             backUpQuery.highlight.fields.text.highlight_query.simple_query_string.query = query
             advancedSearch = true
-            //TODO what if there is escaped ":"
-            if (query.split(":").length > 1) {
+            const pattern = /\w:/
+            if (query.match(pattern) && actQuery.query.bool.must[0].query_string.fields != undefined) {
                 delete actQuery.query.bool.must[0].query_string.fields;
             } else if (actQuery.query.bool.must[0].query_string.fields == undefined) {
                 actQuery.query.bool.must[0].query_string.fields = ORIGFIELDS
