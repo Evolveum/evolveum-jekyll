@@ -7,6 +7,7 @@
     let letters = new Set(["Guide", "Book", "Reference", "Developer", "Other"]);
     let branches = new Set(["notBranched"])
     let notMasterBranchMult = 0
+    const ORIGFIELDS = ["title^2","second_titles^1.5","third_titles^1.2","fourth_titles^1.1","fifth_titles^1.0","keywords^2","search-alias^2.5","text"]
 
     $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
@@ -708,6 +709,12 @@
             backUpQuery.highlight.fields.title.highlight_query.simple_query_string.query = query
             backUpQuery.highlight.fields.text.highlight_query.simple_query_string.query = query
             advancedSearch = true
+            //TODO what if there is escaped ":"
+            if (query.split(":").length > 1) {
+                delete actQuery.query.bool.must[0].query_string.fields;
+            } else if (actQuery.query.bool.must[0].query_string.fields == undefined) {
+                actQuery.query.bool.must[0].query_string.fields = ORIGFIELDS
+            }
         } else {
             query = query.toLowerCase();
             actQuery.query.bool.must[0].function_score.query.multi_match.query = query
