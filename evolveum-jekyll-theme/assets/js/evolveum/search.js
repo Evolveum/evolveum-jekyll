@@ -395,7 +395,7 @@
         OSrequest("GET", "https://{{ site.environment.searchUrl }}/search_settings/_doc/1", undefined, true, setSearchQueries)
     });
 
-    function setDefaultSearchQueries(data) {
+    function setSearchQueries(data) {
         {% if site.environment.name contains "docs" %}
         console.log("DEFAULT: " + DEFAULTDOCSBRANCH)
         notMasterBranchMult = data._source.multipliers.notMasterBranch
