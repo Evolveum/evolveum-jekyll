@@ -236,9 +236,18 @@
                     },
                 }],
             {% endif %}
+                must_not: [{
+                    term: {
+                        "visibility": "hidden"
+                    }
+                },{
+                    term: {
+                        "effectiveVisibility": "hidden"
+                    }
+                }],
                 must: [{
                     query_string: {
-                        "fields": ["title^2","secondTitle^1.5","thirdTitle^1.2","fourthTitle^1.1","fifthTitle^1.0","keywords^2", "search-alias^2.5", "text"],
+                        "fields": ["title^2","second_titles^1.5","third_titles^1.2","fourth_titles^1.1","fifth_titles^1.0","keywords^2", "search-alias^2.5", "text"],
                         query: "",
                     }
                 }]
@@ -266,7 +275,6 @@
             "branch",
             {% endif %}
             "sections1",
-            "second_titles"
         ],
         _source: false,
         highlight: {
@@ -306,12 +314,22 @@
                     },
                 }],
             {% endif %}
+                must_not: [{
+                        term: {
+                            "visibility": "hidden"
+                        }
+                    },{
+                        term: {
+                            "effectiveVisibility": "hidden"
+                        }
+                }],
                 must: [{
                     simple_query_string: {
-                        "fields": ["title^1.75","secondTitle^1.5","thirdTitle^1.2","fourthTitle^1.1","fifthTitle^1.0","keywords^2", "search-alias^2.5", "text"],
+                        "fields": ["title^1.75","second_titles^1.5","third_titles^1.2","fourth_titles^1.1","fifth_titles^1.0","keywords^2", "search-alias^2.5", "text"],
                         query: "",
                     }
-                }]
+                }],
+
             }
         },
         fields: [
@@ -714,7 +732,7 @@
         const showResults = function(data, isBackup, errorMessage) {
             console.log(data)
             const showItems = []
-            const numberOfItems = data.hits.total.value
+            const numberOfItems = data.hits.hits.length
             const suggestionBox = document.getElementById("autocombox")
             if (isBackup && errorMessage != undefined) {
                 html_str_qs = `<p><i class="fas fa-exclamation-triangle"></i>&nbsp;${errorMessage}</p>
