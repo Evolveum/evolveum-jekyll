@@ -852,8 +852,8 @@
         const showResults = function(data, isBackup, errorMessage) {
             console.log(data)
             const showItems = []
-            const numberOfItems = data.hits.total.value
-            if (data.hits.hits.length < pagesShown) {
+            let numberOfItems = data.hits.total.value
+            if (data.hits.hits.length < pagesShown && numberOfItems != 0) {
                 numberOfItems = data.hits.hits.length
             }
             const suggestionBox = document.getElementById("autocombox")
