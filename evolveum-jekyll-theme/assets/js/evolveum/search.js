@@ -65,11 +65,11 @@
         let currentValue = searchbar.val().trim();
         
         if (this.checked) {
-            if (!currentValue.startsWith('sq:')) {
-                searchbar.val('sq:' + currentValue);
+            if (!currentValue.startsWith('qs:')) {
+                searchbar.val('qs:' + currentValue);
             }
         } else {
-            if (currentValue.startsWith('sq:')) {
+            if (currentValue.startsWith('qs:')) {
                 searchbar.val(currentValue.substring(3).trim());
             }
         }
@@ -161,10 +161,14 @@
         document.getElementById('searchbar').value = "";
     });
 
-    function OSrequest(method, url, query, async, callback) {
+    function OSrequest(method, url, query, async, callback, backUpQuery) {
+        let backUpUrl = undefined;
         if (method == "GET" && query != undefined) {
+            if (backUpQuery != undefined) {
+                backUpUrl = url  + "?source_content_type=application/json&source=" + encodeURIComponent(JSON.stringify(backUpQuery.query).replace(/\\n\s*/g, " "))
+            }
             url = url + "?source_content_type=application/json&source=" + encodeURIComponent(JSON.stringify(query).replace(/\\n\s*/g, " "))
-            console.log(url)
+            //console.log(url)
             query = undefined
         }
         $.ajax({
@@ -182,10 +186,27 @@
             contentType: 'application/json',
         }).done(function(data) {
             if (typeof callback !== 'undefined' && callback) {
-                callback(data)
+                callback(data, false)
             }
         }).fail(function(data) {
-            console.log(data);
+            if (method == "GET" && backUpUrl != undefined) {
+                console.log("Main query response:")
+                console.log(data)
+                $.ajax({
+                    method: "GET",
+                    url: backUpUrl,
+                    crossDomain: true,
+                    async: async,
+                }).done(function(data) {
+                    if (typeof callback !== 'undefined' && callback) {
+                        callback(data, true)
+                    }
+                }).fail(function(data) {
+                    console.log("Both main and backup query failed")
+                });
+            } else {
+                console.log(data);
+            }
         });
     }
 
@@ -580,6 +601,7 @@
 
     $('#searchbar').keydown(function() {
         if (event.keyCode != 38 && event.keyCode != 40) {
+            $('[data-toggle="tooltip"]').tooltip('dispose');
             if (typingTimer) {
                 clearTimeout(typingTimer);
                 typingTimer = null;
@@ -601,9 +623,9 @@
             
             let advancedToggle = $('#advanced-search-toggle');
             let searchValue = $('#searchbar').val();
-            if (searchValue.startsWith('sq:') && !advancedToggle.prop('checked')) {
+            if (searchValue.startsWith('qs:') && !advancedToggle.prop('checked')) {
                 advancedToggle.prop('checked', true);
-            } else if (!searchValue.startsWith('sq:') && advancedToggle.prop('checked')) {
+            } else if (!searchValue.startsWith('qs:') && advancedToggle.prop('checked')) {
                 advancedToggle.prop('checked', false);
             }
         }
@@ -630,18 +652,23 @@
         $('[data-toggle="tooltip"]').tooltip('hide')
 
         actQuery = JSON.parse(JSON.stringify(searchQuery))
+        backUpQuery = undefined
+
+        advancedSearch = false
 
         let query = document.getElementById('searchbar').value
 
-        if (query.startsWith('sq:')) {
+        if (query.startsWith('qs:')) {
             query = query.substring(3).trim();
-            actQuery = JSON.parse(JSON.stringify(simpleAdvancedSearchQuery))
-            {% if site.environment.name contains "docs" %}
-            actQuery.query.bool.filter = searchQuery.query.bool.filter
-            {% endif %}
-            actQuery.query.bool.must[0].simple_query_string.query = query
+            actQuery = JSON.parse(JSON.stringify(advancedSearchQuery))
+            backUpQuery = JSON.parse(JSON.stringify(simpleAdvancedSearchQuery))
+            actQuery.query.bool.must[0].query_string.query = query
             actQuery.highlight.fields.title.highlight_query.query_string.query = query
             actQuery.highlight.fields.text.highlight_query.query_string.query = query
+            backUpQuery.query.bool.must[0].simple_query_string.query = query
+            backUpQuery.highlight.fields.title.highlight_query.simple_query_string.query = query
+            backUpQuery.highlight.fields.text.highlight_query.simple_query_string.query = query
+            advancedSearch = true
         } else {
             query = query.toLowerCase();
             actQuery.query.bool.must[0].function_score.query.multi_match.query = query
@@ -657,11 +684,13 @@
         }
 
         actQuery.size = pagesShown;
-        actQuery.query.bool.filter[0].terms["type.keyword"] = Array.from(letters)
+        {% if site.environment.name contains "docs" %}
+            actQuery.query.bool.filter[0].terms["type.keyword"] = Array.from(letters)
+        {% endif %}
 
         //if (query.slice(-1) == '"' && query.slice(0, 1) == '"') {
 
-        const showResults = function(data) {
+        const showResults = function(data, isBackup) {
             console.log(data)
             const showItems = []
             const numberOfItems = data.hits.total.value
@@ -862,7 +891,7 @@
 
         }
 
-        OSrequest("GET", "https://{{ site.environment.searchUrl }}/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}/_search", actQuery, true, showResults)
+        OSrequest("GET", "https://{{ site.environment.searchUrl }}/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}/_search", actQuery, true, showResults, backUpQuery)
     }
 
     function setHighlighting() {
