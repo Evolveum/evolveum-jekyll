@@ -826,7 +826,7 @@
             actQuery.query.bool.filter = JSON.parse(JSON.stringify(searchQuery.query.bool.filter))
             backUpQuery.query.bool.filter = JSON.parse(JSON.stringify(searchQuery.query.bool.filter))
             {% endif %}
-        } else if (query.includes(":") || query.includes("AND") || query.includes("OR") || query.includes(" + ")) {
+        } else if (query.includes(":") || query.includes("AND") || query.includes("OR") || query.includes(" + ") || query.includes('"')) {
             actQuery = JSON.parse(JSON.stringify(searchQueryEdited))
             actQuery.query.bool.must[0].function_score.query.simple_query_string.query = query
             actQuery.highlight.fields.title.highlight_query.simple_query_string.query = query
