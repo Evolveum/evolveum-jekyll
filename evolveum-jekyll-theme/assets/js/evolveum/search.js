@@ -407,76 +407,76 @@
             "script": {
                 "source": `
                     double totalScore = _score;
-                    if (doc.upvotes.size()!=0) {{
+                    if (doc.upvotes.size()!=0) {
                         totalScore = totalScore*(1.0+{${data._source.multipliers.upvotes}*doc.upvotes.value);
-                    }}
-                    if (doc.containsKey('docslikes') && doc.docslikes.size()!=0) {{
+                    }
+                    if (doc.containsKey('docslikes') && doc.docslikes.size()!=0) {
                         totalScore = totalScore*(1.0+{${data._source.multipliers.docslikes}*doc.docslikes.value);
-                    }}
+                    }
                     {% if site.environment.name contains "docs" %}
-                    if (doc.containsKey('type.keyword') && doc['type.keyword'].value == "Book") {{
+                    if (doc.containsKey('type.keyword') && doc['type.keyword'].value == "Book") {
                         totalScore = totalScore*{${data._source.multipliers.book};
-                    }}
+                    }
                     {% endif %}
-                    if (doc.containsKey('upkeep-status.keyword') && doc['upkeep-status.keyword'].size()!=0) {{
-                        if (doc['upkeep-status.keyword'].value == "yellow") {{
+                    if (doc.containsKey('upkeep-status.keyword') && doc['upkeep-status.keyword'].size()!=0) {
+                        if (doc['upkeep-status.keyword'].value == "yellow") {
                             totalScore = totalScore*{${data._source.multipliers.status_yellow};
-                        }} else if (doc['upkeep-status.keyword'].value == "green") {{
+                        } else if (doc['upkeep-status.keyword'].value == "green") {
                             totalScore = totalScore*{${data._source.multipliers.status_green};
-                        }} else if (doc['upkeep-status.keyword'].value == "red") {{
+                        } else if (doc['upkeep-status.keyword'].value == "red") {
                             totalScore = totalScore*{${data._source.multipliers.status_red};
-                        }} else if (doc['upkeep-status.keyword'].value == "orange") {{
+                        } else if (doc['upkeep-status.keyword'].value == "orange") {
                             totalScore = totalScore*{${data._source.multipliers.status_orange};
-                        }}
-                    }} else {{
+                        }
+                    } else {
                         totalScore = totalScore*{${data._source.multipliers.status_absent};
-                    }}
-                    if (doc.containsKey('lastModificationDate') && doc.lastModificationDate.size()!=0) {{
+                    }
+                    if (doc.containsKey('lastModificationDate') && doc.lastModificationDate.size()!=0) {
                         double timestampNow = (double)new Date().getTime();
                         totalScore = totalScore*Math.max(${data._source.values.last_modification_min}, {${data._source.multipliers.last_modification_im}/(1+(timestampNow - doc.lastModificationDate.value.getMillis())/(${data._source.values.last_modification} * 24 * 60 * 60 * 1000.0)))
-                    }} else {{
+                    } else {
                         totalScore = totalScore*{${data._source.multipliers.age_absent};
-                    }}
-                    if (doc.containsKey('deprecated') && doc.deprecated.size()!=0) {{
-                        if (doc.deprecated.value == true) {{
+                    }
+                    if (doc.containsKey('deprecated') && doc.deprecated.size()!=0) {
+                        if (doc.deprecated.value == true) {
                             totalScore = totalScore*{${data._source.multipliers.deprecated};
-                        }}
-                    }}
-                    if (doc.containsKey('experimental') && doc.experimental.size()!=0) {{
-                        if (doc.experimental.value == true) {{
+                        }
+                    }
+                    if (doc.containsKey('experimental') && doc.experimental.size()!=0) {
+                        if (doc.experimental.value == true) {
                             totalScore = totalScore*{${data._source.multipliers.experimental};
-                        }}
-                    }}
-                    if (doc.containsKey('planned') && doc.planned.size()!=0) {{
-                        if (doc.planned.value == true) {{
+                        }
+                    }
+                    if (doc.containsKey('planned') && doc.planned.size()!=0) {
+                        if (doc.planned.value == true) {
                             totalScore = totalScore*{${data._source.multipliers.planned};
-                        }}
-                    }}
-                    if (doc.containsKey('outdated') && doc.outdated.size()!=0) {{
-                        if (doc.outdated.value == true) {{
+                        }
+                    }
+                    if (doc.containsKey('outdated') && doc.outdated.size()!=0) {
+                        if (doc.outdated.value == true) {
                             totalScore = totalScore*{${data._source.multipliers.outdated};
-                        }}
-                    }}
-                    if (doc.containsKey('obsolete') && doc.obsolete.size()!=0) {{
-                        if (doc.obsolete.value == true) {{
+                        }
+                    }
+                    if (doc.containsKey('obsolete') && doc.obsolete.size()!=0) {
+                        if (doc.obsolete.value == true) {
                             totalScore = totalScore*{${data._source.multipliers.obsolete};
-                        }}
-                    }}
+                        }
+                    }
                     {% if site.environment.name contains "docs" %}
-                    if (doc.containsKey('type.keyword') && doc['type.keyword'].size()!=0) {{
-                        if (doc['type.keyword'].value == "Other") {{
+                    if (doc.containsKey('type.keyword') && doc['type.keyword'].size()!=0) {
+                        if (doc['type.keyword'].value == "Other") {
                             totalScore = totalScore*{${data._source.multipliers.other};
-                        }}
-                    }}
-                    if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {{
-                        if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {{
+                        }
+                    }
+                    if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
+                        if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
                             totalScore = totalScore*0.1;
-                        }}
-                    }}
+                        }
+                    }
                     {% endif %}
-                    if (totalScore < 0.0) {{
+                    if (totalScore < 0.0) {
                         totalScore = 0.0;
-                    }}
+                    }
                     return totalScore;
                 `
             }
