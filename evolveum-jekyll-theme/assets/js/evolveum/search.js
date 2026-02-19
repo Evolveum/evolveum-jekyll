@@ -587,7 +587,7 @@
                             }],
                             "must": [{
                                 "multi_match": {
-                                    "query": query,
+                                    "query": "query",
                                     "analyzer": "standard",
                                     "type": "most_fields",
                                     "fields": [
@@ -618,7 +618,7 @@
                                 {
                                     "term": {
                                         "title.keyword": {
-                                            "value": query,
+                                            "value": "query",
                                             "boost": `${data._source.multipliers.queryTitleExactMatch}`,
                                             "case_insensitive": true
                                         }
@@ -627,7 +627,7 @@
                                 {
                                     "term": {
                                         "second_titles.keyword": {
-                                            "value": query,
+                                            "value": "query",
                                             "boost": `${data._source.multipliers.querySecondTitleExactMatch}`,
                                             "case_insensitive": true
                                         }
@@ -636,7 +636,7 @@
                                 {
                                     "term": {
                                         "third_titles.keyword": {
-                                            "value": query,
+                                            "value": "query",
                                             "boost": `${data._source.multipliers.queryThirdTitleExactMatch}`,
                                             "case_insensitive": true
                                         }
@@ -645,7 +645,7 @@
                                 {
                                     "term": {
                                         "fourth_titles.keyword": {
-                                            "value": query,
+                                            "value": "query",
                                             "boost": `${data._source.multipliers.queryFourthTitleExactMatch}`,
                                             "case_insensitive": true
                                         }
@@ -654,7 +654,7 @@
                                 {
                                     "term": {
                                         "keywords.keyword": {
-                                            "value": query,
+                                            "value": "query",
                                             "boost": `${data._source.multipliers.queryKeywordExactMatch}`,
                                             "case_insensitive": true
                                         }
@@ -663,7 +663,7 @@
                                 {
                                     "term": {
                                         "search-alias.keyword": {
-                                            "value": query,
+                                            "value": "query",
                                             "boost": `${data._source.multipliers.querySearchAliasExactMatch}`,
                                             "case_insensitive": true
                                         }
@@ -671,7 +671,7 @@
                                 },
                                 {
                                     "multi_match": {
-                                        "query": query,
+                                        "query": "query",
                                         "analyzer": "simple",
                                         "type": "most_fields",
                                         "fields": [
@@ -684,7 +684,7 @@
                                 },
                                 {
                                     "multi_match": {
-                                        "query": query,
+                                        "query": "query",
                                         "type": "most_fields",
                                         //"analyzer": "standard",
                                         "fields": [
@@ -706,7 +706,7 @@
                                 },
                                 {
                                     "multi_match": {
-                                        "query": query,
+                                        "query": "query",
                                         "type": "most_fields",
                                         //"analyzer": "standard",
                                         "fields": [
