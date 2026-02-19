@@ -874,7 +874,7 @@
             }
             {% if site.environment.name contains "docs" %}
             actQuery.query.bool.filter = JSON.parse(JSON.stringify(searchQuery.query.function_score.query.bool.filter))
-            backUpQuery.query.bool.filter = JSON.parse(JSON.stringify(searchQuery.query.function_score.query.bool.filter)))
+            backUpQuery.query.bool.filter = JSON.parse(JSON.stringify(searchQuery.query.function_score.query.bool.filter))
             {% endif %}
         } else if (query.includes(":") || query.includes("AND") || query.includes("OR") || query.includes(" + ") || query.includes('"')) {
             actQuery = JSON.parse(JSON.stringify(searchQueryEdited))
