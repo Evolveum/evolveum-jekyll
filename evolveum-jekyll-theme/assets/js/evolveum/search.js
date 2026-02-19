@@ -488,7 +488,7 @@
                         "bool": {
                             "filter": [{
                                 "terms": {
-                                    "type.keyword": types
+                                    "type.keyword": Array.from(letters)
                                 }
                             }],
                             "must": [{
@@ -582,7 +582,7 @@
                         "bool": {
                             "filter": [{
                                 "terms": {
-                                    "type.keyword": types
+                                    "type.keyword": Array.from(letters)
                                 }
                             }],
                             "must": [{
