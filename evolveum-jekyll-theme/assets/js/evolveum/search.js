@@ -620,7 +620,7 @@
                                         "title.keyword": {
                                             "value": query,
                                             "boost": `${data._source.multipliers.queryTitleExactMatch}`,
-                                            "case_insensitive": True
+                                            "case_insensitive": true
                                         }
                                     }
                                 },
@@ -629,7 +629,7 @@
                                         "second_titles.keyword": {
                                             "value": query,
                                             "boost": `${data._source.multipliers.querySecondTitleExactMatch}`,
-                                            "case_insensitive": True
+                                            "case_insensitive": true
                                         }
                                     }
                                 },
@@ -638,7 +638,7 @@
                                         "third_titles.keyword": {
                                             "value": query,
                                             "boost": `${data._source.multipliers.queryThirdTitleExactMatch}`,
-                                            "case_insensitive": True
+                                            "case_insensitive": true
                                         }
                                     }
                                 },
@@ -647,7 +647,7 @@
                                         "fourth_titles.keyword": {
                                             "value": query,
                                             "boost": `${data._source.multipliers.queryFourthTitleExactMatch}`,
-                                            "case_insensitive": True
+                                            "case_insensitive": true
                                         }
                                     }
                                 },
@@ -656,7 +656,7 @@
                                         "keywords.keyword": {
                                             "value": query,
                                             "boost": `${data._source.multipliers.queryKeywordExactMatch}`,
-                                            "case_insensitive": True
+                                            "case_insensitive": true
                                         }
                                     }
                                 },
@@ -665,7 +665,7 @@
                                         "search-alias.keyword": {
                                             "value": query,
                                             "boost": `${data._source.multipliers.querySearchAliasExactMatch}`,
-                                            "case_insensitive": True
+                                            "case_insensitive": true
                                         }
                                     }
                                 },
