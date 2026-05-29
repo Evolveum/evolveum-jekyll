@@ -263,7 +263,11 @@ table {
 
 .table-container {
     overflow-x: auto;
-    max-width: 100%;
+    @if $paragraph-max-width !=0 {
+        max-width: $paragraph-max-width;
+    }@else{
+        max-width: 100%;
+    }
     display: block;
     margin-bottom: 2rem;
 }

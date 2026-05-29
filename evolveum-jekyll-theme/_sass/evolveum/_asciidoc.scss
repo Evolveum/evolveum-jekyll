@@ -44,7 +44,11 @@ $table-background: transparent;
     border-collapse: separate;
     border: 0;
     background: none;
-    width: 100%;
+    @if $paragraph-max-width !=0 {
+        max-width: $paragraph-max-width;
+    }@else{
+        width: 100%;
+    }
     td.content {
         padding-left: 1rem;
         padding-right: 1rem;
