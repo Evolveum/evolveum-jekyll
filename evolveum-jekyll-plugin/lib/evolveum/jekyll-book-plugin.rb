@@ -172,6 +172,10 @@ module Evolveum
 
         def cloneBook()
           if (!Dir.exist?(@bookDir) || (Dir.entries(@bookDir) - %w[. ..]).empty?)
+            if @bookTag == "ignore"
+                Jekyll.logger.error "ERROR: Book directory is empty and bookTag is set to 'ignore'. Cannot clone the book repository."
+              return
+            end
             @bookTag ? system("cd #{@bookDir} && git clone -b #{@bookTag} #{@bookGH} . 1> /dev/null") : system("cd #{@bookDir} && git clone #{@bookGH} . 1> /dev/null")
           elsif !File.exist?("#{@bookDir}/.git")
             Jekyll.logger.warn "Book directory is not a git repository and it is not empty, Ignoring automatic update"
@@ -179,7 +183,7 @@ module Evolveum
             current_tag = get_current_book_tag
             Jekyll.logger.info "Current book tag is #{current_tag}"
             expected_tag = @bookTag || "master"
-            if current_tag != expected_tag
+            if current_tag != expected_tag && @bookTag != "ignore"
               Jekyll.logger.warn "Book tag is not the same as expected. Current: #{current_tag}, Expected: #{expected_tag}, updating..."
               system("rm -rf  #{@bookDir} && mkdir -p #{@bookDir}")
               @bookTag ? system("cd #{@bookDir} && git clone -b #{@bookTag} #{@bookGH} . 1> /dev/null") : system("cd #{@bookDir} && git clone #{@bookGH} . 1> /dev/null")
