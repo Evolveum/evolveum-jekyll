@@ -1105,7 +1105,7 @@
 
                 $("#moreResults").click(function() {
                     //TODO
-                    // {% if site.environment.name contains "docs" %}
+                    //  if site.environment.name contains "docs" 
                     // moreClick = {
                     //     "query": query,
                     //     ""
