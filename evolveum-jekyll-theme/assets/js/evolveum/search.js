@@ -18,11 +18,11 @@
         console.log(clickedIndex + " " + isSelected)
         if (isSelected) {
             branches.add(newVersionEdited)
-            if (queryArr[queryLen - 6].includes("branch")) {
+            if (queryArr[queryLen - 9].includes("branch")) {
                 console.log(queryArr)
-                console.log(queryArr[queryLen - 6])
+                console.log(queryArr[queryLen - 9])
                 console.log(queryLen)
-                searchQuery.query.function_score.script_score.script.source = queryArr.slice(0, queryLen - 7).join("\n") + "\n" + queryArr[queryLen - 2]
+                searchQuery.query.function_score.script_score.script.source = queryArr.slice(0, queryLen - 10).join("\n") + "\n" + queryArr[queryLen - 5]
                 searchQuery.query.function_score.query.bool.filter.push({ terms: { "branch.keyword": Array.from(branches) } })
             } else {
                 searchQuery.query.function_score.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
@@ -30,8 +30,8 @@
         } else {
             branches.delete(newVersionEdited)
             console.log(branches)
-            if (branches.size == 1) {
-                searchQuery.query.function_score.script_score.script.source = queryArr.slice(0, queryLen - 1).join("\n") + "\n" + `if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
+            if (branches.size == 0) {
+                searchQuery.query.function_score.script_score.script.source = queryArr.slice(0, queryLen - 4).join("\n") + "\n" + `if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
                     if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
                         totalScore = totalScore*${notMasterBranchMult};
                     }
@@ -850,12 +850,17 @@
         advancedSearch = false
 
         let query = document.getElementById('searchbar').value
+        
 
         {% if site.environment.name contains "docs" %}
             actQuery.query.function_score.query.bool.filter[0].terms["type.keyword"] = Array.from(letters)
         {% endif %}
 
+        //TODO
+        //advancedQuery = false
+
         if (query.startsWith('qs:')) {
+            //advancedQuery = true
             query = query.substring(3).trim();
             actQuery = JSON.parse(JSON.stringify(advancedSearchQuery))
             backUpQuery = JSON.parse(JSON.stringify(simpleAdvancedSearchQuery))
@@ -1099,6 +1104,13 @@
                 suggestionBox.style.display = "table";
 
                 $("#moreResults").click(function() {
+                    //TODO
+                    // {% if site.environment.name contains "docs" %}
+                    // moreClick = {
+                    //     "query": query,
+                    //     ""
+                    // }
+                    // OSrequest("POST", "https://{{ site.environment.searchUrl }}/click_logs/_doc/", moreClick, false)
                     searchForPhrase(pagesShown + 7)
                 });
 
