@@ -12,32 +12,24 @@
     $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
         let newVersionEdited = DOCSBRANCHMAP[newVersion]
-        console.log(newVersionEdited)
         let queryArr = searchQuery.query.function_score.script_score.script.source.split("\n")
         let queryLen = queryArr.length
-        console.log(clickedIndex + " " + isSelected)
         if (isSelected) {
             branches.add(newVersionEdited)
-            if (queryArr[queryLen - 9].includes("branch")) {
-                console.log(queryArr)
-                console.log(queryArr[queryLen - 9])
-                console.log(queryLen)
-                searchQuery.query.function_score.script_score.script.source = queryArr.slice(0, queryLen - 10).join("\n") + "\n" + queryArr[queryLen - 5]
+            if (queryArr[queryLen - 11].includes("branch")) {
+                searchQuery.query.function_score.script_score.script.source = queryArr.slice(0, queryLen - 12).join("\n") + "\n" + queryArr.slice(queryLen - 7).join("\n")
                 searchQuery.query.function_score.query.bool.filter.push({ terms: { "branch.keyword": Array.from(branches) } })
             } else {
                 searchQuery.query.function_score.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
             }
         } else {
             branches.delete(newVersionEdited)
-            console.log(branches)
-            if (branches.size == 0) {
-                searchQuery.query.function_score.script_score.script.source = queryArr.slice(0, queryLen - 4).join("\n") + "\n" + `if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
+            if (branches.size == 1) {
+                searchQuery.query.function_score.script_score.script.source = queryArr.slice(0, queryLen - 6).join("\n") + "\n" + `if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
                     if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
                         totalScore = totalScore*${notMasterBranchMult};
                     }
-                }
-                return totalScore;
-                `
+                }` + "\n" + queryArr.slice(queryLen - 6).join("\n")
                 searchQuery.query.function_score.query.bool.filter.pop()
             } else {
                 searchQuery.query.function_score.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
