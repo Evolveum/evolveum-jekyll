@@ -112,6 +112,7 @@ module Evolveum
             out, status = Open3.capture2(*cmd_args, chdir: repo_dir)
             
             if status.success?
+                out.force_encoding('UTF-8')
                 current_time = nil
                 out.each_line do |line|
                     line = line.strip
@@ -248,7 +249,7 @@ module Evolveum
                 puts("ERROR executing git: #{status.inspect}")
                 return nil
             end
-            return out
+            out.force_encoding('UTF-8')
         end
 
         def self.extract_assets(page)
