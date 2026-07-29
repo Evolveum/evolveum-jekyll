@@ -151,6 +151,12 @@ module Evolveum
             if site.config['environment']['name'].include?("docs")
 #            puts "=========[ EVOLVEUM feature ]============== generate"
                 init(site)
+                @base_dir = site.source
+                
+                # Precompute YAML entry dates upfront - one git blame call per file
+                Evolveum::Git.precompute_yaml_entry_dates("_data/midpoint-features.yml", @base_dir)
+                Evolveum::Git.precompute_yaml_entry_dates("_data/compliance-iso27001.yml", @base_dir)
+                
                 @nav = site.data['nav']
                 @navFeatures = @nav.resolvePath(FEATURES_URL)
                 @navIso27001 = @nav.resolvePath(ISO27001_URL)
@@ -182,6 +188,14 @@ module Evolveum
             page.data['doc-type'] = 'feature'
             page.data['feature'] = feature
 
+            # Compute lastModificationDate from precomputed YAML entry dates
+            yaml_date = Evolveum::Git.get_yaml_entry_date("_data/midpoint-features.yml", feature['id'])
+            if yaml_date.nil?
+                # Fallback: pick newest lastModificationDate from associated source pages
+                yaml_date = compute_page_date_from_doc(feature['doc'])
+            end
+            page.data['lastModificationDate'] = yaml_date
+
             nav = Evolveum::Nav.new(slug)
             nav.page = page
             nav.url = url
@@ -199,7 +213,7 @@ module Evolveum
 #            puts("  [FC] GEN #{slug}")
             # WARNING: Magic follows.
             # We create new "virtual" page using PageWithoutAFile class.
-            # This page has no source file, we will explicitly read the content from feature.html "template"
+            # This page has no source file, we will explicitly read the content from iso27001.html "template"
             url = ISO27001_URL + slug
             page = Jekyll::PageWithoutAFile.new(@site, __dir__, url, "index.html")
             # The "stub.html" template is in the gem, in the same dir as this source code (hence __dir__)
@@ -212,6 +226,14 @@ module Evolveum
             page.data['control'] = control
             page.data['doc-type'] = 'compliance'
 
+            # Compute lastModificationDate from precomputed YAML entry dates
+            yaml_date = Evolveum::Git.get_yaml_entry_date("_data/compliance-iso27001.yml", control['id'])
+            if yaml_date.nil?
+                # Fallback: pick newest lastModificationDate from associated source pages
+                yaml_date = compute_page_date_from_doc(control['doc'])
+            end
+            page.data['lastModificationDate'] = yaml_date
+
             nav = Evolveum::Nav.new(slug)
             nav.page = page
             nav.url = url
@@ -222,6 +244,35 @@ module Evolveum
             control['url'] = url
 
             page
+        end
+
+        def compute_page_date_from_doc(doc_structure)
+            return nil unless doc_structure
+            
+            all_dates = []
+            
+            # Iterate through versions, extracting dates from associated pages
+            doc_structure.each do |version, types_or_entries|
+                # Handle feature structure: feature['doc'][version][type] => [page1, page2, ...]
+                if types_or_entries.is_a?(Hash)
+                    types_or_entries.each do |type, pages|
+                        pages.each do |page|
+                            date = page.data['lastModificationDate']
+                            all_dates << date if date
+                        end
+                    end
+                # Handle compliance structure: control['doc'][version] => [{page: page_obj, ...}, ...]
+                elsif types_or_entries.is_a?(Array)
+                    types_or_entries.each do |entry|
+                        page = entry['page'] if entry.respond_to?(:[])
+                        next unless page
+                        date = page.data['lastModificationDate']
+                        all_dates << date if date
+                    end
+                end
+            end
+            
+            all_dates.max if all_dates.any?
         end
 
         def to_s()

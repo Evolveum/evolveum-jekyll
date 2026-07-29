@@ -47,17 +47,28 @@ module Evolveum
                 cache_key = "#{repo_dir}::docs"
                 return @git_date_caches[cache_key][transformed] if @git_date_caches[cache_key].key?(transformed)
                 
-                date_str = git("log -1 --pretty='format:%ct' '#{transformed}'", page_data['midpointBranchSlug'], mpDir)
+                date_str = git(["log", "-1", "--pretty=format:%ct", transformed], repo_dir)
                 return parse_git_date(date_str, file_path)
                 
             # 2. Midpoint Release
-            elsif file_path != "midpoint/release/index.html" && file_path.include?("midpoint/release/") && page_data && page_data['docsReleaseBranch'] && Dir.exist?("#{mpDir}#{page_data['docsReleaseBranch']}")
-                if file_path.include?("install")
-                    date_str = git("log -1 --pretty='format:%ct' 'install-dist.adoc'", page_data['docsReleaseBranch'], mpDir)
-                else
-                    date_str = git("log -1 --pretty='format:%ct' 'release-notes.adoc'", page_data['docsReleaseBranch'], mpDir)
+            elsif file_path != "midpoint/release/index.html" && file_path.include?("midpoint/release/") && page_data && page_data['docsReleaseBranch']
+                release_branch = page_data['docsReleaseBranch']
+                transformed = release_branch.gsub("docs/", "").gsub("/", "__SLASH__")
+                repo_dir = "#{mpDir}#{transformed}/"
+                
+                if Dir.exist?(repo_dir)
+                    if file_path.include?("install")
+                        date_str = git(["log", "-1", "--pretty=format:%ct", "install-dist.adoc"], repo_dir)
+                    else
+                        date_str = git(["log", "-1", "--pretty=format:%ct", "release-notes.adoc"], repo_dir)
+                    end
+                    return parse_git_date(date_str, file_path)
                 end
-                return parse_git_date(date_str, file_path)
+                
+                # Fallback: for wget'd release notes (no git history), use file mtime
+                if base_dir && check_path && File.exist?(check_path)
+                    return File.mtime(check_path)
+                end
                 
             # 3. Book Directory
             elsif file_path != "book/index.html" && file_path.include?("book/") && Dir.exist?(bookDir)
@@ -65,7 +76,7 @@ module Evolveum
                 ensure_git_cache_built(bookDir)
                 return @git_date_caches[bookDir][transformed] if @git_date_caches[bookDir].key?(transformed)
                 
-                date_str = git("log -1 --pretty='format:%ct' '#{transformed}'", nil, bookDir, true)
+                date_str = git(["log", "-1", "--pretty=format:%ct", transformed], bookDir)
                 return parse_git_date(date_str, file_path)
             end
             
@@ -86,7 +97,7 @@ module Evolveum
             end
             
             # 5. Fallback for untracked files or if cache building failed
-            date_str = git("log -1 --pretty='format:%ct' '#{file_path}'", nil, nil)
+            date_str = git(["log", "-1", "--pretty=format:%ct", file_path], nil)
             parse_git_date(date_str, file_path)
         end
 
@@ -96,9 +107,9 @@ module Evolveum
             return if @git_date_caches.key?(cache_key)
             
             cache = {}
-            cmd = "git log --name-only --pretty='format:%ct'"
-            cmd += " -- #{path}" if path
-            out, status = Open3.capture2(cmd, chdir: repo_dir)
+            cmd_args = ["git", "log", "--name-only", "--pretty=format:%ct"]
+            cmd_args += ["--", path] if path
+            out, status = Open3.capture2(*cmd_args, chdir: repo_dir)
             
             if status.success?
                 current_time = nil
@@ -123,6 +134,64 @@ module Evolveum
                 STDERR.puts("Error parsing git timestamp \"#{date_str}\" for file #{file_path}: #{e}")
                 nil
             end
+        end
+
+        def self.precompute_yaml_entry_dates(yaml_file_path, base_dir)
+            @yaml_entry_caches ||= {}
+            cache_key = yaml_file_path
+            return @yaml_entry_caches[cache_key] if @yaml_entry_caches.key?(cache_key)
+            
+            full_path = yaml_file_path
+            if base_dir && !Pathname.new(yaml_file_path).absolute?
+                full_path = File.join(base_dir, yaml_file_path)
+            end
+            
+            return {} unless File.exist?(full_path)
+            
+            # Use git blame --line-porcelain to get commit timestamp for each line
+            git_file_path = yaml_file_path
+            if base_dir && !Pathname.new(yaml_file_path).absolute?
+                git_file_path = yaml_file_path
+            end
+            
+            blame_out = git(["blame", "--line-porcelain", git_file_path], base_dir)
+            return {} unless blame_out
+            
+            result = {}
+            commit_times = {}
+            current_hash = nil
+            
+            blame_out.each_line do |line|
+                # Block start: <hash> <orig-line> <final-line> <num-lines>
+                if m = line.match(/^([0-9a-f]{40})\s+\d+\s+\d+\s+\d+/)
+                    current_hash = m[1]
+                end
+                
+                # committer-time: just "committer-time <unix-timestamp>" (no hash prefix)
+                if m = line.match(/^committer-time\s+(\d+)/)
+                    commit_times[current_hash] = Time.at(m[1].to_i) if current_hash
+                end
+                
+                # Content line: starts with TAB in --line-porcelain format
+                if line.start_with?("\t")
+                    content = line.sub(/\A\t/, '') # Remove leading TAB
+                    if m = content.match(/id:\s*['"]?(\S+?)['"]?$/)
+                        entry_id = m[1]
+                        timestamp = commit_times[current_hash]
+                        result[entry_id] = timestamp if current_hash && timestamp
+                    end
+                end
+            end
+            
+            @yaml_entry_caches[cache_key] = result
+            result
+        end
+
+        def self.get_yaml_entry_date(yaml_file_path, entry_id)
+            @yaml_entry_caches ||= {}
+            cache = @yaml_entry_caches[yaml_file_path]
+            return nil unless cache
+            cache[entry_id]
         end
 
         def self.update(page, mpDir, bookDir, dependency_files = [])
@@ -167,17 +236,16 @@ module Evolveum
             end
         end
 
-        def self.git(argString, branch, dir = nil, book = nil)
-            if branch == nil && !book
-                out, _ = Open3.capture2("git #{argString}")
-            elsif book
-                out, _ = Open3.capture2("cd #{dir} && git #{argString}")
-            else
-                out, _ = Open3.capture2("cd #{dir}#{branch}/ && git #{argString}")
-            end
+        # Execute git command safely using argument array (prevents shell injection).
+        # args: array of git arguments (e.g. ["log", "-1", "--pretty=format:%ct", "file_path"])
+        # dir: working directory (nil = current directory)
+        def self.git(args, dir = nil)
+            cmd_args = ["git"] + args
+            opts = dir ? { chdir: dir } : {}
+            out, status = Open3.capture2(*cmd_args, **opts)
 
-            if !$?.success?
-                puts("ERROR executing git: #{$?.inspect}")
+            unless status.success?
+                puts("ERROR executing git: #{status.inspect}")
                 return nil
             end
             return out
