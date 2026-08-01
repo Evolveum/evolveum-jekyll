@@ -52,8 +52,10 @@ module Evolveum
                 else
                     versionEntry = develEntry.clone()
                     versionEntry['git-tag'] = "master"
-                    versionEntry['maven-version'] = versionEntry['version'] + "-SNAPSHOT"
-                    versionEntry['download-version'] = "latest"
+                    # This is not the nicest solution, but now the mapper `-SNAPSHOT` is no longer used in links
+                    # To avoid the hassle of changing all the verionlink tags, I have just added anotfher entry
+                    versionEntry['maven-display-version'] = versionEntry['version'] + "-SNAPSHOT"
+                    versionEntry['maven-version'] = "latest"
                     versionEntry['download-tag'] = "latest"
                     if @config['development'].is_a?(Hash) && @config['development']['columns']
                         columnConfig = @config['development']['columns']
@@ -74,7 +76,7 @@ module Evolveum
             expanded = orig.clone()
             expanded['git-tag'] = "v" + expanded['version']
             expanded['maven-version'] = expanded['version']
-            expanded['download-version'] = expanded['version']
+            expanded['maven-display-version'] = expanded['version']
             expanded['download-tag'] = expanded['version']
             return expanded
         end
@@ -89,7 +91,7 @@ module Evolveum
             end
             @s << "    <tr>\n"
             @s << "      <th class=\"tableblock halign-left valign-top\"><p class=\"tableblock\">"
-            @s << versionEntry['maven-version']
+            @s << versionEntry['maven-display-version']
             significant = false
             if versionEntry['status'] == 'development'
                 @s << "<br>(development)"
