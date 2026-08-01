@@ -689,7 +689,7 @@ module Evolveum
 
         page = findCurrentPage(parent.document)
         version = (page && page.data['midpointVersion'])
-        if version.include?("master")
+        if version == "master"
           version = "latest"
         end
         unless version && !version.to_s.strip.empty?
