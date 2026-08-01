@@ -689,6 +689,9 @@ module Evolveum
 
         page = findCurrentPage(parent.document)
         version = (page && page.data['midpointVersion'])
+        if version.include?("master")
+          version = "latest"
+        end
         unless version && !version.to_s.strip.empty?
           defaultBranch = VersionReader.get_config_value('defaultBranch')
           if defaultBranch
