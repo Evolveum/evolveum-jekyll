@@ -14,6 +14,7 @@ require 'open3'
 require 'cgi'
 require_relative 'jekyll-versioning-plugin.rb' # We need readVersions method for checking if xfer path includes exact midpoint version
 require_relative 'jekyll-redirect-plugin.rb'
+require_relative 'jekyll-page-cache.rb'
 
 module Evolveum
 
@@ -47,7 +48,8 @@ module Evolveum
             docfile = document.attr("docfile")
             siteDirPathname = Pathname.new(jekyllSite.source)
             relativeDocfilePath = Pathname.new(docfile).relative_path_from(Pathname.new(jekyllSite.source)).to_s
-            page = findPage { |page| page.path == relativeDocfilePath }
+            cache_result = (defined?(Evolveum::PageCache) ? Evolveum::PageCache.by_path(relativeDocfilePath) : nil)
+            page = cache_result || findPage { |page| page.path == relativeDocfilePath }
             #puts("RRRRRRRRRRRRRRRRRRR: #{relativeDocfilePath} -> #{page&.url}")
             return page
         end
@@ -76,7 +78,8 @@ module Evolveum
             docdir = document.attributes["docdir"]
             relativeFilePath = toRelativePathname(docdir, target)
         #    puts "relativeSourceDir=#{relativeSourceDir}, relativeFilePath=#{relativeFilePath}"
-            page = findPage { |page| page.path == relativeFilePath }
+            page = (defined?(Evolveum::PageCache) ? Evolveum::PageCache.by_path(relativeFilePath) : nil)
+            page ||= findPage { |page| page.path == relativeFilePath }
             #puts "FFF:FILE: #{relativeFilePath} -> #{page&.url}"
             return page
         end
@@ -98,19 +101,22 @@ module Evolveum
 
             if targetPathname.absolute?
                 url = target
-                page = findPage { |page| page.url == url }
+                page = (defined?(Evolveum::PageCache) ? Evolveum::PageCache.by_url(url) : nil) ||
+                       findPage { |page| page.url == url }
             else
                 # Try whether the link is relative to source document path
                 relativeSourceDir = Pathname.new(docdir).relative_path_from(Pathname.new(site.source))
                 url = "/" + (relativeSourceDir + targetPathname).to_s
-                page = findPage { |page| page.url == url }
+                page = (defined?(Evolveum::PageCache) ? Evolveum::PageCache.by_url(url) : nil) ||
+                       findPage { |page| page.url == url }
                 if page == nil
                     # maybe the author meant the link as relative to URL of source document, not filesystem path
                     #puts "Cannot find page by filesystem-based relative link, trying URL-based relative link (#{targetPathname})"
                     currentPage = findCurrentPage(document)
                     currentPageUrlPathname = Pathname.new(currentPage.url)
                     url = (currentPageUrlPathname + targetPathname).to_s
-                    page = findPage { |page| page.url == url }
+                    page = (defined?(Evolveum::PageCache) ? Evolveum::PageCache.by_url(url) : nil) ||
+                           findPage { |page| page.url == url }
                 end
             end
 
@@ -644,6 +650,77 @@ module Evolveum
         end
     end
 
+    class DocrefInlineMacro < JekyllInlineMacro
+      use_dsl
+      named :docref
+      name_positional_attributes 'linktext'
+
+      def process(parent, target, attrs)
+        sourceFile = parent.document.attributes["docfile"]
+
+        unless jekyllSite().config['environment']['name'].include?("docs")
+          Jekyll.logger.error("INVALID DOCREF (non-docs environment) docref:#{target} in #{sourceFile}")
+          return nil
+        end
+
+        match = /\A\/(javadoc|schemadoc)\/(.+)\z/.match(target)
+        unless match
+          Jekyll.logger.error("INVALID DOCREF TARGET docref:#{target} in #{sourceFile}")
+          return nil
+        end
+        type = match[1]
+        fullPath = match[2]
+
+        if fullPath.include?('..') || fullPath.start_with?('/')
+          Jekyll.logger.error("INVALID DOCREF PATH docref:#{target} in #{sourceFile}")
+          return nil
+        end
+        decodedPath = URI::DEFAULT_PARSER.unescape(fullPath)
+        if decodedPath.include?('..') || decodedPath.start_with?('/')
+          Jekyll.logger.error("INVALID DOCREF PATH (encoded) docref:#{target} in #{sourceFile}")
+          return nil
+        end
+
+        path, fragmentSuffix = parseFragment(fullPath)
+        if path.nil? || path.strip.empty?
+          Jekyll.logger.error("EMPTY DOCREF PATH docref:#{target} in #{sourceFile}")
+          return nil
+        end
+
+        page = findCurrentPage(parent.document)
+        version = (page && page.data['midpointVersion'])
+        unless version && !version.to_s.strip.empty?
+          defaultBranch = VersionReader.get_config_value('defaultBranch')
+          if defaultBranch
+            filteredVersions = VersionReader.get_config_value('filteredVersions')
+            latestVersions = VersionReader.get_config_value('latestVersions')
+            if filteredVersions && latestVersions
+              idx = filteredVersions.index(defaultBranch)
+              if idx.nil? || latestVersions[idx].nil?
+                Jekyll.logger.error("DEFAULT BRANCH #{defaultBranch} NOT FOUND in filteredVersions for docref:#{target} in #{sourceFile}")
+              else
+                version = latestVersions[idx]
+              end
+            else
+              Jekyll.logger.error("FILTERED VERSIONS OR LATEST VERSIONS NOT FOUND for docref:#{target} in #{sourceFile}")
+            end
+          else
+            Jekyll.logger.error("DEFAULT BRANCH NOT FOUND for docref:#{target} in #{sourceFile}")
+          end
+        end
+
+        unless version && !version.to_s.strip.empty?
+          Jekyll.logger.error("INVALID VERSION for docref:#{target} in #{sourceFile}")
+          return nil
+        end
+
+        url = "https://download.evolveum.com/midpoint/#{version}/midpoint-#{version}-#{type}/#{path}"
+        url = addFragmentSuffix(url, fragmentSuffix)
+
+        defaultLabel = path.gsub('/', '.').gsub('-', '_').gsub('.html', '')
+        createLink(url, parent, attrs, defaultLabel)
+      end
+    end
 
     class WikiInlineMacro < JekyllInlineMacro
       use_dsl
@@ -929,6 +1006,7 @@ if !Jekyll.sites[0].config['environment'].key?('skipXref') || !Jekyll.sites[0].c
   Asciidoctor::Extensions.register do
     inline_macro Evolveum::XrefInlineMacro
     inline_macro Evolveum::XrefVInlineMacro
+    inline_macro Evolveum::DocrefInlineMacro
     inline_macro Evolveum::WikiInlineMacro
     inline_macro Evolveum::BugInlineMacro
     inline_macro Evolveum::GlossrefInlineMacro
