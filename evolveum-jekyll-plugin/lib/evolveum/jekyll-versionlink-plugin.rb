@@ -52,7 +52,8 @@ module Evolveum
                 else
                     versionEntry = develEntry.clone()
                     versionEntry['git-tag'] = "master"
-                    versionEntry['maven-version'] = "latest" #versionEntry['version'] + "-SNAPSHOT" is outdated
+                    versionEntry['maven-version'] = versionEntry['version'] + "-SNAPSHOT"
+                    versionEntry['download-version'] = "latest"
                     versionEntry['download-tag'] = "latest"
                     if @config['development'].is_a?(Hash) && @config['development']['columns']
                         columnConfig = @config['development']['columns']
@@ -73,6 +74,7 @@ module Evolveum
             expanded = orig.clone()
             expanded['git-tag'] = "v" + expanded['version']
             expanded['maven-version'] = expanded['version']
+            expanded['download-version'] = expanded['version']
             expanded['download-tag'] = expanded['version']
             return expanded
         end
