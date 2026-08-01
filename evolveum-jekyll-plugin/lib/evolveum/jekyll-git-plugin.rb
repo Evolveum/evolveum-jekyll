@@ -149,40 +149,43 @@ module Evolveum
             
             return {} unless File.exist?(full_path)
             
-            # Use git blame --line-porcelain to get commit timestamp for each line
-            git_file_path = yaml_file_path
-            if base_dir && !Pathname.new(yaml_file_path).absolute?
-                git_file_path = yaml_file_path
-            end
-            
-            blame_out = git(["blame", "--line-porcelain", git_file_path], base_dir)
+            blame_out = git(["blame", yaml_file_path], base_dir)
             return {} unless blame_out
             
             result = {}
-            commit_times = {}
-            current_hash = nil
             
+            current_entry_id = nil
+            latest_line_date = nil
+
             blame_out.each_line do |line|
-                # Block start: <hash> <orig-line> <final-line> <num-lines>
-                if m = line.match(/^([0-9a-f]{40})\s+\d+\s+\d+\s+\d+/)
-                    current_hash = m[1]
-                end
-                
-                # committer-time: just "committer-time <unix-timestamp>" (no hash prefix)
-                if m = line.match(/^committer-time\s+(\d+)/)
-                    commit_times[current_hash] = Time.at(m[1].to_i) if current_hash
-                end
-                
-                # Content line: starts with TAB in --line-porcelain format
-                if line.start_with?("\t")
-                    content = line.sub(/\A\t/, '') # Remove leading TAB
-                    if m = content.match(/id:\s*['"]?(\S+?)['"]?$/)
-                        entry_id = m[1]
-                        timestamp = commit_times[current_hash]
-                        result[entry_id] = timestamp if current_hash && timestamp
+                # Parse date from header: "<hash> (Author Name YYYY-MM-DD HH:MM:SS +ZZZZ    line-num) content"
+                if m = line.match(/\(.*?(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})\s+([+-]\d{4})\s+\d+\)\s+(.*)/)
+                    content = m[8]
+
+                    if id_m = content.match(/id:\s*['"]?(\S+?)['"]?$/)
+                        # previoud entry id
+                        if current_entry_id
+                            result[current_entry_id] = latest_line_date
+                        end
+                        # Now reset state for the new entry
+                        current_entry_id = id_m[1]
+                        latest_line_date = Time.new(
+                            m[1].to_i, m[2].to_i, m[3].to_i,
+                            m[4].to_i, m[5].to_i, m[6].to_i,
+                            m[7]
+                        )
+                    elsif current_entry_id && !content.strip.empty?
+                        entry_date = Time.new(
+                            m[1].to_i, m[2].to_i, m[3].to_i,
+                            m[4].to_i, m[5].to_i, m[6].to_i,
+                            m[7]
+                        )
+                        latest_line_date = entry_date if entry_date > latest_line_date
                     end
                 end
             end
+            # Flush last entry
+            result[current_entry_id] = latest_line_date if current_entry_id
             
             @yaml_entry_caches[cache_key] = result
             result
