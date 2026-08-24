@@ -64,13 +64,25 @@ module Evolveum
             pageRedirects = []
             @site.pages.each do |page|
                 if page.data['moved-from']
-                    Array(page.data['moved-from']).each do |movedFrom|
+                    normalizeMovedFrom(page.data['moved-from']).each do |movedFrom|
                         redirects << createRedirect(movedFrom, page)
                         pageRedirects << createPageRedirect(movedFrom, page)
                     end
                 end
             end
             return redirects, pageRedirects
+        end
+
+        # The :page-moved-from: header attribute is passed to Jekyll page data as a single String
+        # (repeated header lines collapse to the last value, so all old URLs must fit on one line).
+        # Accepts: a single URL, a comma-separated list of URLs (like :page-keywords:),
+        # or a YAML array (legacy). Returns a list of old URLs.
+        def normalizeMovedFrom(value)
+            if value.is_a?(Array)
+                value.compact.map { |v| v.to_s.strip }.reject { |v| v.empty? }
+            else
+                value.to_s.split(',').map { |v| v.strip }.reject { |v| v.empty? }
+            end
         end
 
         def createPageRedirect(movedFrom, page)
