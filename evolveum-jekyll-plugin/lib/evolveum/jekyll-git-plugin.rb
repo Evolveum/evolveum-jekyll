@@ -65,11 +65,6 @@ module Evolveum
                     return parse_git_date(date_str, file_path)
                 end
                 
-                # Fallback: for wget'd release notes (no git history), use file mtime
-                if base_dir && check_path && File.exist?(check_path)
-                    return File.mtime(check_path)
-                end
-                
             # 3. Book Directory
             elsif file_path != "book/index.html" && file_path.include?("book/") && Dir.exist?(bookDir)
                 transformed = file_path.gsub("book/", "")
