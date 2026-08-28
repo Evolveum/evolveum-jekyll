@@ -137,7 +137,7 @@ module Evolveum
             end
 
             # Handle the case when the moved-from URL is the same as the new URL. if unhandled, this would create a redirect loop, so we need to log an error and ignore the redirect.
-            if "/out/" == page.url
+            if "/#{out}/" == page.url
               Jekyll.logger.error "Page redirect error: original URL '#{movedFrom}' redirects to the same URL '#{page.url}', ignoring redirect. Please fix the :page-moved-from: attribute in the page front matter. Page url: #{page.url}"
               return nil
             end
