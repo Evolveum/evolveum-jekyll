@@ -224,6 +224,30 @@ module Evolveum
             return ignoredPrefixes.any? { |prefix|  targetPath.start_with?(prefix) }
         end
 
+        def findPageRedirect(target, fragmentSuffix = "")
+            # Redirect patterns are generated without a leading slash, remove it
+            target = target.sub(%r{\A/}, "")
+            Evolveum.getPageRedirects().each do |redirect|
+                match = target.match(redirect['pattern'])
+                if match != nil
+                    newUrl = redirect['substitution']
+                    (1..match.captures.length).each do |i|
+                        newUrl = newUrl.gsub("$#{i}", match[i].to_s)
+                    end
+                    # A subtree redirect can map to many pages, so the title must
+                    # come from the page at the resolved URL, not the redirect entry.
+                    page = (defined?(Evolveum::PageCache) ? Evolveum::PageCache.by_url(newUrl) : nil) ||
+                           findPage { |page| page.url == newUrl }
+                    title = (page != nil ? page.data['title'] : nil)
+                    title = redirect['title'] if title.nil?
+                    # The page lookup must use the plain URL (page URLs never contain
+                    # fragments), the returned link target carries the fragment suffix.
+                    return { "url" => addFragmentSuffix(newUrl, fragmentSuffix), "title" => title }
+                end
+            end
+            return nil
+        end
+
 
         def processXRefLink(parent, target, attrs)
             #    puts "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXREF -------> Processing #{parent} #{targetFile} #{attrs}"
@@ -246,7 +270,6 @@ module Evolveum
             if targetPage == nil
                 # No page. But there still may be a plain file (e.g. a PDF file)
                 fileUrl = findFileByTarget(parent.document, targetPath)
-                output = []
                 if fileUrl == nil
                     ignore = false
                     if ignoreLinkBreak?(parent, targetPath)
@@ -254,20 +277,20 @@ module Evolveum
                         ignore = true
                     else
                         #Jekyll.logger.warn(Evolveum.getPageRedirects().to_s)
-                        matches = false
-                        Evolveum.getPageRedirects().each do |redirect|
-                            if target.match?(redirect['pattern'])
-                                matches = true
-                                Jekyll.logger.warn(redirect['pattern'].to_s + " test " + target)
-                                break
+                        pageRedirect = findPageRedirect(targetPath, fragmentSuffix)
+                        if pageRedirect != nil
+                            Jekyll.logger.warn("DEPRECATED LINK xref:#{target} -> #{pageRedirect['url']} in #{sourceFile}")
+                            if attrs['linktext'] == nil || attrs['linktext'].strip.empty?
+                                linktext = (pageRedirect['title'] != nil ? pageRedirect['title'] : "link")
+                                if linktext == "link"
+                                  Jekyll.logger.error("NO linktext ATTRIBUTE IN BROKEN LINK xref:#{target} in #{sourceFile}")
+                                end
+                                return createLink(pageRedirect['url'], parent, attrs, linktext)
+                            else
+                                return createLink(pageRedirect['url'], parent, attrs, attrs['linktext'])
                             end
                         end
-
-                        if matches
-                            Jekyll.logger.warn("DEPRECATED LINK xref:#{target} in #{sourceFile}")
-                        else
-                            Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
-                        end
+                        Jekyll.logger.error("BROKEN LINK xref:#{target} in #{sourceFile}")
                     end
                     # Leave the target of broken link untouched. Redirects may still be able to handle it.
                     if attrs['linktext'] == nil || attrs['linktext'].strip.empty?
