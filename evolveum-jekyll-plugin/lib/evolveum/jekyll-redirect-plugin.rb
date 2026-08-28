@@ -66,8 +66,10 @@ module Evolveum
                 if page.data['moved-from']
                     normalizeMovedFrom(page.data['moved-from']).each do |movedFrom|
                         redirect = createRedirect(movedFrom, page)
-                        redirects << redirect unless redirect.nil?
-                        pageRedirects << createPageRedirect(movedFrom, page)
+                        if redirect != nil
+                            redirects << redirect
+                            pageRedirects << redirect
+                        end
                     end
                 end
             end
@@ -84,15 +86,6 @@ module Evolveum
             else
                 value.to_s.split(',').map { |v| v.strip }.reject { |v| v.empty? }
             end
-        end
-
-        def createPageRedirect(movedFrom, page)
-            movedFrom = insertReferenceBranch(movedFrom, page)
-
-            if movedFrom.end_with?('*')
-                movedFrom = movedFrom.sub("*", ".*")
-            end
-            return { "pattern" => movedFrom,  "substitution" => page.url }
         end
 
         def insertReferenceBranch(url, page)

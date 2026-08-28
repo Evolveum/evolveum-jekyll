@@ -234,15 +234,10 @@ module Evolveum
                     (1..match.captures.length).each do |i|
                         newUrl = newUrl.gsub("$#{i}", match[i].to_s)
                     end
-                    # A subtree redirect can map to many pages, so the title must
-                    # come from the page at the resolved URL, not the redirect entry.
+                    # A subtree redirect can map to many pages, so the title must come from the page at the resolved URL.
                     page = (defined?(Evolveum::PageCache) ? Evolveum::PageCache.by_url(newUrl) : nil) ||
                            findPage { |page| page.url == newUrl }
-                    title = (page != nil ? page.data['title'] : nil)
-                    title = redirect['title'] if title.nil?
-                    # The page lookup must use the plain URL (page URLs never contain
-                    # fragments), the returned link target carries the fragment suffix.
-                    return { "url" => addFragmentSuffix(newUrl, fragmentSuffix), "title" => title }
+                    return { "url" => addFragmentSuffix(newUrl, fragmentSuffix), "title" => (page != nil ? page.data['title'] : nil) }
                 end
             end
             return nil
