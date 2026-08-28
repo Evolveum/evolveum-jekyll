@@ -65,7 +65,8 @@ module Evolveum
             @site.pages.each do |page|
                 if page.data['moved-from']
                     normalizeMovedFrom(page.data['moved-from']).each do |movedFrom|
-                        redirects << createRedirect(movedFrom, page)
+                        redirect = createRedirect(movedFrom, page)
+                        redirects << redirect unless redirect.nil?
                         pageRedirects << createPageRedirect(movedFrom, page)
                     end
                 end
@@ -86,26 +87,32 @@ module Evolveum
         end
 
         def createPageRedirect(movedFrom, page)
+            movedFrom = insertReferenceBranch(movedFrom, page)
+
             if movedFrom.end_with?('*')
                 movedFrom = movedFrom.sub("*", ".*")
             end
             return { "pattern" => movedFrom,  "substitution" => page.url }
         end
 
-        def createRedirect(movedFrom, page)
-            out = movedFrom
-
+        def insertReferenceBranch(url, page)
             negativeLookAhead = VersionReader.get_config_value('negativeLookAhead')
 
-            if out.include?('midpoint/reference/') && !out.include?('midpoint/reference/index.html') && out.match(negativeLookAhead)
+            if url.include?('midpoint/reference/') && !url.include?('midpoint/reference/index.html') && url.match(negativeLookAhead)
                 branch = nil
                 if page.data['midpointBranchSlug'] != nil
                     branch = page.data['midpointBranchSlug']
                 else
                     branch = findDefaultBranch(@site)
                 end
-                out = out.sub("midpoint/reference/", "midpoint/reference/#{branch}/")
+                url = url.sub("midpoint/reference/", "midpoint/reference/#{branch}/")
             end
+
+            return url
+        end
+
+        def createRedirect(movedFrom, page)
+            out = insertReferenceBranch(movedFrom, page)
 
             if out.start_with?('/')
                 # We do not want to start pattern with /
@@ -127,6 +134,12 @@ module Evolveum
                 # We do not want the pattern to end with /
                 # We will be adding patter suffix that represents both the URL ending and slash and without slash
                 out = out[0..-2]
+            end
+
+            # Handle the case when the moved-from URL is the same as the new URL. if unhandled, this would create a redirect loop, so we need to log an error and ignore the redirect.
+            if "/out/" == page.url
+              Jekyll.logger.error "Page redirect error: original URL '#{movedFrom}' redirects to the same URL '#{page.url}', ignoring redirect. Please fix the :page-moved-from: attribute in the page front matter. Page url: #{page.url}"
+              return nil
             end
 
             return { "pattern" => "^" + escapePattern(out) + "/?$",  "substitution" => page.url }
