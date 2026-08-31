@@ -991,7 +991,7 @@
                         title = cleanTitle
                     }
 
-                    setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id, cleanTitle), 130);
+                    setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id, cleanTitle, pagesShown), 130);
 
                     let displayDate = "Not defined"
 
@@ -1185,7 +1185,7 @@
     }
     {% endif %}
 
-    function setSearchItemOnclick(id, title) {
+    function setSearchItemOnclick(id, title, pagesShown) {
 
         let up = document.getElementById(id + "up")
         up.onclick = function() {
