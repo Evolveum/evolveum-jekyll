@@ -1096,13 +1096,15 @@
                 suggestionBox.style.display = "table";
 
                 $("#moreResults").click(function() {
-                    //TODO
-                    //  if site.environment.name contains "docs" 
-                    // moreClick = {
-                    //     "query": query,
-                    //     ""
-                    // }
-                    // OSrequest("POST", "https://{{ site.environment.searchUrl }}/click_logs/_doc/", moreClick, false)
+                    {% if site.environment.name contains "docs" %}
+                    moreClick = {
+                        "query": query,
+                        "@timestamp": new Date().toISOString(),
+                        "querylength": document.getElementById('searchbar').value.toLowerCase().length,
+                        "num_results": pagesShown + 7
+                    }
+                    OSrequest("POST", "https://{{ site.environment.searchUrl }}/more_logs/_doc/", moreClick, false)
+                    {% endif %}
                     searchForPhrase(pagesShown + 7)
                 });
 
@@ -1235,7 +1237,10 @@
                     "doc_id": id,
                     "@timestamp": date.toISOString(),
                     "querylength": document.getElementById('searchbar').value.toLowerCase().length,
-                    "clickquery": document.getElementById('searchbar').value.toLowerCase()
+                    "clickquery": document.getElementById('searchbar').value.toLowerCase(),
+                    // TODO: Implement click position tracking
+                    //"click_position": xxxx
+                    "num_results": pagesShown
                 }
 
                 event.button == 0 ? OSrequest("POST", "https://{{ site.environment.searchUrl }}/click_logs/_doc/", queryClick, false) : OSrequest("POST", "https://{{ site.environment.searchUrl }}/click_logs/_doc/", queryClick, true);
