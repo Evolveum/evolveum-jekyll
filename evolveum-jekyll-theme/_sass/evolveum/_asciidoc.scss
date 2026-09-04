@@ -265,7 +265,7 @@ pre.prettyprint li:not(:first-child) code[data-lang]:before {
 // Tables
 table.tableblock {
     max-width: 100%;
-    border-collapse: separate;
+    border-collapse: collapse;
     border-radius: $box-radius;
     thead,
     tbody,
@@ -349,11 +349,6 @@ table.grid-rows>tbody>tr>.tableblock {
 
 table.grid-rows>tfoot>tr>.tableblock {
     border-width: $table-border-size 0 0 0;
-}
-
-table.grid-all>*>tr>.tableblock:last-child,
-table.grid-cols>*>tr>.tableblock:last-child {
-    border-right-width: 0;
 }
 
 table.grid-all>tbody>tr:last-child>.tableblock,
