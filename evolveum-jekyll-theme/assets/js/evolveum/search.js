@@ -139,11 +139,6 @@
     });
 
     function OSrequest(method, url, query, async, callback) {
-        if (method == "GET" && query != undefined) {
-            url = url + "?source_content_type=application/json&source=" + encodeURIComponent(JSON.stringify(query).replace(/\\n\s*/g, " "))
-            console.log(url)
-            query = undefined
-        }
         $.ajax({
             {% if site.environment.name contains "guide" %}
             headers: {
@@ -726,7 +721,7 @@
 
         }
 
-        OSrequest("GET", "https://{{ site.environment.searchUrl }}/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}/_search", actQuery, true, showResults)
+        OSrequest("POST", "https://{{ site.environment.searchUrl }}/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}/_search", actQuery, true, showResults)
     }
 
     function setHighlighting() {
