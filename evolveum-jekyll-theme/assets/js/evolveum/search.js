@@ -169,7 +169,7 @@
     let searchQuery = {}
 
     window.addEventListener('load', function() {
-        OSrequest("GET", "https://{{ site.environment.searchUrl }}/search_settings/_doc/1", undefined, true, setSearchQuery)
+        OSrequest("GET", "https://{{ site.environment.searchUrl }}/search_settings/_doc/2", undefined, true, setSearchQuery)
     });
 
     function setSearchQuery(data) {
