@@ -493,6 +493,20 @@
         }
     });
 
+    function makeAnchor(text) {
+        if (!text) return '';
+  
+        let slug = text.toLowerCase().trim();
+        
+        slug = slug.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        
+        slug = slug.replace(/[^a-z0-9\s-]/g, ' ').trim();
+        
+        slug = slug.replace(/[\s-]+/g, '-');
+        
+        return slug;
+    }
+
     function searchForPhrase(pagesShown = 7) {
 
         console.log("function started")
@@ -668,10 +682,28 @@
                     }
                     {% endif %}
 
+                    let pageUrl = data.hits.hits[i].fields.url[0]
+
+                    const cleanTitleLower = cleanTitle.toLowerCase()
+                    if (!cleanTitleLower.includes(query)) {
+                        let titleArr = data.hits.hits[i].fields.second_titles != undefined ? data.hits.hits[i].fields.second_titles : []
+                        if (data.hits.hits[i].fields.third_titles != undefined) {
+                            titleArr = titleArr.concat(data.hits.hits[i].fields.third_titles)
+                        }
+                        if (data.hits.hits[i].fields.fourth_titles != undefined) {
+                            titleArr = titleArr.concat(data.hits.hits[i].fields.fourth_titles)
+                        }
+                        for (const titleOption of titleArr) {
+                            if (typeof titleOption != 'undefined' && titleOption.toLowerCase().includes(query)) {
+                                pageUrl = pageUrl + "#" + makeAnchor(titleOption)
+                                break;
+                            }
+                        }
+                    }
                     showItems.push(`<div><span class="trigger-details searchResult" data-toggle="tooltip" data-toggle="tooltip" data-placement="left"
                     data-html="true" title='<span class="tooltip-preview"><p>Last modification date: ${displayDate}</p>
                     <p>Upkeep status: ${upkeepStatus} <i id="upkeep${upkeepStatus}" class="fa fa-circle"></i>
-                    </p><p>Search likes: ${searchUpvotes}</p><p>Docs likes: ${docsUpvotes}</p>{% if site.environment.name contains "docs" %}<p>Version: ${tooltipVer}</p>{% endif %}<p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${data.hits.hits[i].fields.url[0]}"
+                    </p><p>Search likes: ${searchUpvotes}</p><p>Docs likes: ${docsUpvotes}</p>{% if site.environment.name contains "docs" %}<p>Version: ${tooltipVer}</p>{% endif %}<p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${pageUrl}"
                     id="${data.hits.hits[i]._id}site"><li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i>
                     <span class="font1 searchResultTitle {% if site.environment.name contains "docs" %}${branchClass}{% endif %}">&nbsp;${title}</span>{% if site.environment.name contains "docs" %}<span id="label${type}" class="typeLabel">${type.toUpperCase()}</span>${branchLabel}{% endif %}<i class="${contentTriangleClass}"></i><br><span class="font2">${preview}</span></li></a></span>
                     <span class="vote" id="${data.hits.hits[i]._id}up"><i class="fas fa-thumbs-up"></i></span></div>`);
