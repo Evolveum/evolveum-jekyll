@@ -367,16 +367,14 @@
                                 {
                                     "multi_match": {
                                         "query": "query",
-                                        "analyzer": "standard",
+                                        "analyzer": "simple",
                                         "type": "most_fields",
                                         "fields": [
                                             "text",
                                             "alternative_text^0.5",
                                             `search-alias^${data._source.multipliers.searchAlias}`
                                         ],
-                                        "boost": `${data._source.multipliers.wordExactMatch}`,
-                                        "fuzziness": "0",
-                                        "operator": "and"
+                                        "boost": `${data._source.multipliers.wordExactMatch}`
                                     }
                                 },
                                 {
