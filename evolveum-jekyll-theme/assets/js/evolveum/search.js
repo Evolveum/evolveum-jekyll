@@ -5,7 +5,7 @@
     {% if site.environment.name contains "docs" %}
     let letters = new Set(["Guide", "Book", "Reference", "Other"]);
     let branches = new Set(["notBranched"])
-    let notMasterBranchMult = 0
+    const notMasterBranchMult = 0.25
 
     $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
@@ -170,7 +170,6 @@
     function setSearchQuery(data) {
         {% if site.environment.name contains "docs" %}
         console.log("DEFAULT: " + DEFAULTDOCSBRANCH)
-        notMasterBranchMult = data._source.multipliers.notMasterBranch
         {% endif %}
         script_score_obj = {
             "script": {
@@ -230,7 +229,7 @@
                     }
                     if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
                         if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
-                            totalScore = totalScore*0.15;
+                            totalScore = totalScore*${notMasterBranchMult};
                         }
                     }
                     {% endif %}
