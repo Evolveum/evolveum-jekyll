@@ -5,40 +5,32 @@
     {% if site.environment.name contains "docs" %}
     let letters = new Set(["Guide", "Book", "Reference", "Other"]);
     let branches = new Set(["notBranched"])
-    let notMasterBranchMult = 0
+    const notMasterBranchMult = 0.25
 
     $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
         let newVersionEdited = DOCSBRANCHMAP[newVersion]
-        console.log(newVersionEdited)
-        let queryArr = searchQuery.query.bool.must[0].function_score.script_score.script.source.split("\n")
+        let queryArr = searchQuery.query.function_score.script_score.script.source.split("\n")
         let queryLen = queryArr.length
-        console.log(clickedIndex + " " + isSelected)
         if (isSelected) {
             branches.add(newVersionEdited)
-            if (queryArr[queryLen - 6].includes("branch")) {
-                console.log(queryArr)
-                console.log(queryArr[queryLen - 6])
-                console.log(queryLen)
-                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0, queryLen - 7).join("\n") + "\n" + queryArr[queryLen - 2]
-                searchQuery.query.bool.filter.push({ terms: { "branch.keyword": Array.from(branches) } })
+            if (queryArr[queryLen - 11].includes("branch")) {
+                searchQuery.query.function_score.script_score.script.source = queryArr.slice(0, queryLen - 12).join("\n") + "\n" + queryArr.slice(queryLen - 7).join("\n")
+                searchQuery.query.function_score.query.bool.filter.push({ terms: { "branch.keyword": Array.from(branches) } })
             } else {
-                searchQuery.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
+                searchQuery.query.function_score.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
             }
         } else {
             branches.delete(newVersionEdited)
-            console.log(branches)
             if (branches.size == 1) {
-                searchQuery.query.bool.must[0].function_score.script_score.script.source = queryArr.slice(0, queryLen - 1).join("\n") + "\n" + `if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
+                searchQuery.query.function_score.script_score.script.source = queryArr.slice(0, queryLen - 6).join("\n") + "\n" + `if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
                     if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
                         totalScore = totalScore*${notMasterBranchMult};
                     }
-                }
-                return totalScore;
-                `
-                searchQuery.query.bool.filter.pop()
+                }` + "\n" + queryArr.slice(queryLen - 6).join("\n")
+                searchQuery.query.function_score.query.bool.filter.pop()
             } else {
-                searchQuery.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
+                searchQuery.query.function_score.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
             }
         }
         searchForPhrase()
@@ -58,7 +50,7 @@
             console.log(this.innerHTML + name.toUpperCase())
             letters.delete(name)
         }
-        searchQuery.query.bool.filter[0].terms["type.keyword"] = Array.from(letters)
+        searchQuery.query.function_score.query.bool.filter[0].terms["type.keyword"] = Array.from(letters)
         searchForPhrase()
     });
 
@@ -147,11 +139,6 @@
     });
 
     function OSrequest(method, url, query, async, callback) {
-        if (method == "GET" && query != undefined) {
-            url = url + "?source_content_type=application/json&source=" + encodeURIComponent(JSON.stringify(query).replace(/\\n\s*/g, " "))
-            console.log(url)
-            query = undefined
-        }
         $.ajax({
             {% if site.environment.name contains "guide" %}
             headers: {
@@ -177,205 +164,272 @@
     let searchQuery = {}
 
     window.addEventListener('load', function() {
-        OSrequest("GET", "https://{{ site.environment.searchUrl }}/search_settings/_doc/1", undefined, true, setSearchQuery)
+        OSrequest("GET", "https://{{ site.environment.searchUrl }}/search_settings/_doc/2", undefined, true, setSearchQuery)
     });
 
     function setSearchQuery(data) {
         {% if site.environment.name contains "docs" %}
         console.log("DEFAULT: " + DEFAULTDOCSBRANCH)
-        notMasterBranchMult = data._source.multipliers.notMasterBranch
         {% endif %}
-        searchQuery = {
-            query: {
-                bool: {
+        script_score_obj = {
+            "script": {
+                "source": `
+                    double totalScore = _score;
+                    if (doc.upvotes.size()!=0) {
+                        totalScore = totalScore*(1.0+${data._source.multipliers.upvotes}*doc.upvotes.value);
+                    }
+                    if (doc.containsKey('docslikes') && doc.docslikes.size()!=0) {
+                        totalScore = totalScore*(1.0+${data._source.multipliers.docslikes}*doc.docslikes.value);
+                    }
                     {% if site.environment.name contains "docs" %}
-                    filter: [{
-                        terms: {
-                            "type.keyword": Array.from(letters)
-                        }
-                    }],
+                    if (doc.containsKey('type.keyword') && doc['type.keyword'].value == "Book") {
+                        totalScore = totalScore*${data._source.multipliers.book};
+                    }
                     {% endif %}
-                    must: [{
-                        function_score: {
-                            script_score: {
-                                script: { // TODO update script
-                                    source: `
-                                        double totalScore = _score;
-                                        if (doc.upvotes.size()!=0) {
-                                            totalScore = totalScore*(1.0+${data._source.multipliers.upvotes}*doc.upvotes.value);
-                                        }
-                                        if (doc.containsKey('docslikes') && doc.docslikes.size()!=0) {
-                                            totalScore = totalScore*(1.0+${data._source.multipliers.docslikes}*doc.docslikes.value);
-                                        }
-                                        {% if site.environment.name contains "docs" %}
-                                        if (doc.containsKey('type.keyword') && doc['type.keyword'].value == "Book") {
-                                            totalScore = totalScore*${data._source.multipliers.book};
-                                        }
-                                        {% endif %}
-                                        if (doc.containsKey('upkeep-status.keyword') && doc['upkeep-status.keyword'].size()!=0) {
-                                            if (doc['upkeep-status.keyword'].value == "yellow") {
-                                                totalScore = totalScore*${data._source.multipliers.status_yellow};
-                                            } else if (doc['upkeep-status.keyword'].value == "green") {
-                                                totalScore = totalScore*${data._source.multipliers.status_green};
-                                            } else if (doc['upkeep-status.keyword'].value == "red") {
-                                                totalScore = totalScore*${data._source.multipliers.status_red};
-                                            } else if (doc['upkeep-status.keyword'].value == "orange") {
-                                                totalScore = totalScore*${data._source.multipliers.status_orange};
-                                            }
-                                        } else {
-                                            totalScore = totalScore*${data._source.multipliers.status_absent};
-                                        }
-                                        if (doc.containsKey('lastModificationDate') && doc.lastModificationDate.size()!=0) {
-                                            double timestampNow = (double)new Date().getTime();
-                                            totalScore = totalScore*Math.max(${data._source.values.last_modification_min}, ${data._source.multipliers.last_modification_im}/(1+(timestampNow - doc.lastModificationDate.value.getMillis())/${data._source.values.last_modification * 24 * 60 * 60 * 1000}.0))
-                                        } else {
-                                            totalScore = totalScore*${data._source.multipliers.age_absent};
-                                        }
-                                        if (doc.containsKey('deprecated') && doc.deprecated.size()!=0) {
-                                            if (doc.deprecated.value == true) {
-                                                totalScore = totalScore*${data._source.multipliers.deprecated};
-                                            }
-                                        }
-                                        if (doc.containsKey('experimental') && doc.experimental.size()!=0) {
-                                            if (doc.experimental.value == true) {
-                                                totalScore = totalScore*${data._source.multipliers.experimental};
-                                            }
-                                        }
-                                        if (doc.containsKey('planned') && doc.planned.size()!=0) {
-                                            if (doc.planned.value == true) {
-                                                totalScore = totalScore*${data._source.multipliers.planned};
-                                            }
-                                        }
-                                        if (doc.containsKey('outdated') && doc.outdated.size()!=0) {
-                                            if (doc.outdated.value == true) {
-                                                totalScore = totalScore*${data._source.multipliers.outdated};
-                                            }
-                                        }
-                                        if (doc.containsKey('obsolete') && doc.obsolete.size()!=0) {
-                                            if (doc.obsolete.value == true) {
-                                                totalScore = totalScore*${data._source.multipliers.obsolete};
-                                            }
-                                        }
-                                        {% if site.environment.name contains "docs" %}
-                                        if (doc.containsKey('type.keyword') && doc['type.keyword'].size()!=0) {
-                                            if (doc['type.keyword'].value == "Other") {
-                                                totalScore = totalScore*${data._source.multipliers.other};
-                                            }
-                                        }
-                                        if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
-                                            if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
-                                                totalScore = totalScore*${data._source.multipliers.notMasterBranch};
-                                            }
-                                        }
-                                        {% endif %}return totalScore;
-                                    ` //ADD ONLY BEFORE BRANCH PART
-                                }
-                            },
-                            query: {
-                                multi_match: {
-                                    query: "",
-                                    analyzer: "standard",
-                                    type: "most_fields",
-                                    fields: [
-                                        "text",
-                                        `title^${data._source.multipliers.title}`,
-                                        `second_titles^${data._source.multipliers.secondTitle}`,
-                                        `third_titles^${data._source.multipliers.thirdTitle}`,
-                                        `fourth_titles^${data._source.multipliers.fourthTitle}`,
-                                        `fifth_titles^${data._source.multipliers.fifthTitle}`,
-                                        "alternative_text^0.5", // TODO
-                                        `keywords^${data._source.multipliers.keywords}`,
-                                        `search-alias^${data._source.multipliers.searchAlias}`
-                                    ],
-                                    fuzziness: "AUTO",
-                                    prefix_length: 2,
-                                }
-                            }
+                    {% if site.environment.name contains "docs" %}
+                    if (doc.containsKey('url.keyword') && doc['url.keyword'].size()!=0 && (doc['url.keyword'].value.contains("midpoint/devel") || doc['url.keyword'].value.contains("midpoint/compliance") || doc['url.keyword'].value.contains("midpoint/release") || doc['url.keyword'].value.contains("midpoint/security") || doc['url.keyword'].value.contains("midpoint/projects") || doc['url.keyword'].value.contains("midpoint/reference")) && !doc['url.keyword'].value.contains("midpoint/reference/concepts")) {
+                        if (doc.containsKey('lastModificationDate') && doc.lastModificationDate.size()!=0) {
+                            double timestampNow = (double)new Date().getTime();
+                            totalScore = totalScore*Math.max(${data._source.values.last_modification_min}, 1/(1+Math.pow(Math.max(0.0, timestampNow - doc.lastModificationDate.value.getMillis() - ${data._source.values.last_modification_grace} * 365.0 * 24 * 60 * 60 * 1000.0)/(${data._source.values.last_modification_half_life} * 365.0 * 24 * 60 * 60 * 1000.0), ${data._source.values.last_modification_power})))
+                        } else {
+                            totalScore = totalScore*${data._source.multipliers.age_absent};
                         }
-                    }],
-                    must_not: [{
-                        term: {
-                            "visibility": "hidden"
+                    }
+                    {% endif %}
+                    if (doc.containsKey('deprecated') && doc.deprecated.size()!=0) {
+                        if (doc.deprecated.value == true) {
+                            totalScore = totalScore*${data._source.multipliers.deprecated};
                         }
-                    },{
-                        term: {
-                            "effectiveVisibility": "hidden"
+                    }
+                    if (doc.containsKey('experimental') && doc.experimental.size()!=0) {
+                        if (doc.experimental.value == true) {
+                            totalScore = totalScore*${data._source.multipliers.experimental};
                         }
-                    }],
-                    should: [{
-                            term: {
-                                "title.keyword": {
-                                    value: "",
-                                    boost: `${data._source.multipliers.queryTitleExactMatch}`,
-                                    case_insensitive: true
-                                }
-                            }
-                        },
-                        {
-                            term: {
-                                "second_titles.keyword": {
-                                    value: "",
-                                    boost: `${data._source.multipliers.querySecondTitleExactMatch}`,
-                                    case_insensitive: true
-                                }
-                            }
-                        },
-                        {
-                            term: {
-                                "third_titles.keyword": {
-                                    value: "",
-                                    boost: `${data._source.multipliers.queryThirdTitleExactMatch}`,
-                                    case_insensitive: true
-                                }
-                            }
-                        },
-                        {
-                            term: {
-                                "fourth_titles.keyword": {
-                                    value: "",
-                                    boost: `${data._source.multipliers.queryFourthTitleExactMatch}`,
-                                    case_insensitive: true
-                                }
-                            }
-                        },
-                        {
-                            term: {
-                                "keywords.keyword": {
-                                    value: "",
-                                    boost: `${data._source.multipliers.queryKeywordExactMatch}`,
-                                    case_insensitive: true
-                                }
-                            }
-                        },
-                        {
-                            term: {
-                                "search-alias.keyword": {
-                                    value: "",
-                                    boost: `${data._source.multipliers.querySearchAliasExactMatch}`,
-                                    case_insensitive: true
-                                }
-                            }
-                        },
-                        {
-                            multi_match: {
-                                query: "",
-                                analyzer: "simple",
-                                type: "most_fields",
-                                fields: [
-                                    "text",
-                                    `title^${data._source.multipliers.title}`,
-                                    "alternative_text^0.5",
-                                    `search-alias^${data._source.multipliers.searchAlias}`
-                                ],
-                                boost: `${data._source.multipliers.wordExactMatch}`
-                            }
+                    }
+                    if (doc.containsKey('planned') && doc.planned.size()!=0) {
+                        if (doc.planned.value == true) {
+                            totalScore = totalScore*${data._source.multipliers.planned};
                         }
-                    ]
+                    }
+                    if (doc.containsKey('outdated') && doc.outdated.size()!=0) {
+                        if (doc.outdated.value == true) {
+                            totalScore = totalScore*${data._source.multipliers.outdated};
+                        }
+                    }
+                    if (doc.containsKey('obsolete') && doc.obsolete.size()!=0) {
+                        if (doc.obsolete.value == true) {
+                            totalScore = totalScore*${data._source.multipliers.obsolete};
+                        }
+                    }
+                    {% if site.environment.name contains "docs" %}
+                    if (doc.containsKey('type.keyword') && doc['type.keyword'].size()!=0) {
+                        if (doc['type.keyword'].value == "Other") {
+                            totalScore = totalScore*${data._source.multipliers.other};
+                        }
+                    }
+                    if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
+                        if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
+                            totalScore = totalScore*${notMasterBranchMult};
+                        }
+                    }
+                    {% endif %}
+                    if (totalScore < 0.0) {
+                        totalScore = 0.0;
+                    }
+                    return totalScore;
+                `
+            }
+        }
+        searchQuery = {
+            "query": {
+                "function_score": {
+                    "query": {
+                        "bool": {
+                            {% if site.environment.name contains "docs" %}
+                            "filter": [{
+                                "terms": {
+                                    "type.keyword": Array.from(letters)
+                                }
+                            }],
+                            {% endif %}
+                            "must": [{
+                                "dis_max": {
+                                    "tie_breaker": 0,
+                                    "queries": [
+                                        {
+                                            "multi_match": {
+                                                "query": "query",
+                                                "analyzer": "standard",
+                                                "type": "most_fields",
+                                                "fields": [
+                                                    "text",
+                                                    `title.normal^${data._source.multipliers.title}`,
+                                                    `second_titles^${data._source.multipliers.secondTitle}`,
+                                                    `third_titles^${data._source.multipliers.thirdTitle}`,
+                                                    `fourth_titles^${data._source.multipliers.fourthTitle}`,
+                                                    `fifth_titles^${data._source.multipliers.fifthTitle}`,
+                                                    "alternative_text^0.5",
+                                                    `keywords^${data._source.multipliers.keywords}`,
+                                                    `search-alias^${data._source.multipliers.searchAlias}`
+                                                ],
+                                                "fuzziness": "AUTO",
+                                                "prefix_length": 3,
+                                            }
+                                        },
+                                        {
+                                            "multi_match": {
+                                                "query": "query",
+                                                "analyzer": "standard",
+                                                "type": "most_fields",
+                                                "fields": [
+                                                    "text",
+                                                    `title^${data._source.multipliers.title}`,
+                                                    `second_titles^${data._source.multipliers.secondTitle}`,
+                                                    `third_titles^${data._source.multipliers.thirdTitle}`,
+                                                    `fourth_titles^${data._source.multipliers.fourthTitle}`,
+                                                    `fifth_titles^${data._source.multipliers.fifthTitle}`,
+                                                    "alternative_text^0.5",
+                                                    `keywords^${data._source.multipliers.keywords}`,
+                                                    `search-alias^${data._source.multipliers.searchAlias}`
+                                                ],
+                                                "fuzziness": "0",
+                                                "prefix_length": 3,
+                                            }
+                                        }
+                                    ]
+                                }
+                            }],
+                            "must_not": [{
+                                "term": {
+                                    "visibility": "hidden"
+                                }
+                            },{
+                                "term": {
+                                    "effectiveVisibility": "hidden"
+                                }
+                            }],
+                            "should": [
+                                {
+                                    "term": {
+                                        "title.keyword": {
+                                            "value": "query",
+                                            "boost": `${data._source.multipliers.queryTitleExactMatch}`,
+                                            "case_insensitive": true
+                                        }
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "second_titles.keyword": {
+                                            "value": "query",
+                                            "boost": `${data._source.multipliers.querySecondTitleExactMatch}`,
+                                            "case_insensitive": true
+                                        }
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "third_titles.keyword": {
+                                            "value": "query",
+                                            "boost": `${data._source.multipliers.queryThirdTitleExactMatch}`,
+                                            "case_insensitive": true
+                                        }
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "fourth_titles.keyword": {
+                                            "value": "query",
+                                            "boost": `${data._source.multipliers.queryFourthTitleExactMatch}`,
+                                            "case_insensitive": true
+                                        }
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "keywords.keyword": {
+                                            "value": "query",
+                                            "boost": `${data._source.multipliers.queryKeywordExactMatch}`,
+                                            "case_insensitive": true
+                                        }
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "search-alias.keyword": {
+                                            "value": "query",
+                                            "boost": `${data._source.multipliers.querySearchAliasExactMatch}`,
+                                            "case_insensitive": true
+                                        }
+                                    }
+                                },
+                                {
+                                    "multi_match": {
+                                        "query": "query",
+                                        "analyzer": "simple",
+                                        "type": "most_fields",
+                                        "fields": [
+                                            "text",
+                                            "alternative_text^0.5",
+                                            `search-alias^${data._source.multipliers.searchAlias}`
+                                        ],
+                                        "boost": `${data._source.multipliers.wordExactMatch}`
+                                    }
+                                },
+                                {
+                                    "multi_match": {
+                                        "query": "query",
+                                        "type": "most_fields",
+                                        "fields": [
+                                            "text",
+                                            `title.normal^${data._source.multipliers.titleAnd}`,
+                                            "alternative_text^0.5",
+                                            `search-alias^${data._source.multipliers.searchAliasAnd}`,
+                                            `second_titles^${data._source.multipliers.secondTitleAnd}`,
+                                            `third_titles^${data._source.multipliers.thirdTitleAnd}`,
+                                            `fourth_titles^${data._source.multipliers.fourthTitleAnd}`,
+                                            `fifth_titles^${data._source.multipliers.fifthTitleAnd}`,
+                                            `keywords^${data._source.multipliers.keywordsAnd}`,
+                                        ],
+                                        "operator": "and",
+                                        "boost": `${data._source.multipliers.andOperator}`,
+                                        "fuzziness": "AUTO",
+                                        "prefix_length": 3,
+                                    }
+                                },
+                                {
+                                    "multi_match": {
+                                        "query": "query",
+                                        "type": "most_fields",
+                                        "fields": [
+                                            "text",
+                                            `title.normal^${data._source.multipliers.titleAnd}`,
+                                            "alternative_text^0.5",
+                                            `search-alias^${data._source.multipliers.searchAliasAnd}`,
+                                            `second_titles^${data._source.multipliers.secondTitleAnd}`,
+                                            `third_titles^${data._source.multipliers.thirdTitleAnd}`,
+                                            `fourth_titles^${data._source.multipliers.fourthTitleAnd}`,
+                                            `fifth_titles^${data._source.multipliers.fifthTitleAnd}`,
+                                            `keywords^${data._source.multipliers.keywordsAnd}`,
+                                        ],
+                                        "operator": "and",
+                                        "boost": `${data._source.multipliers.andOperatorNoFuzziness}`,
+                                        "fuzziness": "0",
+                                        "prefix_length": 3,
+                                    }
+                                }
+                            ] 
+                        }
+                    },
+                    "script_score": script_score_obj
                 }
             },
             fields: [
                 "alternative_text",
                 "title",
+                "second_titles",
+                "third_titles",
+                "fourth_titles",
                 "lastModificationDate",
                 "author",
                 "upvotes",
@@ -420,6 +474,9 @@
                         }
                     }
                 }
+            },
+            collapse: {
+                "field": "idWithoutBranch.keyword"
             }
         }
         console.log(searchQuery)
@@ -448,43 +505,50 @@
         }
     });
 
+    function makeAnchor(text) {
+        if (!text) return '';
+  
+        let slug = text.toLowerCase().trim();
+        
+        slug = slug.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        
+        slug = slug.replace(/[^a-z0-9\s-]/g, ' ').trim();
+        
+        slug = slug.replace(/[\s-]+/g, '-');
+        
+        return slug;
+    }
+
     function searchForPhrase(pagesShown = 7) {
 
         console.log("function started")
 
         $('[data-toggle="tooltip"]').tooltip('hide')
 
-        searchQuery.size = pagesShown;
-        const query = document.getElementById('searchbar').value.toLowerCase();
+        actQuery = JSON.parse(JSON.stringify(searchQuery))
 
-        if (query.slice(-1) == '"' && query.slice(0, 1) == '"') {
-            searchQuery.query.bool.must[0].function_score.query.multi_match.operator = "and"
-            searchQuery.query.bool.should[6].multi_match.operator = "and"
-                //searchQuery.query.bool.should[2].term['search-alias.keyword'].operator = "and"
-                //searchQuery.query.bool.should[1].term['keywords.keyword'].operator = "and"
-                //searchQuery.query.bool.should[0].term['title.keyword'].operator = "and"
-            searchQuery.highlight.fields.title.highlight_query.match.title.operator = "and"
-            searchQuery.highlight.fields.text.highlight_query.match.text.operator = "and"
-        } else {
-            searchQuery.query.bool.must[0].function_score.query.multi_match.operator = "or"
-            searchQuery.query.bool.should[6].multi_match.operator = "or"
-                //searchQuery.query.bool.should[2].term['search-alias.keyword'].operator = "or"
-                //searchQuery.query.bool.should[1].term['keywords.keyword'].operator = "or"
-                //searchQuery.query.bool.should[0].term['title.keyword'].operator = "or"
-            searchQuery.highlight.fields.title.highlight_query.match.title.operator = "or"
-            searchQuery.highlight.fields.text.highlight_query.match.text.operator = "or"
-        }
+        let query = document.getElementById('searchbar').value
 
-        searchQuery.query.bool.must[0].function_score.query.multi_match.query = query
-        searchQuery.query.bool.should[6].multi_match.query = query
-        searchQuery.query.bool.should[5].term['search-alias.keyword'].value = query
-        searchQuery.query.bool.should[4].term['keywords.keyword'].value = query
-        searchQuery.query.bool.should[3].term['fourth_titles.keyword'].value = query
-        searchQuery.query.bool.should[2].term['third_titles.keyword'].value = query
-        searchQuery.query.bool.should[1].term['second_titles.keyword'].value = query
-        searchQuery.query.bool.should[0].term['title.keyword'].value = query
-        searchQuery.highlight.fields.title.highlight_query.match.title.query = query
-        searchQuery.highlight.fields.text.highlight_query.match.text.query = query
+        {% if site.environment.name contains "docs" %}
+            actQuery.query.function_score.query.bool.filter[0].terms["type.keyword"] = Array.from(letters)
+        {% endif %}
+
+        query = query.toLowerCase();
+        actQuery.query.function_score.query.bool.must[0].dis_max.queries[0].multi_match.query = query
+        actQuery.query.function_score.query.bool.must[0].dis_max.queries[1].multi_match.query = query
+        actQuery.query.function_score.query.bool.should[6].multi_match.query = query
+        actQuery.query.function_score.query.bool.should[5].term['search-alias.keyword'].value = query
+        actQuery.query.function_score.query.bool.should[4].term['keywords.keyword'].value = query
+        actQuery.query.function_score.query.bool.should[3].term['fourth_titles.keyword'].value = query
+        actQuery.query.function_score.query.bool.should[2].term['third_titles.keyword'].value = query
+        actQuery.query.function_score.query.bool.should[1].term['second_titles.keyword'].value = query
+        actQuery.query.function_score.query.bool.should[0].term['title.keyword'].value = query
+        actQuery.query.function_score.query.bool.should[7].multi_match.query = query
+        actQuery.query.function_score.query.bool.should[8].multi_match.query = query
+        actQuery.highlight.fields.title.highlight_query.match.title.query = query
+        actQuery.highlight.fields.text.highlight_query.match.text.query = query
+
+        actQuery.size = pagesShown;
 
         const showResults = function(data) {
             console.log(data)
@@ -631,10 +695,28 @@
                     }
                     {% endif %}
 
+                    let pageUrl = data.hits.hits[i].fields.url[0]
+
+                    const cleanTitleLower = cleanTitle.toLowerCase()
+                    if (!cleanTitleLower.includes(query)) {
+                        let titleArr = data.hits.hits[i].fields.second_titles != undefined ? data.hits.hits[i].fields.second_titles : []
+                        if (data.hits.hits[i].fields.third_titles != undefined) {
+                            titleArr = titleArr.concat(data.hits.hits[i].fields.third_titles)
+                        }
+                        if (data.hits.hits[i].fields.fourth_titles != undefined) {
+                            titleArr = titleArr.concat(data.hits.hits[i].fields.fourth_titles)
+                        }
+                        for (const titleOption of titleArr) {
+                            if (typeof titleOption != 'undefined' && titleOption.toLowerCase().includes(query)) {
+                                pageUrl = pageUrl + "#" + makeAnchor(titleOption)
+                                break;
+                            }
+                        }
+                    }
                     showItems.push(`<div><span class="trigger-details searchResult" data-toggle="tooltip" data-toggle="tooltip" data-placement="left"
                     data-html="true" title='<span class="tooltip-preview"><p>Last modification date: ${displayDate}</p>
                     <p>Upkeep status: ${upkeepStatus} <i id="upkeep${upkeepStatus}" class="fa fa-circle"></i>
-                    </p><p>Search likes: ${searchUpvotes}</p><p>Docs likes: ${docsUpvotes}</p>{% if site.environment.name contains "docs" %}<p>Version: ${tooltipVer}</p>{% endif %}<p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${data.hits.hits[i].fields.url[0]}"
+                    </p><p>Search likes: ${searchUpvotes}</p><p>Docs likes: ${docsUpvotes}</p>{% if site.environment.name contains "docs" %}<p>Version: ${tooltipVer}</p>{% endif %}<p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${pageUrl}"
                     id="${data.hits.hits[i]._id}site"><li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i>
                     <span class="font1 searchResultTitle {% if site.environment.name contains "docs" %}${branchClass}{% endif %}">&nbsp;${title}</span>{% if site.environment.name contains "docs" %}<span id="label${type}" class="typeLabel">${type.toUpperCase()}</span>${branchLabel}{% endif %}<i class="${contentTriangleClass}"></i><br><span class="font2">${preview}</span></li></a></span>
                     <span class="vote" id="${data.hits.hits[i]._id}up"><i class="fas fa-thumbs-up"></i></span></div>`);
@@ -666,7 +748,7 @@
 
         }
 
-        OSrequest("GET", "https://{{ site.environment.searchUrl }}/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}/_search", searchQuery, true, showResults)
+        OSrequest("POST", "https://{{ site.environment.searchUrl }}/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}/_search", actQuery, true, showResults)
     }
 
     function setHighlighting() {
