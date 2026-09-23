@@ -254,23 +254,50 @@
                             }],
                             {% endif %}
                             "must": [{
-                                "multi_match": {
-                                    "query": "query",
-                                    "analyzer": "standard",
-                                    "type": "most_fields",
-                                    "fields": [
-                                        "text",
-                                        `title^${data._source.multipliers.title}`,
-                                        `second_titles^${data._source.multipliers.secondTitle}`,
-                                        `third_titles^${data._source.multipliers.thirdTitle}`,
-                                        `fourth_titles^${data._source.multipliers.fourthTitle}`,
-                                        `fifth_titles^${data._source.multipliers.fifthTitle}`,
-                                        "alternative_text^0.5",
-                                        `keywords^${data._source.multipliers.keywords}`,
-                                        `search-alias^${data._source.multipliers.searchAlias}`
-                                    ],
-                                    "fuzziness": "AUTO",
-                                    "prefix_length": 3,
+                                "dis_max": {
+                                    "tie_breaker": 0,
+                                    "queries": [
+                                        {
+                                            "multi_match": {
+                                                "query": "query",
+                                                "analyzer": "standard",
+                                                "type": "most_fields",
+                                                "fields": [
+                                                    "text",
+                                                    `title.normal^${data._source.multipliers.title}`,
+                                                    `second_titles^${data._source.multipliers.secondTitle}`,
+                                                    `third_titles^${data._source.multipliers.thirdTitle}`,
+                                                    `fourth_titles^${data._source.multipliers.fourthTitle}`,
+                                                    `fifth_titles^${data._source.multipliers.fifthTitle}`,
+                                                    "alternative_text^0.5",
+                                                    `keywords^${data._source.multipliers.keywords}`,
+                                                    `search-alias^${data._source.multipliers.searchAlias}`
+                                                ],
+                                                "fuzziness": "AUTO",
+                                                "prefix_length": 3,
+                                            }
+                                        },
+                                        {
+                                            "multi_match": {
+                                                "query": "query",
+                                                "analyzer": "standard",
+                                                "type": "most_fields",
+                                                "fields": [
+                                                    "text",
+                                                    `title^${data._source.multipliers.title}`,
+                                                    `second_titles^${data._source.multipliers.secondTitle}`,
+                                                    `third_titles^${data._source.multipliers.thirdTitle}`,
+                                                    `fourth_titles^${data._source.multipliers.fourthTitle}`,
+                                                    `fifth_titles^${data._source.multipliers.fifthTitle}`,
+                                                    "alternative_text^0.5",
+                                                    `keywords^${data._source.multipliers.keywords}`,
+                                                    `search-alias^${data._source.multipliers.searchAlias}`
+                                                ],
+                                                "fuzziness": "0",
+                                                "prefix_length": 3,
+                                            }
+                                        }
+                                    ]
                                 }
                             }],
                             "must_not": [{
@@ -356,7 +383,7 @@
                                         "type": "most_fields",
                                         "fields": [
                                             "text",
-                                            `title^${data._source.multipliers.titleAnd}`,
+                                            `title.normal^${data._source.multipliers.titleAnd}`,
                                             "alternative_text^0.5",
                                             `search-alias^${data._source.multipliers.searchAliasAnd}`,
                                             `second_titles^${data._source.multipliers.secondTitleAnd}`,
@@ -377,7 +404,7 @@
                                         "type": "most_fields",
                                         "fields": [
                                             "text",
-                                            `title^${data._source.multipliers.titleAnd}`,
+                                            `title.normal^${data._source.multipliers.titleAnd}`,
                                             "alternative_text^0.5",
                                             `search-alias^${data._source.multipliers.searchAliasAnd}`,
                                             `second_titles^${data._source.multipliers.secondTitleAnd}`,
@@ -508,7 +535,8 @@
         {% endif %}
 
         query = query.toLowerCase();
-        actQuery.query.function_score.query.bool.must[0].multi_match.query = query
+        actQuery.query.function_score.query.bool.must[0].dis_max.queries[0].multi_match.query = query
+        actQuery.query.function_score.query.bool.must[0].dis_max.queries[1].multi_match.query = query
         actQuery.query.function_score.query.bool.should[6].multi_match.query = query
         actQuery.query.function_score.query.bool.should[5].term['search-alias.keyword'].value = query
         actQuery.query.function_score.query.bool.should[4].term['keywords.keyword'].value = query
