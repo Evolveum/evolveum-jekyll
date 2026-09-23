@@ -367,7 +367,7 @@
                                 {
                                     "multi_match": {
                                         "query": "query",
-                                        "analyzer": "standard",
+                                        "analyzer": "simple",
                                         "type": "most_fields",
                                         "fields": [
                                             "text",
@@ -375,8 +375,6 @@
                                             `search-alias^${data._source.multipliers.searchAlias}`
                                         ],
                                         "boost": `${data._source.multipliers.wordExactMatch}`,
-                                        "operator": "and",
-                                        "fuzziness": "0"
                                     }
                                 },
                                 {
