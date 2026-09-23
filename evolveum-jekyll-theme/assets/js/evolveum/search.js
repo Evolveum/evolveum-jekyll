@@ -422,8 +422,7 @@
                             ] 
                         }
                     },
-                    "script_score": script_score_obj,
-                    "boost_mode": "replace"
+                    "script_score": script_score_obj
                 }
             },
             fields: [
