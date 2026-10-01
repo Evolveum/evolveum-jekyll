@@ -474,10 +474,10 @@
                         }
                     }
                 }
-            },
+            }{% if site.environment.name contains "docs" %},
             collapse: {
                 "field": "idWithoutBranch.keyword"
-            }
+            }{% endif %}
         }
         console.log(searchQuery)
     }
