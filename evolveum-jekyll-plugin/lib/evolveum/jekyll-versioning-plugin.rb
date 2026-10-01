@@ -94,13 +94,19 @@ def installVersions(site)
 
   VersionReader.get_config_value('filteredVersions').each do |version|
     slug     = version.sub('docs/', '')
-    cloneDir = File.join(mpVersionsDir, mpPrefix + slug)
+    cloneDir = File.expand_path(File.join(mpVersionsDir, mpPrefix + slug))
 
     if !Dir.exist?(cloneDir)
       system("cd #{mpVersionsDir} && git clone -b #{version} https://github.com/#{mpRepo} #{mpPrefix}#{slug}")
     end
 
-    FileUtils.ln_s(File.join(cloneDir, 'docs'), File.join(refDir, slug))
+    docsTarget = File.join(cloneDir, 'docs')
+    if !Dir.exist?(docsTarget)
+      Jekyll.logger.warn("WARNING: clone missing docs dir, skipping link for #{slug}: #{docsTarget} (check git clone -b #{version})")
+      next
+    end
+
+    FileUtils.ln_s(docsTarget, File.join(refDir, slug))
   end
 end
 
