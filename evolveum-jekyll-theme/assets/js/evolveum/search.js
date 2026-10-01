@@ -6,7 +6,7 @@
     const originalCategories = ["Guide", "Book", "Reference", "Developer", "Other"]
     let letters = new Set(["Guide", "Book", "Reference", "Developer", "Other"]);
     let branches = new Set(["notBranched"])
-    let notMasterBranchMult = 0
+    const notMasterBranchMult = 0.25
     const ORIGFIELDS = ["title^2","second_titles^1.5","third_titles^1.2","fourth_titles^1.1","fifth_titles^1.0","keywords^2","search-alias^2.5","text"]
 
     $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
@@ -393,7 +393,6 @@
     function setSearchQueries(data) {
         {% if site.environment.name contains "docs" %}
         console.log("DEFAULT: " + DEFAULTDOCSBRANCH)
-        notMasterBranchMult = data._source.multipliers.notMasterBranch
         {% endif %}
         script_score_obj = {
             "script": {
@@ -410,25 +409,16 @@
                         totalScore = totalScore*${data._source.multipliers.book};
                     }
                     {% endif %}
-                    if (doc.containsKey('upkeep-status.keyword') && doc['upkeep-status.keyword'].size()!=0) {
-                        if (doc['upkeep-status.keyword'].value == "yellow") {
-                            totalScore = totalScore*${data._source.multipliers.status_yellow};
-                        } else if (doc['upkeep-status.keyword'].value == "green") {
-                            totalScore = totalScore*${data._source.multipliers.status_green};
-                        } else if (doc['upkeep-status.keyword'].value == "red") {
-                            totalScore = totalScore*${data._source.multipliers.status_red};
-                        } else if (doc['upkeep-status.keyword'].value == "orange") {
-                            totalScore = totalScore*${data._source.multipliers.status_orange};
+                    {% if site.environment.name contains "docs" %}
+                    if (doc.containsKey('url.keyword') && doc['url.keyword'].size()!=0 && (doc['url.keyword'].value.contains("midpoint/devel") || doc['url.keyword'].value.contains("midpoint/compliance") || doc['url.keyword'].value.contains("midpoint/release") || doc['url.keyword'].value.contains("midpoint/security") || doc['url.keyword'].value.contains("midpoint/projects") || doc['url.keyword'].value.contains("midpoint/reference")) && !doc['url.keyword'].value.contains("midpoint/reference/concepts")) {
+                        if (doc.containsKey('lastModificationDate') && doc.lastModificationDate.size()!=0) {
+                            double timestampNow = (double)new Date().getTime();
+                            totalScore = totalScore*Math.max(${data._source.values.last_modification_min}, 1/(1+Math.pow(Math.max(0.0, timestampNow - doc.lastModificationDate.value.getMillis() - ${data._source.values.last_modification_grace} * 365.0 * 24 * 60 * 60 * 1000.0)/(${data._source.values.last_modification_half_life} * 365.0 * 24 * 60 * 60 * 1000.0), ${data._source.values.last_modification_power})))
+                        } else {
+                            totalScore = totalScore*${data._source.multipliers.age_absent};
                         }
-                    } else {
-                        totalScore = totalScore*${data._source.multipliers.status_absent};
                     }
-                    if (doc.containsKey('lastModificationDate') && doc.lastModificationDate.size()!=0) {
-                        double timestampNow = (double)new Date().getTime();
-                        totalScore = totalScore*Math.max(${data._source.values.last_modification_min}, ${data._source.multipliers.last_modification_im}/(1+(timestampNow - doc.lastModificationDate.value.getMillis())/(${data._source.values.last_modification} * 24 * 60 * 60 * 1000.0)))
-                    } else {
-                        totalScore = totalScore*${data._source.multipliers.age_absent};
-                    }
+                    {% endif %}
                     if (doc.containsKey('deprecated') && doc.deprecated.size()!=0) {
                         if (doc.deprecated.value == true) {
                             totalScore = totalScore*${data._source.multipliers.deprecated};
@@ -462,7 +452,7 @@
                     }
                     if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
                         if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
-                            totalScore = totalScore*0.1;
+                            totalScore = totalScore*${notMasterBranchMult};
                         }
                     }
                     {% endif %}
