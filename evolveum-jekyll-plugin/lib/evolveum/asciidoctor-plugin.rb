@@ -36,6 +36,10 @@ module Evolveum
             return (jekyllSite().config['docs']['midpointVersionsPath'] + jekyllSite().config['docs']['midpointVersionsPrefix'] + branch.gsub("docs/",""))
         end
 
+        def jekyllEnvironment()
+            return jekyllSite().config['environment']['name']
+        end
+
         def jekyllData(dataName)
             return jekyllSite().data[dataName]
         end
@@ -676,7 +680,7 @@ module Evolveum
       def process(parent, target, attrs)
         sourceFile = parent.document.attributes["docfile"]
 
-        unless jekyllSite().config['environment']['name'].include?("docs")
+        unless jekyllEnvironment().include?("docs")
           Jekyll.logger.error("INVALID DOCREF (non-docs environment) docref:#{target} in #{sourceFile}")
           return nil
         end
@@ -808,6 +812,10 @@ module Evolveum
         name_positional_attributes 'lines'
 
         def process(parent, target, attrs)
+            unless jekyllEnvironment().include?("docs")
+              Jekyll.logger.error("BROKEN SAMPLE REFERENCE - not supported in the GUIDE environment, sampleRef:#{target} in #{parent.document.attributes["docfile"]}")
+              return nil
+            end
             processCodeInclude(parent, target, attrs, "#{samplesDir()}/#{target}", nil)
         end
 
@@ -821,6 +829,10 @@ module Evolveum
         name_positional_attributes 'branch','lines'
 
         def process(parent, target, attrs)
+            unless jekyllEnvironment().include?("docs")
+              Jekyll.logger.error("BROKEN MIDPOINT REFERENCE - not supported in the GUIDE environment, midpointRef:#{target} in #{parent.document.attributes["docfile"]}")
+              return nil
+            end
             branch = "support-4.8"
             if attrs['branch'] != nil
                 branch = attrs['branch']
@@ -873,13 +885,15 @@ module Evolveum
       name_positional_attributes 'linktext'
 
       def process(parent, target, attrs)
-
         feature = findFeature(target)
         if feature == nil
             sourceFile = parent.document.attributes["docfile"]
-            Jekyll.logger.error("BROKEN FEATURE inline REFERENCE #{target} in #{sourceFile}")
+            if jekyllEnvironment().include?("docs")
+                Jekyll.logger.error("BROKEN FEATURE inline REFERENCE #{target} in #{sourceFile}")
+            end
+            # This is not the nicest solution, but it is better than nothing.
             defaultLabel = target
-            targetUrl = "#"  # fallback URL for broken references
+            targetUrl = "https://docs.evolveum.com/midpoint/features/current/#{target}/"
         else
             defaultLabel = feature['title']
             targetUrl = feature['url']
@@ -891,7 +905,7 @@ module Evolveum
 
       def findFeature(entry_id)
         features = jekyllData('midpoint-features')
-        feature = features.detect {|e| e['id'] == entry_id }
+        feature = features&.detect {|e| e['id'] == entry_id }
 #        puts "FEATURE:entry: #{feature['title']}"
         return feature
       end
