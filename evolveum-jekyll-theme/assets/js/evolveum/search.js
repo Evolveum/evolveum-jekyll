@@ -73,9 +73,14 @@
         }
     });
 
+    let searchReportPopoverInitialized = false;
+
     $("#search-modal").on('shown.bs.modal', async function() {
         $('#searchbar').trigger('focus')
-        searchReportPopoverSetup()
+        if (!searchReportPopoverInitialized) {
+            searchReportPopoverSetup()
+            searchReportPopoverInitialized = true;
+        }
     });
 
     function searchReportPopoverSetup() {
@@ -118,9 +123,14 @@
                     searchProblemCategory = searchProblemSelected[0].childNodes[0].textContent
                 }
 
+                let details = $("#searchReportTextArea").val()
+                if (details == undefined || details == "") {
+                    details = "No details provided"
+                }
+
                 let reportSearchQuery = {
                     category: searchProblemCategory,
-                    details: $("#searchReportTextArea").val(),
+                    details: details,
                     query: document.getElementById('searchbar').value,
                     width: $(document).width(),
                     height: $(document).height()
