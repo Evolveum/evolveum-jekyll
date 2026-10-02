@@ -97,10 +97,15 @@
             if (docsProblemSelected[0] != undefined) {
                 docsProblemCategory = docsProblemSelected[0].childNodes[1].textContent
             }
+
+            let details = $("#docsReportTextArea").val()
+            if (details == undefined || details == "") {
+                details = "No details provided"
+            }
     
             let reportdocsQuery = {
                 category: docsProblemCategory,
-                details: $("#docsReportTextArea").val(),
+                details: details,
                 width: $(document).width(),
                 height: $(document).height()
             }

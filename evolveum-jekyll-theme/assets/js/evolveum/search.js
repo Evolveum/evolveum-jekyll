@@ -137,9 +137,14 @@
                     searchProblemCategory = searchProblemSelected[0].childNodes[0].textContent
                 }
 
+                let details = $("#searchReportTextArea").val()
+                if (details == undefined || details == "") {
+                    details = "No details provided"
+                }
+
                 let reportSearchQuery = {
                     category: searchProblemCategory,
-                    details: $("#searchReportTextArea").val(),
+                    details: details,
                     query: document.getElementById('searchbar').value,
                     width: $(document).width(),
                     height: $(document).height()
@@ -1142,7 +1147,7 @@
 
         }
 
-        OSrequest("GET", "https://{{ site.environment.searchUrl }}/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}/_search", actQuery, true, showResults, backUpQuery)
+        OSrequest("POST", "https://{{ site.environment.searchUrl }}/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}/_search", actQuery, true, showResults, backUpQuery)
     }
 
     function setHighlighting() {
