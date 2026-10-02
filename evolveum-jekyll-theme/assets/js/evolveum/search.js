@@ -92,9 +92,14 @@
         }
     });
 
+    let searchReportPopoverInitialized = false;
+
     $("#search-modal").on('shown.bs.modal', async function() {
         $('#searchbar').trigger('focus')
-        searchReportPopoverSetup()
+        if (!searchReportPopoverInitialized) {
+            searchReportPopoverSetup()
+            searchReportPopoverInitialized = true;
+        }
     });
 
     function searchReportPopoverSetup() {
