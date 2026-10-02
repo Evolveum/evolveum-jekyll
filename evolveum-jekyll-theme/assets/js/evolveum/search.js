@@ -73,14 +73,9 @@
         }
     });
 
-    let searchReportPopoverInitialized = false;
-
     $("#search-modal").on('shown.bs.modal', async function() {
         $('#searchbar').trigger('focus')
-        if (!searchReportPopoverInitialized) {
-            searchReportPopoverSetup()
-            searchReportPopoverInitialized = true;
-        }
+        searchReportPopoverSetup()
     });
 
     function searchReportPopoverSetup() {
@@ -109,7 +104,7 @@
                     </div>`
         });
 
-        $('#reportSearchProblemPopover').on('inserted.bs.popover', function() {
+        $('#reportSearchProblemPopover').off('inserted.bs.popover.searchReport').on('inserted.bs.popover.searchReport', function() {
             $('#reportSearchProblemPopoverClose').click(function() {
                 $('#reportSearchProblemPopover').popover('hide');
             });
@@ -117,11 +112,7 @@
             $('#searchReportAProblemSelect').selectpicker();
 
             $('#reportSearchProblemPopoverSend').click(function() {
-                let searchProblemSelected = $(".searchReportAProblemOption.selected")
-                let searchProblemCategory = "Not defined"
-                if (searchProblemSelected[0] != undefined) {
-                    searchProblemCategory = searchProblemSelected[0].childNodes[0].textContent
-                }
+                let searchProblemCategory = $("#searchReportAProblemSelect").val() || "Not defined"
 
                 let details = $("#searchReportTextArea").val()
                 if (details == undefined || details == "") {
@@ -142,6 +133,7 @@
     }
 
     $("#search-modal").on('hidden.bs.modal', function() {
+        $('#reportSearchProblemPopover').popover('dispose');
         document.getElementById("autocombox").innerHTML = "";
         document.getElementById("autocombox").style.display = "none";
         document.getElementById('searchToggle').value = "";
