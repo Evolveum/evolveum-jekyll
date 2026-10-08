@@ -853,8 +853,7 @@ module Evolveum
         if !jekyllEnvironment().include?("docs")
           targetUrl = "https://docs.evolveum.com/glossary/##{target}"
           defaultLabel = target
-          createLink(targetUrl, parent, attrs, defaultLabel, "glossref")
-          return
+          return createLink(targetUrl, parent, attrs, defaultLabel, "glossref")
         end
 
         glossentry = findGlossaryEntry(target)
