@@ -850,6 +850,12 @@ module Evolveum
 
       def process(parent, target, attrs)
 
+        if !jekyllEnvironment().include?("docs")
+          targetUrl = "https://docs.evolveum.com/glossary/##{target}"
+          defaultLabel = target
+          return createLink(targetUrl, parent, attrs, defaultLabel, "glossref")
+        end
+
         glossentry = findGlossaryEntry(target)
         if glossentry == nil
             sourceFile = parent.document.attributes["docfile"]
