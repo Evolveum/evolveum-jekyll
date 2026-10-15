@@ -8,7 +8,6 @@
         })[char]);
     }
 
-    // Only the exact, attribute-free highlight tags may become HTML.
     function safeHighlight(value) {
         return escapeHtml(value)
             .replaceAll('&lt;strong&gt;', '<strong>')
@@ -309,8 +308,6 @@
             let numberOfItems = data.total
             const suggestionBox = document.getElementById("autocombox")
             if (data.fallback && data.fallback_error != undefined) {
-                // The API escapes its parser message. Decode as inert textarea text,
-                // then escape it for this HTML context, including unexpected raw input.
                 const errorText = document.createElement('textarea');
                 errorText.innerHTML = String(data.fallback_error);
                 const html_str_qs = `<p><i class="fas fa-exclamation-triangle"></i>&nbsp;${escapeHtml(errorText.value)}</p>
@@ -659,8 +656,9 @@
         });
 
         site.addEventListener("contextmenu", (event) => {
-            $(site).parent().tooltip('hide');
-            $('[data-toggle="tooltip"]').tooltip('hide');
+            // This isn't a perfect solution, right click may be anything other than open in new tab, but I think
+            // it is better to have false positives than false negatives.
+            recordActivation();
         });
         {% endif %}
     }
