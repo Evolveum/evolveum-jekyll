@@ -429,6 +429,8 @@
                     if (typeof upkeepStatusRaw != 'undefined' && upkeepStatusRaw) {
                         upkeepStatus = upkeepStatusRaw[0]
                     }
+                    const upkeepColor = ["orange", "red", "green", "yellow"].includes(upkeepStatus)
+                        ? upkeepStatus : "unknown";
 
                     contentTriangleClass = "fas fa-exclamation-triangle conditionTriangle"
                     contentStatusArray = [data.results[i].fields.obsolete, data.results[i].fields.deprecated, data.results[i].fields.experimental, data.results[i].fields.planned, data.results[i].fields.outdated]
@@ -475,7 +477,7 @@
                         }
                     }
                     const tooltip = `<span class="tooltip-preview"><p>Last modification date: ${escapeHtml(displayDate)}</p>
-                    <p>Upkeep status: ${escapeHtml(upkeepStatus)} <i class="fa fa-circle"></i>
+                    <p>Upkeep status: ${escapeHtml(upkeepStatus)} <i class="fa fa-circle upkeep-${upkeepColor}"></i>
                     </p><p>Search likes: ${escapeHtml(searchUpvotes)}</p><p>Docs likes: ${escapeHtml(docsUpvotes)}</p>{% if site.environment.name contains "docs" %}<p>Version: ${escapeHtml(tooltipVer)}</p>{% endif %}<p>Author: ${escapeHtml(author)}</p><p>Content: ${escapeHtml(contentStatus)} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>`;
                     // Escape again for the attribute: Bootstrap later parses the tooltip HTML.
                     const linkAttribute = pageUrl ? `href="${escapeHtml(pageUrl)}"` : 'aria-disabled="true"';
@@ -609,7 +611,7 @@
             queryUpvote.categories = Array.from(letters)
             {% endif %}
 
-            OSrequest("POST", "https://{{ site.environment.searchUrl }}/api/v1/likes/search/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}/", queryUpvote, true)
+            OSrequest("POST", "https://{{ site.environment.searchUrl }}/api/v1/likes/search/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}", queryUpvote, true)
 
             $(this).toggleClass('on');
         };
