@@ -2,73 +2,129 @@
 ---
 (function() {
 
+    // This is not entirely neccessary because we trust the content from our own search service,
+    // but it is a last resort. Main problem may be community integration catalog.
+
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, char => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[char]);
+    }
+
+    function removeDoubleEncoding(escapedHtml) {
+        return escapedHtml.replace(/&amp;((?:#\d+|#x[\da-f]+|[a-z][a-z\d]+);)/gi, '&$1');
+    }
+
+    function escapeSearchText(value) {
+        return removeDoubleEncoding(escapeHtml(value));
+    }
+
+    function safeHighlight(value) {
+        return removeDoubleEncoding(escapeHtml(value)
+            .replaceAll('&lt;strong&gt;', '<strong>')
+            .replaceAll('&lt;/strong&gt;', '</strong>'));
+    }
+
+    function safeUrl(value) {
+        if (typeof value !== 'string' || !value.trim()) return null;
+        try {
+            const url = new URL(value, window.location.origin);
+            return ['http:', 'https:'].includes(url.protocol) ? url.href : null;
+        } catch {
+            return null;
+        }
+    }
+
+
     {% if site.environment.name contains "docs" %}
-    let letters = new Set(["Guide", "Book", "Reference", "Other"]);
-    let branches = new Set(["notBranched"])
-    const notMasterBranchMult = 0.25
+    let letters = new Set(["Guide", "Book", "Reference", "Other", "Integrations"]);
+    let branches = new Set([])
 
     $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text();
         let newVersionEdited = DOCSBRANCHMAP[newVersion]
-        let queryArr = searchQuery.query.function_score.script_score.script.source.split("\n")
-        let queryLen = queryArr.length
         if (isSelected) {
             branches.add(newVersionEdited)
-            if (queryArr[queryLen - 11].includes("branch")) {
-                searchQuery.query.function_score.script_score.script.source = queryArr.slice(0, queryLen - 12).join("\n") + "\n" + queryArr.slice(queryLen - 7).join("\n")
-                searchQuery.query.function_score.query.bool.filter.push({ terms: { "branch.keyword": Array.from(branches) } })
-            } else {
-                searchQuery.query.function_score.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
-            }
         } else {
             branches.delete(newVersionEdited)
-            if (branches.size == 1) {
-                searchQuery.query.function_score.script_score.script.source = queryArr.slice(0, queryLen - 6).join("\n") + "\n" + `if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
-                    if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
-                        totalScore = totalScore*${notMasterBranchMult};
-                    }
-                }` + "\n" + queryArr.slice(queryLen - 6).join("\n")
-                searchQuery.query.function_score.query.bool.filter.pop()
-            } else {
-                searchQuery.query.function_score.query.bool.filter[1].terms["branch.keyword"] = Array.from(branches)
-            }
+        }
+        if (branches.size == 0 && "branches" in searchQuery) {
+            delete searchQuery.branches
+        } else if (branches.size > 0) {
+            searchQuery.branches = Array.from(branches)
         }
         searchForPhrase()
     });
 
-    $('.ovalSearch').click(function() {
-        $(this).toggleClass('on');
-        let name = this.id.replace('oval', '')
-        if (this.classList.contains('on')) {
-            document.getElementById("check" + name).className = 'fas fa-check'
-            this.innerHTML = this.innerHTML.replace(name.toUpperCase(), "&nbsp;" + name.toUpperCase())
-            console.log(this.innerHTML)
-            letters.add(name)
+    $('.ovalSearch').on('click', function() {
+        const name = this.id.replace('oval', '');
+        const selected = !letters.has(name);
+        if (selected) {
+            letters.add(name);
         } else {
-            document.getElementById("check" + name).className = ''
-            this.innerHTML = this.innerHTML.replace("&nbsp;" + name.toUpperCase(), name.toUpperCase())
-            console.log(this.innerHTML + name.toUpperCase())
-            letters.delete(name)
+            letters.delete(name);
         }
-        searchQuery.query.function_score.query.bool.filter[0].terms["type.keyword"] = Array.from(letters)
-        searchForPhrase()
+        $(this).toggleClass('on', selected).attr('aria-pressed', String(selected));
+        $(this).find('i').toggleClass('fas fa-check', selected);
+        searchForPhrase();
     });
 
     {% endif %}
 
+    $('#docssearchbutton').on('click', function() {
+        searchForPhrase();
+    });
+
     var typingTimer = null;
-    let logTimer = null;
-    let logScheduled = false
+    let activeSearchRequest = null;
+    let searchRequestId = 0;
+    let navigationItems = [];
+    let navigationIndex = 0;
+
+    function invalidateSearch() {
+        searchRequestId++;
+        if (activeSearchRequest) {
+            activeSearchRequest.abort();
+            activeSearchRequest = null;
+        }
+    }
+
+    function clearSearchResults() {
+        const suggestionBox = document.getElementById('autocombox');
+        suggestionBox.innerHTML = '';
+        suggestionBox.style.display = 'none';
+        navigationItems = [];
+        navigationIndex = 0;
+    }
+
+    function hasSearchText(query) {
+        return Boolean(query.trim());
+    }
+
+    // Input covers typing, paste, mobile keyboards, and composition completion.
+    $('#searchbar').on('input compositionend', function(event) {
+        invalidateSearch();
+        clearTimeout(typingTimer);
+        typingTimer = null;
+        $('[data-toggle="tooltip"]').tooltip('dispose');
+
+        const query = $('#searchbar').val();
+        if (!hasSearchText(query)) {
+            clearSearchResults();
+            return;
+        }
+        if (event.originalEvent?.isComposing) return;
+        typingTimer = setTimeout(searchForPhrase, 200);
+    });
 
     $(document).on('keydown', function(e) {
+        if (e.target?.closest('input, textarea, select, [contenteditable]')) return;
+        if (e.originalEvent?.isComposing) return;
         if (/^[a-zA-Z0-9-_ ]$/.test(e.key) && !e.altKey && !e.ctrlKey && !e.metaKey && e.which !== 32) {
             if (!$("#search-modal").hasClass('show')) {
                 $("#search-modal").modal()
+                clearTimeout(typingTimer);
                 typingTimer = setTimeout(searchForPhrase, 200)
-                {% if site.environment.name contains "docs" %}
-                logTimer = setTimeout(sendSearchLog, 2000)
-                {% endif %}
-                logScheduled = true
             }
         }
     });
@@ -132,21 +188,36 @@
         })
     }
 
+    $("#search-modal").on('hide.bs.modal', function() {
+        invalidateSearch();
+        clearTimeout(typingTimer);
+        typingTimer = null;
+        navigationItems = [];
+        navigationIndex = 0;
+    });
+
     $("#search-modal").on('hidden.bs.modal', function() {
         $('#reportSearchProblemPopover').popover('dispose');
+        // Dispose all tooltips before clearing content
+        $('[data-toggle="tooltip"]').tooltip('dispose');
         document.getElementById("autocombox").innerHTML = "";
         document.getElementById("autocombox").style.display = "none";
         document.getElementById('searchToggle').value = "";
         document.getElementById('searchbar').value = "";
     });
 
-    function OSrequest(method, url, query, async, callback) {
-        $.ajax({
-            {% if site.environment.name contains "guide" %}
-            headers: {
-                "Authorization": "Basic " + btoa("{{ site.environment.osUsername }}" + ":" + "{{ site.environment.osPassword }}")
-            },
-            {% endif %}
+    function OSrequest(method,url, query, async, callback, errorCallback) {
+        const headers = {};
+        {% if site.environment.name contains "guide" %}
+        const requestUrl = new URL(url, window.location.origin);
+        const guidePaths = ['/api/v1/guide-search', '/api/v1/likes/guide', '/api/v1/likes/search/guide'];
+        if (requestUrl.origin === 'https://{{ site.environment.searchUrl }}'
+            && guidePaths.includes(requestUrl.pathname.replace(/\/$/, ''))) {
+            headers['X-API-Key'] = {{ site.environment.guideKey | jsonify }};
+        }
+        {% endif %}
+        return $.ajax({
+            headers: headers,
             method: method,
             url: url,
             crossDomain: true,
@@ -156,356 +227,27 @@
             contentType: 'application/json',
         }).done(function(data) {
             if (typeof callback !== 'undefined' && callback) {
-                callback(data)
+                callback(data, false)
             }
-        }).fail(function(data) {
-            console.log(data);
+        }).fail(function(data, status) {
+            if (status !== 'abort') {
+                console.log(data);
+                if (typeof errorCallback === 'function') errorCallback();
+            }
         });
     }
 
-    let searchQuery = {}
-
-    window.addEventListener('load', function() {
-        OSrequest("GET", "https://{{ site.environment.searchUrl }}/search_settings/_doc/2", undefined, true, setSearchQuery)
-    });
-
-    function setSearchQuery(data) {
+    // Object sent to search api service, not the actual opensearch query
+    let searchQuery = {
+        query: "query",
         {% if site.environment.name contains "docs" %}
-        console.log("DEFAULT: " + DEFAULTDOCSBRANCH)
+        categories: Array.from(letters),
         {% endif %}
-        script_score_obj = {
-            "script": {
-                "source": `
-                    double totalScore = _score;
-                    if (doc.upvotes.size()!=0) {
-                        totalScore = totalScore*(1.0+${data._source.multipliers.upvotes}*doc.upvotes.value);
-                    }
-                    if (doc.containsKey('docslikes') && doc.docslikes.size()!=0) {
-                        totalScore = totalScore*(1.0+${data._source.multipliers.docslikes}*doc.docslikes.value);
-                    }
-                    {% if site.environment.name contains "docs" %}
-                    if (doc.containsKey('type.keyword') && doc['type.keyword'].value == "Book") {
-                        totalScore = totalScore*${data._source.multipliers.book};
-                    }
-                    {% endif %}
-                    {% if site.environment.name contains "docs" %}
-                    if (doc.containsKey('url.keyword') && doc['url.keyword'].size()!=0 && (doc['url.keyword'].value.contains("midpoint/devel") || doc['url.keyword'].value.contains("midpoint/compliance") || doc['url.keyword'].value.contains("midpoint/release") || doc['url.keyword'].value.contains("midpoint/security") || doc['url.keyword'].value.contains("midpoint/projects") || doc['url.keyword'].value.contains("midpoint/reference")) && !doc['url.keyword'].value.contains("midpoint/reference/concepts")) {
-                        if (doc.containsKey('lastModificationDate') && doc.lastModificationDate.size()!=0) {
-                            double timestampNow = (double)new Date().getTime();
-                            totalScore = totalScore*Math.max(${data._source.values.last_modification_min}, 1/(1+Math.pow(Math.max(0.0, timestampNow - doc.lastModificationDate.value.getMillis() - ${data._source.values.last_modification_grace} * 365.0 * 24 * 60 * 60 * 1000.0)/(${data._source.values.last_modification_half_life} * 365.0 * 24 * 60 * 60 * 1000.0), ${data._source.values.last_modification_power})))
-                        } else {
-                            totalScore = totalScore*${data._source.multipliers.age_absent};
-                        }
-                    }
-                    {% endif %}
-                    if (doc.containsKey('deprecated') && doc.deprecated.size()!=0) {
-                        if (doc.deprecated.value == true) {
-                            totalScore = totalScore*${data._source.multipliers.deprecated};
-                        }
-                    }
-                    if (doc.containsKey('experimental') && doc.experimental.size()!=0) {
-                        if (doc.experimental.value == true) {
-                            totalScore = totalScore*${data._source.multipliers.experimental};
-                        }
-                    }
-                    if (doc.containsKey('planned') && doc.planned.size()!=0) {
-                        if (doc.planned.value == true) {
-                            totalScore = totalScore*${data._source.multipliers.planned};
-                        }
-                    }
-                    if (doc.containsKey('outdated') && doc.outdated.size()!=0) {
-                        if (doc.outdated.value == true) {
-                            totalScore = totalScore*${data._source.multipliers.outdated};
-                        }
-                    }
-                    if (doc.containsKey('obsolete') && doc.obsolete.size()!=0) {
-                        if (doc.obsolete.value == true) {
-                            totalScore = totalScore*${data._source.multipliers.obsolete};
-                        }
-                    }
-                    {% if site.environment.name contains "docs" %}
-                    if (doc.containsKey('type.keyword') && doc['type.keyword'].size()!=0) {
-                        if (doc['type.keyword'].value == "Other") {
-                            totalScore = totalScore*${data._source.multipliers.other};
-                        }
-                    }
-                    if (doc.containsKey('branch.keyword') && doc['branch.keyword'].size()!=0) {
-                        if (doc['branch.keyword'].value != "${DEFAULTDOCSBRANCH}" && doc['branch.keyword'].value != "notBranched") {
-                            totalScore = totalScore*${notMasterBranchMult};
-                        }
-                    }
-                    {% endif %}
-                    if (totalScore < 0.0) {
-                        totalScore = 0.0;
-                    }
-                    return totalScore;
-                `
-            }
-        }
-        searchQuery = {
-            "query": {
-                "function_score": {
-                    "query": {
-                        "bool": {
-                            {% if site.environment.name contains "docs" %}
-                            "filter": [{
-                                "terms": {
-                                    "type.keyword": Array.from(letters)
-                                }
-                            }],
-                            {% endif %}
-                            "must": [{
-                                "dis_max": {
-                                    "tie_breaker": 0,
-                                    "queries": [
-                                        {
-                                            "multi_match": {
-                                                "query": "query",
-                                                "analyzer": "standard",
-                                                "type": "most_fields",
-                                                "fields": [
-                                                    "text",
-                                                    `title.normal^${data._source.multipliers.title}`,
-                                                    `second_titles^${data._source.multipliers.secondTitle}`,
-                                                    `third_titles^${data._source.multipliers.thirdTitle}`,
-                                                    `fourth_titles^${data._source.multipliers.fourthTitle}`,
-                                                    `fifth_titles^${data._source.multipliers.fifthTitle}`,
-                                                    "alternative_text^0.5",
-                                                    `keywords^${data._source.multipliers.keywords}`,
-                                                    `search-alias^${data._source.multipliers.searchAlias}`
-                                                ],
-                                                "fuzziness": "AUTO",
-                                                "prefix_length": 3,
-                                            }
-                                        },
-                                        {
-                                            "multi_match": {
-                                                "query": "query",
-                                                "analyzer": "standard",
-                                                "type": "most_fields",
-                                                "fields": [
-                                                    "text",
-                                                    `title^${data._source.multipliers.title}`,
-                                                    `second_titles^${data._source.multipliers.secondTitle}`,
-                                                    `third_titles^${data._source.multipliers.thirdTitle}`,
-                                                    `fourth_titles^${data._source.multipliers.fourthTitle}`,
-                                                    `fifth_titles^${data._source.multipliers.fifthTitle}`,
-                                                    "alternative_text^0.5",
-                                                    `keywords^${data._source.multipliers.keywords}`,
-                                                    `search-alias^${data._source.multipliers.searchAlias}`
-                                                ],
-                                                "fuzziness": "0",
-                                                "prefix_length": 3,
-                                            }
-                                        }
-                                    ]
-                                }
-                            }],
-                            "must_not": [{
-                                "term": {
-                                    "visibility": "hidden"
-                                }
-                            },{
-                                "term": {
-                                    "effectiveVisibility": "hidden"
-                                }
-                            }],
-                            "should": [
-                                {
-                                    "term": {
-                                        "title.keyword": {
-                                            "value": "query",
-                                            "boost": `${data._source.multipliers.queryTitleExactMatch}`,
-                                            "case_insensitive": true
-                                        }
-                                    }
-                                },
-                                {
-                                    "term": {
-                                        "second_titles.keyword": {
-                                            "value": "query",
-                                            "boost": `${data._source.multipliers.querySecondTitleExactMatch}`,
-                                            "case_insensitive": true
-                                        }
-                                    }
-                                },
-                                {
-                                    "term": {
-                                        "third_titles.keyword": {
-                                            "value": "query",
-                                            "boost": `${data._source.multipliers.queryThirdTitleExactMatch}`,
-                                            "case_insensitive": true
-                                        }
-                                    }
-                                },
-                                {
-                                    "term": {
-                                        "fourth_titles.keyword": {
-                                            "value": "query",
-                                            "boost": `${data._source.multipliers.queryFourthTitleExactMatch}`,
-                                            "case_insensitive": true
-                                        }
-                                    }
-                                },
-                                {
-                                    "term": {
-                                        "keywords.keyword": {
-                                            "value": "query",
-                                            "boost": `${data._source.multipliers.queryKeywordExactMatch}`,
-                                            "case_insensitive": true
-                                        }
-                                    }
-                                },
-                                {
-                                    "term": {
-                                        "search-alias.keyword": {
-                                            "value": "query",
-                                            "boost": `${data._source.multipliers.querySearchAliasExactMatch}`,
-                                            "case_insensitive": true
-                                        }
-                                    }
-                                },
-                                {
-                                    "multi_match": {
-                                        "query": "query",
-                                        "analyzer": "simple",
-                                        "type": "most_fields",
-                                        "fields": [
-                                            "text",
-                                            "alternative_text^0.5",
-                                            `search-alias^${data._source.multipliers.searchAlias}`
-                                        ],
-                                        "boost": `${data._source.multipliers.wordExactMatch}`
-                                    }
-                                },
-                                {
-                                    "multi_match": {
-                                        "query": "query",
-                                        "type": "most_fields",
-                                        "fields": [
-                                            "text",
-                                            `title.normal^${data._source.multipliers.titleAnd}`,
-                                            "alternative_text^0.5",
-                                            `search-alias^${data._source.multipliers.searchAliasAnd}`,
-                                            `second_titles^${data._source.multipliers.secondTitleAnd}`,
-                                            `third_titles^${data._source.multipliers.thirdTitleAnd}`,
-                                            `fourth_titles^${data._source.multipliers.fourthTitleAnd}`,
-                                            `fifth_titles^${data._source.multipliers.fifthTitleAnd}`,
-                                            `keywords^${data._source.multipliers.keywordsAnd}`,
-                                        ],
-                                        "operator": "and",
-                                        "boost": `${data._source.multipliers.andOperator}`,
-                                        "fuzziness": "AUTO",
-                                        "prefix_length": 3,
-                                    }
-                                },
-                                {
-                                    "multi_match": {
-                                        "query": "query",
-                                        "type": "most_fields",
-                                        "fields": [
-                                            "text",
-                                            `title.normal^${data._source.multipliers.titleAnd}`,
-                                            "alternative_text^0.5",
-                                            `search-alias^${data._source.multipliers.searchAliasAnd}`,
-                                            `second_titles^${data._source.multipliers.secondTitleAnd}`,
-                                            `third_titles^${data._source.multipliers.thirdTitleAnd}`,
-                                            `fourth_titles^${data._source.multipliers.fourthTitleAnd}`,
-                                            `fifth_titles^${data._source.multipliers.fifthTitleAnd}`,
-                                            `keywords^${data._source.multipliers.keywordsAnd}`,
-                                        ],
-                                        "operator": "and",
-                                        "boost": `${data._source.multipliers.andOperatorNoFuzziness}`,
-                                        "fuzziness": "0",
-                                        "prefix_length": 3,
-                                    }
-                                }
-                            ] 
-                        }
-                    },
-                    "script_score": script_score_obj
-                }
-            },
-            fields: [
-                "alternative_text",
-                "title",
-                "second_titles",
-                "third_titles",
-                "fourth_titles",
-                "lastModificationDate",
-                "author",
-                "upvotes",
-                "upkeep-status",
-                "obsolete",
-                "deprecated",
-                "experimental",
-                "planned",
-                "outdated",
-                "wiki-metadata-create-user",
-                "url",
-                {% if site.environment.name contains "docs" %}
-                "type",
-                "branch",
-                {% endif %}
-                "sections1",
-                "second_titles"
-            ],
-            _source: false,
-            highlight: {
-                pre_tags: ["<strong>"],
-                post_tags: ["</strong>"],
-                fields: {
-                    title: {
-                        highlight_query: {
-                            match: {
-                                title: {
-                                    query: "reverse",
-                                    analyzer: "simple"
-                                }
-                            }
-                        }
-                    },
-                    text: {
-                        highlight_query: {
-                            match: {
-                                text: {
-                                    query: "reverse",
-                                    analyzer: "simple"
-                                }
-                            }
-                        }
-                    }
-                }
-            }{% if site.environment.name contains "docs" %},
-            collapse: {
-                "field": "idWithoutBranch.keyword"
-            }{% endif %}
-        }
-        console.log(searchQuery)
+        type: "basic",
+        size: 7
     }
 
-    $('#searchbar').keydown(function() {
-        if (event.keyCode != 38 && event.keyCode != 40) {
-            if (typingTimer) {
-                clearTimeout(typingTimer);
-                typingTimer = null;
-                console.log("timer removed")
-            }
-            if (logTimer) {
-                clearTimeout(logTimer);
-                logTimer = null;
-                console.log("logtimer removed")
-            }
-            if ($('#searchbar').val()) {
-                typingTimer = setTimeout(searchForPhrase, 200);
-                {% if site.environment.name contains "docs" %}
-                logTimer = setTimeout(sendSearchLog, 2000)
-                {% endif %}
-                console.log("timer and logtimer added")
-                logScheduled = true
-            }
-        }
-    });
+    const catalogUrl = {{ site.environment.catalogUrl | default: "https://integrations.evolveum.com" | jsonify }};
 
     function makeAnchor(text) {
         if (!text) return '';
@@ -523,75 +265,79 @@
 
     function searchForPhrase(pagesShown = 7) {
 
-        console.log("function started")
-
         $('[data-toggle="tooltip"]').tooltip('hide')
 
-        actQuery = JSON.parse(JSON.stringify(searchQuery))
+        invalidateSearch();
+        const requestId = searchRequestId;
+        clearTimeout(typingTimer);
+        typingTimer = null;
+        const actQuery = JSON.parse(JSON.stringify(searchQuery))
 
         let query = document.getElementById('searchbar').value
-
+        if (!hasSearchText(query)) {
+            clearSearchResults();
+            return;
+        }
+        
         {% if site.environment.name contains "docs" %}
-            actQuery.query.function_score.query.bool.filter[0].terms["type.keyword"] = Array.from(letters)
+        actQuery.categories = Array.from(letters)
+        actQuery.default_branch = DEFAULTDOCSBRANCH;
         {% endif %}
 
-        query = query.toLowerCase();
-        actQuery.query.function_score.query.bool.must[0].dis_max.queries[0].multi_match.query = query
-        actQuery.query.function_score.query.bool.must[0].dis_max.queries[1].multi_match.query = query
-        actQuery.query.function_score.query.bool.should[6].multi_match.query = query
-        actQuery.query.function_score.query.bool.should[5].term['search-alias.keyword'].value = query
-        actQuery.query.function_score.query.bool.should[4].term['keywords.keyword'].value = query
-        actQuery.query.function_score.query.bool.should[3].term['fourth_titles.keyword'].value = query
-        actQuery.query.function_score.query.bool.should[2].term['third_titles.keyword'].value = query
-        actQuery.query.function_score.query.bool.should[1].term['second_titles.keyword'].value = query
-        actQuery.query.function_score.query.bool.should[0].term['title.keyword'].value = query
-        actQuery.query.function_score.query.bool.should[7].multi_match.query = query
-        actQuery.query.function_score.query.bool.should[8].multi_match.query = query
-        actQuery.highlight.fields.title.highlight_query.match.title.query = query
-        actQuery.highlight.fields.text.highlight_query.match.text.query = query
+        actQuery.type = "basic";
+        const searchType = actQuery.type;
+        const headingQuery = query.trim().toLowerCase();
 
+        actQuery.query = query
         actQuery.size = pagesShown;
 
         const showResults = function(data) {
+            if (requestId !== searchRequestId) return;
+            activeSearchRequest = null;
             console.log(data)
             const showItems = []
-            const numberOfItems = data.hits.total.value
+            let numberOfItems = data.total
             const suggestionBox = document.getElementById("autocombox")
             if (numberOfItems > 0) {
 
-                if (numberOfItems > 0) {
-                    showItems.push('<li class="notShown">' + numberOfItems + ' search results' + '</li>')
-                } else if (numberOfItems === 1) {
+                if (numberOfItems === 1) {
                     showItems.push('<li class="notShown">' + numberOfItems + ' search result' + '</li>')
+                } else {
+                    showItems.push('<li class="notShown">' + numberOfItems + ' search results' + '</li>')
                 }
 
                 for (let i = 0; i < pagesShown && i < numberOfItems; i++) {
+                    const fields = data.results[i].fields;
+                    const isCatalog = data.results[i].source === "catalog";
                     let text = undefined
                     let title = undefined
                     {% if site.environment.name contains "docs" %}
-                    let branch = data.hits.hits[i].fields.branch
+                    let branch = data.results[i].fields.branch
                     let branchClass = "searchResultNotBranched"
                     let branchLabel = ""
                     let displayBranch = ""
                     let tooltipVer = "not versioned"
 
-                    console.log(DOCSBRANCHESCOLORS)
-
                     if (branch != null && branch != "notBranched") {
                         branchClass = "searchResultBranched"
                         displayBranch = DOCSBRANCHMAP[branch]
                         tooltipVer = displayBranch
-                        console.log("CB" + displayBranch)
-                        let colorString = DOCSBRANCHESCOLORS.get(displayBranch)
-                        branchLabel = `<span id="branch${branch}" class="typeLabel branchLabel" style="color: ${colorString}; border-color: ${colorString};">${displayBranch}</span>`
+                        const rawColor = DOCSBRANCHESCOLORS.get(displayBranch);
+                        const colorString = /^#[0-9a-f]{6}$/i.test(rawColor) ? rawColor : 'inherit';
+                        branchLabel = `<span id="branch${escapeHtml(branch)}" class="typeLabel branchLabel" style="color: ${colorString}; border-color: ${colorString};">${escapeHtml(displayBranch)}</span>`
                     } else {
                         branch = "notBranched"
                     }
                     {% endif %}
 
-                    if (data.hits.hits[i].highlight != undefined) {
-                        text = data.hits.hits[i].highlight.text
-                        title = data.hits.hits[i].highlight.title
+                    if (data.results[i].highlight != undefined) {
+                        const highlight = data.results[i].highlight;
+                        text = isCatalog
+                            ? highlight.description ?? highlight["integrations.description"]
+                                ?? highlight["integrations.connectors.description"]
+                                ?? highlight["integrations.name"] ?? highlight["integrations.connectors.name"]
+                            : highlight.text;
+                        title = isCatalog ? highlight.name : highlight.title;
                     }
                     let preview = ""
                     if (typeof text !== 'undefined' && text) {
@@ -605,46 +351,49 @@
                             }
                         }
                     } else {
-                        preview = data.hits.hits[i].fields.alternative_text[0]
+                        preview = isCatalog
+                            ? (fields.description?.[0] ?? '').slice(0, 240)
+                            : fields.alternative_text?.[0] ?? ''
                     }
 
-                    if (preview != undefined && preview) {
-                        preview = preview.replaceAll("<strong>", "vQU0nfuawhKCT38fZDcSl0hnWMfXcrOq7VydIETdqMde8wmTzxnaZQ==")
-                        preview = preview.replaceAll("</strong>", "7U3pTwKZCEwGRrgirF9cydI9cQWP2mzOiofD2Pl/HjFwxoekr5fRpg==")
-                        preview = preview.replaceAll("<", "&lt;")
-                        preview = preview.replaceAll(">", "&gt;")
-                        preview = preview.replaceAll("vQU0nfuawhKCT38fZDcSl0hnWMfXcrOq7VydIETdqMde8wmTzxnaZQ==", "<strong>")
-                        preview = preview.replaceAll("7U3pTwKZCEwGRrgirF9cydI9cQWP2mzOiofD2Pl/HjFwxoekr5fRpg==", "</strong>")
-                    }
+                    preview = safeHighlight(preview);
 
                     let cleanTitle = "" // Title without highlighting used for setSearchItemOnclick
 
-                    if (data.hits.hits[i].fields.title != undefined) {
-                        cleanTitle = data.hits.hits[i].fields.title[0]
-                    } else if (data.hits.hits[i].fields.second_titles != undefined) {
-                        cleanTitle = data.hits.hits[i].fields.second_titles[0]
+                    if (isCatalog) {
+                        cleanTitle = fields.name?.[0] ?? "Integration application";
+                    } else if (data.results[i].fields.title != undefined) {
+                        cleanTitle = data.results[i].fields.title[0]
+                    } else if (data.results[i].fields.second_titles != undefined) {
+                        cleanTitle = data.results[i].fields.second_titles[0]
                     } else {
                         cleanTitle = "Not defined"
                     }
 
                     if (title == undefined || !title) {
-                        title = cleanTitle
+                        title = escapeSearchText(cleanTitle);
+                    } else {
+                        title = safeHighlight(title);
                     }
 
-                    setTimeout(setSearchItemOnclick.bind(null, data.hits.hits[i]._id, cleanTitle), 130);
+                    setTimeout(function() {
+                        if (requestId !== searchRequestId) return;
+                        setSearchItemOnclick(data.results[i].id, cleanTitle, i, query, searchType, pagesShown, data.results[i].source);
+                    }, 130);
 
                     let displayDate = "Not defined"
 
-                    if (data.hits.hits[i].fields.lastModificationDate != undefined) {
-                        const parsedDate = Date.parse(data.hits.hits[i].fields.lastModificationDate[0])
+                    const modifiedDate = isCatalog ? fields.updated?.[0] : fields.lastModificationDate?.[0];
+                    if (modifiedDate != undefined) {
+                        const parsedDate = Date.parse(modifiedDate)
                         const date = new Date(parsedDate)
                         displayDate = date.toLocaleDateString('en-GB', { timeZone: 'UTC' })
                     }
 
-                    let authorRaw = data.hits.hits[i].fields.author
+                    let authorRaw = data.results[i].fields.author
                     let author = ""
                     if (typeof authorRaw == 'undefined' || !authorRaw) {
-                        authorRaw = data.hits.hits[i].fields["wiki-metadata-create-user"]
+                        authorRaw = data.results[i].fields["wiki-metadata-create-user"]
                         author = "unknown"
                         if (typeof authorRaw != 'undefined' && authorRaw) {
                             author = authorRaw[0]
@@ -653,26 +402,28 @@
                         author = authorRaw[0]
                     }
 
-                    let searchUpvotesRaw = data.hits.hits[i].fields.upvotes
+                    let searchUpvotesRaw = data.results[i].fields.upvotes
                     let searchUpvotes = 0
                     if (typeof searchUpvotesRaw != 'undefined' && searchUpvotesRaw) {
                         searchUpvotes = searchUpvotesRaw[0]
                     }
 
-                    let docsUpvotesRaw = data.hits.hits[i].fields.docslikes
+                    let docsUpvotesRaw = data.results[i].fields.docslikes
                     let docsUpvotes = 0
                     if (typeof docsUpvotesRaw != 'undefined' && docsUpvotesRaw) {
                         docsUpvotes = docsUpvotesRaw[0]
                     }
 
-                    let upkeepStatusRaw = data.hits.hits[i].fields["upkeep-status"]
+                    let upkeepStatusRaw = data.results[i].fields["upkeep-status"]
                     let upkeepStatus = "unknown"
                     if (typeof upkeepStatusRaw != 'undefined' && upkeepStatusRaw) {
                         upkeepStatus = upkeepStatusRaw[0]
                     }
+                    const upkeepColor = ["orange", "red", "green", "yellow"].includes(upkeepStatus)
+                        ? upkeepStatus : "unknown";
 
                     contentTriangleClass = "fas fa-exclamation-triangle conditionTriangle"
-                    contentStatusArray = [data.hits.hits[i].fields.obsolete, data.hits.hits[i].fields.deprecated, data.hits.hits[i].fields.experimental, data.hits.hits[i].fields.planned, data.hits.hits[i].fields.outdated]
+                    contentStatusArray = [data.results[i].fields.obsolete, data.results[i].fields.deprecated, data.results[i].fields.experimental, data.results[i].fields.planned, data.results[i].fields.outdated]
                     contentStatusValuesArray = ["obsolete", "deprecated", "experimental", "planned", "outdated"]
                     contentStatus = "" // TODO as array
                     filtredArray = contentStatusArray.filter(function(element, index) {
@@ -689,39 +440,47 @@
                         contentTriangleClass = ""
                     }
 
+                    let pageUrl = isCatalog
+                        ? safeUrl(catalogUrl.replace(/\/+$/, '') + '/applications/' + encodeURIComponent(data.results[i].id))
+                        : safeUrl(fields.url?.[0]);
+
                     {% if site.environment.name contains "docs" %}
-                    let typeRaw = data.hits.hits[i].fields.type
-                    let type = "other"
-                    if (typeRaw != undefined && typeRaw) {
+                    let typeRaw = data.results[i].fields.type
+                    let type = isCatalog ? "Integrations" : "other"
+                    if (!isCatalog && typeRaw != undefined && typeRaw) {
                         type = typeRaw[0]
                     }
                     {% endif %}
-
-                    let pageUrl = data.hits.hits[i].fields.url[0]
-
+                    
                     const cleanTitleLower = cleanTitle.toLowerCase()
-                    if (!cleanTitleLower.includes(query)) {
-                        let titleArr = data.hits.hits[i].fields.second_titles != undefined ? data.hits.hits[i].fields.second_titles : []
-                        if (data.hits.hits[i].fields.third_titles != undefined) {
-                            titleArr = titleArr.concat(data.hits.hits[i].fields.third_titles)
+                    if (!isCatalog && headingQuery && !cleanTitleLower.includes(headingQuery)) {
+                        let titleArr = data.results[i].fields.second_titles != undefined ? data.results[i].fields.second_titles : []
+                        if (data.results[i].fields.third_titles != undefined) {
+                            titleArr = titleArr.concat(data.results[i].fields.third_titles)
                         }
-                        if (data.hits.hits[i].fields.fourth_titles != undefined) {
-                            titleArr = titleArr.concat(data.hits.hits[i].fields.fourth_titles)
+                        if (data.results[i].fields.fourth_titles != undefined) {
+                            titleArr = titleArr.concat(data.results[i].fields.fourth_titles)
                         }
                         for (const titleOption of titleArr) {
-                            if (typeof titleOption != 'undefined' && titleOption.toLowerCase().includes(query)) {
-                                pageUrl = pageUrl + "#" + makeAnchor(titleOption)
+                            if (typeof titleOption != 'undefined' && titleOption.toLowerCase().includes(headingQuery)) {
+                                if (pageUrl) pageUrl = pageUrl + "#" + makeAnchor(titleOption)
                                 break;
                             }
                         }
                     }
-                    showItems.push(`<div><span class="trigger-details searchResult" data-toggle="tooltip" data-toggle="tooltip" data-placement="left"
-                    data-html="true" title='<span class="tooltip-preview"><p>Last modification date: ${displayDate}</p>
-                    <p>Upkeep status: ${upkeepStatus} <i id="upkeep${upkeepStatus}" class="fa fa-circle"></i>
-                    </p><p>Search likes: ${searchUpvotes}</p><p>Docs likes: ${docsUpvotes}</p>{% if site.environment.name contains "docs" %}<p>Version: ${tooltipVer}</p>{% endif %}<p>Author: ${author}</p><p>Content: ${contentStatus} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>'><a class="aWithoutUnderline" href="${pageUrl}"
-                    id="${data.hits.hits[i]._id}site"><li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i>
-                    <span class="font1 searchResultTitle {% if site.environment.name contains "docs" %}${branchClass}{% endif %}">&nbsp;${title}</span>{% if site.environment.name contains "docs" %}<span id="label${type}" class="typeLabel">${type.toUpperCase()}</span>${branchLabel}{% endif %}<i class="${contentTriangleClass}"></i><br><span class="font2">${preview}</span></li></a></span>
-                    <span class="vote" id="${data.hits.hits[i]._id}up"><i class="fas fa-thumbs-up"></i></span></div>`);
+                    const tooltip = isCatalog
+                        ? `<span class="tooltip-preview"><p>Integration application</p><p>Last modification date: ${escapeHtml(displayDate)}</p><p>Search likes: ${escapeHtml(searchUpvotes)}</p></span>`
+                        : `<span class="tooltip-preview"><p>Last modification date: ${escapeHtml(displayDate)}</p>
+                    <p>Upkeep status: ${escapeHtml(upkeepStatus)} <i class="fa fa-circle upkeep-${upkeepColor}"></i>
+                    </p><p>Search likes: ${escapeHtml(searchUpvotes)}</p><p>Docs likes: ${escapeHtml(docsUpvotes)}</p>{% if site.environment.name contains "docs" %}<p>Version: ${escapeHtml(tooltipVer)}</p>{% endif %}<p>Author: ${escapeHtml(author)}</p><p>Content: ${escapeHtml(contentStatus)} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>`;
+                    // Escape again for the attribute: Bootstrap later parses the tooltip HTML.
+                    const linkAttribute = pageUrl ? `href="${escapeHtml(pageUrl)}"` : 'aria-disabled="true"';
+                    const vote = `<span class="vote" id="${escapeHtml(data.results[i].id)}up"><i class="fas fa-thumbs-up"></i></span>`;
+                    showItems.push(`<div><span class="trigger-details searchResult" data-toggle="tooltip" data-placement="left"
+                    data-html="true" title="${escapeHtml(tooltip)}"><a class="aWithoutUnderline" ${linkAttribute}
+                    id="${escapeHtml(data.results[i].id)}site"><li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i>
+                    <span class="font1 searchResultTitle {% if site.environment.name contains "docs" %}${branchClass}{% endif %}">&nbsp;${title}</span>{% if site.environment.name contains "docs" %}<span id="label${escapeHtml(type)}" class="typeLabel">${escapeHtml(String(type).toUpperCase())}</span>${branchLabel}{% endif %}<i class="${contentTriangleClass}"></i><br><span class="font2">${preview}</span></li></a></span>
+                    ${vote}</div>`);
                 }
 
                 const numberOfNotShown = numberOfItems - pagesShown
@@ -736,137 +495,171 @@
                 suggestionBox.style.display = "table";
 
                 $("#moreResults").click(function() {
+                    {% if site.environment.name contains "docs" %}
+                    moreClick = {
+                        "search_query": query,
+                        "num_results": pagesShown + 7,
+                        "categories": Array.from(letters),
+                        "type": searchType
+                    }
+                    if (branches.size > 0) {
+                        moreClick.branches = Array.from(branches)
+                    } else {
+                        moreClick.default_branch = DEFAULTDOCSBRANCH
+                    }
+                    OSrequest("POST", "https://{{ site.environment.searchUrl }}/api/v1/logs/more_results", moreClick, false)
+                    {% endif %}
                     searchForPhrase(pagesShown + 7)
                 });
 
             } else {
-                suggestionBox.innerHTML = ""
-                suggestionBox.style.display = "none";
+                suggestionBox.innerHTML = '<li class="notShown" role="status">No results found.</li>';
+                suggestionBox.style.display = 'table';
             }
 
-            $('[data-toggle="tooltip"]').tooltip();
+            $('[data-toggle="tooltip"]').tooltip({
+                trigger: 'hover',
+                delay: { show: 100, hide: 100 }
+            });
 
-            setTimeout(setHighlighting, 30);
+            setHighlighting();
 
         }
 
-        OSrequest("POST", "https://{{ site.environment.searchUrl }}/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}/_search", actQuery, true, showResults)
+        const showError = function() {
+            if (requestId !== searchRequestId) return;
+            activeSearchRequest = null;
+            clearSearchResults();
+            const suggestionBox = document.getElementById('autocombox');
+            suggestionBox.innerHTML = '<li class="notShown" role="alert">Search is currently unavailable. Please try again.</li>';
+            suggestionBox.style.display = 'table';
+        };
+
+        activeSearchRequest = OSrequest("POST", "https://{{ site.environment.searchUrl }}/api/v1/{% if site.environment.name contains "docs" %}search{% else %}guide-search{% endif %}", actQuery, true, showResults, showError)
     }
 
     function setHighlighting() {
-        let listItems = document.querySelectorAll("#searchbar, .aWithoutUnderline");
-
-        // Set up a counter to keep track of which <li> is selected
-        let currentLI = 0;
-
-        // Initialize first li as the selected (focused) one:
-        listItems[currentLI].classList.add("highlightSearch");
-
-        // Set up a key event handler for the document
-        document.addEventListener("keydown", function(event) {
-            // Check for up/down key presses
-            switch (event.keyCode) {
-                case 38: // Up arrow
-                    // Remove the highlighting from the previous element
-                    listItems[currentLI].classList.remove("highlightSearch");
-                    if (listItems[currentLI].className == "aWithoutUnderline") {
-                        listItems[currentLI].parentElement.parentElement.classList.remove("highlightParentSearch");
-                    }
-                    listItems[currentLI].blur()
-
-                    currentLI = currentLI > 0 ? --currentLI : 0; // Decrease the counter
-                    listItems[currentLI].classList.add("highlightSearch"); // Highlight the new element
-                    if (listItems[currentLI].id != "searchbar") {
-                        listItems[currentLI].parentElement.parentElement.classList.add("highlightParentSearch");
-                    }
-                    listItems[currentLI].focus({ focusVisible: true })
-                    break;
-                case 40: // Down arrow
-                    // Remove the highlighting from the previous element
-                    listItems[currentLI].classList.remove("highlightSearch");
-                    if (listItems[currentLI].className == "aWithoutUnderline") {
-                        listItems[currentLI].parentElement.parentElement.classList.remove("highlightParentSearch");
-                    }
-                    listItems[currentLI].blur()
-
-                    currentLI = currentLI < listItems.length - 1 ? ++currentLI : listItems.length - 1; // Increase counter
-                    listItems[currentLI].classList.add("highlightSearch"); // Highlight the new element
-                    if (listItems[currentLI].id != "searchbar") {
-                        listItems[currentLI].parentElement.parentElement.classList.add("highlightParentSearch");
-                    }
-                    listItems[currentLI].focus({ focusVisible: true })
-                    break;
+        navigationItems = Array.from(document.querySelectorAll('#search-modal #searchbar, #search-modal .aWithoutUnderline'));
+        navigationIndex = 0;
+        for (const item of navigationItems) {
+            item.classList.remove('highlightSearch');
+            if (item.id !== 'searchbar') {
+                item.parentElement.parentElement.classList.remove('highlightParentSearch');
             }
-        });
-    }
-
-    {% if site.environment.name contains "docs" %}
-    function sendSearchLog(id, title) {
-        logScheduled = false
-        const date = new Date();
-        let logPayload = {
-            "@timestamp": date.toISOString(),
-            "querylength": document.getElementById('searchbar').value.toLowerCase().length,
-            "query": document.getElementById('searchbar').value.toLowerCase()
         }
-        OSrequest("POST", "https://{{ site.environment.searchUrl }}/finalsearchlogs/_doc/", logPayload, true)
+        if (navigationItems.length) {
+            navigationItems[0].classList.add('highlightSearch');
+        }
     }
-    {% endif %}
 
-    function setSearchItemOnclick(id, title) {
+    $(document).on('keydown.searchNavigation', function(event) {
+        if (!$('#search-modal').hasClass('show') || !navigationItems.length) return;
+        if (event.keyCode !== 38 && event.keyCode !== 40) return;
+        if (!navigationItems.includes(document.activeElement)) return;
+
+        event.preventDefault();
+        navigationIndex = navigationItems.indexOf(document.activeElement);
+        const previous = navigationItems[navigationIndex];
+        previous.classList.remove('highlightSearch');
+        if (previous.id !== 'searchbar') {
+            previous.parentElement.parentElement.classList.remove('highlightParentSearch');
+        }
+
+        const direction = event.keyCode === 38 ? -1 : 1;
+        navigationIndex = Math.max(0, Math.min(navigationItems.length - 1, navigationIndex + direction));
+        const current = navigationItems[navigationIndex];
+        current.classList.add('highlightSearch');
+        if (current.id !== 'searchbar') {
+            current.parentElement.parentElement.classList.add('highlightParentSearch');
+        }
+        current.focus({ focusVisible: true });
+    });
+
+    function setSearchItemOnclick(id, title, position, query, searchType, pagesShown, source) {
 
         let up = document.getElementById(id + "up")
-        up.onclick = function() {
-            let modify = "+"
+        if (up) up.onclick = function() {
+            let modify = true
 
             if ($(this).prop("classList").contains('on')) {
-                modify = "-"
+                modify = false
             }
 
-            let queryUpvote = {
-                script: {
-                    source: "if (ctx._source['upvotes'] != null) { ctx._source['upvotes'] " + modify + "= 1 } else { ctx._source['upvotes'] = 1 }"
-                }
+            const queryUpvote = {
+                {% if site.environment.name contains "docs" %}
+                "result_source": source === "catalog" ? "catalog" : "docs",
+                "type": searchType,
+                "search_query": query,
+                "position": position,
+                "title": title,
+                "num_results": pagesShown,
+                {% endif %}
+                "id": id,
+                "like": modify
             }
 
-            OSrequest("POST", "https://{{ site.environment.searchUrl }}/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}/_update/" + id + "?refresh", queryUpvote, true)
+            {% if site.environment.name contains "docs" %}
+            if (branches.size > 0) {
+                queryUpvote.branches = Array.from(branches)
+            } else {
+                queryUpvote.default_branch = DEFAULTDOCSBRANCH
+            }
+            queryUpvote.categories = Array.from(letters)
+            {% endif %}
+
+            OSrequest("POST", "https://{{ site.environment.searchUrl }}/api/v1/likes/search/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}", queryUpvote, true)
 
             $(this).toggleClass('on');
         };
 
         {% if site.environment.name contains "docs" %}
-        // TODO for now, we suppose that cases in which the user did not select "open in a new tab" or just triggered the "mousedown" event and did not click are statistically insignificant
-        let site = document.getElementById(id + "site")
-        site.addEventListener("mousedown", (event) => {
-            if (event.button == 0 || event.button == 2) {
+        const site = document.getElementById(id + "site");
 
-                const date = new Date();
+        const recordActivation = function() {
+            // Disabled/invalid links do not navigate and should not count as clicks.
+            if (!site.hasAttribute('href')) return;
+            $(site).parent().tooltip('hide');
+            $('[data-toggle="tooltip"]').tooltip('hide');
 
-                if (logScheduled) {
-                    clearTimeout(logTimer);
-                    logTimer = null;
-                    let logPayload = {
-                        "@timestamp": date.toISOString(),
-                        "querylength": document.getElementById('searchbar').value.toLowerCase().length,
-                        "query": document.getElementById('searchbar').value.toLowerCase()
-                    }
-                    OSrequest("POST", "https://{{ site.environment.searchUrl }}/finalsearchlogs/_doc/", logPayload, true)
-                    logScheduled = false
-                    console.log("logtimer removed")
-                }
-
-                console.log("mousedown" + event.button);
-
-                let queryClick = {
-                    "title": title,
-                    "doc_id": id,
-                    "@timestamp": date.toISOString(),
-                    "querylength": document.getElementById('searchbar').value.toLowerCase().length,
-                    "clickquery": document.getElementById('searchbar').value.toLowerCase()
-                }
-
-                event.button == 0 ? OSrequest("POST", "https://{{ site.environment.searchUrl }}/click_logs/_doc/", queryClick, false) : OSrequest("POST", "https://{{ site.environment.searchUrl }}/click_logs/_doc/", queryClick, true);
+            const queryClick = {
+                "categories": Array.from(letters),
+                "type": searchType,
+                "search_query": query,
+                "position": position,
+                "title": title,
+                "num_results": pagesShown,
+                "result_id": id,
+                "result_source": source,
+                "result_url": site.href,
+            };
+            if (branches.size > 0) {
+                queryClick.branches = Array.from(branches);
+            } else {
+                queryClick.default_branch = DEFAULTDOCSBRANCH;
             }
+
+            // Keep logging alive when keyboard or primary-click navigation unloads the page.
+            fetch("https://{{ site.environment.searchUrl }}/api/v1/logs/clicks", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(queryClick),
+                keepalive: true,
+            }).catch(function(error) {
+                console.log(error);
+            });
+        };
+
+        site.addEventListener('click', function(event) {
+            if (event.button === 0) recordActivation();
+        });
+        site.addEventListener('auxclick', function(event) {
+            if (event.button === 1) recordActivation();
+        });
+
+        site.addEventListener("contextmenu", (event) => {
+            // This isn't a perfect solution, right click may be anything other than open in new tab, but I think
+            // it is better to have false positives than false negatives.
+            recordActivation();
         });
         {% endif %}
     }

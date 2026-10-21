@@ -22,18 +22,19 @@
                         </select>
                     </div>
                     {% endif %}
-                    <button id="docssearchbutton" class="btn btn-outline-secondary btn-sm my-2 my-sm-0">Search</button>
+                    <button type="button" id="docssearchbutton" class="btn btn-outline-secondary btn-sm my-2 my-sm-0">Search</button>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 {% if site.environment.name contains 'docs' %}
-                <div id="checkboxes">
-                    <span id="ovalGuide" class="oval on ovalSearch"><i id="checkGuide" class="fas fa-check"></i>&nbsp;GUIDE</span>
-                    <span id="ovalBook" class="oval on ovalSearch"><i id="checkBook" class="fas fa-check"></i>&nbsp;BOOK</span>
-                    <span id="ovalReference" class="oval on ovalSearch"><i id="checkReference" class="fas fa-check"></i>&nbsp;REFERENCE</span>
-                    <span id="ovalOther" class="oval on ovalSearch"><i id="checkOther" class="fas fa-check"></i>&nbsp;OTHER</span>
-                    <span id="ovalDeveloper" class="oval ovalSearch"><i id="checkDeveloper" class=""></i>&nbsp;DEVELOPER</span>
+                <div id="checkboxes" role="group" aria-label="Search categories">
+                    <button type="button" id="ovalGuide" class="oval ovalSearch on" aria-pressed="true"><i id="checkGuide" class="fas fa-check" aria-hidden="true"></i>&nbsp;GUIDE</button>
+                    <button type="button" id="ovalBook" class="oval ovalSearch on" aria-pressed="true"><i id="checkBook" class="fas fa-check" aria-hidden="true"></i>&nbsp;BOOK</button>
+                    <button type="button" id="ovalReference" class="oval ovalSearch on" aria-pressed="true"><i id="checkReference" class="fas fa-check" aria-hidden="true"></i>&nbsp;REFERENCE</button>
+                    <button type="button" id="ovalOther" class="oval ovalSearch on" aria-pressed="true"><i id="checkOther" class="fas fa-check" aria-hidden="true"></i>&nbsp;OTHER</button>
+                    <button type="button" id="ovalIntegrations" class="oval ovalSearch on" aria-pressed="true"><i id="checkIntegrations" class="fas fa-check" aria-hidden="true"></i>&nbsp;INTEGRATIONS</button>
+                    <button type="button" id="ovalDeveloper" class="oval ovalSearch" aria-pressed="false"><i id="checkDeveloper" class="" aria-hidden="true"></i>&nbsp;DEVELOPER</button>
                 </div>
                 {% endif %}
             </div>

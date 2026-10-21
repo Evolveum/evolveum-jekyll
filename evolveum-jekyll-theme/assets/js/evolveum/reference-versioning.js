@@ -21,22 +21,22 @@ function rgbToHex(r, g, b) {
 }
 
 window.addEventListener('load', function() {
-    console.log($("#select-version-picker-search"))
+    //console.log($("#select-version-picker-search"))
     let options = document.getElementById('select-version-picker-search').options
-    console.log("opts" + options)
+    //console.log("opts" + options)
     let start = 85
     let end = 210
-    console.log(options.length)
+    //console.log(options.length)
     let step = Math.round((end - start) / options.length)
-    console.log("ADB" + options)
+    //console.log("ADB" + options)
     for (let o = 0; o < options.length; o++) {
-        console.log(start + (o*step))
-        console.log(o)
-        console.log(options[o].dataset['tokens'])
-        console.log(options[o].dataset['default'])
-        console.log(options[o])
+        // console.log(start + (o*step))
+        // console.log(o)
+        // console.log(options[o].dataset['tokens'])
+        // console.log(options[o].dataset['default'])
+        // console.log(options[o])
         if (options[o].dataset['default'] != undefined && options[o].dataset['default'] == "default") {
-            console.log(options[o].dataset['default'] + " " + options[o].dataset['tokens'])
+            //console.log(options[o].dataset['default'] + " " + options[o].dataset['tokens'])
             DEFAULTDOCSBRANCH = options[o].dataset['tokens'].replace("docs/")
         }
         DOCSORIGINALBRANCHMAP[options[o].dataset['tokens'].replace("docs/", "")] = options[o].dataset['tokens']
@@ -63,9 +63,9 @@ window.addEventListener('load', function() {
     $('#select-version-picker').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
         let newVersion = $(this).find('option').eq(clickedIndex).text().toString();
         let newVersionEdited = DOCSBRANCHMAP[newVersion].toString()
-        console.log(newVersionEdited)
-        console.log(url)
-        console.log(version)
+        // console.log(newVersionEdited)
+        // console.log(url)
+        // console.log(version)
         window.location.href = url.replace(version, newVersionEdited)
     });
 });

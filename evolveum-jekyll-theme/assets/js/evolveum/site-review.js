@@ -6,14 +6,16 @@
         let id = url.replace("https://{{ site.environment.docsUrl }}", "").replace(/\//g, "") + "title"
 
         let queryDocsLikes = {
-            script: {
-                source: "if (ctx._source['docslikes'] != null) { ctx._source['docslikes'] " + modify + "= 1 } else { ctx._source['docslikes'] =" + modify  + "1 }"
-            }
+            "id": id,
+            "like": modify
         }
     
         $.ajax({
+            {% if site.environment.name contains "guide" %}
+            headers: { 'X-API-Key': {{ site.environment.guideKey | jsonify }} },
+            {% endif %}
             method: "POST",
-            url: "https://{{ site.environment.searchUrl }}/docs/_update/" + id + "?refresh",
+            url: "https://{{ site.environment.searchUrl }}/api/v1/likes/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}",
             crossDomain: true,
             async: true,
             data: JSON.stringify(queryDocsLikes),
@@ -33,9 +35,9 @@
             $(".thanksFeedback").toggleClass('on');
         }
         if ($(this)[0].classList.contains("on")) {
-            sendLike("+");
+            sendLike(true);
         } else {
-            sendLike("-")
+            sendLike(false)
         }
         
     });
@@ -44,14 +46,14 @@
         $(this).toggleClass('on');
         if ($("#yesSiteReviewThumb")[0].classList.contains("on")) {
             $("#yesSiteReviewThumb").toggleClass('on');
-            sendLike("-");
+            sendLike(false);
         } else {
             $(".thanksFeedback").toggleClass('on');
         }
         if ($(this)[0].classList.contains("on")) {
-            sendLike("-");
+            sendLike(false);
         } else {
-            sendLike("+")
+            sendLike(true);
         }
     });
     
@@ -86,10 +88,6 @@
         });
     
         $('#docsReportAProblemSelect').selectpicker();
-    
-        $('#docsReportTextArea').on('focus', function() {
-            $(document).off('keydown');
-        });
     
         $('#reportDocsProblemPopoverSend').click(function() {
             let docsProblemSelected = $(".docsReportAProblemOption.selected")
