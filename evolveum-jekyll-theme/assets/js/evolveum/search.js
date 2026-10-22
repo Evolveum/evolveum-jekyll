@@ -213,7 +213,7 @@
         const guidePaths = ['/api/v1/guide-search', '/api/v1/likes/guide', '/api/v1/likes/search/guide'];
         if (requestUrl.origin === 'https://{{ site.environment.searchUrl }}'
             && guidePaths.includes(requestUrl.pathname.replace(/\/$/, ''))) {
-            headers['X-API-Key'] = {{ site.environment.guideKey | jsonify }};
+            headers['Authorization'] = 'Bearer ' + {{ site.environment.searchApiKey | jsonify }};
         }
         {% endif %}
         return $.ajax({
