@@ -215,7 +215,12 @@
     $(document).ready(function() {
         setLMDLSearchIn()
         {% if site.environment.name contains "docs" %}
-        setLMDLVersion()
+        // We need to wait for the versions to be populated, this is done on window load
+        if (document.readyState === 'complete') {
+            setLMDLVersion();
+        } else {
+            window.addEventListener('load', setLMDLVersion, { once: true });
+        }
         {% endif %}
         setLMDLCategory()
         setLMDLImpact()
