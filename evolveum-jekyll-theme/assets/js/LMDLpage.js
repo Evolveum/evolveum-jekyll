@@ -13,146 +13,74 @@
     let filterBranches = new Set([])
     {% endif %}
     let allAuthors = []
-    var shouldIgnoreScroll = false;
+    const endpoint = "https://{{ site.environment.searchUrl }}/api/v1/commits/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}";
+    let dateRange = {};
+    let activeRequest = null;
+    let requestGeneration = 0;
+    let nextOffset = 0;
+    let hasMore = true;
+    let rowNumber = 0;
+    let currentQuery = {};
 
-    let initialSearchQuery = {
-        query: {
-            bool: {
-                must_not: [{
-                    term: {
-                        "effectiveVisibility": "hidden"
-                    }
-                },
-                {
-                    term: {
-                        "visibility": "hidden"
-                    }
-                }
-                ]
-            }
-        },
-        fields: [
-            "commitMessage",
-            "title",
-            "date",
-            "upkeep-status",
-            "obsolete",
-            "deprecated",
-            "experimental",
-            "planned",
-            "outdated",
-            "contentType",
-            "importance",
-            "author",
-            "url",
-            "id",
-            "gitUrl"{% if site.environment.name contains "docs" %},
-            "branch"{% endif %}
-        ],
-        _source: false,
-        size: 30,
-        sort: [{
-            date: {
-                order: "desc"
-            }
-        }]
+    // This is not entirely neccessary because we trust the content from our own search service,
+    // but it is a last resort.
+
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, char => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[char]);
     }
 
-    let afterSearchQuery = {
-        query: {
-            bool: {
-                must: [{
-                        bool: {
-                            filter: [{
-                                terms: {
-                                    "importance.keyword": allImportance
-                                }
-                            }, {
-                                terms: {
-                                    "author.keyword": []
-                                }
-                            }, {
-                                terms: {
-                                    "contentType.keyword": allSearchCategory
-                                }
-                            }]
-                        }
-                    }, {
-                        bool: {
-                            should: []
-                        }
-                    }
-
-                ],
-                must_not: [{
-                    term: {
-                        "effectiveVisibility": "hidden"
-                    }
-                },
-                {
-                    term: {
-                        "visibility": "hidden"
-                    }
-                }]
-            }
-        },
-        fields: [
-            "commitMessage",
-            "title",
-            "date",
-            "upkeep-status",
-            "obsolete",
-            "deprecated",
-            "experimental",
-            "planned",
-            "outdated",
-            "contentType",
-            "importance",
-            "author",
-            "url",
-            "id",
-            "gitUrl"{% if site.environment.name contains "docs" %},
-            "branch"{% endif %}
-        ],
-        _source: false,
-        size: 30,
-        from: 0,
-        sort: [{
-            date: {
-                order: "desc"
-            }
-        }]
+    function safeUrl(value) {
+        if (!value) return '#';
+        try {
+            const url = new URL(value, window.location.origin);
+            return ['http:', 'https:'].includes(url.protocol) ? escapeHtml(url.href) : '#';
+        } catch {
+            return '#';
+        }
     }
 
-    function OSrequest(method, url, query, async, callback) {
-        $.ajax({
+    function serviceRequest(method, url, query) {
+        return $.ajax({
             method: method,
             url: url,
             {% if site.environment.name contains "guide" %}
-            headers: {
-                "Authorization": "Basic " + btoa("{{ site.environment.osUsername }}" + ":" + "{{ site.environment.osPassword }}")
-            },
+            headers: { Authorization: 'Bearer ' + {{ site.environment.searchApiKey | jsonify }} },
             {% endif %}
-            crossDomain: true,
-            async: async,
-            data: JSON.stringify(query),
+            data: query === undefined ? undefined : JSON.stringify(query),
             dataType: 'json',
             contentType: 'application/json',
-        }).done(function(data) {
-            if (typeof callback !== 'undefined' && callback) {
-                callback(data)
-            }
-        }).fail(function(data) {
-            console.log(data);
         });
+    }
+
+    function showError(message) {
+        let error = document.getElementById('LMDLerror');
+        if (!error) {
+            error = document.createElement('p');
+            error.id = 'LMDLerror';
+            error.setAttribute('role', 'alert');
+            const table = document.getElementById('listOfUpdatedPages').closest('table');
+            table.parentNode.insertBefore(error, table);
+        }
+        error.textContent = message;
     }
 
     const updateList = function(data) {
         let listbox = document.getElementById("listOfUpdatedPages")
         let listitems = []
-        console.log(data)
-        for (let i = 0; i < data.hits.hits.length && i < data.hits.total.value; i++) { // TODO
-            let commitMessageRaw = data.hits.hits[i].fields.commitMessage;
+        const rowIds = [];
+        for (let i = 0; i < data.results.length && i < data.total; i++) {
+            const fields = Object.fromEntries(Object.entries(data.results[i].fields).map(([key, values]) => [
+                key, (Array.isArray(values) ? values : [values]).map(value =>
+                    key === 'url' || key === 'gitUrl' ? safeUrl(value) : escapeHtml(value))
+            ]));
+            for (const key of ['title', 'date', 'url', 'gitUrl']) {
+                if (!fields[key] || !fields[key].length) fields[key] = [''];
+            }
+            const rowId = 'LMDLrow' + rowNumber++;
+            rowIds.push(rowId);
+            let commitMessageRaw = fields.commitMessage;
             let commitMessage = ""
             if (commitMessageRaw != undefined && commitMessageRaw) {
                 commitMessage = commitMessageRaw[0]
@@ -164,54 +92,37 @@
             let contentDisplayVersion = "Not versioned"
             let versionColor = "#CACACA"
 
-            if (data.hits.hits[i].fields.branch != undefined) {
-                contentVersion = data.hits.hits[i].fields.branch[0]
+            if (fields.branch != undefined) {
+                contentVersion = fields.branch[0]
                 if (contentVersion != "Not versioned") {
                     let contentVersionWithoutDocs = contentVersion.replace("docs/", "")
-                    contentDisplayVersion = DOCSBRANCHMAP[contentVersionWithoutDocs]
-                    versionColor = DOCSBRANCHESCOLORS.get(contentDisplayVersion)
+                    contentDisplayVersion = DOCSBRANCHMAP[contentVersionWithoutDocs] || contentVersionWithoutDocs
+                    versionColor = DOCSBRANCHESCOLORS.get(contentDisplayVersion) || "#CACACA"
                 }
             }
             {% endif %}
 
-            if (commitMessage != undefined && commitMessage) {
-                commitMessage = commitMessage.replaceAll("<", "&lt;")
-                commitMessage = commitMessage.replaceAll(">", "&gt;")
-            }
+            const title = fields.title[0];
 
-            let title = ""
-            let titleRaw = data.hits.hits[i].fields.title
-
-            if (data.hits.hits[i].highlight == undefined) {
-                if (titleRaw != undefined && titleRaw) {
-                    title = titleRaw[0]
-                }
-            } else {
-                title = data.hits.hits[i].highlight.title
-            }
-
-            let rawDate = data.hits.hits[i].fields.date[0]
+            let rawDate = fields.date[0]
             const parsedDate = Date.parse(rawDate)
             const date = new Date(parsedDate)
 
-            let upkeepStatusRaw = data.hits.hits[i].fields["upkeep-status"]
+            let upkeepStatusRaw = fields["upkeep-status"]
             let upkeepStatus = "unknown"
             if (typeof upkeepStatusRaw == 'undefined' || !upkeepStatusRaw) {
                 unknownStatus = "&nbsp;unknown"
             } else {
-                upkeepStatus = upkeepStatusRaw[0]
+                upkeepStatus = ["green", "yellow", "orange", "red"].includes(upkeepStatusRaw[0]) ? upkeepStatusRaw[0] : "unknown"
             }
 
-            contentTriangleClass = ""
-            contentStatusArray = [data.hits.hits[i].fields.obsolete, data.hits.hits[i].fields.deprecated, data.hits.hits[i].fields.experimental, data.hits.hits[i].fields.planned, data.hits.hits[i].fields.outdated]
-            contentStatusValuesArray = ["obsolete", "deprecated", "experimental", "planned", "outdated"]
-            contentStatus = "" // TODO as array
-            filtredArray = contentStatusArray.filter(function(element, index) {
+            let contentTriangleClass = ""
+            const contentStatusArray = [fields.obsolete, fields.deprecated, fields.experimental, fields.planned, fields.outdated]
+            const contentStatusValuesArray = ["obsolete", "deprecated", "experimental", "planned", "outdated"]
+            let contentStatus = ""
+            contentStatusArray.forEach(function(element, index) {
                 if (element != undefined && (element == "true")) {
                     contentStatus = contentStatusValuesArray[index]
-                    return true;
-                } else {
-                    return false;
                 }
             });
 
@@ -219,125 +130,86 @@
                 contentTriangleClass = "fas fa-exclamation-triangle conditionTriangle LMDLelementTooltip"
             }
 
-            let contentTypeRaw = data.hits.hits[i].fields.contentType;
+            let contentTypeRaw = fields.contentType;
             let contentType = ""
             if (typeof contentTypeRaw != 'undefined' && contentTypeRaw) {
                 contentType = contentTypeRaw[0]
             }
 
-            let impactOfChangeRaw = data.hits.hits[i].fields.importance
+            let impactOfChangeRaw = fields.importance
             let impactOfChange = ""
             if (typeof impactOfChangeRaw != 'undefined' && impactOfChangeRaw) {
                 impactOfChange = impactOfChangeRaw[0]
             }
 
-            let authorRaw = data.hits.hits[i].fields.author
+            let authorRaw = fields.author
             let author = ""
             if (typeof authorRaw != 'undefined' && authorRaw) {
                 author = authorRaw[0]
             }
 
-            author = author.replace(/<.*>/, "")
+            author = author.replace(/&lt;.*?&gt;/g, "")
 
-            let parsedTitle = title.replace(/[\W_]+/g, "")
 
             listitems.push(`<tr>
-        <th class="LMDLtitle" scope="row"><a href="${data.hits.hits[i].fields.url[0]}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='<span>Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></i>${unknownStatus}</span>'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="${data.hits.hits[i].fields.gitUrl[0]}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
+        <th class="LMDLtitle" scope="row"><a href="${fields.url[0]}" class="LMDLelementTooltip" data-toggle="tooltip" data-html="true" data-original-title='<span>Upkeep status:&nbsp;<i id="upkeep${upkeepStatus}" class="fa fa-circle LMDLupkeep${upkeepStatus}"></i>${unknownStatus}</span>'>${title}</a>&nbsp;<a class="LMDLtitleGithubLink" href="${fields.gitUrl[0]}">history&nbsp;<i class="fab fa-github"></i></a><i data-toggle="tooltip" title="${contentStatus}" class="${contentTriangleClass}"></th>
         {% if site.environment.name contains "docs" %}<td class="LMDLcategory${contentVersion} LMDLcategory" style="color:${versionColor};">${contentDisplayVersion}</td>{% endif %}
         <td class="LMDLcategory${contentType} LMDLcategory">${contentType.toUpperCase()}</td>
         <td class="tableCentered LMDLimpact${impactOfChange} LMDLimpact">${impactOfChange.toUpperCase()}</td>
         <td class="tableCentered LMDLauthor">${author}</td>
-        <td class="tableCentered LMDLdate">${date.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</td>
+        <td class="tableCentered LMDLdate">${Number.isNaN(parsedDate) ? '' : date.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</td>
         <td class="LMDLmessage">${commitMessage}</td></tr>
-        <tr id="${data.hits.hits[i].fields.id[0]}${parsedTitle}header" class="LMDLexpandedHeaderRow"><td scope="row" class="tableCentered LMDLexpandedHeader LMDLexpandedCategory">Category</td>
+        <tr id="${rowId}header" class="LMDLexpandedHeaderRow"><td scope="row" class="tableCentered LMDLexpandedHeader LMDLexpandedCategory">Category</td>
         <td scope="row" class="tableCentered LMDLtooltipTh LMDLexpandedHeader LMDLexpandedImpactHeader" data-toggle="tooltip" data-html="true" 
         title="<div><span>Extend to which the page had been modified</span><br><span><span class=&quot;LMDLimpactMajor&quot;>Major</span> - more than 30% of lines were edited</span><br><span><span class=&quot;LMDLimpactSignificant&quot;>Significant</span> - more than 10% and less than 30% of lines were edited</span><br><span><span class=&quot;LMDLimpactMinor&quot;>Minor</span> - less than 10% of lines were edited</span></div>">Impact of change&nbsp;<i style="font-size: 0.8rem;" class="fas fa-question-circle"></i></td>
         <td scope="row" class="tableCentered LMDLexpandedHeader LMDLexpandedAuthor">Author</td></tr>
-        <tr id="${data.hits.hits[i].fields.id[0]}${parsedTitle}detail" class="LMDLexpandedDetailRow"><td scope="row" class="LMDLcategoryGuide LMDLcategory LMDLexpandedDetail LMDLexpandedCategoryCell">GUIDE</td>
-        <td class="tableCentered LMDLimpactMinor LMDLimpact LMDLexpandedDetail LMDLexpandedImpactCell">MINOR</td>
-        <td class="tableCentered LMDLauthor LMDLexpandedDetail LMDLexpandedAuthorCell">Jan Mederly</td></tr>
-        <tr id="${data.hits.hits[i].fields.id[0]}${parsedTitle}" class='LMDLmoreSmallDetails'><td colspan="3" class="notShown LMDLmoreSmallDetailsTd">Show more&nbsp;<i class="fas fa-angle-down LMDLmoreSmallDetailsI"></i></td></tr>`);
-            setTimeout(setMoreDetailsOnClick.bind(null, `${data.hits.hits[i].fields.id[0]}${parsedTitle}`), 100);
+        <tr id="${rowId}detail" class="LMDLexpandedDetailRow"><td scope="row" class="LMDLcategory${contentType} LMDLcategory LMDLexpandedDetail LMDLexpandedCategoryCell">${contentType.toUpperCase()}</td>
+        <td class="tableCentered LMDLimpact${impactOfChange} LMDLimpact LMDLexpandedDetail LMDLexpandedImpactCell">${impactOfChange.toUpperCase()}</td>
+        <td class="tableCentered LMDLauthor LMDLexpandedDetail LMDLexpandedAuthorCell">${author}</td></tr>
+        <tr id="${rowId}" class='LMDLmoreSmallDetails'><td colspan="3" class="notShown LMDLmoreSmallDetailsTd">Show more&nbsp;<i class="fas fa-angle-down LMDLmoreSmallDetailsI"></i></td></tr>`);
         }
-        listbox.innerHTML += listitems.join("")
+        listbox.insertAdjacentHTML("beforeend", listitems.join(""));
+        rowIds.forEach(setMoreDetailsOnClick);
         $(".LMDLelementTooltip").tooltip();
     }
 
-    function searchLMDP(beginningIndex = 0) {
-        let pagesShown = 30
-        afterSearchQuery.size = pagesShown
-        afterSearchQuery.from = beginningIndex
-        afterSearchQuery.query.bool.must[1].bool.should = []
-
-        if (document.getElementById('LMDLsearchbar').value.toLowerCase() != undefined && document.getElementById('LMDLsearchbar').value.toLowerCase() != "") {
-            if (searchIn.has("Title") || searchIn.size == 0) {
-                afterSearchQuery.query.bool.must[1].bool.should.push({
-                    bool: {
-                        filter: [{
-                            term: {
-                                title: document.getElementById('LMDLsearchbar').value.toLowerCase()
-                            }
-                        }]
-                    }
-                });
-            }
-            if (searchIn.has("Text") || searchIn.size == 0) {
-                afterSearchQuery.query.bool.must[1].bool.should.push({
-                    bool: {
-                        filter: [{
-                            term: {
-                                text: document.getElementById('LMDLsearchbar').value.toLowerCase()
-                            }
-                        }]
-                    }
-                });
-            }
-            if (searchIn.has("Commit message") || searchIn.size == 0) {
-                afterSearchQuery.query.bool.must[1].bool.should.push({
-                    bool: {
-                        filter: [{
-                            term: {
-                                commitMessage: document.getElementById('LMDLsearchbar').value.toLowerCase()
-                            }
-                        }]
-                    }
-                });
-            }
-        } else(
-            afterSearchQuery.query.bool.must[1].bool.should = [{
-                "exists": {
-                    field: "commitMessage"
-                }
-            }]
-        )
-
-        if (beginningIndex == 0) {
-            let listbox = document.getElementById("listOfUpdatedPages")
-            listbox.innerHTML = ""
+    function searchLMDP(append = false) {
+        if (append && (activeRequest || !hasMore)) return;
+        if (!append) {
+            requestGeneration++;
+            if (activeRequest) activeRequest.abort();
+            nextOffset = 0;
+            hasMore = true;
+            document.getElementById('listOfUpdatedPages').innerHTML = '';
+            const fieldNames = { Title: 'title', Text: 'text', 'Commit message': 'commitMessage' };
+            currentQuery = {
+                query: document.getElementById('LMDLsearchbar').value.trim(),
+                search_in: Array.from(searchIn, field => fieldNames[field]),
+                categories: Array.from(searchCategory),
+                importance: Array.from(importance),
+                authors: Array.from(authors),
+                {% if site.environment.name contains "docs" %}
+                branches: Array.from(filterBranches),
+                {% endif %}
+                ...dateRange,
+            };
         }
-
-        $(window).off('scroll');
-
-        scrollEvent = function() {
-            if ($(window).scrollTop() >= $(document).height() - $(window).height() - 10) {
-                if (shouldIgnoreScroll) {
-                    return;
-                }
-                shouldIgnoreScroll = true;
-                setTimeout(() => {
-                    shouldIgnoreScroll = false;
-                }, 1200);
-                searchLMDP(beginningIndex + 30)
-            }
-        }
-        $(window).scroll(scrollEvent); // TODO DO NOT REPEAT
-
-
-        {% if site.environment.name contains "docs" %}
-        OSrequest("POST", "https://{{ site.environment.searchUrl }}/docs_commits/_search", afterSearchQuery, true, updateList)
-        {% else %}
-        OSrequest("POST", "https://{{ site.environment.searchUrl }}/guide_commits/_search", afterSearchQuery, true, updateList)
-        {% endif %}
+        const generation = requestGeneration;
+        showError('');
+        const request = serviceRequest('POST', endpoint, { ...currentQuery, offset: nextOffset, size: 30 });
+        activeRequest = request;
+        request.done(function(data) {
+            if (generation !== requestGeneration) return;
+            updateList(data);
+            nextOffset += data.results.length;
+            hasMore = data.results.length > 0 && nextOffset < data.total && nextOffset <= 9970;
+            if (!append && !data.total) showError('No changes match these filters.');
+        }).fail(function(xhr, status) {
+            if (generation !== requestGeneration || status === 'abort') return;
+            showError('Unable to load changes. Please try again.');
+        }).always(function() {
+            if (generation === requestGeneration) activeRequest = null;
+        });
     }
 
     $(document).ready(function() {
@@ -354,44 +226,19 @@
 
         $(".LMDLtooltipTh").tooltip()
 
-        {% if site.environment.name contains "docs" %}
-        OSrequest("POST", "https://{{ site.environment.searchUrl }}/docs_commits/_search", initialSearchQuery, true, updateList)
-        {% else %}
-        OSrequest("POST", "https://{{ site.environment.searchUrl }}/guide_commits/_search", initialSearchQuery, true, updateList)
-        {% endif %}
-
-        let request = {
-            "aggs": {
-                "authors": {
-                    "terms": {
-                        "field": "author.keyword",
-                        "order": {
-                            "_key": "asc"
-                        },
-                        "size": 1000
-                    }
-
-                }
-            },
-            "size": 0
-        }
-
-        {% if site.environment.name contains "docs" %}
-        OSrequest("POST", "https://{{ site.environment.searchUrl }}/docs_commits/_search", request, true, setAuthors)
-        {% else %}
-        OSrequest("POST", "https://{{ site.environment.searchUrl }}/guide_commits/_search", request, true, setAuthors)
-        {% endif %}
-
-        $(window).scroll(function() {
+        searchLMDP();
+        serviceRequest('GET', endpoint + '/authors').done(setAuthors).fail(function() {
+            showError('Unable to load the author filter. Please reload to try again.');
+        });
+        $(window).on('scroll.LMDL', function() {
             if ($(window).scrollTop() >= $(document).height() - $(window).height() - 10) {
-                if (shouldIgnoreScroll) {
-                    return;
-                }
-                shouldIgnoreScroll = true;
-                setTimeout(() => {
-                    shouldIgnoreScroll = false;
-                }, 1200);
-                searchLMDP(30)
+                searchLMDP(true);
+            }
+        });
+        $('#LMDLsearchbar').on('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                searchLMDP();
             }
         });
 
@@ -416,21 +263,17 @@
         $('.LMDLDatePickerButton').on('apply.daterangepicker', function(ev, picker) {
             document.getElementById("LMDLPickedDate").innerHTML = picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY')
             document.getElementById("LMDLPickedDate").style.color = "#000"
-            afterSearchQuery.query.bool.must[0].bool.filter.push({
-                range: {
-                    "date": {
-                        gte: picker.startDate.format('YYYY-MM-DD'),
-                        lte: picker.endDate.format('YYYY-MM-DD')
-                    }
-                }
-            })
+            dateRange = {
+                date_from: picker.startDate.format('YYYY-MM-DD'),
+                date_to: picker.endDate.format('YYYY-MM-DD'),
+            };
             searchLMDP()
         });
 
         $('.LMDLDatePickerButton').on('cancel.daterangepicker', function(ev, picker) {
             document.getElementById("LMDLPickedDate").innerHTML = 'Pick a date range'
             document.getElementById("LMDLPickedDate").style.color = "#909090"
-            afterSearchQuery.query.bool.must[0].bool.filter.pop()
+            dateRange = {};
             searchLMDP()
         });
     });
@@ -448,15 +291,18 @@
         });
     });
 
+    function updateSelection(select, selected, values) {
+        selected.clear();
+        Array.from(select.options).forEach((option, index) => {
+            if (option.selected && values[index] !== undefined) selected.add(values[index]);
+        });
+    }
+
     function setLMDLSearchIn() {
         $('#selectpickersearchin').selectpicker();
         $('#selectpickersearchin').selectpicker('deselectAll');
-        $('#selectpickersearchin').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
-            if (isSelected) {
-                searchIn.add(allSearchIn[clickedIndex])
-            } else {
-                searchIn.delete(allSearchIn[clickedIndex])
-            }
+        $('#selectpickersearchin').on('changed.bs.select', function() {
+            updateSelection(this, searchIn, allSearchIn);
         });
     }
 
@@ -465,29 +311,14 @@
         let branchList = []
         for (let i = 0; i < DOCSBRANCHESDISPLAYNAMES.length; i++) {
             branchList.push("<option style=\"color: " + DOCSBRANCHESCOLORS.get(DOCSBRANCHESDISPLAYNAMES[i]) + ";\">" + DOCSBRANCHESDISPLAYNAMES[i] + "</option>")
-            console.log("<option style=\"color: " + DOCSBRANCHESCOLORS.get(DOCSBRANCHESDISPLAYNAMES[i]) + ";\">" + DOCSBRANCHESDISPLAYNAMES[i] + "</option>")
         }
         let selectObjects = document.getElementById("selectpickerversion")
         selectObjects.innerHTML = branchList.join("")
-            //afterSearchQuery.query.bool.must[0].bool.filter[1].terms["author.keyword"] = allAuthors
         $('#selectpickerversion').selectpicker();
         $('#selectpickerversion').selectpicker('deselectAll');
-        $('#selectpickerversion').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
-            if (isSelected) {
-                filterBranches.add(DOCSORIGINALBRANCHMAP[DOCSBRANCHMAP[DOCSBRANCHESDISPLAYNAMES[clickedIndex]]]) //TODO improve - not very pretty
-            } else {
-                filterBranches.delete(DOCSORIGINALBRANCHMAP[DOCSBRANCHMAP[DOCSBRANCHESDISPLAYNAMES[clickedIndex]]])
-            }
+        $('#selectpickerversion').on('changed.bs.select', function() {
+            updateSelection(this, filterBranches, DOCSBRANCHESDISPLAYNAMES.map(name => DOCSBRANCHMAP[name]));
 
-            if (filterBranches.size == 0) {
-                afterSearchQuery.query.bool.must[0].bool.filter.pop()
-            } else {
-                afterSearchQuery.query.bool.must[0].bool.filter.push({
-                    terms: {
-                        "branch.keyword": Array.from(filterBranches)
-                    }
-                })
-            }
             searchLMDP()
         }).on('loaded.bs.select', function(e) {
             let parent = $('#selectpickerversion')[0].parentElement
@@ -498,18 +329,9 @@
     function setLMDLCategory() {
         $('#selectpickercategory').selectpicker();
         $('#selectpickercategory').selectpicker('deselectAll');
-        $('#selectpickercategory').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
-            if (isSelected) {
-                searchCategory.add(allSearchCategory[clickedIndex])
-            } else {
-                searchCategory.delete(allSearchCategory[clickedIndex])
-            }
+        $('#selectpickercategory').on('changed.bs.select', function() {
+            updateSelection(this, searchCategory, allSearchCategory);
 
-            if (searchCategory.size == 0) {
-                afterSearchQuery.query.bool.must[0].bool.filter[2].terms["contentType.keyword"] = allSearchCategory
-            } else {
-                afterSearchQuery.query.bool.must[0].bool.filter[2].terms["contentType.keyword"] = Array.from(searchCategory)
-            }
             searchLMDP()
         }).on('loaded.bs.select', function(e) {
             let parent = $('#selectpickercategory')[0].parentElement
@@ -520,27 +342,15 @@
     function setLMDLImpact() {
         $('#selectpickerimpact').selectpicker();
         $('#selectpickerimpact').selectpicker('deselectAll');
-        $('#selectpickerimpact').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
-            if (isSelected) {
-                importance.add(allImportance[clickedIndex])
-            } else {
-                importance.delete(allImportance[clickedIndex])
-            }
+        $('#selectpickerimpact').on('changed.bs.select', function() {
+            updateSelection(this, importance, allImportance);
 
-            if (importance.size == 0) {
-                afterSearchQuery.query.bool.must[0].bool.filter[0].terms["importance.keyword"] = allImportance
-            } else {
-                afterSearchQuery.query.bool.must[0].bool.filter[0].terms["importance.keyword"] = Array.from(importance)
-            }
             searchLMDP()
         }).on('loaded.bs.select', function(e) {
 
             // save the element
             let el = $(this);
 
-            console.log(el)
-
-            console.log(el.data('selectpicker'))
 
             // the list items with the options
             let lis = el.data('selectpicker').selectpicker.main.data;
@@ -579,28 +389,17 @@
     }
 
     function setAuthors(data) {
-        let authorsArray = data.aggregations.authors.buckets
+        let authorsArray = data.authors
         let authorsList = []
         authorsArray.forEach(element => {
-            allAuthors.push(element.key)
-            authorsList.push("<option>" + element.key + "</option>")
+            allAuthors.push(element)
+            authorsList.push("<option>" + escapeHtml(element) + "</option>")
         });
         let selectObjects = document.getElementById("selectpickerauthor")
         selectObjects.innerHTML = authorsList.join("")
-        afterSearchQuery.query.bool.must[0].bool.filter[1].terms["author.keyword"] = allAuthors
         $('#selectpickerauthor').selectpicker();
-        $('#selectpickerauthor').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
-            if (isSelected) {
-                authors.add(allAuthors[clickedIndex])
-            } else {
-                authors.delete(allAuthors[clickedIndex])
-            }
-
-            if (authors.size == 0) {
-                afterSearchQuery.query.bool.must[0].bool.filter[1].terms["author.keyword"] = allAuthors
-            } else {
-                afterSearchQuery.query.bool.must[0].bool.filter[1].terms["author.keyword"] = Array.from(authors)
-            }
+        $('#selectpickerauthor').on('changed.bs.select', function() {
+            updateSelection(this, authors, allAuthors);
 
             searchLMDP()
         }).on('loaded.bs.select', function(e) {
@@ -652,13 +451,13 @@
             if (element.classList.contains('on')) {
                 element.innerHTML = `Show more&nbsp;<i class=\"fas fa-angle-down LMDLmoreSmallDetailsI\"></i>`
                 element.classList.remove("on");
-                $(`#${id}header`)[0].style.display = "none"
-                $(`#${id}detail`)[0].style.display = "none"
+                document.getElementById(id + "header").style.display = "none"
+                document.getElementById(id + "detail").style.display = "none"
             } else {
                 element.innerHTML = `Show less&nbsp;<i class=\"fas fa-angle-up LMDLmoreSmallDetailsI\"></i>`
                 element.classList.add("on");
-                $(`#${id}header`)[0].style.display = "table-row"
-                $(`#${id}detail`)[0].style.display = "table-row"
+                document.getElementById(id + "header").style.display = "table-row"
+                document.getElementById(id + "detail").style.display = "table-row"
             }
         };
     }

@@ -48,7 +48,7 @@ module Evolveum
         end
     end
 
-    Jekyll::Hooks.register :site, :pre_render, priority: :lowest do |site|
+    Jekyll::Hooks.register :site, :pre_render, priority: :low do |site|
         Evolveum::PageCache.build(site)
     end
 
