@@ -1,16 +1,34 @@
 $(document).ready(function() {
 
-    $("#navtree-toggle").click(function() {
-        const $navtree = $(".navtree-column");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-        if ($navtree.hasClass("d-none")) {
+    const $fixedPanel = $("#navtree-panel.navtree-fixed");
+    const current = $fixedPanel.find('[aria-current="page"]')[0];
+    if (current && $fixedPanel.is(":visible")) {
+        const panel = $fixedPanel[0];
+        const top = current.getBoundingClientRect().top - panel.getBoundingClientRect().top;
+        if (top + current.offsetHeight > panel.clientHeight) {
+            panel.scrollTop += top - panel.clientHeight / 3;
+        }
+    }
+
+    $("#navtree-toggle").click(function() {
+        const $toggle = $(this);
+        const $navtree = $("#" + $toggle.attr("aria-controls"));
+        const opening = $navtree.hasClass("d-none");
+        const duration = reduceMotion.matches ? 0 : 400;
+
+        if (opening) {
             $navtree.removeClass("d-none").css({
                 'height': '0',
                 'overflow': 'hidden'
             }).animate({
                 'height': $navtree[0].scrollHeight + 'px'
-            }, 400, function() {
-                $navtree.css('height', '');
+            }, duration, function() {
+                $navtree.css({
+                    'height': '',
+                    'overflow': ''
+                });
             });
         } else {
             const originalHeight = $navtree.height();
@@ -19,7 +37,7 @@ $(document).ready(function() {
                 'overflow': 'hidden'
             }).animate({
                 'height': '0'
-            }, 400, function() {
+            }, duration, function() {
                 $navtree.addClass("d-none").css({
                     'height': '',
                     'overflow': ''
@@ -27,11 +45,10 @@ $(document).ready(function() {
             });
         }
 
-        if ($("#navtree-toggle i").hasClass("fa-angle-down")) {
-            $("#navtree-toggle i").removeClass("fa-angle-down").addClass("fa-angle-up");
-        } else {
-            $("#navtree-toggle i").removeClass("fa-angle-up").addClass("fa-angle-down");
-        }
+        $toggle.attr("aria-expanded", opening ? "true" : "false");
+        $toggle.find("i")
+            .toggleClass("fa-angle-down", !opening)
+            .toggleClass("fa-angle-up", opening);
     });
 
 });

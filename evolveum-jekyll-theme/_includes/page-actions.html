@@ -1,0 +1,7 @@
+<ul class="ev-page-actions">
+  {%- include page-source-links.html %}
+  <li><button type="button" class="ev-link-button" data-ev-report aria-haspopup="dialog"><i class="fa-solid fa-flag fa-fw" aria-hidden="true"></i>Report a problem</button></li>
+  {%- if page.lastModificationDate %}
+  <li class="ev-page-actions__meta">Last modified {{ page.lastModificationDate | date: "%d %b %Y" }}</li>
+  {%- endif %}
+</ul>

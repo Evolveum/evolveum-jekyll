@@ -22,7 +22,7 @@ function rgbToHex(r, g, b) {
 
 window.addEventListener('load', function() {
     //console.log($("#select-version-picker-search"))
-    let options = document.getElementById('select-version-picker-search').options
+    let options = document.querySelectorAll('#version-search-panel input')
     //console.log("opts" + options)
     let start = 85
     let end = 210
@@ -57,11 +57,11 @@ window.addEventListener('load', function() {
     if (!url.includes("/midpoint/reference")) {
         $("#select-version").css("display", "none");
     } else {
-        $('#select-version-picker').selectpicker('val', versionDisplay);
+        $('#select-version-picker').val(versionDisplay);
     }
 
-    $('#select-version-picker').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
-        let newVersion = $(this).find('option').eq(clickedIndex).text().toString();
+    $('#select-version-picker').on('change', function() {
+        let newVersion = this.value;
         let newVersionEdited = DOCSBRANCHMAP[newVersion].toString()
         // console.log(newVersionEdited)
         // console.log(url)

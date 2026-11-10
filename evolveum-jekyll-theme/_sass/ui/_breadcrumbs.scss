@@ -1,0 +1,36 @@
+.breadcrumb {
+  display: block;
+  line-height: 1.5rem;
+}
+
+.breadcrumb-item,
+.breadcrumb-item + .breadcrumb-item {
+  display: inline;
+  padding-left: 0;
+}
+
+.breadcrumb-item:not(:last-child)::after {
+  content: " ";
+  white-space: pre-wrap;
+}
+
+.breadcrumb-item::before,
+.breadcrumb-item + .breadcrumb-item::before {
+  display: inline;
+  padding-right: 0.25rem;
+  color: #6c757d;
+  content: "/";
+  content: "/" / "";
+}
+
+.breadcrumb-item > a {
+  display: inline;
+}
+
+.breadcrumb-item > a {
+  color: var(--ev-color-link);
+}
+
+.breadcrumb-item > a[aria-current="page"] {
+  color: var(--ev-color-text);
+}

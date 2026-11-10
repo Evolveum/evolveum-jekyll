@@ -1,0 +1,17 @@
+.ev-skip-link {
+  position: absolute;
+  top: var(--ev-space-2);
+  left: var(--ev-space-2);
+  z-index: var(--ev-z-skip-link);
+  padding: var(--ev-space-2) var(--ev-space-3);
+  color: var(--ev-color-bg);
+  background-color: var(--ev-color-focus);
+  font-weight: 700;
+  text-decoration: underline;
+  transform: translateY(-200%);
+
+  &:focus {
+    color: var(--ev-color-bg);
+    transform: none;
+  }
+}

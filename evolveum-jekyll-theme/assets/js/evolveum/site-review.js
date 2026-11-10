@@ -1,6 +1,14 @@
 ---
 ---
 (function() {
+    function syncFeedback() {
+        const yesOn = $("#yesSiteReviewThumb").hasClass("on");
+        const noOn = $("#noSiteReviewThumb").hasClass("on");
+        $("button#yesSiteReviewThumb").attr("aria-pressed", yesOn ? "true" : "false");
+        $("button#noSiteReviewThumb").attr("aria-pressed", noOn ? "true" : "false");
+        $(".thanksFeedback").text(yesOn || noOn ? "Thanks for your feedback" : "");
+    }
+
     function sendLike(modify) {
         let url = window.location.href
         let id = url.replace("https://{{ site.environment.docsUrl }}", "").replace(/\//g, "") + "title"
@@ -39,86 +47,64 @@
         } else {
             sendLike(false)
         }
-        
+        syncFeedback();
+
     });
     
+    const report = document.getElementById("docs-report");
+
+    $(document).on("click", "[data-ev-report]", function() {
+        if (report) {
+            report.showModal();
+        }
+    });
+
     $("#noSiteReviewThumb").on("click", function() {
         $(this).toggleClass('on');
-        if ($("#yesSiteReviewThumb")[0].classList.contains("on")) {
+        if ($("#yesSiteReviewThumb").hasClass("on")) {
             $("#yesSiteReviewThumb").toggleClass('on');
             sendLike(false);
         } else {
             $(".thanksFeedback").toggleClass('on');
         }
-        if ($(this)[0].classList.contains("on")) {
+        if ($(this).hasClass("on")) {
             sendLike(false);
         } else {
             sendLike(true);
         }
+        if ($(this).hasClass("on") || !$("button#yesSiteReviewThumb").length) {
+            report.showModal();
+        }
+        syncFeedback();
     });
-    
-    $('#noSiteReviewThumb').popover({
-        html: true,
-        sanitize: false,
-        container: '#pageEval',
-        title: "Please tell us more about what you don't like",
-        content: `<div>
-                    <div class="form-group">
-                        <label for="docsReportAProblemSelect">Type of a problem</label>
-                        <select id="docsReportAProblemSelect" data-style="btn-light btn-sm btndocsSelectReport" title="Type of a problem" data-width="auto">
-                            <option class="input-sm docsReportAProblemOption">Visual bug</option>
-                            <option class="input-sm docsReportAProblemOption">Functional bug</option>
-                            <option class="input-sm docsReportAProblemOption">Problem with content</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="docsReportTextArea">Details of the problem</label>
-                        <textarea class="form-control" id="docsReportTextArea" rows="5"></textarea>
-                    </div>
-                    <span>
-                        <button type="button" class="btn btn-primary" id="reportDocsProblemPopoverClose">Close</button>
-                        <button type="button" class="btn btn-primary" id="reportDocsProblemPopoverSend">Send message</button>
-                    </span>
-                </div>`
-    });
-    
-    $('#noSiteReviewThumb').on('inserted.bs.popover', function() {
-        $('#reportDocsProblemPopoverClose').click(function() {
-            $('#noSiteReviewThumb').popover('hide');
-        });
-    
-        $('#docsReportAProblemSelect').selectpicker();
-    
-        $('#reportDocsProblemPopoverSend').click(function() {
-            let docsProblemSelected = $(".docsReportAProblemOption.selected")
-            let docsProblemCategory = "Not defined"
-            if (docsProblemSelected[0] != undefined) {
-                docsProblemCategory = docsProblemSelected[0].childNodes[1].textContent
-            }
 
-            let details = $("#docsReportTextArea").val()
-            if (details == undefined || details == "") {
-                details = "No details provided"
-            }
-    
-            let reportdocsQuery = {
-                category: docsProblemCategory,
-                details: details,
-                width: $(document).width(),
-                height: $(document).height()
-            }
-            $.ajax({
-                method: "POST",
-                url: "https://{{ site.environment.docsUrl }}/webhooks/report/docs",
-                crossDomain: true,
-                async: true,
-                data: JSON.stringify(reportdocsQuery),
-                dataType: 'json',
-                contentType: 'application/json',
-            }).fail(function(data) {
-                console.log(data);
-            });
-            $('#noSiteReviewThumb').popover('hide');
+    $("#docs-report").on("close", function() {
+        this.querySelector("form").reset();
+    });
+
+    $("#docs-report-send").on("click", function() {
+        let details = $("#docs-report-details").val()
+        if (details == undefined || details == "") {
+            details = "No details provided"
+        }
+
+        let reportdocsQuery = {
+            category: $("#docs-report-type").val() || "Not defined",
+            details: details,
+            width: $(document).width(),
+            height: $(document).height()
+        }
+        $.ajax({
+            method: "POST",
+            url: "https://{{ site.environment.docsUrl }}/webhooks/report/docs",
+            crossDomain: true,
+            async: true,
+            data: JSON.stringify(reportdocsQuery),
+            dataType: 'json',
+            contentType: 'application/json',
+        }).fail(function(data) {
+            console.log(data);
         });
-    })
+        report.close();
+    });
 })();

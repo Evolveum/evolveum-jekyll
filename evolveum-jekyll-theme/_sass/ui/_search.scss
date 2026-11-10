@@ -1,0 +1,174 @@
+$ev-search-categories: (
+  "Guide": #c2410c,
+  "Book": #6f42c1,
+  "Reference": #1f6a9e,
+  "Developer": #1e7a4d,
+  "Other": #a3305c,
+);
+
+@each $name, $color in $ev-search-categories {
+  #oval#{$name},
+  .typeLabel#{$name} {
+    outline-color: $color;
+    color: $color;
+  }
+
+  #oval#{$name}.on {
+    color: #fff;
+    background-color: $color;
+    border-color: $color;
+  }
+}
+
+.typeLabelIntegrations {
+  outline-color: #087e8b;
+  color: #087e8b;
+}
+
+.ev-search-results {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ev-search-count {
+  margin: 0;
+}
+
+.ev-search-more {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+#docssearchbutton:not(:hover):not(:active) {
+  color: #a35f00;
+}
+
+.versioningButton:is(:hover, :focus, :active) {
+  border-color: #707070;
+  color: var(--ev-color-text);
+  background-color: var(--ev-color-bg-subtle);
+  box-shadow: none;
+}
+
+select.versioningButton {
+  width: 220px;
+  max-width: 100%;
+  padding-right: 1.75rem;
+  text-align: left;
+}
+
+#version-search-select {
+  position: relative;
+  min-width: 110px;
+}
+
+#version-search-toggle {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  color: var(--ev-color-text-muted);
+}
+
+#version-search-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#version-search-panel {
+  position: absolute;
+  z-index: 10;
+  min-width: 180px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: var(--ev-space-1) var(--ev-space-2);
+  border: 1px solid #b1b1b1;
+  border-radius: 0.2rem;
+  background-color: var(--ev-color-bg);
+  font-size: var(--ev-font-size-sm);
+
+  label {
+    display: block;
+    min-height: 1.5rem;
+    margin: 0;
+  }
+}
+
+#search-modal {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  overflow-y: auto;
+
+  &::backdrop {
+    background-color: rgb(0 0 0 / 50%);
+  }
+}
+
+html:has(#search-modal[open]) {
+  overflow: hidden;
+}
+
+.ev-report-dialog {
+  width: min(30rem, calc(100vw - 2rem));
+  padding: 1rem;
+  border: 1px solid #b1b1b1;
+  border-radius: 0.3rem;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: left;
+
+  &::backdrop {
+    background-color: rgb(0 0 0 / 50%);
+  }
+}
+
+.ev-report-title {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.ev-search-details {
+  position: fixed;
+  z-index: 20;
+  width: 200px;
+  padding: 0 0.5rem 0.25rem;
+  border-radius: 0.25rem;
+  color: #fff;
+  background-color: #000;
+  font-size: var(--ev-font-size-sm);
+  text-align: center;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+#search-modal .vote {
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: inherit;
+}
+
+.branchLabel {
+  border-color: var(--ev-color-text-muted);
+  color: var(--ev-color-text-muted);
+}

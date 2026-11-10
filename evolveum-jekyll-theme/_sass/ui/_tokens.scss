@@ -1,0 +1,46 @@
+:root {
+  --ev-color-alpha-01: hsl(230, 65%, 23%);
+  --ev-color-alpha-02: hsl(214, 73%, 20%);
+  --ev-color-alpha-05: hsl(207, 34%, 45%);
+  --ev-color-alpha-06: hsl(197, 45%, 75%);
+
+  --ev-color-text: var(--ev-color-alpha-02);
+  --ev-color-text-muted: #595959;
+  --ev-color-link: var(--ev-color-alpha-05);
+  --ev-color-link-hover: var(--ev-color-alpha-06);
+  --ev-color-focus: #1f4288;
+  --ev-color-bg: #ffffff;
+  --ev-color-bg-subtle: #f8f8f8;
+  --ev-color-separator: rgba(130, 130, 130, 0.1);
+  --ev-color-guide: rgba(130, 130, 130, 0.25);
+  --ev-wrapper: min(87.5rem, 90dvw);
+  --ev-header-height: 69px;
+  --ev-aside-width: 15rem;
+
+  --ev-space-1: 0.25rem;
+  --ev-space-2: 0.5rem;
+  --ev-space-3: 1rem;
+  --ev-space-4: 1.5rem;
+  --ev-space-5: 2rem;
+
+  --ev-font-size-sm: 0.875rem;
+  --ev-font-size-base: 1rem;
+  --ev-font-size-lg: 1.25rem;
+  --ev-line-height: 1.5;
+
+  --ev-font-family: "Roboto", sans-serif;
+  --ev-fz-content: 1.125rem;
+  --ev-lh-content: 1.6;
+  --ev-fz-table: 0.9375rem;
+  --ev-lh-table: 1.5;
+  --ev-fz-h1: clamp(2rem, calc(1rem + 2.667vw), 3rem);
+  --ev-fz-h2: clamp(1.75rem, calc(1.5rem + 0.667vw), 2rem);
+  --ev-fz-h3: clamp(1.625rem, calc(1.438rem + 0.5vw), 1.813rem);
+  --ev-fz-h4: clamp(1.375rem, calc(1.188rem + 0.5vw), 1.563rem);
+  --ev-fz-h5: clamp(1.188rem, calc(1rem + 0.5vw), 1.375rem);
+  --ev-fz-h6: clamp(1.063rem, calc(0.938rem + 0.333vw), 1.188rem);
+
+  --ev-focus-width: 3px;
+  --ev-focus-offset: 2px;
+  --ev-z-skip-link: 1000;
+}

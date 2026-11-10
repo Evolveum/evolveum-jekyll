@@ -18,7 +18,7 @@ $(document).ready(function() {
             releaseNavTables.forEach(table => {
                 table.style.display = 'none';
             });
-            releaseNavTables[index].style.display = 'inline-table';
+            releaseNavTables[index].style.display = '';
             releaseNavTabs.forEach(tab => {
                 tab.classList.remove('active');
             });

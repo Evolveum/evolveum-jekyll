@@ -86,7 +86,7 @@ $(document).ready(async function() {
     }
     
     // Enumerate all images in the page
-    let images = document.querySelectorAll('img');
+    let images = document.querySelectorAll('main img');
 
     // Classes for unzoomed (fit size) and zoomed image (zooming by double click in the lightbox)
     const fitSizeClass = 'image-in-lb-fit-size';
@@ -115,32 +115,36 @@ $(document).ready(async function() {
     document.body.appendChild(lightboxWrapper);
 
     // The lightbox closing button
-    const lightboxCloseButton = document.createElement('div');
+    const lightboxCloseButton = document.createElement('button');
+    lightboxCloseButton.setAttribute('type', 'button');
     lightboxCloseButton.innerHTML = '×';
     lightboxCloseButton.setAttribute('id', 'image-lightbox-close-btn');
     lightboxCloseButton.setAttribute('title', 'Close the image lightbox');
-    lightboxCloseButton.setAttribute('alt', 'Close the image lightbox');
+    lightboxCloseButton.setAttribute('aria-label', 'Close the image lightbox');
     lightboxCloseButton.addEventListener('click', function() {
         closeLightbox();
     });
 
-    const lightboxZoomInButton = document.createElement('div');
+    const lightboxZoomInButton = document.createElement('button');
+    lightboxZoomInButton.setAttribute('type', 'button');
     lightboxZoomInButton.setAttribute('id', 'zoom-in-btn');
     lightboxZoomInButton.innerHTML = '+';
     lightboxZoomInButton.setAttribute('title', 'Zoom in');
-    lightboxZoomInButton.setAttribute('alt', 'Zoom in');
+    lightboxZoomInButton.setAttribute('aria-label', 'Zoom in');
 
-    const lightboxZoomOutButton = document.createElement('div');
+    const lightboxZoomOutButton = document.createElement('button');
+    lightboxZoomOutButton.setAttribute('type', 'button');
     lightboxZoomOutButton.setAttribute('id', 'zoom-out-btn');
     lightboxZoomOutButton.innerHTML = '−';
     lightboxZoomOutButton.setAttribute('title', 'Zoom out');
-    lightboxZoomOutButton.setAttribute('alt', 'Zoom out');
+    lightboxZoomOutButton.setAttribute('aria-label', 'Zoom out');
 
-    const lightboxZoomResetButton = document.createElement('div');
+    const lightboxZoomResetButton = document.createElement('button');
+    lightboxZoomResetButton.setAttribute('type', 'button');
     lightboxZoomResetButton.setAttribute('id', 'zoom-reset-btn');
     lightboxZoomResetButton.innerHTML = '•';
     lightboxZoomResetButton.setAttribute('title', 'Reset zoom');
-    lightboxZoomResetButton.setAttribute('alt', 'Reset zoom');
+    lightboxZoomResetButton.setAttribute('aria-label', 'Reset zoom');
 
     // Element in the wrapper but beneath the lightbox element to enable closing the lightbox when user clicks the blurred lightbox background
     const lightboxKillingFloor = document.createElement('div');
@@ -154,6 +158,25 @@ $(document).ready(async function() {
     // The lightbox
     const lightbox = document.createElement('div');
     lightbox.setAttribute('id', 'image-lightbox');
+    lightbox.setAttribute('role', 'dialog');
+    lightbox.setAttribute('aria-modal', 'true');
+    lightbox.setAttribute('tabindex', '-1');
+
+    const lightboxButtons = [lightboxCloseButton, lightboxZoomInButton, lightboxZoomOutButton, lightboxZoomResetButton];
+    let lightboxOpener = null;
+
+    lightboxWrapper.addEventListener('keydown', function(event) {
+        if (event.key !== 'Tab') return;
+        const first = lightboxButtons[0];
+        const last = lightboxButtons[lightboxButtons.length - 1];
+        if (event.shiftKey && (document.activeElement === first || !lightbox.contains(document.activeElement))) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+        }
+    });
     lightbox.appendChild(lightboxCloseButton);
     lightbox.appendChild(lightboxZoomInButton);
     lightbox.appendChild(lightboxZoomOutButton);
@@ -172,7 +195,9 @@ $(document).ready(async function() {
     lightboxWrapper.appendChild(zoomHelperTip);
 
     // Function to open the lightbox, set required properties and call functions
-    function openLightbox(image, imageLabel, originalImage) {
+    function openLightbox(image, imageLabel, originalImage, opener) {
+        lightboxOpener = opener || null;
+        lightbox.setAttribute('aria-label', image.alt || 'Image');
         // TODO: some element selections could be improved by using the variables holding the elements instead of using getElementById or …byClass.
         document.getElementById('image-lightbox-wrapper').style.display = 'block';
         lightboxKillingFloor.style.display = 'block';
@@ -229,6 +254,7 @@ $(document).ready(async function() {
         // Display the lightbox by setting it to block and prevent the body to show scrollbars when lightbox open
         document.getElementById('image-lightbox').style.display = 'block';
         document.body.style.overflow = 'hidden';
+        lightboxCloseButton.focus();
 
         // Don't set explicit width/height on lightbox - let CSS handle it with fit-content
         // The CSS centering with transform: translate(-50%, -50%) will work correctly
@@ -313,6 +339,11 @@ $(document).ready(async function() {
             document.body.style.overflow = 'auto';
             document.getElementById('image-lightbox').style.display = 'none';
         }, 500);
+
+        if (lightboxOpener && document.body.contains(lightboxOpener)) {
+            lightboxOpener.focus();
+        }
+        lightboxOpener = null;
 
         event.stopPropagation();
     }
@@ -602,8 +633,14 @@ $(document).ready(async function() {
 
     // Loop through each image in the page
     images.forEach(img => {
+        if (img.closest('a[href], button') || img.classList.contains('personal-photo') || img.getAttribute('alt') === '' || img.closest('.logo-title') || img.classList.contains('ev-funding-logo')) {
+            return;
+        }
+
         // Create a new link element
-        const link = document.createElement('a');
+        const link = document.createElement('button');
+        link.setAttribute('type', 'button');
+        link.setAttribute('aria-label', img.alt ? 'Enlarge image: ' + img.alt : 'Enlarge image');
 
         // Remove the hardcoded width attribute which comes probably from the template and conflicts with the lightbox
         // (and, in general, is unneeded as we set responsive width for not-lightboxed in-content images).
@@ -631,8 +668,8 @@ $(document).ready(async function() {
         imgInLB.setAttribute('id', 'active-lightboxed-image');
 
         // Open the lightbox on mouse click
-        img.addEventListener('click', function() {
-            openLightbox(imgInLB, imageLabel, img);
+        link.addEventListener('click', function() {
+            openLightbox(imgInLB, imageLabel, img, link);
         });
 
         // Replace the image with the link element

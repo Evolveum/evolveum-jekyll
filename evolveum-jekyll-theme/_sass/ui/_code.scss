@@ -1,0 +1,57 @@
+.highlight {
+  .c,
+  .ch,
+  .cd,
+  .cm,
+  .cpf,
+  .c1 {
+    color: #717165;
+  }
+
+  .cp,
+  .cs,
+  .gh,
+  .go,
+  .gu,
+  .bp,
+  .w {
+    color: #707070;
+  }
+
+  .m,
+  .mb,
+  .mf,
+  .mh,
+  .mi,
+  .il,
+  .mo,
+  .mx {
+    color: #007d7d;
+  }
+
+  .na,
+  .no,
+  .nv,
+  .vc,
+  .vg,
+  .vi,
+  .vm {
+    color: #007373;
+  }
+
+  .nb {
+    color: #0079a2;
+  }
+
+  .sr {
+    color: #008220;
+  }
+}
+
+div.page-meta {
+  color: var(--ev-color-text-muted);
+}
+
+.conum[data-value] {
+  background: var(--ev-color-text);
+}

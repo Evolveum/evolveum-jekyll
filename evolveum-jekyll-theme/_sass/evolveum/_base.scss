@@ -42,7 +42,6 @@ nav.navbar {
         font-size: 0.78rem;
         font-style: italic;
         color: $gray-600;
-        margin-left: 1rem;
         position: relative;
         &::after {
             content: '';
@@ -69,32 +68,14 @@ nav.navbar {
     .navtree-fixed {
         overflow-y: auto;
         background: $white;
-        position: fixed;
-        top: 69px;
-        z-index: 99;
-        padding-top: 23px;
-        height: calc(100vh - 69px);
         scrollbar-color: #c1c1c1 transparent;
         scrollbar-width: none;
-    }
-    .content-left-margin {
-        margin-left: 25%;
     }
     .navtree-fixed:hover {
         scrollbar-width: thin;
     }
 }
 
-@media (min-width: 2048px) {
-    .navtree-column {
-        // Stop-gap measure for ridiculously wide browser windows.
-        // We need to figure something better in the future.
-        max-width: 32rem;
-    }
-    .content-left-margin {
-        margin-left: 32rem !important;
-    }
-}
 
 .navtree {
     list-style: none;
@@ -122,7 +103,9 @@ nav.navbar {
         padding-left: 0.5rem;
     }
     >ul {
-        // top-level nodes, we want it closer to margin
+        padding-left: 0;
+    }
+    >ul:not(:first-child) {
         padding-left: 0.5rem;
     }
 }
@@ -238,18 +221,10 @@ div.page-meta {
     }
 }
 
-.glossref {
-    font-style: italic;
-    color: $indigo;
-}
-
 .table.release-nav-table {
     margin-bottom: 0rem;
 }
 
-.nav.nav-tabs:has(.release-nav-table) {
-    margin-bottom: 2rem;
-}
 
 img {
     height: auto;

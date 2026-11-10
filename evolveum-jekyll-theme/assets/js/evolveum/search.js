@@ -40,10 +40,17 @@
     let letters = new Set(["Guide", "Book", "Reference", "Other", "Integrations"]);
     let branches = new Set([])
 
-    $('#select-version-picker-search').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
-        let newVersion = $(this).find('option').eq(clickedIndex).text();
-        let newVersionEdited = DOCSBRANCHMAP[newVersion]
-        if (isSelected) {
+    const versionToggle = document.getElementById('version-search-toggle');
+    const versionPanel = document.getElementById('version-search-panel');
+
+    function closeVersionPanel() {
+        versionPanel.classList.remove('show');
+        versionToggle.setAttribute('aria-expanded', 'false');
+    }
+
+    $(versionPanel).on('change', 'input', function() {
+        let newVersionEdited = DOCSBRANCHMAP[this.value]
+        if (this.checked) {
             branches.add(newVersionEdited)
         } else {
             branches.delete(newVersionEdited)
@@ -53,7 +60,21 @@
         } else if (branches.size > 0) {
             searchQuery.branches = Array.from(branches)
         }
+        const selected = Array.from(versionPanel.querySelectorAll('input:checked'), input => input.value);
+        document.getElementById('version-search-label').textContent = selected.length ? selected.join(', ') : 'Versions';
         searchForPhrase()
+    });
+
+    $('#version-search-select').on('keydown', function(event) {
+        if (event.key !== 'Escape' || !versionPanel.classList.contains('show')) return;
+        event.preventDefault();
+        event.stopPropagation();
+        closeVersionPanel();
+        versionToggle.focus();
+    });
+
+    $('#search-modal').on('click', function(event) {
+        if (!event.target.closest('#version-search-select')) closeVersionPanel();
     });
 
     $('.ovalSearch').on('click', function() {
@@ -75,11 +96,23 @@
         searchForPhrase();
     });
 
+    $('#search-ddg').on('submit', function(event) {
+        event.preventDefault();
+        searchForPhrase();
+    });
+
     var typingTimer = null;
     let activeSearchRequest = null;
     let searchRequestId = 0;
     let navigationItems = [];
     let navigationIndex = 0;
+    let focusBeforeSearch = null;
+    const searchModal = document.getElementById('search-modal');
+    const searchReport = document.getElementById('search-report');
+
+    function setSearchStatus(text) {
+        document.getElementById('search-status').textContent = text;
+    }
 
     function invalidateSearch() {
         searchRequestId++;
@@ -95,6 +128,7 @@
         suggestionBox.style.display = 'none';
         navigationItems = [];
         navigationIndex = 0;
+        setSearchStatus('');
     }
 
     function hasSearchText(query) {
@@ -106,8 +140,6 @@
         invalidateSearch();
         clearTimeout(typingTimer);
         typingTimer = null;
-        $('[data-toggle="tooltip"]').tooltip('dispose');
-
         const query = $('#searchbar').val();
         if (!hasSearchText(query)) {
             clearSearchResults();
@@ -118,92 +150,99 @@
     });
 
     $(document).on('keydown', function(e) {
+        if (e.key !== '/' || e.altKey || e.ctrlKey || e.metaKey) return;
         if (e.target?.closest('input, textarea, select, [contenteditable]')) return;
         if (e.originalEvent?.isComposing) return;
-        if (/^[a-zA-Z0-9-_ ]$/.test(e.key) && !e.altKey && !e.ctrlKey && !e.metaKey && e.which !== 32) {
-            if (!$("#search-modal").hasClass('show')) {
-                $("#search-modal").modal()
-                clearTimeout(typingTimer);
-                typingTimer = setTimeout(searchForPhrase, 200)
-            }
-        }
+        if (searchModal.open) return;
+        e.preventDefault();
+        openSearch();
     });
 
-    $("#search-modal").on('shown.bs.modal', async function() {
+    function openSearch() {
+        focusBeforeSearch = document.activeElement;
+        searchModal.showModal();
         $('#searchbar').trigger('focus')
-        searchReportPopoverSetup()
-    });
-
-    function searchReportPopoverSetup() {
-        $('#reportSearchProblemPopover').popover({
-            html: true,
-            sanitize: false,
-            container: '#search-modal',
-            title: "Report a problem",
-            content: `<div>
-                        <div class="form-group">
-                            <label for="searchReportAProblemSelect">Select the type of problem</label>
-                            <select id="searchReportAProblemSelect" data-style="btn-light btn-sm btnSearchSelectReport" title="Type of a problem" data-width="auto">
-                                <option class="input-sm searchReportAProblemOption">Visual bug</option>
-                                <option class="input-sm searchReportAProblemOption">Functional bug</option>
-                                <option class="input-sm searchReportAProblemOption">Problem with results</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="searchReportTextArea">Details of the problem</label>
-                            <textarea class="form-control" id="searchReportTextArea" rows="5"></textarea>
-                        </div>
-                        <span>
-                            <button type="button" class="btn btn-primary" id="reportSearchProblemPopoverClose">Close</button>
-                            <button type="button" class="btn btn-primary" id="reportSearchProblemPopoverSend">Send message</button>
-                        </span>
-                    </div>`
-        });
-
-        $('#reportSearchProblemPopover').off('inserted.bs.popover.searchReport').on('inserted.bs.popover.searchReport', function() {
-            $('#reportSearchProblemPopoverClose').click(function() {
-                $('#reportSearchProblemPopover').popover('hide');
-            });
-
-            $('#searchReportAProblemSelect').selectpicker();
-
-            $('#reportSearchProblemPopoverSend').click(function() {
-                let searchProblemCategory = $("#searchReportAProblemSelect").val() || "Not defined"
-
-                let details = $("#searchReportTextArea").val()
-                if (details == undefined || details == "") {
-                    details = "No details provided"
-                }
-
-                let reportSearchQuery = {
-                    category: searchProblemCategory,
-                    details: details,
-                    query: document.getElementById('searchbar').value,
-                    width: $(document).width(),
-                    height: $(document).height()
-                }
-                OSrequest("POST", "https://{{ site.environment.docsUrl }}/webhooks/report/search", reportSearchQuery, true)
-                $('#reportSearchProblemPopover').popover('hide');
-            });
-        })
     }
 
-    $("#search-modal").on('hide.bs.modal', function() {
+    $('#searchToggle').on('click', openSearch);
+
+    // Esc in a search input only clears the text, so the dialog never gets it.
+    $('#searchbar').on('keydown', function(event) {
+        if (event.key !== 'Escape') return;
+        event.preventDefault();
+        searchModal.close();
+    });
+
+    $('#search-modal-close').on('click', function() {
+        searchModal.close();
+    });
+
+    $(searchModal).on('click', function(event) {
+        if (event.target === searchModal) searchModal.close();
+    });
+
+    $('#reportSearchProblemPopover').on('click', function() {
+        searchReport.showModal();
+    });
+
+    $(searchReport).on('close', function() {
+        this.querySelector('form').reset();
+    });
+
+    $('#search-report-send').on('click', function() {
+        let details = $("#search-report-details").val()
+        if (details == undefined || details == "") {
+            details = "No details provided"
+        }
+
+        let reportSearchQuery = {
+            category: $("#search-report-type").val() || "Not defined",
+            details: details,
+            query: document.getElementById('searchbar').value,
+            width: $(document).width(),
+            height: $(document).height()
+        }
+        OSrequest("POST", "https://{{ site.environment.docsUrl }}/webhooks/report/search", reportSearchQuery, true)
+        searchReport.close();
+    });
+
+    function hideResultDetails() {
+        $('.ev-search-details').prop('hidden', true);
+    }
+
+    function showResultDetails(result) {
+        hideResultDetails();
+        const details = result.querySelector('.ev-search-details');
+        details.hidden = false;
+        const box = result.getBoundingClientRect();
+        const fitsLeft = box.left >= details.offsetWidth;
+        const top = fitsLeft ? box.top : box.bottom;
+        details.style.left = (fitsLeft ? box.left - details.offsetWidth : box.left) + 'px';
+        details.style.top = Math.max(0, Math.min(top, window.innerHeight - details.offsetHeight)) + 'px';
+    }
+
+    $('#autocombox').on('mouseenter focusin', '.searchResult', function() {
+        showResultDetails(this);
+    }).on('mouseleave focusout', '.searchResult', hideResultDetails);
+
+    searchModal.addEventListener('scroll', hideResultDetails);
+
+    $(searchModal).on('close', function() {
         invalidateSearch();
         clearTimeout(typingTimer);
         typingTimer = null;
         navigationItems = [];
         navigationIndex = 0;
-    });
-
-    $("#search-modal").on('hidden.bs.modal', function() {
-        $('#reportSearchProblemPopover').popover('dispose');
-        // Dispose all tooltips before clearing content
-        $('[data-toggle="tooltip"]').tooltip('dispose');
         document.getElementById("autocombox").innerHTML = "";
         document.getElementById("autocombox").style.display = "none";
-        document.getElementById('searchToggle').value = "";
         document.getElementById('searchbar').value = "";
+        setSearchStatus('');
+        if (focusBeforeSearch && document.body.contains(focusBeforeSearch) && focusBeforeSearch !== document.body) {
+            focusBeforeSearch.focus();
+        } else {
+            document.getElementById('searchToggle').focus();
+        }
+        focusBeforeSearch = null;
     });
 
     function OSrequest(method,url, query, async, callback, errorCallback) {
@@ -265,8 +304,6 @@
 
     function searchForPhrase(pagesShown = 7) {
 
-        $('[data-toggle="tooltip"]').tooltip('hide')
-
         invalidateSearch();
         const requestId = searchRequestId;
         clearTimeout(typingTimer);
@@ -300,13 +337,9 @@
             const suggestionBox = document.getElementById("autocombox")
             if (numberOfItems > 0) {
 
-                if (numberOfItems === 1) {
-                    showItems.push('<li class="notShown">' + numberOfItems + ' search result' + '</li>')
-                } else {
-                    showItems.push('<li class="notShown">' + numberOfItems + ' search results' + '</li>')
-                }
+                const countText = numberOfItems === 1 ? '1 search result' : numberOfItems + ' search results';
 
-                for (let i = 0; i < pagesShown && i < numberOfItems; i++) {
+                for (let i = 0; i < pagesShown && i < numberOfItems && i < data.results.length; i++) {
                     const fields = data.results[i].fields;
                     const isCatalog = data.results[i].source === "catalog";
                     let text = undefined
@@ -322,9 +355,7 @@
                         branchClass = "searchResultBranched"
                         displayBranch = DOCSBRANCHMAP[branch]
                         tooltipVer = displayBranch
-                        const rawColor = DOCSBRANCHESCOLORS.get(displayBranch);
-                        const colorString = /^#[0-9a-f]{6}$/i.test(rawColor) ? rawColor : 'inherit';
-                        branchLabel = `<span id="branch${escapeHtml(branch)}" class="typeLabel branchLabel" style="color: ${colorString}; border-color: ${colorString};">${escapeHtml(displayBranch)}</span>`
+                        branchLabel = `<span id="branch${escapeHtml(branch)}" class="typeLabel branchLabel">${escapeHtml(displayBranch)}</span>`
                     } else {
                         branch = "notBranched"
                     }
@@ -473,26 +504,29 @@
                         : `<span class="tooltip-preview"><p>Last modification date: ${escapeHtml(displayDate)}</p>
                     <p>Upkeep status: ${escapeHtml(upkeepStatus)} <i class="fa fa-circle upkeep-${upkeepColor}"></i>
                     </p><p>Search likes: ${escapeHtml(searchUpvotes)}</p><p>Docs likes: ${escapeHtml(docsUpvotes)}</p>{% if site.environment.name contains "docs" %}<p>Version: ${escapeHtml(tooltipVer)}</p>{% endif %}<p>Author: ${escapeHtml(author)}</p><p>Content: ${escapeHtml(contentStatus)} <i class="${contentTriangleClass}" style="margin-left: 5px;"></i></p></span>`;
-                    // Escape again for the attribute: Bootstrap later parses the tooltip HTML.
-                    const linkAttribute = pageUrl ? `href="${escapeHtml(pageUrl)}"` : 'aria-disabled="true"';
-                    const vote = `<span class="vote" id="${escapeHtml(data.results[i].id)}up"><i class="fas fa-thumbs-up"></i></span>`;
-                    showItems.push(`<div><span class="trigger-details searchResult" data-toggle="tooltip" data-placement="left"
-                    data-html="true" title="${escapeHtml(tooltip)}"><a class="aWithoutUnderline" ${linkAttribute}
-                    id="${escapeHtml(data.results[i].id)}site"><li class="list-group-item border-0 search-list-item"><i class="fas fa-align-left"></i>
-                    <span class="font1 searchResultTitle {% if site.environment.name contains "docs" %}${branchClass}{% endif %}">&nbsp;${title}</span>{% if site.environment.name contains "docs" %}<span id="label${escapeHtml(type)}" class="typeLabel">${escapeHtml(String(type).toUpperCase())}</span>${branchLabel}{% endif %}<i class="${contentTriangleClass}"></i><br><span class="font2">${preview}</span></li></a></span>
-                    ${vote}</div>`);
+                    const resultTag = pageUrl ? 'a' : 'span';
+                    const linkAttribute = pageUrl ? ` href="${escapeHtml(pageUrl)}"` : '';
+                    const vote = `<button type="button" class="vote" id="${escapeHtml(data.results[i].id)}up" aria-pressed="false" aria-label="Like: ${escapeHtml(cleanTitle)}"><i class="fas fa-thumbs-up" aria-hidden="true"></i></button>`;
+                    showItems.push(`<li class="ev-search-result"><span class="trigger-details searchResult"><${resultTag} aria-describedby="${escapeHtml(data.results[i].id)}details" class="aWithoutUnderline list-group-item border-0 search-list-item"${linkAttribute}
+                    id="${escapeHtml(data.results[i].id)}site"><i class="fas fa-align-left" aria-hidden="true"></i>
+                    <span class="font1 searchResultTitle {% if site.environment.name contains "docs" %}${branchClass}{% endif %}">&nbsp;${title}</span>{% if site.environment.name contains "docs" %}<span class="typeLabel typeLabel${escapeHtml(type)}">${escapeHtml(String(type).toUpperCase())}</span>${branchLabel}{% endif %}<i class="${contentTriangleClass}" aria-hidden="true"></i><br><span class="font2">${preview}</span></${resultTag}><span class="ev-search-details" id="${escapeHtml(data.results[i].id)}details" role="tooltip" hidden>${tooltip}</span></span>
+                    ${vote}</li>`);
                 }
 
                 const numberOfNotShown = numberOfItems - pagesShown
+                let moreButton = '';
 
                 if (numberOfNotShown === 1) {
-                    showItems.push('<li class="notShown" id="moreResults"> additional ' + numberOfNotShown + ' result not shown (click here for more results)' + '</li>')
+                    moreButton = '<button type="button" class="notShown ev-search-more" id="moreResults">Additional 1 result not shown. Show more results</button>'
                 } else if (numberOfNotShown > 0) {
-                    showItems.push('<li class="notShown" id="moreResults"> additional ' + numberOfNotShown + ' results not shown (click here for more results)' + '</li>')
+                    moreButton = '<button type="button" class="notShown ev-search-more" id="moreResults">Additional ' + numberOfNotShown + ' results not shown. Show more results</button>'
                 }
 
-                suggestionBox.innerHTML = showItems.join("")
+                suggestionBox.innerHTML = '<p class="notShown ev-search-count">' + countText + '</p>'
+                    + '<ul class="ev-search-results">' + showItems.join("") + '</ul>'
+                    + moreButton;
                 suggestionBox.style.display = "table";
+                setSearchStatus(countText);
 
                 $("#moreResults").click(function() {
                     {% if site.environment.name contains "docs" %}
@@ -513,14 +547,10 @@
                 });
 
             } else {
-                suggestionBox.innerHTML = '<li class="notShown" role="status">No results found.</li>';
+                suggestionBox.innerHTML = '<p class="notShown ev-search-count">No results found.</p>';
                 suggestionBox.style.display = 'table';
+                setSearchStatus('No results found.');
             }
-
-            $('[data-toggle="tooltip"]').tooltip({
-                trigger: 'hover',
-                delay: { show: 100, hide: 100 }
-            });
 
             setHighlighting();
 
@@ -531,15 +561,16 @@
             activeSearchRequest = null;
             clearSearchResults();
             const suggestionBox = document.getElementById('autocombox');
-            suggestionBox.innerHTML = '<li class="notShown" role="alert">Search is currently unavailable. Please try again.</li>';
+            suggestionBox.innerHTML = '<p class="notShown ev-search-count">Search is currently unavailable. Please try again.</p>';
             suggestionBox.style.display = 'table';
+            setSearchStatus('Search is currently unavailable. Please try again.');
         };
 
         activeSearchRequest = OSrequest("POST", "https://{{ site.environment.searchUrl }}/api/v1/{% if site.environment.name contains "docs" %}search{% else %}guide-search{% endif %}", actQuery, true, showResults, showError)
     }
 
     function setHighlighting() {
-        navigationItems = Array.from(document.querySelectorAll('#search-modal #searchbar, #search-modal .aWithoutUnderline'));
+        navigationItems = Array.from(document.querySelectorAll('#search-modal #searchbar, #search-modal a.aWithoutUnderline'));
         navigationIndex = 0;
         for (const item of navigationItems) {
             item.classList.remove('highlightSearch');
@@ -553,7 +584,7 @@
     }
 
     $(document).on('keydown.searchNavigation', function(event) {
-        if (!$('#search-modal').hasClass('show') || !navigationItems.length) return;
+        if (!searchModal.open || !navigationItems.length) return;
         if (event.keyCode !== 38 && event.keyCode !== 40) return;
         if (!navigationItems.includes(document.activeElement)) return;
 
@@ -609,7 +640,7 @@
 
             OSrequest("POST", "https://{{ site.environment.searchUrl }}/api/v1/likes/search/{% if site.environment.name contains "docs" %}docs{% else %}guide{% endif %}", queryUpvote, true)
 
-            $(this).toggleClass('on');
+            $(this).toggleClass('on').attr('aria-pressed', String(modify));
         };
 
         {% if site.environment.name contains "docs" %}
@@ -618,8 +649,6 @@
         const recordActivation = function() {
             // Disabled/invalid links do not navigate and should not count as clicks.
             if (!site.hasAttribute('href')) return;
-            $(site).parent().tooltip('hide');
-            $('[data-toggle="tooltip"]').tooltip('hide');
 
             const queryClick = {
                 "categories": Array.from(letters),

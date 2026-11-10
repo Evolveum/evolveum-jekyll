@@ -1,24 +1,34 @@
 <!DOCTYPE html>
-<html lang="{{ page.lang | default: site.lang | default: " en " }}" class="h-100">
+<html lang="{{ page.lang | default: site.lang | default: "en" | strip }}" class="h-100">
 
 {%- include head.html -%}
 
 <body class="h-100">
 
+    <a class="ev-skip-link" href="#main-content">Skip to content</a>
+
     <div id="page-container" class="container-fluid pr-0 pl-0 h-100 d-flex flex-column">
 
-        {%- include header.html -%}
+        <header>
+            {%- include header.html -%}
+        </header>
 
-        <main role="main" class="container-fluid">
+        {%- include search-modal.html -%}
+
+        {%- if content contains 'id="main-content"' %}
+        <div class="ev-page container-fluid">
+            {{ content }}
+        </div>
+        {%- else %}
+        <main id="main-content" class="ev-page container-fluid" tabindex="-1">
             {{ content }}
         </main>
+        {%- endif %}
 
         {%- include footer.html -%}
 
         <script src="/assets/js/jquery-3.5.1.min.js"></script>
-        <script src="/assets/js/popper.min.js"></script>
-        <script src="/assets/js/bootstrap.min.js"></script>
-        <script src="/assets/js/bootstrap-select.min.js"></script>
+        <script src="/assets/js/evolveum/disclosure.js"></script>
         <script src="/assets/js/datatables.min.js"></script>
         <script src="/assets/js/mermaid.min.js"></script>
         <!--<script>
@@ -32,7 +42,9 @@
         <script src="/assets/js/evolveum/site-review.js"></script>
         <script src="/assets/js/evolveum/initialize-tables.js"></script>
         <script src="/assets/js/evolveum/navtree-expand.js"></script>
+        <script src="/assets/js/evolveum/page-toc.js"></script>
         <script src="/assets/js/evolveum/lightboxize.js"></script>
+        <script src="/assets/js/evolveum/scroll-regions.js"></script>
         <!--- <script src="/assets/js/evolveum/rag-test.js"></script> --->
 
         <script type="text/x-mathjax-config">

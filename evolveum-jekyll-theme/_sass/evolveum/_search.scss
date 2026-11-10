@@ -136,11 +136,6 @@
         margin-bottom: 1rem;
         margin-top: calc(1.125rem - 0.75em - 1px);
     }
-    #titleAndSelectVerDiv {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap-reverse;
-    }
     .searchResultBranched {
         max-width: calc(100% - 175px) !important;
     }
@@ -184,10 +179,6 @@
         margin-bottom: calc(1.125rem - 0.75em - 1px);
         margin-top: calc(1.125rem - 0.75em - 1px);
         margin-right: 6rem;
-    }
-    #titleAndSelectVerDiv {
-        display: flex;
-        justify-content: space-between;
     }
     .searchResultBranched {
         max-width: calc(100% - 175px) !important;
