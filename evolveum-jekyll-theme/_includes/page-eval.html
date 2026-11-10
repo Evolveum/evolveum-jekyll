@@ -1,17 +1,16 @@
 {% comment %} Evaluation (feedback) footer of a page {% endcomment %}
-<div id="pageEval" style="text-align: center;">
+<div id="pageEval">
     <div id="helpfullPageText">Was this page helpful?</div>
-    <div class="siteReviewThumbs">
-                <span id="yesSiteReviewThumb" class="siteReviewThumb noselect">
-              <i class="fas fa-thumbs-up"></i>
-                YES
-          </span>
-        <span id="noSiteReviewThumb" class="siteReviewThumb noselect" data-toggle="popover" data-html="true">
-              <i class="fas fa-thumbs-down"></i>
-               NO
-          </span>
+    <div class="siteReviewThumbs" role="group" aria-labelledby="helpfullPageText">
+        <button type="button" id="yesSiteReviewThumb" class="siteReviewThumb noselect" aria-pressed="false">
+            <i class="fas fa-thumbs-up" aria-hidden="true"></i>
+            Yes
+        </button>
+        <button type="button" id="noSiteReviewThumb" class="siteReviewThumb noselect" aria-pressed="false" aria-haspopup="dialog">
+            <i class="fas fa-thumbs-down" aria-hidden="true"></i>
+            No
+        </button>
     </div>
-    <div class="thanksFeedback">
-        Thanks for your feedback
-    </div>
+    <div class="thanksFeedback" role="status"></div>
+    {% include report-dialog.html id="docs-report" title="Please tell us more about what you don't like" type_label="Type of a problem" last_type="Problem with content" %}
 </div>

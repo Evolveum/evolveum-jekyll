@@ -1,0 +1,20 @@
+<dialog id="{{ include.id }}" class="ev-report-dialog" aria-labelledby="{{ include.id }}-title">
+    <form method="dialog">
+        <h2 id="{{ include.id }}-title" class="ev-report-title">{{ include.title }}</h2>
+        <div class="form-group">
+            <label for="{{ include.id }}-type">{{ include.type_label }}</label>
+            <select class="custom-select custom-select-sm" id="{{ include.id }}-type">
+                <option value="">Type of a problem</option>
+                <option>Visual bug</option>
+                <option>Functional bug</option>
+                <option>{{ include.last_type }}</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="{{ include.id }}-details">Details of the problem</label>
+            <textarea class="form-control" id="{{ include.id }}-details" rows="5"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Close</button>
+        <button type="button" class="btn btn-primary" id="{{ include.id }}-send">Send message</button>
+    </form>
+</dialog>

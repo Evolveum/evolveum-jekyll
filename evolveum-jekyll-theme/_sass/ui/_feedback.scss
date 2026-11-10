@@ -1,0 +1,48 @@
+#pageEval {
+  margin-top: var(--ev-space-4);
+  font-size: var(--ev-font-size-base);
+}
+
+#helpfullPageText {
+  color: var(--ev-color-text);
+  font-weight: 600;
+}
+
+.siteReviewThumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ev-space-2);
+  margin-top: var(--ev-space-2);
+}
+
+button.siteReviewThumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0.375rem 0.875rem;
+  border: 1px solid var(--ev-color-alpha-01);
+  border-radius: 0.25rem;
+  color: var(--ev-color-alpha-01);
+  background-color: var(--ev-color-bg);
+  font: inherit;
+  font-size: var(--ev-font-size-sm);
+  line-height: 1.25;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--ev-color-bg-subtle);
+  }
+
+  &.on,
+  &[aria-pressed="true"] {
+    color: var(--ev-color-bg);
+    background-color: var(--ev-color-alpha-01);
+  }
+}
+
+.thanksFeedback {
+  display: block;
+  margin-top: var(--ev-space-2);
+  font-size: var(--ev-font-size-sm);
+}

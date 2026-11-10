@@ -1,0 +1,12 @@
+    {%- assign section_nav = false -%}
+    {%- if site.navigation.sidebar == 'section' and page.nav_section_title -%}{%- assign section_nav = true -%}{%- endif %}
+    <nav class="ev-sidebar" {% if section_nav %}aria-labelledby="navtree-title"{% else %}aria-label="Documentation"{% endif %}>
+        <button type="button" id="navtree-toggle" aria-expanded="false" aria-controls="navtree-panel">
+            {% if section_nav %}{{ page.nav_section_title }} navigation{% else %}Navigation Tree{% endif %} <i class="fa-solid fa-angle-down" aria-hidden="true"></i>
+        </button>
+        <div id="navtree-panel" class="d-none d-md-block navtree-fixed">
+            <div class="navtree">
+                {% navtree %}
+            </div>
+        </div>
+    </nav>

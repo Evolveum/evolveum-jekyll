@@ -1,0 +1,4 @@
+:focus-visible {
+  outline: var(--ev-focus-width) solid var(--ev-color-focus) !important;
+  outline-offset: var(--ev-focus-offset);
+}

@@ -43,6 +43,7 @@ module Evolveum
             stub.data["layout"] = "page"
             stub.data['title'] = nav.slug
             nav.page = stub
+            nav.stub = true
             stub
         end
     end
@@ -64,10 +65,19 @@ module Evolveum
             navtree = context['site']['data']['nav']
             s = StringIO.new
             s << '<ol class="breadcrumb">'
+            if Evolveum::Nav.section_mode?(context['site'])
+                s << '<li class="breadcrumb-item"><a href="/">Home</a></li>'
+            end
             breadcrumbs = navtree.breadcrumbs(context['page']['url'])
-            breadcrumbs.each do |crumb|
+            breadcrumbs.each_with_index do |crumb, i|
                 s << '<li class="breadcrumb-item">'
-                crumb.append_label_link(s)
+                if i == breadcrumbs.length - 1 && crumb.active?(context['page']['url'])
+                    s << "<a href=\"#{crumb.url}\" aria-current=\"page\">"
+                    s << crumb.label
+                    s << "</a>"
+                else
+                    crumb.append_label_link(s)
+                end
                 s << '</li>'
             end
             s << '</ol>'
@@ -92,6 +102,49 @@ module Evolveum
         def render(context)
             navtree = context['site']['data']['nav']
             currentPageUrl = context['page']['url']
+            if Evolveum::Nav.section_mode?(context['site'])
+                render_section(navtree, currentPageUrl)
+            else
+                render_legacy(navtree, currentPageUrl)
+            end
+        end
+
+        def render_section(navtree, currentPageUrl)
+            root = navtree.find(currentPageUrl)&.sidebar_root
+            return render_top_level(navtree, currentPageUrl) if root == nil
+            s = StringIO.new
+            s << '<p class="ev-sidebar-home"><a href="/"><i class="fa-solid fa-house" aria-hidden="true"></i>Documentation home</a></p>'
+            s << '<p class="ev-sidebar-title" id="navtree-title">'
+            if root.active?(currentPageUrl)
+                s << "<a href=\"#{root.url}\" aria-current=\"page\">#{root.label}</a>"
+            else
+                root.append_label_link(s)
+            end
+            s << "</p>\n"
+            branch = StringIO.new
+            unless root.active?(currentPageUrl)
+                dive(branch, root, root.depth, currentPageUrl, navtree.slugize(currentPageUrl))
+            end
+            if branch.string.empty?
+                append_subnodes(s, root, 0)
+            else
+                s << branch.string
+            end
+            s.string
+        end
+
+        def render_top_level(navtree, currentPageUrl)
+            s = StringIO.new
+            s << "<ul>\n"
+            navtree.presentableSubnodes.each do |node|
+                append_li_label_start(s, node, currentPageUrl, 1)
+                s << "</li>\n"
+            end
+            s << "</ul>\n"
+            s.string
+        end
+
+        def render_legacy(navtree, currentPageUrl)
             currentPageSlugs = navtree.slugize(currentPageUrl)
 
             s = StringIO.new
@@ -186,15 +239,15 @@ module Evolveum
 
         def append_li_label_start(s, node, currentPageUrl, indent)
             s << node.indent(indent)
-            s << "<!--"
-            s << node.display_order.to_s
-            s << "-->"
             if (node.active?(currentPageUrl))
                 s << '<li class="active">'
+                s << "<a href=\"#{node.url}\" aria-current=\"page\">"
+                s << node.label
+                s << "</a>"
             else
                 s << "<li>"
+                node.append_label_link(s)
             end
-            node.append_label_link(s)
         end
 
     end
@@ -293,8 +346,8 @@ module Evolveum
     # Subnodes of each node are stored in subnodes field.
     # Each node is identified by "slug", which is one part of the URL hierarchy.
     class Nav
-        attr_reader :subnodes, :slug
-        attr_accessor :url, :title, :visibility, :display_order, :page, :alias
+        attr_reader :subnodes, :slug, :parent
+        attr_accessor :url, :title, :visibility, :display_order, :page, :alias, :stub
 
         def initialize(slug)
             @subnodes = []
@@ -309,12 +362,97 @@ module Evolveum
                 nav = navtree.index_page(page)
                 #puts("  [C] #{nav.url}: #{nav.title}")
             end
-            navtree.recomputeTree()
+            navtree.recomputeTree(primary_urls(site))
             return navtree
         end
 
-        def recomputeTree()
+        def self.primary_urls(site)
+            Array(site.data['navbar']).map { |item| item['url'] }.compact
+        end
+
+        def self.primary_url_for(url, primary_urls)
+            normalized = with_trailing_slash(url)
+            primary_urls
+                .select { |candidate| normalized.start_with?(with_trailing_slash(candidate)) }
+                .max_by { |candidate| with_trailing_slash(candidate).length }
+        end
+
+        def self.with_trailing_slash(url)
+            url.end_with?('/') ? url : url + '/'
+        end
+
+        def self.report_stubs(site)
+            navigation = site.config['navigation']
+            return unless navigation.is_a?(Hash) && navigation['report-stubs'] == true
+            site.data['nav'].stub_urls.each do |url|
+                Jekyll.logger.warn("Navigation stub without an index page: #{url}")
+            end
+        end
+
+        def stub_urls
+            urls = []
+            subnodes.each do |subnode|
+                urls << subnode.url if subnode.stub
+                urls.concat(subnode.stub_urls)
+            end
+            urls
+        end
+
+        def self.section_mode?(site)
+            navigation = site.is_a?(Jekyll::Site) ? site.config['navigation'] : site['navigation']
+            navigation.is_a?(Hash) && navigation['sidebar'] == 'section'
+        end
+
+        def recomputeTree(primary_urls = [])
+            link_aliases
             recomputeLevel(nil)
+            apply_section_data(primary_urls, {})
+        end
+
+        def apply_section_data(primary_urls, sidebar_roots)
+            if @page != nil && !@alias
+                root = section_root
+                sidebar = root && (sidebar_roots.key?(root) ? sidebar_roots[root] : (sidebar_roots[root] = root.sidebar_candidate))
+                @page.data['nav_section_url'] = sidebar&.url
+                @page.data['nav_section_title'] = sidebar&.label
+                @page.data['nav_primary_url'] = Nav.primary_url_for(@url, primary_urls)
+            end
+            subnodes.each { |subnode| subnode.apply_section_data(primary_urls, sidebar_roots) }
+        end
+
+        def depth
+            @parent == nil ? 0 : @parent.depth + 1
+        end
+
+        def section_flag?
+            [true, 'true'].include?(@page&.data&.[]('nav-section'))
+        end
+
+        def section_root
+            return nil if @parent == nil
+            node = self
+            while node.depth > 1
+                return node if node.section_flag?
+                node = node.parent
+            end
+            node
+        end
+
+        def sidebar_candidate
+            presentableSubnodes.empty? ? nil : self
+        end
+
+        def sidebar_root
+            section_root&.sidebar_candidate
+        end
+
+        def find(url)
+            node = self
+            slugize(url).each do |slug|
+                node = node.resolve(slug)
+                return nil if node == nil
+            end
+            node
         end
 
         def recomputeLevel(parent)
@@ -355,7 +493,7 @@ module Evolveum
                 nav = index_page(page)
                 #puts("  [U] #{nav.url}: #{nav.title}")
             end
-            recomputeTree()
+            recomputeTree(Nav.primary_urls(site))
         end
 
         def index_page(page)
@@ -376,13 +514,28 @@ module Evolveum
                 nav.display_order = 100
             end
             if page.data['alias'] != nil
-                if page.data['alias'].kind_of?(Array)
-                    page.data['alias'].each { |a| index_alias(a, page)}
-                else
-                    index_alias(page.data['alias'], page)
-                end
+                @pending_aliases ||= []
+                aliases = page.data['alias'].kind_of?(Array) ? page.data['alias'] : [page.data['alias']]
+                aliases.each { |a| @pending_aliases << [a, page] }
             end
             nav
+        end
+
+        def link_aliases
+            linked = (@pending_aliases || []).map { |aliasdef, page| index_alias(aliasdef, page) }.compact
+            @pending_aliases = []
+            linked.each do |alias_nav|
+                own_nav = find(alias_nav.url)
+                next if own_nav == nil || own_nav.section_root == alias_nav.parent.section_root
+                warn_once("Alias of page #{alias_nav.url} is in another section, under #{alias_nav.parent.url || alias_nav.parent.slug}.")
+            end
+        end
+
+        def warn_once(message)
+            @warned ||= {}
+            return if @warned[message]
+            @warned[message] = true
+            Jekyll.logger.warn(message)
         end
 
         def index_alias(aliasdef, page)
@@ -411,7 +564,11 @@ module Evolveum
                 end
                 #Jekyll.logger.error("Page alias error: referencing non-reference documentation from reference documentation in page #{page.url}")
             end
-            parent_nav = index_path(parent_url)
+            parent_nav = find(parent_url)
+            if parent_nav == nil
+                warn_once("Alias parent #{parent_url} does not exist, in alias specification in page #{page.url}. Ignoring.")
+                return
+            end
             slug = aliasdef['slug']
             if slug == nil
                 slug = slugize(page.url).last
@@ -436,6 +593,7 @@ module Evolveum
             if (sub_nav.display_order == 0)
                 sub_nav.display_order = 100
             end
+            sub_nav
         end
 
         def index_path(url)
@@ -474,8 +632,12 @@ module Evolveum
         end
 
         def add(subnode)
+            subnode.parent = self
             @subnodes << subnode
         end
+
+        attr_writer :parent
+        protected :parent=
 
         def to_liquid()
             return self
@@ -740,4 +902,5 @@ end
 Jekyll::Hooks.register :site, :pre_render do |site|
     puts "=========[ EVOLVEUM nav ]============== pre_render"
     site.data['nav'].update(site)
+    Evolveum::Nav.report_stubs(site)
 end

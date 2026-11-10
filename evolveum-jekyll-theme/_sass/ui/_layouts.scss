@@ -1,0 +1,56 @@
+@media (max-width: 575.98px) {
+  img.personal-photo {
+    float: none;
+    display: block;
+    width: 50%;
+    margin: 0 0 1rem;
+  }
+}
+
+.ev-myth-logo {
+  float: right;
+}
+
+h1.logo-title {
+  margin-top: 0;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.ev-funding-logo {
+  max-width: 100%;
+  height: auto;
+  max-height: 100px;
+}
+
+.synopsis-table td {
+  overflow-wrap: anywhere;
+}
+
+.admonitionblock td.content,
+.admonitionblock td.content code {
+  overflow-wrap: anywhere;
+}
+
+.admonitionblock > table :is(td.content, td.icon) {
+  color: var(--ev-color-text);
+}
+
+.ev-link-columns-intro {
+  padding-bottom: 1.5rem;
+}
+
+.ev-link-columns {
+  display: grid;
+  gap: 0 30px;
+  padding-bottom: 1.5rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.error-container .links li > :is(a, button) {
+  display: inline-block;
+  min-height: 1.5rem;
+}

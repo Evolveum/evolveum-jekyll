@@ -1,0 +1,123 @@
+.ev-sidebar #navtree-toggle {
+  width: fit-content;
+  min-height: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: inherit;
+}
+
+.ev-sidebar .ev-sidebar-home {
+  margin: 0 0 var(--ev-space-3);
+  padding-bottom: var(--ev-space-3);
+  border-bottom: 1px solid var(--ev-color-separator);
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ev-space-2);
+    color: var(--ev-color-link);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--ev-color-link-hover);
+      text-decoration: underline;
+    }
+  }
+}
+
+.ev-sidebar .ev-sidebar-title {
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+
+  a {
+    color: var(--ev-color-text);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.ev-sidebar .navtree {
+  line-height: var(--ev-line-height);
+
+  li,
+  li.active {
+    padding-left: 0;
+    text-indent: 0;
+  }
+
+  li.active {
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: calc(0.25rem + 0.2em);
+      left: -0.75rem;
+      width: 3px;
+      height: 1.1em;
+      background-color: var(--ev-color-link);
+    }
+  }
+
+  li ul {
+    margin-left: 0.25rem;
+    padding-left: calc(0.75rem - 1px);
+    border-left: 1px solid var(--ev-color-guide);
+  }
+
+  li > a {
+    display: block;
+    padding: 0.25rem 0 0.25rem 1rem;
+    text-indent: -1rem;
+    color: var(--ev-color-link);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--ev-color-link-hover);
+      text-decoration: underline;
+    }
+  }
+
+  li > a[aria-current="page"] {
+    font-weight: 600;
+    color: var(--ev-color-text);
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --ev-sidebar-width: clamp(15rem, 25vw, 20rem);
+  }
+
+  .ev-sidebar .navtree-fixed {
+    flex: none;
+    position: sticky;
+    top: var(--ev-header-height);
+    width: auto;
+    max-width: none;
+    max-height: calc(100vh - var(--ev-header-height));
+    margin-inline-start: -0.75rem;
+    padding: var(--ev-space-3) 0.75rem;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+
+    &:hover,
+    &:focus-within {
+      scrollbar-color: #c1c1c1 transparent;
+    }
+  }
+}
+
+@media (max-width: 767.98px) {
+  .ev-sidebar {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
