@@ -87,10 +87,12 @@ def installVersions(site)
   VersionReader.load_config(docsDir)
 
   # Wipe the reference dir and recreate every symlink from scratch each build.
-  # Only the git clones are reused, so this stays fast while never leaving stale links behind.
-  FileUtils.rm_rf(refDir)
-  FileUtils.mkdir_p(refDir)
-  system("cp /mnt/index.html #{refDir}/")
+  # Only the git clones and the index.html are reused, so this stays fast while never leaving stale links behind.
+  Dir.children(refDir).each do |entry|
+    next if entry == 'index.html'
+
+    FileUtils.rm_rf(File.join(refDir, entry))
+  end
 
   VersionReader.get_config_value('filteredVersions').each do |version|
     slug     = version.sub('docs/', '')
