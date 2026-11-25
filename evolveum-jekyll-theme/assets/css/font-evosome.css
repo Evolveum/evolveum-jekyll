@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'font-evosome';
-  src:  url('/assets/fonts/font-evosome.eot?o82zna');
-  src:  url('/assets/fonts/font-evosome.eot?o82zna#iefix') format('embedded-opentype'),
-    url('/assets/fonts/font-evosome.ttf?o82zna') format('truetype'),
-    url('/assets/fonts/font-evosome.woff?o82zna') format('woff'),
-    url('/assets/fonts/font-evosome.svg?o82zna#font-evosome') format('svg');
+  src:  url('fonts/font-evosome.eot?ilzqhq');
+  src:  url('fonts/font-evosome.eot?ilzqhq#iefix') format('embedded-opentype'),
+    url('fonts/font-evosome.ttf?ilzqhq') format('truetype'),
+    url('fonts/font-evosome.woff?ilzqhq') format('woff'),
+    url('fonts/font-evosome.svg?ilzqhq#font-evosome') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -126,4 +126,10 @@
 }
 .fe-role:before {
   content: "\e922";
+}
+.fe-bullseye:before {
+  content: "\e917";
+}
+.fe-circle-dashed:before {
+  content: "\e921";
 }
