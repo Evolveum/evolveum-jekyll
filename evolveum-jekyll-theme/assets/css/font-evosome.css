@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'font-evosome';
-  src:  url('fonts/font-evosome.eot?ilzqhq');
-  src:  url('fonts/font-evosome.eot?ilzqhq#iefix') format('embedded-opentype'),
-    url('fonts/font-evosome.ttf?ilzqhq') format('truetype'),
-    url('fonts/font-evosome.woff?ilzqhq') format('woff'),
-    url('fonts/font-evosome.svg?ilzqhq#font-evosome') format('svg');
+  src:  url('/assets/fonts/font-evosome.eot?ilzqhq');
+  src:  url('/assets/fonts/font-evosome.eot?ilzqhq#iefix') format('embedded-opentype'),
+    url('/assets/fonts/font-evosome.ttf?ilzqhq') format('truetype'),
+    url('/assets/fonts/font-evosome.woff?ilzqhq') format('woff'),
+    url('/assets/fonts/font-evosome.svg?ilzqhq#font-evosome') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
