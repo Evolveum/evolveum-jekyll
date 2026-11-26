@@ -248,7 +248,8 @@ module Evolveum
         end
 
 
-        def processXRefLink(parent, target, attrs)
+
+        def processXRefLink(parent, target, attrs, ignoreBrokenLinks = false)
             #    puts "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXREF -------> Processing #{parent} #{targetFile} #{attrs}"
 
             targetPath, fragmentSuffix = parseFragment(target)
@@ -270,6 +271,13 @@ module Evolveum
                 # No page. But there still may be a plain file (e.g. a PDF file)
                 fileUrl = findFileByTarget(parent.document, targetPath)
                 if fileUrl == nil
+                    if ignoreBrokenLinks
+                        if attrs['linktext'] != nil && !attrs['linktext'].strip.empty?
+                          return (create_anchor parent, attrs['linktext'], type: :link, target: target).convert
+                        else
+                          return (create_anchor parent, "link", type: :link, target: target).convert
+                        end
+                    end
                     ignore = false
                     if ignoreLinkBreak?(parent, targetPath)
                         Jekyll.logger.debug("Ignoring broken link xref:#{target} in #{sourceFile}")
@@ -624,39 +632,43 @@ module Evolveum
 
             if (!document_path.include?("/midpoint/reference/") || document_path.include?("midpoint/reference/index.html"))
                 if (!target.include?("/midpoint/reference/"))
-                    processXRefLink(parent, target, attrs)
+                    processXRefLink(parent, target, attrs, false)
                 elsif (target.match?(negativeLookAhead))
                     if document_path.match?(/\/midpoint\/release\/.+/)
-                        parentVer = document_path.split("/")[4]
+                        parentVer = document_path.split("/midpoint/release/")[1].split("/")[0]
                         if (VersionReader.get_config_value('releaseDocsVerMap').key?(parentVer))
                             replaceVersion = VersionReader.get_config_value('releaseDocsVerMap')[parentVer].to_s
-                            editedTarget = target.gsub("/midpoint/reference/", "/midpoint/reference/#{replaceVersion}/")
-                            processXRefLink(parent, editedTarget, attrs)
+                            if replaceVersion == "deprecated"
+                              processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs, true)
+                            else
+                              editedTarget = target.gsub("/midpoint/reference/", "/midpoint/reference/#{replaceVersion}/")
+                              processXRefLink(parent, editedTarget, attrs, false)
+                            end
                         else
-                            processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs)
+                            processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs, false)
                         end
                     else
-                        processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs)
+                        processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{VersionReader.get_config_value('defaultBranch')}/"), attrs, false)
                     end
                 else
                     Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
-                    processXRefLink(parent, target, attrs)
+                    processXRefLink(parent, target, attrs, false)
                 end
             else
                 if (!target.include?("/midpoint/reference/"))
-                    processXRefLink(parent, target, attrs)
+                    processXRefLink(parent, target, attrs, false)
                 elsif (target.match?(negativeLookAhead))
                     currentPage = findCurrentPage(parent.document)
                     version = currentPage.data['midpointBranchSlug']
-                    processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{version}/"), attrs)
+                    processXRefLink(parent, target.gsub("/midpoint/reference/", "/midpoint/reference/#{version}/"), attrs, false)
                 else
                     Jekyll.logger.warn("Specific midpoint version included in link xref:#{target} in #{document_path}")
-                    processXRefLink(parent, target, attrs)
+                    processXRefLink(parent, target, attrs, false)
                 end
                 #currentPage = findCurrentPage(parent.document)S
             end
         else
-            processXRefLink(parent, target, attrs)
+            processXRefLink(parent, target, attrs, false)
         end
       end
     end
@@ -675,9 +687,13 @@ module Evolveum
                 if reference && deprecatedBranches&.include?(reference[1])
                     defaultBranch = VersionReader.get_config_value('defaultBranch')
                     target = target.sub(reference[0], "/midpoint/reference/#{defaultBranch}/")
+                    processXRefLink(parent, target, attrs, true)
+                else
+                    processXRefLink(parent, target, attrs, false)
                 end
+            else
+                processXRefLink(parent, target, attrs, false)
             end
-            processXRefLink(parent, target, attrs)
         end
     end
 

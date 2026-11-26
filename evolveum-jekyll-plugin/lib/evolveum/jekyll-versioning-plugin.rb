@@ -15,7 +15,6 @@ module VersionReader
     @config['filteredVersionsWhDocs'] = []
     # Versions with docsBranch where the end of support date is in the past
     @config['deprecatedVersionsWhDocs'] = []
-    @config['deprecatedVersions'] = []
     versions = []
     @config['latestVersions'] = []
     @config['releaseDocsVerMap'] = {}
@@ -62,15 +61,9 @@ module VersionReader
       end
       # TODO - for now it works but there should be a check if the versions are in the correct order
       @config['releaseDocsVerMap'][ver['version'].to_s] = actVer
-      if actVer == "deprecated"
-        @config['deprecatedVersions'].push(ver['version'].to_s)
-      end
     end
     if @config['defaultBranch'] == ""
       @config['defaultBranch'] = "master"
-    end
-    for ver in @config['deprecatedVersions']
-      @config['releaseDocsVerMap'][ver] = @config['defaultBranch']
     end
     @config['negativeLookAhead'] << "before-4.8|"
     @config['negativeLookAhead'] << "master|"
