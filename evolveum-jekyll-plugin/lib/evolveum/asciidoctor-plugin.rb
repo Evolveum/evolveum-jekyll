@@ -668,6 +668,15 @@ module Evolveum
         name_positional_attributes 'linktext'
 
         def process(parent, target, attrs)
+            # If the specified version is deprecated we still want to replace it with the default branch version.
+            if jekyllEnvironment().include?("docs")
+                reference = target.match(%r{\A/midpoint/reference/([^/?#]+)(?:/|(?=[?#]|\z))})
+                deprecatedBranches = VersionReader.get_config_value('deprecatedVersionsWhDocs')
+                if reference && deprecatedBranches&.include?(reference[1])
+                    defaultBranch = VersionReader.get_config_value('defaultBranch')
+                    target = target.sub(reference[0], "/midpoint/reference/#{defaultBranch}/")
+                end
+            end
             processXRefLink(parent, target, attrs)
         end
     end
