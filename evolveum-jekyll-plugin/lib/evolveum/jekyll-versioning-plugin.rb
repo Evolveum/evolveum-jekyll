@@ -13,6 +13,9 @@ module VersionReader
     @config['filteredVersions'] = []
     @config['filteredDisplayVersions'] = []
     @config['filteredVersionsWhDocs'] = []
+    # Versions with docsBranch where the end of support date is in the past
+    @config['deprecatedVersionsWhDocs'] = []
+    @config['deprecatedVersions'] = []
     versions = []
     @config['latestVersions'] = []
     @config['releaseDocsVerMap'] = {}
@@ -31,18 +34,23 @@ module VersionReader
       end
       if ver['docsBranch'] != nil && ver['docsDisplayBranch']
         #puts("version" + ver['docsBranch'])
-        versions.push(ver['version'].to_s)
-        @config['releaseDocsVerMap'][ver['version'].to_s] = ver['docsBranch']
-        @config['latestVersions'].push(ver['version'].to_s)
-        @config['filteredVersions'].push(ver['docsBranch'])
-        @config['filteredVersionsWhDocs'].push(ver['docsBranch'].gsub("docs/",""))
-        @config['filteredDisplayVersions'].push(ver['docsDisplayBranch'])
-        @config['negativeLookAhead'] << "#{ver['docsBranch'].gsub("docs/","")}|"
-        #puts ver['defaultBranch']
-        if ver['defaultBranch'] != nil && ver['defaultBranch'] == true
-          @config['defaultBranch'] = ver['docsBranch']
+        if ver['endOfSupport'] != nil && Date.parse(ver['endOfSupport']) < Date.today
+          actVer = "deprecated"
+          @config['deprecatedVersionsWhDocs'].push(ver['docsBranch'].gsub("docs/",""))
+        else
+          versions.push(ver['version'].to_s)
+          @config['releaseDocsVerMap'][ver['version'].to_s] = ver['docsBranch']
+          @config['latestVersions'].push(ver['version'].to_s)
+          @config['filteredVersions'].push(ver['docsBranch'])
+          @config['filteredVersionsWhDocs'].push(ver['docsBranch'].gsub("docs/",""))
+          @config['filteredDisplayVersions'].push(ver['docsDisplayBranch'])
+          @config['negativeLookAhead'] << "#{ver['docsBranch'].gsub("docs/","")}|"
+          #puts ver['defaultBranch']
+          if ver['defaultBranch'] != nil && ver['defaultBranch'] == true
+            @config['defaultBranch'] = ver['docsBranch']
+          end
+          actVer = ver['docsBranch']
         end
-        actVer = ver['docsBranch']
       end
       if (ver["type"] == "production" && ( ver["status"] == "planned" || ver["status"] == "development"))
         actVer = "master"
@@ -54,9 +62,15 @@ module VersionReader
       end
       # TODO - for now it works but there should be a check if the versions are in the correct order
       @config['releaseDocsVerMap'][ver['version'].to_s] = actVer
+      if actVer == "deprecated"
+        @config['deprecatedVersions'].push(ver['version'].to_s)
+      end
     end
     if @config['defaultBranch'] == ""
       @config['defaultBranch'] = "master"
+    end
+    for ver in @config['deprecatedVersions']
+      @config['releaseDocsVerMap'][ver] = @config['defaultBranch']
     end
     @config['negativeLookAhead'] << "before-4.8|"
     @config['negativeLookAhead'] << "master|"

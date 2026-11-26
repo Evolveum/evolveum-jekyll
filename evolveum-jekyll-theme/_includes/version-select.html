@@ -4,9 +4,13 @@
   <select class="custom-select versioningButton" id="select-version-picker">
     <option data-tokens="master">Development</option>
     {%- assign versions = site.data.midpoint-versions | reverse %}
+    {%- assign today = 'now' | date: '%Y-%m-%d' %}
     {%- for v in versions %}
-      {%- if v.docsDisplayBranch != null %}
+      {%- if v.docsBranch != nil and v.docsDisplayBranch != nil %}
+        {%- assign end_of_support = v.endOfSupport | date: '%Y-%m-%d' %}
+        {%- if v.endOfSupport == nil or end_of_support >= today %}
     <option data-tokens="{{ v.docsBranch }}">{{ v.docsDisplayBranch }}</option>
+        {%- endif %}
       {%- endif %}
     {%- endfor %}
     <option data-tokens="before-4.8">4.7 and earlier</option>
