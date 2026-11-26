@@ -38,6 +38,8 @@ module Evolveum
 
             if site.config['environment']['name'].include?("docs")
                 page.data["defaultBranch"] = findDefaultBranch(site)
+                deprecatedVersions = Array(VersionReader.get_config_value('deprecatedVersionsWhDocs'))
+                page.data["deprecatedVersionPatterns"] = deprecatedVersions.map { |version| Regexp.escape(version) }
             end
 
             @site.pages << page

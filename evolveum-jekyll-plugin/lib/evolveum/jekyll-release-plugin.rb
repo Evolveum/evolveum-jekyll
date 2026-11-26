@@ -8,7 +8,7 @@ def readReleaseVersions(docsDir)
   versionBranches = []
   docsBranches = []
   verObject.each do |ver|
-    if ver['docsBranch'] != nil && ver['docsDisplayBranch']
+    if (ver['docsBranch'] != nil && ver['docsDisplayBranch'] && (ver['endOfSupport'] == nil || Date.parse(ver['endOfSupport']) >= Date.today))
       docsBranches.push(ver['docsBranch'])
     end
     if ((!ver.key?("legacyDocs") || ver["legacyDocs"] != true ))
