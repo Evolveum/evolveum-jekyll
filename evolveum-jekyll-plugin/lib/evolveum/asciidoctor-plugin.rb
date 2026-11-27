@@ -687,7 +687,7 @@ module Evolveum
                 if reference && deprecatedBranches&.include?(reference[1])
                     defaultBranch = VersionReader.get_config_value('defaultBranch')
                     target = target.sub(reference[0], "/midpoint/reference/#{defaultBranch}/")
-                    processXRefLink(parent, target, attrs, true)
+                    processXRefLink(parent, target, attrs, false)
                 else
                     processXRefLink(parent, target, attrs, false)
                 end
